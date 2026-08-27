@@ -122,16 +122,24 @@ inexistentes / casos propios), prestaciones, plazos y vía procesal.
 
 ## 6. Pendientes — próxima sesión (en orden)
 
-1. **Validar y refinar una vez más el portal** — recorrido completo pantalla
-   por pantalla (escritorio + móvil) buscando incoherencias, textos, estados
-   vacíos y detalles finos antes del deploy. Es el paso #1 de la próxima sesión.
-2. **Deploy a Vercel** (tras la validación) — el MCP de Vercel está sin
-   autenticar; usar `vercel` CLI o autorizar con /mcp.
+1. [x] ✅ **Validación y refinado integral** (2026-08-26): las 15 pantallas
+   revisadas una a una con Wesley (escritorio + móvil, 0 overflow), fechas
+   vivas, deep-links en URL en todas las vistas, orden/búsqueda honestos en
+   jurisprudencia, y 2 pantallas nuevas (Legislación, Monitoreo).
+2. [x] ✅ **DEPLOY EN VERCEL** (2026-08-26): **https://justihn-app.vercel.app**
+   — repo `github.com/WesleyObeth/justihn-app` (main), env
+   `JUSTIHN_DEMO_SESSION=1` en Vercel. Verificado en producción: rutas 200,
+   redirects `/portal`→`/abogados`, headers de seguridad, `noindex` de
+   validación (quitar al lanzar) y el chat de Jus IA respondiendo con citas.
 3. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
    workflow del corpus de Data Table → Postgres + embeddings pgvector (el
    esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3).
 4. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
    ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo).
+5. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
+   2026-08-26): "Mis casos" (+agenda de plazos integrada) es la #16 priorizada
+   — gancho de retención/uso diario; referidos como card, no pantalla. No
+   construir hasta tener feedback de la validación (backlog #4 del producto).
 
 ## 7. Qué falta para Fase 2 (en orden)
 
