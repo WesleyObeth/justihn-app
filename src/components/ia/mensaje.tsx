@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
 import { AvatarJusIA, SimboloJusIA, SimboloJusIALinear } from "@/components/brand/logos";
 import { ChipMateria } from "@/components/ui/primitivos";
@@ -104,22 +104,30 @@ export function RespuestaJusIA({
 }
 
 /**
+ * Marca los [datos por completar] en negrita para ubicarlos de un vistazo.
+ * El texto se escapa ANTES de insertar las marcas (§3.3: nunca HTML crudo
+ * de una fuente al DOM) — solo nuestro <b> sobrevive.
+ */
+function marcarCorchetes(texto: string): string {
+  const escapado = texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return escapado.replace(/\[[^\][]*\]/g, "<b>$&</b>");
+}
+
+/**
  * Borrador de escrito NATIVO en el hilo (nada de drawers): documento editable
  * en línea con las acciones al pie. El borrador es del profesional — se edita
  * aquí mismo y la advertencia de responsabilidad queda siempre visible.
+ * `contentEditable` (no textarea): así los [corchetes] se ven en negrita y el
+ * documento se muestra completo, sin scroll interno.
  */
 function EscritoChat({ escrito }: { escrito: NonNullable<MensajeChat["escrito"]> }) {
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const [texto, setTexto] = useState(escrito.cuerpo);
-  const campo = useRef<HTMLTextAreaElement>(null);
-
-  // Auto-alto con tope: el documento crece hasta ~420px y luego scrollea.
-  useLayoutEffect(() => {
-    const el = campo.current;
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, 420)}px`;
-  }, [texto]);
+  // HTML inicial fijo: React no lo vuelve a tocar, así el cursor no salta al editar.
+  const [htmlInicial] = useState(() => marcarCorchetes(escrito.cuerpo));
 
   const copiar = async () => {
     try {
@@ -149,12 +157,15 @@ function EscritoChat({ escrito }: { escrito: NonNullable<MensajeChat["escrito"]>
         Completa los datos entre [corchetes] — la responsabilidad del escrito es del profesional.
       </div>
 
-      <textarea
-        ref={campo}
-        value={texto}
-        onChange={(e) => setTexto(e.target.value)}
+      <div
+        contentEditable
+        suppressContentEditableWarning
+        role="textbox"
+        aria-multiline="true"
         aria-label={`Borrador: ${escrito.titulo}`}
-        className="w-full resize-none overflow-y-auto border-none bg-white px-4.5 py-3.5 text-[13px] leading-[1.7] text-marino outline-none"
+        onInput={(e) => setTexto((e.currentTarget as HTMLElement).innerText)}
+        dangerouslySetInnerHTML={{ __html: htmlInicial }}
+        className="w-full bg-white px-4.5 py-3.5 text-[13px] leading-[1.7] whitespace-pre-line text-marino outline-none focus:bg-[#fbfcfe]"
       />
 
       <div className="flex flex-wrap gap-2 border-t border-borde px-4 py-2.5">
