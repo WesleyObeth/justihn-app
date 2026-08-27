@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Icono } from "@/components/brand/iconos";
-import { AvatarJusIA, SimboloJusIA } from "@/components/brand/logos";
+import { AvatarJusIA, SimboloJusIA, SimboloJusIALinear } from "@/components/brand/logos";
 import { ChipMateria } from "@/components/ui/primitivos";
 import { usePortal } from "@/store/portal";
 import { isFuenteOficial } from "@/lib/security/sanitize";
@@ -59,6 +60,7 @@ export function RespuestaJusIA({
 
         {mensaje.tabla && <TablaResultado filas={mensaje.tabla} />}
         {mensaje.tarjeta && <TarjetaSentenciaChat tarjeta={mensaje.tarjeta} />}
+        {mensaje.escrito && <EscritoChat escrito={mensaje.escrito} />}
         {mensaje.citas && mensaje.citas.length > 0 && <Citas citas={mensaje.citas} />}
 
         {mensaje.chips && mensaje.chips.length > 0 && (
@@ -96,6 +98,80 @@ export function RespuestaJusIA({
           </button>
           {mensaje.meta && <span className="ml-auto text-[#b3bfd0]">{mensaje.meta}</span>}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Borrador de escrito NATIVO en el hilo (nada de drawers): documento editable
+ * en línea con las acciones al pie. El borrador es del profesional — se edita
+ * aquí mismo y la advertencia de responsabilidad queda siempre visible.
+ */
+function EscritoChat({ escrito }: { escrito: NonNullable<MensajeChat["escrito"]> }) {
+  const mostrarToast = usePortal((s) => s.mostrarToast);
+  const [texto, setTexto] = useState(escrito.cuerpo);
+  const campo = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-alto con tope: el documento crece hasta ~420px y luego scrollea.
+  useLayoutEffect(() => {
+    const el = campo.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 420)}px`;
+  }, [texto]);
+
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(texto);
+      mostrarToast("Escrito copiado al portapapeles");
+    } catch {
+      mostrarToast("No se pudo copiar — selecciona el texto manualmente");
+    }
+  };
+
+  return (
+    <div className="mt-3 max-w-[620px] overflow-hidden rounded-[12px] border border-borde bg-white">
+      <div
+        className="flex items-center gap-2.5 px-4 py-3 text-white"
+        style={{ background: "linear-gradient(180deg,#0d2144,#0a1830)" }}
+      >
+        <SimboloJusIALinear size={15} className="shrink-0" />
+        <div className="min-w-0 flex-1">
+          <div className="font-display truncate text-[13.5px] font-bold">{escrito.titulo}</div>
+          <div className="text-[10.5px] text-sobre-marino">
+            Borrador editable · citas verificadas incluidas
+          </div>
+        </div>
+      </div>
+
+      <div className="border-b border-aviso-borde bg-aviso px-4 py-2 text-[11.5px] text-aviso-cuerpo">
+        Completa los datos entre [corchetes] — la responsabilidad del escrito es del profesional.
+      </div>
+
+      <textarea
+        ref={campo}
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        aria-label={`Borrador: ${escrito.titulo}`}
+        className="w-full resize-none overflow-y-auto border-none bg-white px-4.5 py-3.5 text-[13px] leading-[1.7] text-marino outline-none"
+      />
+
+      <div className="flex flex-wrap gap-2 border-t border-borde px-4 py-2.5">
+        <button
+          type="button"
+          onClick={copiar}
+          className="cursor-pointer rounded-lg bg-marino px-3.5 py-2 text-[12px] font-semibold text-white hover:bg-celeste"
+        >
+          Copiar escrito
+        </button>
+        <button
+          type="button"
+          onClick={() => mostrarToast("La descarga .docx llega con el backend — copia el texto mientras tanto")}
+          className="cursor-pointer rounded-lg border border-borde bg-lienzo px-3.5 py-2 text-[12px] font-medium text-marino hover:border-celeste"
+        >
+          Descargar .docx
+        </button>
       </div>
     </div>
   );

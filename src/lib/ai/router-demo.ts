@@ -148,7 +148,7 @@ export function responderDemo(consulta: string, turno: number, metaCosto: string
 
   if (/redact|borrador|contestaci|escrito para|escrito de/.test(low)) {
     return {
-      text: "Preparé un borrador con los datos disponibles y las citas verificadas insertadas — lo abrí en el editor lateral. Completa los datos entre [corchetes] y ajusta lo que necesites; puedo reescribir cualquier sección.",
+      text: "Preparé un borrador con los datos disponibles y las citas verificadas insertadas — aquí abajo, listo para editar. Completa los datos entre [corchetes] y ajusta lo que necesites; puedo reescribir cualquier sección.",
       citas: [
         { etiqueta: "Código del Trabajo, art. ___" },
         { etiqueta: "Código Procesal del Trabajo, art. ___" },

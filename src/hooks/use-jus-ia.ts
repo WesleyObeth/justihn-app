@@ -33,7 +33,6 @@ export function useJusIA() {
   const agregarMensaje = usePortal((s) => s.agregarMensaje);
   const setPensando = usePortal((s) => s.setPensando);
   const consumirCuota = usePortal((s) => s.consumirCuota);
-  const abrirEscrito = usePortal((s) => s.abrirEscrito);
   const setBorrador = usePortal((s) => s.setBorrador);
   const cuota = useCuota();
 
@@ -119,11 +118,10 @@ export function useJusIA() {
 
         limpiarTemporizadores();
         setPensando(false);
+        // El borrador de escrito viaja DENTRO del mensaje y se renderiza
+        // nativo en el hilo (nada de abrir el editor lateral desde el chat —
+        // ese drawer queda para acciones fuera de esta pantalla).
         agregarMensaje({ id: nuevoId(), who: "a", ...contenido });
-
-        if (contenido.escrito) {
-          abrirEscrito(contenido.escrito.titulo, contenido.escrito.cuerpo);
-        }
         if (!gratuita) consumirCuota();
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -146,15 +144,7 @@ export function useJusIA() {
         });
       }
     },
-    [
-      agregarMensaje,
-      setPensando,
-      setBorrador,
-      consumirCuota,
-      abrirEscrito,
-      cuota.restantes,
-      limpiarTemporizadores,
-    ],
+    [agregarMensaje, setPensando, setBorrador, consumirCuota, cuota.restantes, limpiarTemporizadores],
   );
 
   return { chat, pensando, enviar };
