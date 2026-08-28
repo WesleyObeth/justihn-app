@@ -22,7 +22,7 @@ function normalizar(texto: string): string {
 }
 
 export function PantallaPlantillas() {
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const solicitarUpgrade = useUpgrade();
   const router = useRouter();
@@ -60,7 +60,7 @@ export function PantallaPlantillas() {
 
   return (
     <>
-      {!esPro && (
+      {!esPremium && (
         <div
           className="mb-4.5 flex flex-wrap items-center gap-3.5 rounded-xl px-5 py-4 text-[#e8eef6]"
           style={{ background: "linear-gradient(90deg,#0d2144,#0a1830)" }}
@@ -117,7 +117,7 @@ export function PantallaPlantillas() {
               }}
               className="relative flex flex-col p-4.5"
             >
-              {!esPro && (
+              {!esPremium && (
                 <span className="absolute top-3 right-3 grid place-items-center text-texto-4">
                   <Icono nombre="candado" size={13} />
                 </span>

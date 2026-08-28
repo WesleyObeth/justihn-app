@@ -34,7 +34,7 @@ export const PLANES: Plan[] = [
     destacado: false,
   },
   {
-    id: "base",
+    id: "profesional",
     nombre: "Profesional",
     precioLempiras: 130,
     precioEtiqueta: "L130",
@@ -53,7 +53,7 @@ export const PLANES: Plan[] = [
     destacado: false,
   },
   {
-    id: "pro",
+    id: "premium",
     nombre: "Premium",
     precioLempiras: 260,
     precioEtiqueta: "L260",

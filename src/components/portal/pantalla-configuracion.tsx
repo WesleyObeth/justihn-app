@@ -10,7 +10,7 @@ export function PantallaConfiguracion() {
   const prefs = usePortal((s) => s.prefs);
   const togglePreferencia = usePortal((s) => s.togglePreferencia);
   const mostrarToast = usePortal((s) => s.mostrarToast);
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const solicitarUpgrade = useUpgrade();
 
   const [cuenta, setCuenta] = useState({
@@ -71,8 +71,8 @@ export function PantallaConfiguracion() {
           {PREFERENCIAS_NOTIFICACION.map((p) => {
             // "Monitoreo de nombres" es feature Pro: con plan Base el toggle
             // abre el upgrade en vez de fingir que activa algo.
-            const esFeaturePro = p.k === "nombres";
-            const bloqueada = esFeaturePro && !esPro;
+            const esFeaturePremium = p.k === "nombres";
+            const bloqueada = esFeaturePremium && !esPremium;
             return (
               <div
                 key={p.k}
@@ -80,7 +80,7 @@ export function PantallaConfiguracion() {
               >
                 <div className="flex-1">
                   <div className="text-[13.5px] font-semibold">
-                    {esFeaturePro && esPro ? "Monitoreo de nombres" : p.titulo}
+                    {esFeaturePremium && esPremium ? "Monitoreo de nombres" : p.titulo}
                   </div>
                   <div className="mt-px text-xs text-texto-4">{p.desc}</div>
                 </div>

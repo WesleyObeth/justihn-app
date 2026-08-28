@@ -24,13 +24,13 @@ const ETIQUETA_TIPO: Record<NombreVigilado["tipo"], string> = {
  * que el Estado publica, no movimientos de expedientes (eso no es público).
  */
 export function PantallaMonitoreo() {
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const vigilados = usePortal((s) => s.nombresVigilados);
   const solicitarUpgrade = useUpgrade();
 
   return (
     <>
-      {!esPro && (
+      {!esPremium && (
         <div
           className="mb-4.5 flex flex-wrap items-center gap-3.5 rounded-xl px-5 py-4 text-[#e8eef6]"
           style={{ background: "linear-gradient(90deg,#0d2144,#0a1830)" }}
@@ -48,7 +48,7 @@ export function PantallaMonitoreo() {
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="flex flex-col gap-4">
-          <FormularioVigilar esPro={esPro} />
+          <FormularioVigilar esPremium={esPremium} />
           {vigilados.map((v) => (
             <CardVigilado key={v.id} vigilado={v} />
           ))}
@@ -65,7 +65,7 @@ export function PantallaMonitoreo() {
 
 // ── Alta de un nombre ──────────────────────────────────────────────────────
 
-function FormularioVigilar({ esPro }: { esPro: boolean }) {
+function FormularioVigilar({ esPremium }: { esPremium: boolean }) {
   const vigilarNombre = usePortal((s) => s.vigilarNombre);
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const solicitarUpgrade = useUpgrade();
@@ -75,7 +75,7 @@ function FormularioVigilar({ esPro }: { esPro: boolean }) {
   const vigilar = () => {
     const limpio = nombre.trim();
     if (limpio.length < 4) return;
-    if (!esPro) {
+    if (!esPremium) {
       solicitarUpgrade();
       return;
     }
@@ -115,7 +115,7 @@ function FormularioVigilar({ esPro }: { esPro: boolean }) {
         </select>
         <Boton
           variante="marino"
-          icono={esPro ? undefined : "candado"}
+          icono={esPremium ? undefined : "candado"}
           className="px-4 py-2.5 text-[13px]"
           onClick={vigilar}
         >

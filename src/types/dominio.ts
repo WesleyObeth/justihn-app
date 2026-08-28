@@ -21,7 +21,7 @@ export type Materia =
   | "Mercantil"
   | "Notarial";
 
-export type PlanId = "gratis" | "base" | "pro";
+export type PlanId = "gratis" | "profesional" | "premium";
 
 /** Tabla `sentencias` — corpus CSJ + cortes de apelaciones. */
 export interface Sentencia {

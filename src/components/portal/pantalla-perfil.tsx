@@ -293,7 +293,7 @@ function TarjetaPlan() {
         <Rotulo className="text-sobre-marino">Tu plan</Rotulo>
         <div className="mt-1 flex items-baseline gap-2">
           <div className="font-display text-[22px] font-bold">
-            {cuota.esPro ? "Premium" : "Profesional"}
+            {cuota.esPremium ? "Premium" : "Profesional"}
           </div>
           <div className="text-[13px] text-sobre-marino-2">{etiquetaPrecio}</div>
         </div>
@@ -343,9 +343,9 @@ function TarjetaPlan() {
 }
 
 function TarjetaPrioridadLeads() {
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const solicitarUpgrade = useUpgrade();
-  if (esPro) return null;
+  if (esPremium) return null;
 
   return (
     <Card className="p-5">

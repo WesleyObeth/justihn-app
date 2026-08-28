@@ -36,11 +36,11 @@ export function useUpgrade() {
 
 export function ProveedorUpgrade({ children }: { children: React.ReactNode }) {
   const [abierto, setAbierto] = useState(false);
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const mostrarToast = usePortal((s) => s.mostrarToast);
 
   const solicitar = () => {
-    if (esPro) mostrarToast("Ya tienes el plan Premium — todo desbloqueado");
+    if (esPremium) mostrarToast("Ya tienes el plan Premium — todo desbloqueado");
     else setAbierto(true);
   };
 

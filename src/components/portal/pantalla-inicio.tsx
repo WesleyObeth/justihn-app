@@ -155,7 +155,7 @@ function Metricas() {
         <Card interactiva className="h-full px-5 py-4.5">
           <div className="text-xs tracking-[.4px] text-texto-3 uppercase">Consultas a Jus IA</div>
           <div className="font-display mt-1.5 text-[30px] font-bold">{cuota.etiquetaLarga}</div>
-          {!cuota.esPro && (
+          {!cuota.esPremium && (
             <div className="mt-2 h-1.5 overflow-hidden rounded bg-sutil">
               <div
                 className="h-full rounded bg-celeste transition-[width]"
@@ -164,7 +164,7 @@ function Metricas() {
             </div>
           )}
           <div className="mt-1.5 text-xs text-texto-3">
-            {cuota.esPro ? "Plan Premium · sin límite" : "Se renueva el 1 de septiembre"}
+            {cuota.esPremium ? "Plan Premium · sin límite" : "Se renueva el 1 de septiembre"}
           </div>
         </Card>
       </Link>

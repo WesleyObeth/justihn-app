@@ -20,14 +20,14 @@ export function ModalVistaPrevia({
   plantilla: Plantilla | null;
   onCerrar: () => void;
 }) {
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const solicitarUpgrade = useUpgrade();
   const preguntar = usePreguntarAJusIA();
 
   const descargar = (nombre: string) => {
     onCerrar();
-    if (esPro) mostrarToast(`Modelo "${nombre}" descargado — listo para editar`);
+    if (esPremium) mostrarToast(`Modelo "${nombre}" descargado — listo para editar`);
     else solicitarUpgrade();
   };
 
@@ -83,11 +83,11 @@ export function ModalVistaPrevia({
                 </BotonJusIA>
                 <Boton
                   variante="marino"
-                  icono={esPro ? undefined : "candado"}
+                  icono={esPremium ? undefined : "candado"}
                   className="flex-1 py-[11px]"
                   onClick={() => descargar(plantilla.nombre)}
                 >
-                  {esPro ? "Descargar" : "Editar con Premium"}
+                  {esPremium ? "Descargar" : "Editar con Premium"}
                 </Boton>
               </div>
             </>

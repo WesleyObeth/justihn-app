@@ -315,12 +315,12 @@ function CalculadoraVia() {
  * (Decreto 82-96) — honestidad de demo: sin fuente no hay número.
  */
 function CalculadoraAranceles() {
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const solicitarUpgrade = useUpgrade();
   const preguntar = usePreguntarAJusIA();
   const [cuantia, setCuantia] = useState("");
 
-  if (!esPro) {
+  if (!esPremium) {
     return (
       <Card className="relative overflow-hidden p-6">
         <div className="flex items-center gap-2">

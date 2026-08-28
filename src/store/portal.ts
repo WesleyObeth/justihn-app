@@ -102,7 +102,7 @@ const SUBS_INICIALES: Record<string, boolean> = {
 export const usePortal = create<PortalState>()(
   persist(
     (set) => ({
-      plan: "base",
+      plan: "profesional",
       cicloPlan: "mensual",
       iaUsadas: 34,
       chat: [],
@@ -131,7 +131,7 @@ export const usePortal = create<PortalState>()(
       setPensando: (pensando, mensaje) =>
         set((s) => ({ pensando, pensandoMsg: mensaje ?? s.pensandoMsg })),
       consumirCuota: () =>
-        set((s) => (s.plan === "pro" ? s : { iaUsadas: Math.min(CUOTA_BASE, s.iaUsadas + 1) })),
+        set((s) => (s.plan === "premium" ? s : { iaUsadas: Math.min(CUOTA_BASE, s.iaUsadas + 1) })),
       nuevaConsulta: () =>
         set({ chat: [], conversacionActiva: null, borrador: "", pensando: false }),
       cargarConversacion: (id, mensajes) =>
@@ -186,6 +186,15 @@ export const usePortal = create<PortalState>()(
       name: "justihn-portal-v1",
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
+      // v1: los ids de plan cambiaron (base→profesional, pro→premium) al fijar
+      // la marca de los planes; el storage anterior se migra sin romperse.
+      version: 1,
+      migrate: (persistido) => {
+        const s = persistido as { plan?: string } | undefined;
+        if (s?.plan === "base") s.plan = "profesional";
+        if (s?.plan === "pro") s.plan = "premium";
+        return persistido;
+      },
       partialize: (s) => ({
         plan: s.plan,
         cicloPlan: s.cicloPlan,
@@ -219,14 +228,14 @@ export function useNotifsSinLeer(): number {
 export function useCuota() {
   const plan = usePortal((s) => s.plan);
   const usadas = usePortal((s) => s.iaUsadas);
-  const esPro = plan === "pro";
+  const esPremium = plan === "premium";
   return {
-    esPro,
+    esPremium,
     usadas,
     max: CUOTA_BASE,
-    restantes: esPro ? null : Math.max(0, CUOTA_BASE - usadas),
-    etiqueta: esPro ? "Ilimitada" : `${usadas}/${CUOTA_BASE}`,
-    etiquetaLarga: esPro ? "Ilimitada" : `${usadas} / ${CUOTA_BASE}`,
-    porcentaje: esPro ? 18 : Math.round((usadas / CUOTA_BASE) * 100),
+    restantes: esPremium ? null : Math.max(0, CUOTA_BASE - usadas),
+    etiqueta: esPremium ? "Ilimitada" : `${usadas}/${CUOTA_BASE}`,
+    etiquetaLarga: esPremium ? "Ilimitada" : `${usadas} / ${CUOTA_BASE}`,
+    porcentaje: esPremium ? 18 : Math.round((usadas / CUOTA_BASE) * 100),
   };
 }

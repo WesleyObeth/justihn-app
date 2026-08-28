@@ -221,7 +221,7 @@ function Hilo({
 
       <p className="mt-2 text-center text-[11.5px] text-texto-4">
         Solo fuentes oficiales publicadas ·{" "}
-        {cuota.esPro ? "consultas ilimitadas" : `${cuota.restantes} consultas restantes`}
+        {cuota.esPremium ? "consultas ilimitadas" : `${cuota.restantes} consultas restantes`}
       </p>
     </>
   );
@@ -356,7 +356,7 @@ function Composer({
         </button>
         <span className="flex-1" />
         <span className="text-[11.5px] text-texto-4">
-          {cuota.esPro ? "Consultas ilimitadas" : `${cuota.restantes} consultas restantes`}
+          {cuota.esPremium ? "Consultas ilimitadas" : `${cuota.restantes} consultas restantes`}
         </span>
         {botonEnviar}
       </div>

@@ -18,7 +18,7 @@ import type { Lead } from "@/types/dominio";
  * vitrina. Pantalla de trabajo: filtrar → responder inline → medir contactos.
  */
 export function PantallaLeads() {
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
   const respondidos = usePortal((s) => s.leadsRespondidos);
   const router = useRouter();
   const params = useSearchParams();
@@ -47,7 +47,7 @@ export function PantallaLeads() {
     <>
       <p className="mb-3.5 text-[13px] text-texto-3">
         Consultas del consultorio gratuito en tus especialidades.{" "}
-        {esPro
+        {esPremium
           ? "Con tu plan Premium respondes con prioridad — tu respuesta pública es tu vitrina."
           : "Responder públicamente requiere plan Premium."}
       </p>
@@ -73,7 +73,7 @@ export function PantallaLeads() {
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="flex flex-col gap-3">
           {filtrados.map((lead) => (
-            <CardLead key={lead.id} lead={lead} esPro={esPro} />
+            <CardLead key={lead.id} lead={lead} esPremium={esPremium} />
           ))}
           {filtrados.length === 0 && (
             <Card className="px-5 py-8 text-center text-[13px] text-texto-3">
@@ -85,7 +85,7 @@ export function PantallaLeads() {
 
         <div className="flex flex-col gap-4">
           <TuDesempeno />
-          {!esPro && <CardPrioridad />}
+          {!esPremium && <CardPrioridad />}
           <ComoFunciona />
         </div>
       </div>
@@ -95,7 +95,7 @@ export function PantallaLeads() {
 
 // ── Card de lead con respuesta inline ──────────────────────────────────────
 
-function CardLead({ lead, esPro }: { lead: Lead; esPro: boolean }) {
+function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const respondidos = usePortal((s) => s.leadsRespondidos);
   const responderLead = usePortal((s) => s.responderLead);
@@ -106,7 +106,7 @@ function CardLead({ lead, esPro }: { lead: Lead; esPro: boolean }) {
   const miRespuesta = respondidos[lead.id];
 
   const responder = () => {
-    if (!esPro) {
+    if (!esPremium) {
       solicitarUpgrade();
       return;
     }
@@ -196,7 +196,7 @@ function CardLead({ lead, esPro }: { lead: Lead; esPro: boolean }) {
       <div className="mt-3 flex items-center gap-2.5">
         {!miRespuesta && (
           <Boton onClick={responder} className="px-3.5 py-2 text-[12.5px]">
-            {esPro ? (abierto ? "Cerrar" : "Responder") : "Responder (Premium)"}
+            {esPremium ? (abierto ? "Cerrar" : "Responder") : "Responder (Premium)"}
           </Boton>
         )}
         <span className="text-xs text-texto-4">{etiquetaRespuestas(lead, miRespuesta)}</span>

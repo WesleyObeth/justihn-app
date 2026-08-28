@@ -15,7 +15,7 @@ interface ItemNav {
   label: string;
   icono?: NombreIcono;
   jusIa?: boolean;
-  pro?: boolean;
+  premium?: boolean;
 }
 
 type EntradaNav = ItemNav | { seccion: string };
@@ -28,8 +28,8 @@ const NAV: EntradaNav[] = [
   { href: "/abogados/legislacion", label: "Legislación", icono: "libro" },
   { href: "/abogados/procesos", label: "Procesos", icono: "pasos" },
   { href: "/abogados/gaceta", label: "Gaceta", icono: "gaceta" },
-  { href: "/abogados/monitoreo", label: "Monitoreo", icono: "bell", pro: true },
-  { href: "/abogados/modelos", label: "Modelos", icono: "plantillas", pro: true },
+  { href: "/abogados/monitoreo", label: "Monitoreo", icono: "bell", premium: true },
+  { href: "/abogados/modelos", label: "Modelos", icono: "plantillas", premium: true },
   { seccion: "Consultorio" },
   { href: "/abogados/leads", label: "Leads", icono: "leads" },
   { href: "/abogados/calculadoras", label: "Calculadoras", icono: "calc" },
@@ -143,7 +143,7 @@ function ItemNavegacion({
   activo: boolean;
   expandido: boolean;
 }) {
-  const esPro = usePortal((s) => s.plan) === "pro";
+  const esPremium = usePortal((s) => s.plan) === "premium";
 
   return (
     <Link
@@ -161,7 +161,7 @@ function ItemNavegacion({
       {expandido && (
         <>
           <span className="text-[13.5px] font-medium whitespace-nowrap">{item.label}</span>
-          {item.pro && !esPro && (
+          {item.premium && !esPremium && (
             <span className="ml-auto rounded-full border border-[rgba(201,154,58,.4)] bg-[rgba(201,154,58,.18)] px-1.5 py-px text-[10px] font-semibold text-dorado">
               PREMIUM
             </span>
@@ -217,12 +217,12 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                 <span
                   className={cn(
                     "rounded-full px-1.5 py-px text-[10px] font-bold",
-                    cuota.esPro
+                    cuota.esPremium
                       ? "border border-[rgba(201,154,58,.4)] bg-[rgba(201,154,58,.18)] text-dorado"
                       : "border border-white/20 bg-white/10 text-[#9fb6d0]",
                   )}
                 >
-                  {cuota.esPro ? "PREMIUM" : "PROFESIONAL"}
+                  {cuota.esPremium ? "PREMIUM" : "PROFESIONAL"}
                 </span>
               </div>
               <div className="mt-0.5 text-[11.5px] text-sobre-marino">
@@ -244,7 +244,7 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                 <span className="flex-1">Jus IA este mes</span>
                 <b className="text-[#e8eef6]">{cuota.etiqueta}</b>
               </div>
-              {!cuota.esPro && (
+              {!cuota.esPremium && (
                 <div className="mt-2 ml-[28px] h-1 overflow-hidden rounded bg-white/15">
                   <div
                     className="h-full rounded bg-celeste"
@@ -253,7 +253,7 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                 </div>
               )}
               <div className="mt-1.5 ml-[28px] text-[11px] text-celeste">
-                {cuota.esPro ? "Ver plan y facturación" : "Mejorar plan →"}
+                {cuota.esPremium ? "Ver plan y facturación" : "Mejorar plan →"}
               </div>
             </button>
 
@@ -314,7 +314,7 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                 {ABOGADA_DEMO.nombreCorto}
               </span>
               <span className="block text-[11px] text-sobre-marino">
-                {cuota.esPro ? "Plan Premium" : "Plan Profesional"}
+                {cuota.esPremium ? "Plan Premium" : "Plan Profesional"}
               </span>
             </span>
             <span className="grid place-items-center text-sobre-marino">

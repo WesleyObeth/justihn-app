@@ -50,7 +50,7 @@ export function ModalUpgrade({
   onCerrar: () => void;
 }) {
   const router = useRouter();
-  const planPro = getPlan("pro")!;
+  const planPremium = getPlan("premium")!;
 
   return (
     <Dialog.Root open={abierto} onOpenChange={(v) => !v && onCerrar()}>
@@ -75,7 +75,7 @@ export function ModalUpgrade({
           </Dialog.Description>
 
           <ul className="mt-3.5 flex flex-col gap-[9px]">
-            {planPro.features.map((f) => (
+            {planPremium.features.map((f) => (
               <li key={f} className="flex gap-2 text-[13.5px]">
                 <span className="text-celeste">✓</span>
                 <span>{f}</span>
@@ -84,9 +84,9 @@ export function ModalUpgrade({
           </ul>
 
           <div className="mt-4 flex items-baseline gap-2 rounded-[10px] bg-lienzo px-4 py-3.5">
-            <span className="font-display text-2xl font-bold">{planPro.precioEtiqueta}</span>
+            <span className="font-display text-2xl font-bold">{planPremium.precioEtiqueta}</span>
             <span className="text-[12.5px] text-texto-3">
-              /mes · o {planPro.precioAnualEtiqueta} al año ({OFERTA.descuentoAnual})
+              /mes · o {planPremium.precioAnualEtiqueta} al año ({OFERTA.descuentoAnual})
             </span>
           </div>
 
