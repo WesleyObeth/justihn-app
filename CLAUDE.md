@@ -131,12 +131,20 @@ inexistentes / casos propios), prestaciones, plazos y vía procesal.
    `JUSTIHN_DEMO_SESSION=1` en Vercel. Verificado en producción: rutas 200,
    redirects `/portal`→`/abogados`, headers de seguridad, `noindex` de
    validación (quitar al lanzar) y el chat de Jus IA respondiendo con citas.
-3. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
+3. **🚦 GATE — Validación del socio abogado (decisión Wesley 2026-08-26):** el
+   socio AÚN NO revisa el sistema (https://justihn-app.vercel.app). **Sin su
+   validación no se crean las tablas en Supabase**: los seeds de `src/data/`
+   son el contrato literal del esquema, y su feedback (pantallas, features,
+   planes, cálculo laboral, códigos a priorizar) puede cambiarlo — congelar el
+   contrato antes de su revisión sería construir sobre hipótesis.
+4. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
    workflow del corpus de Data Table → Postgres + embeddings pgvector (el
-   esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3).
-4. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
-   ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo).
-5. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
+   esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). ⛔ Bloqueado
+   por el gate #3.
+5. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
+   ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende
+   del gate: el destino provisional (Data Table de n8n) sigue válido.
+6. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
    2026-08-26): "Mis casos" (+agenda de plazos integrada) es la #16 priorizada
    — gancho de retención/uso diario; referidos como card, no pantalla. No
    construir hasta tener feedback de la validación (backlog #4 del producto).
