@@ -28,7 +28,8 @@ export function PantallaPlanes() {
           Todo el corpus para todos — la diferencia es la IA
         </h2>
         <p className="mt-1.5 text-[13.5px] text-texto-3">
-          Primer mes a {OFERTA.anclaPrimerMes} · pago anual {OFERTA.descuentoAnual}
+          Primer mes a {OFERTA.anclaPrimerMes} — solo en tu primera suscripción · pago anual{" "}
+          {OFERTA.descuentoAnual}
         </p>
 
         <div
@@ -115,6 +116,9 @@ function TarjetaPlan({
   const precio = anual ? plan.precioAnualEtiqueta : plan.precioEtiqueta;
   const periodo = anual ? plan.periodoAnual : plan.periodo;
   const ahorro = plan.precioLempiras * 12 - plan.precioAnualLempiras;
+  // El ancla del 1er mes es promoción de captación: aplica UNA sola vez, en la
+  // primera suscripción de pago. Quien ya paga un plan cambia a precio normal.
+  const anclaDisponible = planActual === "gratis";
 
   // "Actual" exige plan Y ciclo: estando en Base mensual, la card Base con el
   // toggle en anual ofrece el cambio de ciclo (la táctica del modelo, §2).
@@ -132,7 +136,9 @@ function TarjetaPlan({
           : "Volver al pago mensual"
         : anual
           ? `Cambiar a ${plan.nombre} anual — ${OFERTA.descuentoAnual}`
-          : `Cambiar a ${plan.nombre} — 1er mes ${OFERTA.anclaPrimerMes}`;
+          : anclaDisponible
+            ? `Cambiar a ${plan.nombre} — 1er mes ${OFERTA.anclaPrimerMes}`
+            : `Cambiar a ${plan.nombre} — ${plan.precioEtiqueta}/mes`;
 
   const inerte = esActual || plan.id === "gratis";
 
