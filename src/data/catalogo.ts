@@ -35,7 +35,7 @@ export const PLANES: Plan[] = [
   },
   {
     id: "base",
-    nombre: "Base",
+    nombre: "Profesional",
     precioLempiras: 130,
     precioEtiqueta: "L130",
     periodo: "/mes (US$5)",
@@ -54,7 +54,7 @@ export const PLANES: Plan[] = [
   },
   {
     id: "pro",
-    nombre: "Pro",
+    nombre: "Premium",
     precioLempiras: 260,
     precioEtiqueta: "L260",
     periodo: "/mes (US$10)",
@@ -229,7 +229,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     id: "notif-factura",
     icono: "card",
     titulo: "Factura de agosto disponible",
-    meta: "Plan Base · L130",
+    meta: "Plan Profesional · L130",
     cuando: "Vie 21",
     noLeidaPorDefecto: false,
     destino: "/abogados/perfil",
@@ -294,7 +294,7 @@ export const FAQS = [
       "Suscríbete a materias en Alertas de Gaceta. Cada publicación nueva en tus materias te llega por correo y, si lo activas, en el digest semanal por WhatsApp.",
   },
   {
-    pregunta: "¿Qué incluye el plan Pro?",
+    pregunta: "¿Qué incluye el plan Premium?",
     respuesta:
       "Jus IA ilimitada, modelos de escritos editables, calculadoras, monitoreo de nombres y prioridad en los leads del consultorio. Puedes cambiar de plan en cualquier momento desde Mi perfil.",
   },
@@ -323,7 +323,7 @@ export const PREFERENCIAS_NOTIFICACION = [
   },
   {
     k: "nombres",
-    titulo: "Monitoreo de nombres (Pro)",
+    titulo: "Monitoreo de nombres (Premium)",
     desc: "Si tu nombre o el de tu cliente aparece en publicaciones",
   },
 ] as const;

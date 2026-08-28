@@ -341,7 +341,7 @@ function CalculadoraAranceles() {
 
         <div className="absolute right-6 bottom-6 left-6">
           <Boton variante="marino" className="w-full py-[11px]" onClick={solicitarUpgrade}>
-            Desbloquear con Pro
+            Desbloquear con Premium
           </Boton>
         </div>
       </Card>

@@ -164,7 +164,7 @@ function Metricas() {
             </div>
           )}
           <div className="mt-1.5 text-xs text-texto-3">
-            {cuota.esPro ? "Plan Pro · sin límite" : "Se renueva el 1 de septiembre"}
+            {cuota.esPro ? "Plan Premium · sin límite" : "Se renueva el 1 de septiembre"}
           </div>
         </Card>
       </Link>

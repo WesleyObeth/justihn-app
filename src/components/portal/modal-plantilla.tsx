@@ -87,7 +87,7 @@ export function ModalVistaPrevia({
                   className="flex-1 py-[11px]"
                   onClick={() => descargar(plantilla.nombre)}
                 >
-                  {esPro ? "Descargar" : "Editar con Pro"}
+                  {esPro ? "Descargar" : "Editar con Premium"}
                 </Boton>
               </div>
             </>

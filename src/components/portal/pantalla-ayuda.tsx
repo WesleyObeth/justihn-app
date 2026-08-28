@@ -24,7 +24,7 @@ const GUIAS: { titulo: string; desc: string; href: string; icono: NombreIcono }[
   },
   {
     titulo: "Planes y facturación",
-    desc: "Base, Pro y pago anual con descuento",
+    desc: "Profesional, Premium y pago anual con descuento",
     href: "/abogados/planes",
     icono: "planes",
   },

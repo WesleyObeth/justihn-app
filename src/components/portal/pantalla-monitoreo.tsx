@@ -37,11 +37,11 @@ export function PantallaMonitoreo() {
         >
           <Icono nombre="candado" size={17} />
           <p className="min-w-[220px] flex-1 text-[13.5px]">
-            El monitoreo de nombres es parte del plan <b>Pro</b>. Mira cómo funciona con esta
+            El monitoreo de nombres es parte del plan <b>Premium</b>. Mira cómo funciona con esta
             demostración; para vigilar tus propios nombres, mejora tu plan.
           </p>
           <Boton variante="dorado" onClick={solicitarUpgrade} className="px-4 py-[9px]">
-            Mejorar a Pro
+            Mejorar a Premium
           </Boton>
         </div>
       )}

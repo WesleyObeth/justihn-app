@@ -163,7 +163,7 @@ function ItemNavegacion({
           <span className="text-[13.5px] font-medium whitespace-nowrap">{item.label}</span>
           {item.pro && !esPro && (
             <span className="ml-auto rounded-full border border-[rgba(201,154,58,.4)] bg-[rgba(201,154,58,.18)] px-1.5 py-px text-[10px] font-semibold text-dorado">
-              PRO
+              PREMIUM
             </span>
           )}
         </>
@@ -222,7 +222,7 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                       : "border border-white/20 bg-white/10 text-[#9fb6d0]",
                   )}
                 >
-                  {cuota.esPro ? "PRO" : "BASE"}
+                  {cuota.esPro ? "PREMIUM" : "PROFESIONAL"}
                 </span>
               </div>
               <div className="mt-0.5 text-[11.5px] text-sobre-marino">
@@ -314,7 +314,7 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                 {ABOGADA_DEMO.nombreCorto}
               </span>
               <span className="block text-[11px] text-sobre-marino">
-                {cuota.esPro ? "Plan Pro" : "Plan Base"}
+                {cuota.esPro ? "Plan Premium" : "Plan Profesional"}
               </span>
             </span>
             <span className="grid place-items-center text-sobre-marino">

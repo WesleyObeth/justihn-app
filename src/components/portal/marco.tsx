@@ -40,7 +40,7 @@ export function ProveedorUpgrade({ children }: { children: React.ReactNode }) {
   const mostrarToast = usePortal((s) => s.mostrarToast);
 
   const solicitar = () => {
-    if (esPro) mostrarToast("Ya tienes el plan Pro — todo desbloqueado");
+    if (esPro) mostrarToast("Ya tienes el plan Premium — todo desbloqueado");
     else setAbierto(true);
   };
 

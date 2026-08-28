@@ -48,8 +48,8 @@ export function PantallaLeads() {
       <p className="mb-3.5 text-[13px] text-texto-3">
         Consultas del consultorio gratuito en tus especialidades.{" "}
         {esPro
-          ? "Con tu plan Pro respondes con prioridad — tu respuesta pública es tu vitrina."
-          : "Responder públicamente requiere plan Pro."}
+          ? "Con tu plan Premium respondes con prioridad — tu respuesta pública es tu vitrina."
+          : "Responder públicamente requiere plan Premium."}
       </p>
 
       <div className="mb-3.5 flex flex-wrap items-center gap-2">
@@ -196,7 +196,7 @@ function CardLead({ lead, esPro }: { lead: Lead; esPro: boolean }) {
       <div className="mt-3 flex items-center gap-2.5">
         {!miRespuesta && (
           <Boton onClick={responder} className="px-3.5 py-2 text-[12.5px]">
-            {esPro ? (abierto ? "Cerrar" : "Responder") : "Responder (Pro)"}
+            {esPro ? (abierto ? "Cerrar" : "Responder") : "Responder (Premium)"}
           </Boton>
         )}
         <span className="text-xs text-texto-4">{etiquetaRespuestas(lead, miRespuesta)}</span>
@@ -264,11 +264,11 @@ function CardPrioridad() {
         <TituloSeccion className="text-[14.5px]">Prioridad en leads</TituloSeccion>
       </div>
       <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-3">
-        Con Pro respondes públicamente, recibes los leads antes que nadie y tu perfil aparece
+        Con Premium respondes públicamente, recibes los leads antes que nadie y tu perfil aparece
         primero en el directorio de tu especialidad.
       </p>
       <Boton variante="marino" className="mt-3.5 w-full py-2.5" onClick={solicitarUpgrade}>
-        Ver plan Pro
+        Ver plan Premium
       </Boton>
     </Card>
   );

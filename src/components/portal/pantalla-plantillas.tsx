@@ -67,11 +67,11 @@ export function PantallaPlantillas() {
         >
           <Icono nombre="candado" size={17} />
           <p className="min-w-[220px] flex-1 text-[13.5px]">
-            Los modelos de escritos son parte del plan <b>Pro</b>. Puedes verlos; para
+            Los modelos de escritos son parte del plan <b>Premium</b>. Puedes verlos; para
             descargarlos y editarlos, mejora tu plan.
           </p>
           <Boton variante="dorado" onClick={solicitarUpgrade} className="px-4 py-[9px]">
-            Mejorar a Pro
+            Mejorar a Premium
           </Boton>
         </div>
       )}

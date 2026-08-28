@@ -293,7 +293,7 @@ function TarjetaPlan() {
         <Rotulo className="text-sobre-marino">Tu plan</Rotulo>
         <div className="mt-1 flex items-baseline gap-2">
           <div className="font-display text-[22px] font-bold">
-            {cuota.esPro ? "Pro" : "Base"}
+            {cuota.esPro ? "Premium" : "Profesional"}
           </div>
           <div className="text-[13px] text-sobre-marino-2">{etiquetaPrecio}</div>
         </div>
@@ -354,11 +354,11 @@ function TarjetaPrioridadLeads() {
         <TituloSeccion className="text-[14.5px]">Prioridad en leads</TituloSeccion>
       </div>
       <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-3">
-        Con Pro, tu perfil aparece primero cuando alguien busca tu especialidad y recibes los leads
+        Con Premium, tu perfil aparece primero cuando alguien busca tu especialidad y recibes los leads
         del consultorio antes que nadie.
       </p>
       <Boton variante="marino" className="mt-3.5 w-full py-2.5" onClick={solicitarUpgrade}>
-        Ver plan Pro
+        Ver plan Premium
       </Boton>
     </Card>
   );

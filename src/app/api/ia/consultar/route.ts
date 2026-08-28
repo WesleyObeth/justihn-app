@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
   const metaCosto =
     g.data.cuotaRestante === null
-      ? "Consulta ilimitada · plan Pro"
+      ? "Consulta ilimitada · plan Premium"
       : `Usó 1 crédito · quedan ${Math.max(0, g.data.cuotaRestante - 1)}`;
 
   const respuesta: RespuestaIA =

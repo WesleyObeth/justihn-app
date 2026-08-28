@@ -32,7 +32,7 @@ const PANTALLAS: { titulo: string; destino: string; claves: string }[] = [
   { titulo: "Leads del consultorio", destino: "/abogados/leads", claves: "consultorio clientes preguntas" },
   { titulo: "Calculadoras", destino: "/abogados/calculadoras", claves: "prestaciones cesantia preaviso aranceles honorarios" },
   { titulo: "Mi perfil", destino: "/abogados/perfil", claves: "validacion directorio colegiacion facturas" },
-  { titulo: "Planes y suscripción", destino: "/abogados/planes", claves: "precios pro base mejorar upgrade" },
+  { titulo: "Planes y suscripción", destino: "/abogados/planes", claves: "precios premium profesional pro base mejorar upgrade" },
   { titulo: "Configuración", destino: "/abogados/configuracion", claves: "cuenta contrasena whatsapp correo notificaciones" },
   { titulo: "Notificaciones", destino: "/abogados/notificaciones", claves: "avisos alertas" },
   { titulo: "Ayuda", destino: "/abogados/ayuda", claves: "soporte faq preguntas frecuentes whatsapp" },
@@ -129,7 +129,7 @@ export function BuscadorGlobal() {
           .slice(0, 3)
           .map((p) => ({
             titulo: p.nombre,
-            meta: "Modelo editable · Pro",
+            meta: "Modelo editable · Premium",
             destino: "/abogados/modelos",
           })),
       },

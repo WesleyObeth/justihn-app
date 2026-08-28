@@ -68,10 +68,10 @@ export function ModalUpgrade({
           </div>
 
           <Dialog.Title className="wordmark mt-3.5 text-[21px]">
-            Mejora a Justihn Pro
+            Mejora a Justihn Premium
           </Dialog.Title>
           <Dialog.Description className="mt-1.5 text-[13.5px] leading-[1.55] text-texto-3">
-            Todo lo del plan Base, más:
+            Todo lo del plan Profesional, más:
           </Dialog.Description>
 
           <ul className="mt-3.5 flex flex-col gap-[9px]">
