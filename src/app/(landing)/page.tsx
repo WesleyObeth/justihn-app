@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HomePublica } from "@/components/publico/home";
+import { LandingContenido } from "@/components/landing/landing-content";
 
 export const metadata: Metadata = {
   title: "Justihn — Tu guía legal en Honduras",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function PaginaHome() {
-  return <HomePublica />;
+  return <LandingContenido />;
 }

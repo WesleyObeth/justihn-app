@@ -1,0 +1,208 @@
+/* Landing aurora — tokens y capas replicados del proyecto de origen.
+   Adaptación permitida: paleta a la marca Justihn y fuente del proyecto.
+   Scopeado bajo .landing-aurora para no afectar los portales. */
+
+.landing-aurora {
+  --bg: #0a1830;
+  --card: rgba(255, 255, 255, 0.035);
+  --line: rgba(255, 255, 255, 0.09);
+  --ink: #e8f0f8;
+  --muted: rgba(232, 240, 248, 0.62);
+  --mint: #7cc7f0;
+  --turq: #1584c7;
+  --teal: #0e5f92;
+  --font: var(--font-instrument-sans), -apple-system, system-ui, sans-serif;
+  --mono: ui-monospace, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pad: clamp(20px, 5vw, 64px);
+  --grad: linear-gradient(135deg, #7cc7f0 0%, #0e5f92 100%);
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  min-height: 100vh;
+}
+
+.landing-aurora a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Capas de fondo ── */
+.bg-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.bg-base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(14, 95, 146, 0.22) 0%, transparent 55%),
+    radial-gradient(60% 50% at 85% 30%, rgba(21, 132, 199, 0.1) 0%, transparent 50%),
+    var(--bg);
+}
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(100% 70% at 50% 0%, #000 0%, transparent 75%);
+}
+.bg-grain {
+  position: absolute;
+  inset: -50%;
+  opacity: 0.04;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.funnel-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+  opacity: 0.82;
+}
+.funnel-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(120% 85% at 50% 42%, transparent 30%, rgba(10, 24, 48, 0.55) 100%);
+}
+.funnel-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  pointer-events: none;
+}
+.funnel-fallback i {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  width: min(60vw, 620px);
+  aspect-ratio: 1;
+  border-radius: 46% 54% 52% 48% / 55% 50% 50% 45%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(124, 199, 240, 0.28), transparent 70%);
+  filter: blur(14px);
+}
+
+/* ── Nav fijo glassy ── */
+.landing-aurora .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px var(--pad);
+  transition:
+    background 0.4s,
+    border-color 0.4s,
+    padding 0.4s;
+  border-bottom: 1px solid transparent;
+}
+.landing-aurora .nav.solid {
+  background: rgba(6, 13, 26, 0.65);
+  backdrop-filter: blur(16px);
+  border-color: var(--line);
+  padding-block: 12px;
+}
+.landing-aurora .brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.landing-aurora .brand .wm {
+  font: 600 18px/1 var(--font);
+  letter-spacing: -0.02em;
+}
+.landing-aurora .nav-mid {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px;
+}
+.landing-aurora .nav-mid a {
+  font-size: 13.5px;
+  color: var(--muted);
+  padding: 9px 16px;
+  border-radius: 999px;
+  transition:
+    color 0.25s,
+    background 0.25s;
+}
+.landing-aurora .nav-mid a:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
+}
+.landing-aurora .nav-login {
+  font-size: 13.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+.landing-aurora .nav-login:hover {
+  color: var(--ink);
+}
+.landing-aurora .nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font: 600 13.5px/1 var(--font);
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: var(--bg);
+  white-space: nowrap;
+  transition:
+    background 0.25s,
+    box-shadow 0.25s;
+}
+.landing-aurora .nav-cta:hover {
+  background: #9dd6f5;
+  box-shadow: 0 8px 26px rgba(124, 199, 240, 0.34);
+}
+.landing-aurora .nav-cta svg {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 980px) {
+  .landing-aurora .nav-mid,
+  .landing-aurora .nav-login {
+    display: none;
+  }
+}
+
+/* ── Utilidades de la landing (contenido z-2, cards glass) ── */
+.landing-contenido {
+  position: relative;
+  z-index: 2;
+}
+.glass-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  backdrop-filter: blur(6px);
+  transition:
+    border-color 0.3s,
+    transform 0.3s var(--ease);
+}
+.glass-card:hover {
+  border-color: rgba(124, 199, 240, 0.45);
+  transform: translateY(-2px);
+}

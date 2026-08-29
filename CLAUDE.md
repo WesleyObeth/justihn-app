@@ -91,6 +91,15 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   (patrón abogados) con Mi perfil (actividad real del store), Configuración
   (cuenta + prefs `prefsPersona` + habeas data) y Ayuda (FAQ ciudadana) —
   9 rutas en el portal ciudadano.
+- **✨ LANDING AURORA (2026-08-29):** la home se movió al grupo `(landing)` con
+  shell propio estilo Jusbrasil: fondo aurora WebGL (three.js, shader FBM
+  replicado verbatim de otro proyecto de Wesley — solo se adaptaron los vec3 a
+  la marca: navy #0a1830 · celeste #1584c7 · claro #7cc7f0) + nav fija glassy
+  con estado sólido al scroll. Módulo en `components/landing/` (aurora.ts,
+  fondo-aurora.tsx con fallback sin-WebGL/reduced-motion, nav-aurora.tsx,
+  landing.css scopeado bajo .landing-aurora). Stacking: fondo z-0 ·
+  canvas+scrim z-1 · contenido z-2 · nav z-100. Las páginas públicas
+  interiores conservan el shell claro de `(publico)`.
 
 ## 2. Stack (pins reales)
 
