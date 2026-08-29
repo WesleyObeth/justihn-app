@@ -152,18 +152,56 @@ export const TRAMITES: Tramite[] = [
     nombre: "Facturación con CAI",
     tipo: "tramite",
     institucionId: "sar",
-    paraQuien: "Negocios y profesionales que emiten facturas",
+    paraQuien: "Todo el que vende bienes o presta servicios y tiene que dar factura",
     resumen:
-      "El Código de Autorización de Impresión habilita tu facturación ante el SAR: sin CAI vigente, tus facturas no son válidas fiscalmente.",
+      "El SAR es tajante: todo contribuyente que transfiera bienes o preste servicios está obligado a emitir comprobante fiscal. Para poder imprimirlos necesitas una autorización con su CAI — y esa autorización dura como máximo un año: vencida, tus facturas pierden validez aunque te sobren talonarios.",
     materia: "Mercantil",
     pasos: [
-      { titulo: "Ten tu RTN y obligaciones al día", detalle: "El SAR verifica tu situación tributaria antes de autorizar." },
-      { titulo: "Solicita la autorización de facturación", detalle: "Por la Oficina Virtual del SAR o con una imprenta autorizada, según tu modalidad (talonario, impresión o factura electrónica)." },
-      { titulo: "Emite dentro de la vigencia", detalle: "El CAI vence: controla la fecha límite de emisión y renueva a tiempo." },
+      {
+        titulo: "Revisa tu comportamiento tributario antes de pedir nada",
+        detalle:
+          "El SAR puede limitar, condicionar o rechazar la autorización según tu comportamiento tributario: datos actualizados en el RTN, cumplimiento de obligaciones formales y materiales, deudas líquidas firmes pendientes de pago y procedimientos que tengas abiertos (fiscalizaciones, cobros, requerimientos). El propio reglamento te manda a verificarlo ANTES de solicitar, para que no te rechacen (art. 63 del Acuerdo 481-2017).",
+      },
+      {
+        titulo: "Inscríbete en el Régimen de Facturación",
+        detalle:
+          "Requisitos del art. 45: tener los datos al día en el RTN, estar al día en la presentación y pago de tus obligaciones, suscribir el contrato de adhesión y llenar el formulario del SAR. Al inscribirte declaras con precisión cuatro cosas: modalidad de impresión, qué comprobantes y documentos vas a emitir, tus establecimientos y tus puntos de emisión.",
+      },
+      {
+        titulo: "Elige tu modalidad: imprenta o autoimpresor",
+        detalle:
+          "Por IMPRENTA: eliges una imprenta certificada en el Registro Fiscal de Imprentas y ella gestiona la autorización. Factura prevalorada, recibo por honorarios profesionales y constancia de donación solo pueden emitirse por esta vía. Por AUTOIMPRESOR: solicitas la autorización tú, de forma electrónica — por cada máquina registradora, o por cada sistema computarizado y tipo de documento.",
+      },
+      {
+        titulo: "Solicita la autorización de impresión y vigencia (el CAI)",
+        detalle:
+          "La gestión es electrónica. La autorización se da por punto de emisión y por tipo de documento, fijando el rango de numeración correlativa. Puedes hacer una sola solicitud por punto de emisión hasta agotar los documentos autorizados, dentro de los DOS MESES previos a la fecha límite de emisión (art. 59).",
+      },
+      {
+        titulo: "Verifica que la factura lleve todo lo que exige el art. 10",
+        detalle:
+          "Datos del emisor (RTN, nombre o razón social, nombre comercial, dirección de casa matriz y del establecimiento del punto de emisión, teléfono y correo del contrato de adhesión); la palabra «Factura»; el CAI; la fecha límite de emisión vigente; el rango autorizado vigente; el destino de los ejemplares (original al cliente, copia al emisor); y el correlativo de 16 dígitos NNN-NNN-NN-NNNNNNNN (establecimiento · punto de emisión · 01 = factura · ocho dígitos correlativos desde 00000001). Si es preimpresa, además los datos de la imprenta y su número de certificado.",
+      },
+      {
+        titulo: "Renueva a tiempo y avisa de lo que no usaste",
+        detalle:
+          "La autorización se otorga por un plazo máximo de un (1) año; vencido, los documentos pierden validez y no pueden usarse (art. 62). Y hay una obligación que casi nadie cumple: comunicar al SAR los comprobantes NO utilizados dentro de los primeros 10 días hábiles del mes siguiente al vencimiento de la vigencia — o al cambiar tus datos, cerrar un establecimiento, dar de baja un punto de emisión, o por deterioro, robo o extravío (art. 42).",
+      },
     ],
-    requisitos: ["RTN", "Obligaciones tributarias al día", "[Verificar modalidad y plazos vigentes]"],
-    tasa: "L ___ (según modalidad e imprenta)",
-    nota: "Emitir con CAI vencido genera multas — es de los errores más comunes en negocios pequeños.",
+    requisitos: [
+      "RTN con los datos actualizados",
+      "Estar al día en la presentación y pago de obligaciones formales y materiales",
+      "Contrato de adhesión suscrito",
+      "Formulario de inscripción al Régimen de Facturación",
+      "Declarar modalidad de impresión, tipos de comprobante, establecimientos y puntos de emisión",
+      "Modalidad imprenta: imprenta seleccionada del Registro Fiscal de Imprentas",
+      "Modalidad autoimpresor: cada máquina registradora o sistema computarizado registrado",
+    ],
+    tasa: "El Reglamento del Régimen de Facturación no fija tasa por la autorización: lo que se paga es la impresión a la imprenta certificada, o el sistema propio si eres autoimpresor",
+    nota:
+      "⏰ Emitir con la vigencia vencida es el error clásico: los comprobantes «perderán su validez y no podrán ser utilizados cuando se haya vencido el plazo de tiempo autorizado» (art. 62). Pide la renovación dentro de los 2 meses previos a la fecha límite.\n\n↩️ Si te rechazan la solicitud tienes un plazo perentorio de 10 días hábiles desde la comunicación para regularizar tu situación o pedir la verificación de la gestión (art. 64).\n\n📄 Marco legal: Acuerdo 481-2017 (Reglamento del Régimen de Facturación, Otros Documentos Fiscales y Registro Fiscal de Imprentas) y sus reformas — Acuerdos 609-2017, 725-2018 y 817-2018.",
+    fuenteUrl: "https://www.sar.gob.hn/facturacion/",
+    fuenteNombre: "SAR — Régimen de Facturación (Acuerdo 481-2017, texto en La Gaceta N.º 34,413)",
   },
   {
     id: "permiso-operacion",
