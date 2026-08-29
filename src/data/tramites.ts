@@ -172,16 +172,49 @@ export const TRAMITES: Tramite[] = [
     institucionId: "municipalidad",
     paraQuien: "Todo negocio con local o actividad en un municipio",
     resumen:
-      "La alcaldía autoriza la operación del negocio en su municipio y cobra la tasa anual correspondiente según tu volumen de ventas.",
+      "La alcaldía autoriza que tu negocio opere en su municipio. Esta guía sigue los requisitos oficiales de la AMDC (Distrito Central) — cada alcaldía tiene los suyos, pero el esquema se repite.",
     materia: "Mercantil",
     pasos: [
-      { titulo: "Reúne los documentos del negocio", detalle: "RTN, DNI del propietario o representante, y constancias que pida tu alcaldía (solvencia municipal, contrato de local)." },
-      { titulo: "Presenta la solicitud en la alcaldía", detalle: "Ventanilla de permisos de operación del municipio donde opera el negocio; declara tu volumen de ventas." },
-      { titulo: "Paga la tasa y recibe el permiso", detalle: "El permiso es anual — se renueva cada enero con la declaración jurada de volumen de ventas." },
+      {
+        titulo: "Obtén la compatibilidad de uso del local",
+        detalle:
+          "La aprueba la Gerencia de Control de la Construcción; si tu negocio está en el Centro Histórico (entre el Puente del Guanacaste y El Obelisco), la aprueba la Gerencia del Centro Histórico.",
+      },
+      {
+        titulo: "Regístrate primero en la Cámara de Comercio",
+        detalle:
+          "La alcaldía NO autoriza permisos a quien no esté inscrito o renovado en la cámara de comercio de su municipio (art. 31 de la Ley de Cámaras). La constancia se renueva cada 5 años.",
+      },
+      {
+        titulo: "Llena la declaración jurada ICS F-01",
+        detalle:
+          "Formulario de Industria, Comercio y Servicio, sin manchones, tachaduras ni corrector, firmado por el propietario o representante legal — y con el croquis del lugar dibujado dentro del mismo formulario.",
+      },
+      {
+        titulo: "Reúne solvencias y documentos del negocio",
+        detalle:
+          "Solvencia municipal vigente, estado de cuenta de bienes inmuebles al día del local donde operas, DNI del propietario, RTN si es sociedad y la escritura de constitución inscrita en el Registro Mercantil.",
+      },
+      {
+        titulo: "Presenta el trámite y retira tu permiso",
+        detalle:
+          "En la ventanilla de atención al ciudadano de la alcaldía (en la AMDC, la ventanilla AER) o en línea. Pagas los impuestos y tasas correspondientes y retiras el permiso.",
+      },
     ],
-    requisitos: ["RTN del negocio", "DNI del propietario", "Solvencia municipal", "[Cada alcaldía agrega requisitos propios]"],
-    tasa: "L ___ (tabla municipal, según volumen de ventas)",
-    nota: "Rubros regulados (alimentos, salud) necesitan además el permiso sanitario de ARSA antes de operar.",
+    requisitos: [
+      "Compatibilidad de uso aprobada",
+      "Formulario ICS F-01 firmado, con croquis del local",
+      "Solvencia municipal vigente del propietario o representante",
+      "Estado de cuenta de bienes inmuebles del local, al día",
+      "DNI / pasaporte / carné de residente",
+      "RTN (si es sociedad) y escritura inscrita en Registro Mercantil y Cámara",
+      "Si va un gestor: carta poder autenticada FIRMADA POR EL PROPIETARIO (no por el gestor), su DNI y su solvencia",
+    ],
+    tasa: "Impuestos y tasas municipales según tu volumen de ventas declarado",
+    nota:
+      "Si estás registrado como MYPE (Decreto 145-2018 / 48-2022) presenta el certificado de SENPRENDE y la constancia vigente de SEFIN. Y ojo: la carta poder la firma el dueño, no quien hace la fila — es motivo común de rechazo.",
+    fuenteUrl: "https://gac.amdc.hn/tramites/apertura-de-negocios/",
+    fuenteNombre: "AMDC — Apertura de Negocio",
   },
   {
     id: "licencia-sanitaria",
