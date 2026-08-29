@@ -40,7 +40,7 @@ export function LandingContenido() {
           colegiados y la jurisprudencia del país en un solo lugar.
         </p>
 
-        <div className="mx-auto mt-8 flex max-w-[620px] items-center gap-2 rounded-[16px] bg-white p-2 pl-4 shadow-[0_18px_60px_rgba(4,10,22,.5)]">
+        <div className="mx-auto mt-8 flex max-w-[620px] items-center gap-2 rounded-[16px] bg-white p-2 pl-4 border border-borde shadow-[0_16px_48px_rgba(13,33,68,.14)]">
           <Icono nombre="buscar" size={18} className="shrink-0 text-texto-4" />
           <input
             value={q}
@@ -163,7 +163,7 @@ export function LandingContenido() {
           <Link
             href="/calculadora-prestaciones"
             className="rounded-[12px] px-6 py-3.5 text-[14px] font-semibold"
-            style={{ background: "var(--mint)", color: "var(--bg)" }}
+            style={{ background: "var(--turq)", color: "#fff" }}
           >
             Calcular mis prestaciones
           </Link>
@@ -279,7 +279,7 @@ function Puerta({
     <Link href={href} className="glass-card block p-6">
       <span
         className="grid h-11 w-11 place-items-center rounded-xl"
-        style={{ background: "rgba(124,199,240,0.12)", color: "var(--mint)" }}
+        style={{ background: "rgba(21,132,199,0.1)", color: "var(--mint)" }}
       >
         <Icono nombre={icono} size={19} />
       </span>

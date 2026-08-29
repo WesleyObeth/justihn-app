@@ -3,12 +3,12 @@
    Scopeado bajo .landing-aurora para no afectar los portales. */
 
 .landing-aurora {
-  --bg: #0a1830;
-  --card: rgba(255, 255, 255, 0.035);
-  --line: rgba(255, 255, 255, 0.09);
-  --ink: #e8f0f8;
-  --muted: rgba(232, 240, 248, 0.62);
-  --mint: #7cc7f0;
+  --bg: #f8fafc;
+  --card: rgba(255, 255, 255, 0.72);
+  --line: rgba(13, 33, 68, 0.1);
+  --ink: #0d2144;
+  --muted: rgba(13, 33, 68, 0.62);
+  --mint: #1584c7;
   --turq: #1584c7;
   --teal: #0e5f92;
   --font: var(--font-instrument-sans), -apple-system, system-ui, sans-serif;
@@ -39,8 +39,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(80% 60% at 50% 0%, rgba(14, 95, 146, 0.22) 0%, transparent 55%),
-    radial-gradient(60% 50% at 85% 30%, rgba(21, 132, 199, 0.1) 0%, transparent 50%),
+    radial-gradient(80% 60% at 50% 0%, rgba(21, 132, 199, 0.12) 0%, transparent 55%),
+    radial-gradient(60% 50% at 85% 30%, rgba(14, 95, 146, 0.07) 0%, transparent 50%),
     var(--bg);
 }
 .bg-grid {
@@ -48,16 +48,16 @@
   inset: 0;
   opacity: 0.5;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(13, 33, 68, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 33, 68, 0.045) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(100% 70% at 50% 0%, #000 0%, transparent 75%);
 }
 .bg-grain {
   position: absolute;
   inset: -50%;
-  opacity: 0.04;
-  mix-blend-mode: screen;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .funnel-bg {
@@ -75,7 +75,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(120% 85% at 50% 42%, transparent 30%, rgba(10, 24, 48, 0.55) 100%);
+  background: radial-gradient(120% 85% at 50% 42%, transparent 30%, rgba(248, 250, 252, 0.7) 100%);
 }
 .funnel-fallback {
   position: fixed;
@@ -92,7 +92,7 @@
   width: min(60vw, 620px);
   aspect-ratio: 1;
   border-radius: 46% 54% 52% 48% / 55% 50% 50% 45%;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(124, 199, 240, 0.28), transparent 70%);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(21, 132, 199, 0.18), transparent 70%);
   filter: blur(14px);
 }
 
@@ -114,7 +114,7 @@
   border-bottom: 1px solid transparent;
 }
 .landing-aurora .nav.solid {
-  background: rgba(6, 13, 26, 0.65);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(16px);
   border-color: var(--line);
   padding-block: 12px;
@@ -132,7 +132,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.6);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 5px;
@@ -148,7 +148,7 @@
 }
 .landing-aurora .nav-mid a:hover {
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(21, 132, 199, 0.08);
 }
 .landing-aurora .nav-login {
   font-size: 13.5px;
@@ -166,16 +166,16 @@
   font: 600 13.5px/1 var(--font);
   padding: 11px 18px;
   border-radius: 999px;
-  background: var(--mint);
-  color: var(--bg);
+  background: var(--turq);
+  color: #fff;
   white-space: nowrap;
   transition:
     background 0.25s,
     box-shadow 0.25s;
 }
 .landing-aurora .nav-cta:hover {
-  background: #9dd6f5;
-  box-shadow: 0 8px 26px rgba(124, 199, 240, 0.34);
+  background: var(--teal);
+  box-shadow: 0 8px 26px rgba(21, 132, 199, 0.34);
 }
 .landing-aurora .nav-cta svg {
   width: 14px;
@@ -198,11 +198,12 @@
   border: 1px solid var(--line);
   border-radius: 18px;
   backdrop-filter: blur(6px);
+  box-shadow: 0 6px 24px rgba(13, 33, 68, 0.05);
   transition:
     border-color 0.3s,
     transform 0.3s var(--ease);
 }
 .glass-card:hover {
-  border-color: rgba(124, 199, 240, 0.45);
+  border-color: rgba(21, 132, 199, 0.45);
   transform: translateY(-2px);
 }

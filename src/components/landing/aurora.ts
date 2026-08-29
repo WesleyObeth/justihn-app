@@ -49,7 +49,7 @@ export function initAurora(canvas: HTMLCanvasElement, opts?: AuroraOpts) {
       " float glow=pow(band,1.6)*0.9 + g*0.12;" +
       " vec3 col;" +
       " if(uLight>0.5){" +
-      "   vec3 paper=vec3(0.957,0.945,0.925); vec3 tealT=vec3(0.082,0.518,0.780), mintT=vec3(0.486,0.780,0.941);" +
+      "   vec3 paper=vec3(0.973,0.980,0.988); vec3 tealT=vec3(0.082,0.518,0.780), mintT=vec3(0.486,0.780,0.941);" +
       "   vec3 tint=mix(tealT,mintT,band);" +
       "   col=mix(paper, tint, clamp((pow(band,1.3)*0.60 + g*0.12),0.0,0.85));" +
       " } else {" +

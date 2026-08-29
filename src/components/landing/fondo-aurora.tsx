@@ -30,7 +30,7 @@ export function FondoAurora() {
     let api: { dispose: () => void } | null = null;
     if (canvas.current && hasWebGL() && !reduced) {
       try {
-        api = initAurora(canvas.current, { lowPerf });
+        api = initAurora(canvas.current, { lowPerf, light: true });
       } catch {
         api = null;
       }

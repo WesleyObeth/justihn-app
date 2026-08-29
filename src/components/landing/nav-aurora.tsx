@@ -20,7 +20,7 @@ export function NavAurora() {
   return (
     <nav ref={nav} className="nav">
       <Link className="brand" href="/" aria-label="Justihn — inicio">
-        <SimboloJustihn size={30} variante="oscuro" />
+        <SimboloJustihn size={30} />
         <span className="wm">Justihn</span>
       </Link>
       <div className="nav-mid">
