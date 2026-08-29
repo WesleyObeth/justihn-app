@@ -275,18 +275,50 @@ export const TRAMITES: Tramite[] = [
     nombre: "Tradición de dominio de un inmueble",
     tipo: "tramite",
     institucionId: "ip",
-    paraQuien: "Quien compra, vende o hereda una propiedad",
+    paraQuien: "Quien compra, vende o hereda una casa o un terreno",
     resumen:
-      "La compraventa no termina con la escritura: la propiedad cambia de dueño ante terceros cuando la tradición de dominio se inscribe en el Instituto de la Propiedad.",
+      "Firmar la escritura no te hace dueño frente a terceros: eso ocurre cuando el documento se inscribe en el Registro Inmueble del Instituto de la Propiedad. Y el registrador no inscribe nada hasta que estén pagados los impuestos de la operación — incluido uno que casi siempre sorprende al vendedor.",
     materia: "Notarial",
     pasos: [
-      { titulo: "Verifica el folio real ANTES de comprar", detalle: "Confirma quién es el dueño registral y si hay gravámenes o anotaciones — el error más caro es saltarse este paso." },
-      { titulo: "Otorga la escritura pública", detalle: "Ante notario, con el pago de los impuestos de la transacción (tradición de bienes inmuebles y tasas registrales)." },
-      { titulo: "Inscribe la escritura en el IP", detalle: "Presenta el testimonio de la escritura en el registro correspondiente; la inscripción en el folio real te hace dueño ante terceros." },
+      {
+        titulo: "Antes de pagar: pide la constancia de libertad de gravamen",
+        detalle:
+          "Es el paso que evita el fraude de la doble venta y las hipotecas ocultas. La constancia de libertad de gravamen cuesta L 200.00; si quieres la historia completa del inmueble (todos los asientos registrales), pide la certificación íntegra por L 300.00. Existe además la certificación de gravámenes judiciales, L 200.00.",
+      },
+      {
+        titulo: "Otorga la escritura pública ante notario",
+        detalle:
+          "El notario redacta y autoriza la escritura de compraventa. Ojo: el IP exige presentar la escritura de compra-venta ORIGINAL al inscribirla — no una copia.",
+      },
+      {
+        titulo: "Paga los impuestos ANTES de ir al registro",
+        detalle:
+          "Para inscribir la compraventa hay que acompañar tres pagos: (1) las tasas registrales según el valor de la venta, (2) el Impuesto de Tradición sobre bienes inmuebles según el monto de la venta y (3) el impuesto de Ganancia de Capital — este último es del vendedor y es el que más veces frena una inscripción a última hora. Cuando corresponda, se adjunta también la constancia de valor catastral del inmueble.",
+      },
+      {
+        titulo: "Presenta la escritura para inscripción de compra-venta",
+        detalle:
+          "Con la escritura original y los recibos, el Registro Inmueble inscribe la compraventa. Los pagos se hacen en las ventanillas de cobro del IP o en las instituciones bancarias autorizadas — conserva el recibo hasta que el trámite esté completado.",
+      },
+      {
+        titulo: "Si lo que necesitas es el trámite de tradición de dominio",
+        detalle:
+          "Es un trámite registral distinto (por ejemplo, para ordenar la cadena de dominio de un inmueble heredado). Se presenta solicitud de tradición de dominio —adjuntando el testamento si es testamentaria—, recibo de pago de L 200.00 con su copia, y copias del DNI de los solicitantes. Si el inmueble está inscrito en otra circunscripción, se acompaña la certificación íntegra de la sentencia. Y si la solicitud la firma un profesional del derecho, debe acreditar su representación con poder o, en su defecto, carta poder.",
+      },
     ],
-    requisitos: ["Escritura pública", "Constancias fiscales y pago de impuestos", "[Verificar tasas registrales vigentes]"],
-    tasa: "L ___ (impuesto de tradición + tasas registrales)",
-    nota: "Los fraudes de doble venta se evitan en el paso 1 — un abogado o notario revisa el folio real antes de que pagues.",
+    requisitos: [
+      "Escritura de compra-venta ORIGINAL",
+      "Recibo de pago de tasas registrales, calculado sobre el valor de la venta",
+      "Recibo del Impuesto de Tradición sobre bienes inmuebles, según el monto de la venta",
+      "Comprobante de pago del impuesto de Ganancia de Capital",
+      "Constancia de valor catastral del inmueble, cuando corresponda",
+      "Para el trámite de tradición de dominio: solicitud, recibo de L 200.00 y copia, DNI de los solicitantes, testamento si es testamentaria, y poder o carta poder si actúa un abogado",
+    ],
+    tasa: "Tasa base registral L 200.00 (más L 1.50 por millar o fracción cuando el valor excede L 1,000.00) + Impuesto de Tradición del 1.5% del valor de la transacción (art. 53 de la Ley de Propiedad, según la tabla de tasas del IP)",
+    nota:
+      "🏠 Si el inmueble viene de una herencia, el trámite registral es la posesión efectiva de herencia: L 200.00, con la certificación de sentencia original y copia legible (testamentaria o abintestato).\n\n⚠️ Para propiedades con valor superior a L 300,000.00 el IP aplica tasas proporcionales según la tabla registral vigente, y advierte que las tasas pueden modificarse — confirma el monto en ventanilla antes de presupuestar.",
+    fuenteUrl: "https://www.ip.gob.hn/direcciones/registro-inmueble/tramites-inmueble",
+    fuenteNombre: "IP — Dirección General de Registro Inmueble (requisitos y tabla de tasas)",
   },
   {
     id: "traspaso-vehiculo",
