@@ -5,12 +5,16 @@ import type { Materia } from "@/types/dominio";
  * grande del feedback del socio abogado (2026-08-29). Sirve a las DOS vías:
  * la gente común busca "cómo sacar el RTN"; el abogado lo usa de referencia.
  *
- * HONESTIDAD (regla #1): los pasos son orientación general; las tasas y
- * requisitos exactos van con marcadores "L ___" hasta que el socio verifique
- * cada trámite contra la fuente institucional. Cada guía lo declara.
+ * HONESTIDAD (regla #1): las 13 guías están VERIFICADAS contra su fuente
+ * oficial (backlog #3c, cerrado 2026-08-29) — cada una lleva `fuenteUrl` y
+ * `fuenteNombre`, que es lo que enciende el sello "Verificado con la fuente
+ * oficial" en la UI. Ya no quedan marcadores "L ___": los montos, plazos y
+ * artículos salen del portal institucional o del código citado. Al editar una
+ * guía, o se mantiene la fuente o se quita el sello — nunca texto sin respaldo.
  *
- * TODO(data): tablas `instituciones` + `tramites` + `pasos_tramite`,
- * contenido verificado por el socio (backlog #1b del producto).
+ * TODO(data): tablas `instituciones` + `tramites` + `pasos_tramite`. Pendiente
+ * de revisión del socio abogado: contraste de práctica real y actualización
+ * de tarifas (las de las instituciones cambian sin aviso).
  */
 
 export interface Institucion {
@@ -768,42 +772,61 @@ export const TRAMITES: Tramite[] = [
     nombre: "Herencia: cómo poner los bienes a tu nombre",
     tipo: "proceso",
     institucionId: "poder-judicial",
-    paraQuien: "Familiares que heredan una casa, terreno o cuentas de una persona fallecida",
+    paraQuien: "Familiares que heredan una casa, terreno, vehículo o cuentas de una persona fallecida",
     resumen:
-      "Heredar no basta con ser familiar: hasta que se declaren los herederos y se inscriba la partición, los bienes siguen a nombre del fallecido y no se pueden vender ni hipotecar.",
+      "Ser el hijo o el cónyuge no te hace dueño: hasta que hay una sentencia de declaratoria de herederos inscrita y los bienes se registran, la casa sigue a nombre del fallecido y no se puede vender ni hipotecar. La declaratoria se tramita todavía bajo el Código de Procedimientos Civiles de 1906, porque Honduras no ha aprobado su Ley de Jurisdicción Voluntaria (art. 919 del Código Procesal Civil).",
     materia: "Civil",
     pasos: [
       {
         titulo: "Reúne los documentos del fallecido y del vínculo",
         detalle:
-          "Certificado de defunción, partidas de nacimiento o matrimonio que prueben el parentesco, y los títulos de los bienes (escrituras, folio real).",
+          "Certificado de defunción, las partidas de nacimiento o de matrimonio que prueben el parentesco, y los títulos de los bienes: escrituras, folio real, matrícula del vehículo. Pide en el Instituto de la Propiedad la certificación íntegra del inmueble (L 300.00) para saber exactamente qué está inscrito y a nombre de quién.",
       },
       {
         titulo: "Verifica si dejó testamento",
         detalle:
-          "Con testamento, la sucesión sigue lo que dispuso; sin testamento, la ley define quiénes heredan y en qué proporción.",
+          "Con testamento la sucesión es testamentaria y sigue lo que dispuso el causante; sin testamento es abintestato y la ley define quiénes heredan. Esa distinción se arrastra en todos los trámites posteriores: el Instituto de la Propiedad pide expresamente el testamento cuando la tradición de dominio es testamentaria.",
       },
       {
         titulo: "Tramita la declaratoria de herederos",
         detalle:
-          "Se promueve ante juzgado o por vía notarial según el caso; ahí queda oficialmente reconocido quién hereda.",
+          "Es un acto de jurisdicción voluntaria. Como aún no existe la Ley de Jurisdicción Voluntaria, siguen vigentes las disposiciones del Código de Procedimientos Civiles de 1906, Libro IV «Actos Judiciales no Contenciosos» (art. 919 del CPC de 2018). El resultado es la sentencia de declaratoria de herederos, que es el documento con el que se mueve todo lo demás.",
       },
       {
-        titulo: "Inscribe los bienes a nombre de los herederos",
+        titulo: "Inscribe la posesión efectiva de herencia en el Instituto de la Propiedad",
         detalle:
-          "Con la declaratoria y la partición, se inscribe en el Instituto de la Propiedad — hasta ese momento no puedes vender ni hipotecar el inmueble.",
+          "El trámite registral se llama posesión efectiva de herencia y cuesta L 200.00: se presenta la certificación de la sentencia original más una copia legible, sea testamentaria o abintestato. A partir de ahí el inmueble queda a nombre de los herederos.",
+      },
+      {
+        titulo: "Si hay vehículo, tiene su propia ruta",
+        detalle:
+          "En el traspaso por herencia NO se presenta formulario de traspaso: se acompaña la certificación de la sentencia de declaratoria de herederos (o instrumento público equivalente) debidamente inscrita en el Registro de Sentencias del Instituto de la Propiedad. El trámite cuesta L 300.00 y el cambio del kit de placas se hace en el mismo procedimiento, marcando ambos trámites en el formulario.",
+      },
+      {
+        titulo: "Para vender: primero a nombre de todos, después a quien decidan",
+        detalle:
+          "Si los herederos quieren pasar el bien a uno de ellos o a un tercero, primero deben inscribirlo a nombre de todos mediante una cesión de derechos y después suscribir la tradición de dominio a favor de la persona designada. Saltarse ese orden es el error que traba las ventas de bienes heredados.",
+      },
+      {
+        titulo: "Si el bien no lo posee nadie, existe una vía más rápida",
+        detalle:
+          "El Código Procesal Civil prevé un proceso abreviado para que el juzgado ponga en posesión de los bienes a quien los adquirió por herencia, siempre que no estén siendo poseídos por nadie a título de dueño o usufructuario (art. 601.1). La demanda va con el documento que acredite fehacientemente la sucesión y una lista de testigos que declaren esa ausencia de poseedor (art. 602). El juzgado los oye, dicta auto y lo publica por edictos en la sede del tribunal y en lugares públicos del municipio, a costa del demandante, dando 30 días a quien crea tener mejor derecho; si nadie comparece, se confirma la posesión (art. 606).",
       },
     ],
     requisitos: [
       "Certificado de defunción",
-      "Documentos que prueben el parentesco",
-      "Escrituras o folio real de los bienes",
-      "Testamento (si existe)",
-      "[Verificar impuestos y tasas vigentes]",
+      "Partidas de nacimiento o matrimonio que prueben el parentesco",
+      "Testamento, si existe",
+      "Escrituras, folio real o certificación íntegra de los inmuebles (L 300.00 en el IP)",
+      "Sentencia de declaratoria de herederos, certificada — original y copia legible",
+      "Para vehículos: esa misma certificación inscrita en el Registro de Sentencias del IP",
     ],
-    tasa: "Honorarios del abogado o notario · [tasas registrales por verificar]",
+    tasa: "Posesión efectiva de herencia en el Registro Inmueble: L 200.00 · Traspaso de vehículo por herencia: L 300.00 · Certificación íntegra del inmueble: L 300.00 · Más los honorarios del abogado o notario que tramite la declaratoria",
     nota:
-      "Dejar la herencia sin tramitar por años multiplica el problema: se suman herederos, se pierden documentos y el inmueble queda inmovilizado.",
+      "⏳ Dejar la herencia sin tramitar por años multiplica el problema: se suman herederos (los que van falleciendo dejan a su vez sus propios herederos), se pierden documentos y el inmueble queda inmovilizado — no se puede vender ni hipotecar.\n\n📜 Dato de contexto: la declaratoria de herederos se rige todavía por un código de 1906 porque la Ley de Jurisdicción Voluntaria que el CPC de 2018 anunció nunca se aprobó (art. 919). Por eso conviene un profesional que conozca ese procedimiento antiguo.",
+    fuenteUrl: "https://www.poderjudicial.gob.hn/Cedij/Cdigos/Codigo%20Procesal%20Civil%20(2018).pdf",
+    fuenteNombre:
+      "Código Procesal Civil (edición CEDIJ, 2018), arts. 601-606 y 919 — Poder Judicial · tasas del Instituto de la Propiedad",
   },
 ];
 
