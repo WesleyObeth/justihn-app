@@ -315,18 +315,57 @@ export const TRAMITES: Tramite[] = [
     nombre: "Licencia ambiental",
     tipo: "tramite",
     institucionId: "miambiente",
-    paraQuien: "Proyectos y negocios con impacto ambiental (construcción, industria, agro)",
+    paraQuien: "Proyectos y negocios con impacto ambiental: construcción, industria, agro, minería, energía",
     resumen:
-      "MiAmbiente clasifica los proyectos por categoría de impacto y emite la licencia ambiental que exige la ley antes de operar o construir.",
+      "No es una licencia sino dos: primero la Operativa, que te deja empezar, y después la Funcional, que vale 5 años. Y hay tres cosas que sorprenden al que llega sin asesoría: necesitas contratar sí o sí un Prestador de Servicios Ambientales autorizado, tienes que publicar un aviso en el diario, y el precio no está en ninguna tabla — lo calcula el sistema en línea según tu proyecto.",
     materia: "Contencioso Adm.",
     pasos: [
-      { titulo: "Determina la categoría del proyecto", detalle: "La tabla de categorización ambiental clasifica el impacto (de menor a mayor) — define los estudios que te pedirán." },
-      { titulo: "Prepara los estudios ambientales", detalle: "Según la categoría: desde formularios simples hasta estudios de impacto ambiental elaborados por prestadores registrados." },
-      { titulo: "Solicita la licencia y atiende la evaluación", detalle: "MiAmbiente evalúa, puede inspeccionar y emite la licencia con las medidas de control que debes cumplir." },
+      {
+        titulo: "Regístrate en el Sistema en línea de Licenciamiento Ambiental",
+        detalle:
+          "Todo arranca en el sistema en línea de MiAmbiente (SERNA). Ahí se genera después el Reporte Oficial que fija cuánto vas a pagar.",
+      },
+      {
+        titulo: "Contrata un Prestador de Servicios Ambientales (PSA) autorizado",
+        detalle:
+          "No es opcional: el PSA es el experto que elabora tu Plan de Gestión Ambiental y/o Estudio de Impacto Ambiental. MiAmbiente publica la lista de PSA autorizados, y el propio sistema te obliga a elegir uno de esa lista antes de continuar. Con él obtienes el pre-dictamen técnico del proyecto: costos, medidas de control ambiental y los requisitos de tu categoría.",
+      },
+      {
+        titulo: "Paga: TGR-1, depósito de inspección y garantía bancaria",
+        detalle:
+          "Son tres pagos distintos. (1) El costo de la licencia: se anota el monto de «Inversión por Licenciamiento» del Reporte Oficial en la casilla 12209 «Otras Licencias» del formulario TGR-1 de SEFIN y se paga en cualquier banco. (2) El depósito para la primera visita de los inspectores de la DECA, en BANADESA, a la cuenta del Fondo Rotatorio de DECA 02-001-000131-0, por el monto de «Pago primera visita DECA». (3) Una garantía bancaria que respalda la Licencia Operativa, por el monto que indique el mismo reporte.",
+      },
+      {
+        titulo: "Publica el aviso en el diario — y cuida los plazos",
+        detalle:
+          "El aviso de solicitud de licencia ambiental va en un octavo (1/8) de página en un diario de mayor circulación local y/o nacional, indicando el proyecto, su giro, su ubicación y la intención de solicitar la licencia. Debe publicarse 3 días consecutivos, y la solicitud se presenta dentro de los 5 días posteriores a la publicación: el recorte tiene una validez de 5 días hábiles y debe llevar el nombre del diario y la fecha.",
+      },
+      {
+        titulo: "Solicita y retira la Licencia Operativa",
+        detalle:
+          "Con el Informe de Validación Ambiental y la Declaración Jurada del PSA, envías la solicitud por el sistema y luego la presentas en ventanilla con: escritura de constitución, RTN, DNI, recibo TGR-1 cancelado, comprobante del depósito, garantía bancaria, carta poder si aplica, el recorte de la publicación y el certificado de autenticidad de las fotocopias. Firmas el Contrato de Cumplimiento de Medidas de Mitigación o Control Ambiental y retiras la Licencia Operativa — que es temporal y pierde valor cuando salga la Funcional.",
+      },
+      {
+        titulo: "Inspección de DECA y Licencia Funcional (5 años)",
+        detalle:
+          "Los inspectores de la DECA visitan el sitio: ahí se presenta el SINEIA F-02 y las constancias que apliquen a tu proyecto — ICF, factibilidad del INSEP, constancia de la UMA municipal, Instituto Hondureño de Antropología e Historia, credencial del alcalde. Después presentas en ventanilla la Solicitud de Licencia Funcional con el título de propiedad y el resumen del Plan de Gestión Ambiental, y retiras la licencia: vigencia de 5 años.",
+      },
     ],
-    requisitos: ["Documentos legales del proyecto y del predio", "Estudios según categoría", "[Verificar categorización vigente]"],
-    tasa: "L ___ (según categoría del proyecto)",
-    nota: "Operar sin licencia ambiental expone a multas y cierre — y es de los trámites donde más ayuda un abogado administrativo.",
+    requisitos: [
+      "Registro en el Sistema en línea de Licenciamiento Ambiental",
+      "Prestador de Servicios Ambientales (PSA) autorizado por MiAmbiente, elegido de su lista oficial",
+      "Recibo TGR-1 cancelado (casilla 12209 «Otras Licencias») + comprobante del depósito a BANADESA + garantía bancaria",
+      "Informe de Validación Ambiental y Declaración Jurada del PSA",
+      "Escritura pública de constitución, RTN y documento de identidad (carta poder si actúa un representante)",
+      "Recorte de la publicación del aviso (1/8 de página, 3 días consecutivos) y certificado de autenticidad de las fotocopias",
+      "SINEIA F-02, título de propiedad y resumen del Plan de Gestión Ambiental",
+      "Constancias según el proyecto: ICF, INSEP, UMA municipal, Instituto Hondureño de Antropología e Historia",
+    ],
+    tasa: "No hay tarifa fija publicada: el monto de «Inversión por Licenciamiento» y el «Pago primera visita DECA» los calcula el Sistema en línea de Licenciamiento Ambiental según tu proyecto, y se suman la garantía bancaria y los honorarios del PSA",
+    nota:
+      "📊 La categoría manda. El Acuerdo Ministerial 016-2015 (Tabla de Categorización Ambiental) clasifica los proyectos en categorías 1 a 4 según su magnitud e impacto, y de ahí salen los estudios que te van a pedir. Las categorías 1 y 2 siguen exactamente la misma ruta de 16 pasos; lo que cambia es la profundidad técnica del trabajo del PSA.\n\n⚖️ Base legal: Ley General del Ambiente (art. 5), Acuerdo Ejecutivo 008-2015 (Reglamento del SINEIA), Acuerdo Ministerial 016-2015 (Tabla de Categorización, Anexo 3) y art. 60 de la Ley de Fortalecimiento de los Ingresos.\n\n⚠️ Verifica en MiAmbiente el número de cuenta de BANADESA y los formularios antes de pagar: el portal de trámites del Estado puede estar desactualizado.",
+    fuenteUrl: "https://honduras.eregulations.org/procedure/373/586?l=es",
+    fuenteNombre: "e-Regulations Honduras — Licencias Ambientales (MiAmbiente/SERNA, 16 pasos)",
   },
   {
     id: "inscripcion-oncae",
