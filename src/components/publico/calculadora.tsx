@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Icono } from "@/components/brand/iconos";
 import { calcularPrestaciones } from "@/lib/prestaciones";
 import { buscarAbogados } from "@/data/directorio";
 import { usePortal } from "@/store/portal";
@@ -12,18 +14,46 @@ import { fmtLempiras } from "@/lib/utils";
  * tráfico #1 del análisis. USA EL MISMO `calcularPrestaciones` que el portal
  * de abogados (§0.5: un solo lugar por dato): la persona y su abogado ven el
  * mismo número.
+ *
+ * Fuera del portal el resultado se muestra BLOQUEADO (patrón Jusbrasil): el
+ * cálculo ya corrió — se ve difuminado — y para leerlo hay que crear cuenta o
+ * iniciar sesión. Los valores viajan en la URL: al entrar, la persona ve SU
+ * cálculo, no un formulario vacío.
  */
 export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean }) {
+  const router = useRouter();
+  const params = useSearchParams();
   const rutaConsultorio = enPortal ? "/persona/consultas" : "/#consultorio";
   const mostrarToast = usePortal((s) => s.mostrarToast);
-  const [salario, setSalario] = useState("");
-  const [anios, setAnios] = useState("");
+  const [salario, setSalario] = useState(enPortal ? (params.get("salario") ?? "") : "");
+  const [anios, setAnios] = useState(enPortal ? (params.get("anios") ?? "") : "");
 
   const salarioNum = Number(salario);
   const aniosNum = Number(anios);
   const valido = salarioNum > 0 && aniosNum > 0;
+  const bloqueado = !enPortal && valido;
   const r = calcularPrestaciones(salarioNum, aniosNum);
   const laborales = buscarAbogados("Laboral").slice(0, 2);
+
+  /** Con los valores puestos: al entrar ve su propio cálculo hecho. */
+  const destinoConDatos = `/persona/calculadora?salario=${salarioNum}&anios=${aniosNum}`;
+
+  const iniciarSesion = () => {
+    mostrarToast("Sesión de demostración — el login real llega con la Fase 2");
+    router.push(destinoConDatos);
+  };
+
+  const desglose = (
+    <div className="flex flex-col gap-2 rounded-xl bg-lienzo p-5">
+      <Fila etiqueta="Cesantía (auxilio por el despido)" valor={fmtLempiras(r.cesantia)} />
+      <Fila etiqueta="Preaviso" valor={fmtLempiras(r.preaviso)} />
+      <Fila etiqueta="Vacaciones + 13º y 14º proporcionales" valor={fmtLempiras(r.proporcionales)} />
+      <div className="flex justify-between gap-3 border-t border-borde pt-2.5 text-[16px]">
+        <span className="font-semibold">Total estimado</span>
+        <b className="whitespace-nowrap text-celeste">{fmtLempiras(r.total)}</b>
+      </div>
+    </div>
+  );
 
   return (
     <div className={enPortal ? "max-w-[860px]" : "mx-auto max-w-[860px] px-4 py-8 md:px-6"}>
@@ -65,22 +95,49 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
           </label>
         </div>
 
-        {valido ? (
-          <div className="mt-5 flex flex-col gap-2 rounded-xl bg-lienzo p-5">
-            <Fila etiqueta="Cesantía (auxilio por el despido)" valor={fmtLempiras(r.cesantia)} />
-            <Fila etiqueta="Preaviso" valor={fmtLempiras(r.preaviso)} />
-            <Fila
-              etiqueta="Vacaciones + 13º y 14º proporcionales"
-              valor={fmtLempiras(r.proporcionales)}
-            />
-            <div className="flex justify-between gap-3 border-t border-borde pt-2.5 text-[16px]">
-              <span className="font-semibold">Total estimado</span>
-              <b className="whitespace-nowrap text-celeste">{fmtLempiras(r.total)}</b>
-            </div>
-          </div>
-        ) : (
+        {!valido && (
           <div className="mt-5 rounded-xl bg-lienzo p-5 text-center text-[13px] text-texto-4">
             Escribe tu salario y tus años trabajados para ver el cálculo.
+          </div>
+        )}
+
+        {valido && !bloqueado && <div className="mt-5">{desglose}</div>}
+
+        {bloqueado && (
+          <div className="relative mt-5">
+            {/* El cálculo YA corrió: se ve detrás, difuminado. */}
+            <div aria-hidden className="pointer-events-none blur-[7px] select-none">
+              {desglose}
+            </div>
+
+            <div className="absolute inset-0 grid place-items-center rounded-xl bg-white/45 px-4">
+              <div className="w-full max-w-[420px] rounded-2xl border border-chip-borde bg-white px-5 py-5 text-center shadow-[0_12px_36px_rgba(13,33,68,.14)]">
+                <span className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-chip text-celeste">
+                  <Icono nombre="candado" size={17} />
+                </span>
+                <div className="font-display mt-2.5 text-[16px] leading-[1.35] font-bold">
+                  Tu cálculo está listo
+                </div>
+                <p className="mx-auto mt-1 max-w-[320px] text-[12.5px] leading-[1.55] text-texto-3">
+                  Crea tu cuenta gratis para ver el desglose completo, guardarlo y saber qué
+                  hacer después.
+                </p>
+                <Link
+                  href={destinoConDatos}
+                  className="mt-3.5 block rounded-xl bg-celeste px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
+                >
+                  Crear mi cuenta gratis
+                </Link>
+                <button
+                  type="button"
+                  onClick={iniciarSesion}
+                  className="mt-2 w-full cursor-pointer rounded-xl border border-borde bg-lienzo px-5 py-2.5 text-[13px] font-medium text-marino hover:border-celeste hover:text-celeste"
+                >
+                  Ya tengo cuenta — iniciar sesión
+                </button>
+                <p className="mt-2 text-[11px] text-texto-4">Sin tarjeta · demo de validación</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -91,7 +148,7 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
         </p>
       </div>
 
-      {valido && (
+      {valido && !bloqueado && (
         <div className="mt-6 rounded-2xl border border-borde bg-white p-6">
           <h2 className="font-display text-[17px] font-bold">¿Y ahora qué? Tus siguientes pasos</h2>
           <ol className="mt-3 flex flex-col gap-2.5">
@@ -100,7 +157,10 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
               "Reclama primero por la vía administrativa (Secretaría de Trabajo) — es gratis",
               "Si no hay acuerdo, un abogado laboral presenta la demanda con este cálculo",
             ].map((paso, i) => (
-              <li key={paso} className="flex items-start gap-2.5 text-[13.5px] leading-[1.6] text-texto-2">
+              <li
+                key={paso}
+                className="flex items-start gap-2.5 text-[13.5px] leading-[1.6] text-texto-2"
+              >
                 <span className="grid h-[22px] w-[22px] min-w-[22px] place-items-center rounded-full bg-chip text-[11.5px] font-bold text-celeste">
                   {i + 1}
                 </span>

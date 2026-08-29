@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { CalculadoraPublica } from "@/components/publico/calculadora";
 
 export const metadata: Metadata = {
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function PaginaCalculadoraPublica() {
-  return <CalculadoraPublica />;
+  return (
+    <Suspense fallback={null}>
+      <CalculadoraPublica />
+    </Suspense>
+  );
 }
