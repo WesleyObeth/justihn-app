@@ -280,17 +280,58 @@ export const TRAMITES: Tramite[] = [
     institucionId: "registro-mercantil",
     paraQuien: "Socios que quieren formalizar una empresa (S. de R.L. o S.A.)",
     resumen:
-      "La sociedad nace con la escritura pública y existe frente a terceros cuando se inscribe en el Registro Mercantil — después vienen RTN, permisos y facturación.",
+      "Formalizar una empresa en Honduras no es un trámite: son 33 pasos oficiales ante notario, banco, Registro Mercantil, SAR, alcaldía, IHSS, INFOP y RAP. Toma entre 34 y 54 días. Esta guía te ordena el camino por etapas.",
     materia: "Mercantil",
     pasos: [
-      { titulo: "Define el tipo social y el pacto", detalle: "S. de R.L. o S.A., capital, socios y administración — es la estructura legal de tu negocio por años." },
-      { titulo: "Otorga la escritura ante notario", detalle: "La escritura de constitución con los estatutos de la sociedad." },
-      { titulo: "Inscribe en el Registro Mercantil", detalle: "En la cámara de comercio de tu jurisdicción (CCIT en Tegucigalpa, CCIC en Cortés)." },
-      { titulo: "Activa la vida fiscal", detalle: "RTN de la sociedad, permiso de operación y facturación CAI — los otros trámites de esta guía." },
+      {
+        titulo: "Deposita el capital y obtén el certificado",
+        detalle:
+          "El notario emite la nota para el certificado de depósito y depositas el aporte en numerario en un banco del sistema. Con ese certificado arranca todo lo demás.",
+      },
+      {
+        titulo: "Otorga la escritura pública de constitución",
+        detalle:
+          "El notario elabora la escritura con los datos fundamentales: socios, capital, tipo de sociedad y representación legal. Firmas, recibes el aviso de constitución y retiras el testimonio.",
+      },
+      {
+        titulo: "Inscribe la sociedad en el Registro Mercantil",
+        detalle:
+          "Calculas y pagas la tasa registral, solicitas la inscripción y retiras la matrícula. Aquí la sociedad empieza a existir frente a terceros.",
+      },
+      {
+        titulo: "Saca el RTN de la sociedad y la afiliación a la cámara",
+        detalle:
+          "Con la matrícula tramitas el registro tributario de la empresa y la afiliación a la cámara de comercio, ambos gestionados en el Registro Mercantil.",
+      },
+      {
+        titulo: "Autoriza tus libros contables",
+        detalle:
+          "Compras los libros, solicitas su autorización en la alcaldía, pagas en el banco y los retiras autorizados.",
+      },
+      {
+        titulo: "Obtén el permiso de operación municipal",
+        detalle:
+          "En la alcaldía: constancia de compatibilidad de uso de suelo, solicitud del permiso, pago de impuestos y retiro del permiso de operación.",
+      },
+      {
+        titulo: "Inscríbete como patrono: IHSS, INFOP y RAP",
+        detalle:
+          "Si vas a tener empleados: inscripción patronal en el IHSS (número patronal y planilla), afiliación al INFOP e inscripción al RAP. Sin esto no puedes contratar en regla.",
+      },
     ],
-    requisitos: ["DNI de los socios", "Capital según tipo social", "[Verificar montos y aranceles vigentes]"],
-    tasa: "L ___ (notario + registro)",
-    nota: "El pacto social mal diseñado cuesta caro al crecer o al pelearse los socios — aquí el abogado mercantil vale cada lempira.",
+    requisitos: [
+      "Documento de identidad de los socios (te lo piden en casi todos los pasos)",
+      "RTN personal del representante",
+      "Certificado de depósito del capital",
+      "Testimonio de la escritura pública",
+      "Carta de poder si actúa un representante",
+      "Formularios: inscripción tributaria, inscripción patronal IHSS, planilla y RAP",
+    ],
+    tasa: "≈ L 2,040 en tasas oficiales (sin honorarios de abogado ni notario)",
+    nota:
+      "⏱️ Cuenta con 34 a 54 días. Ojo: los montos y formularios del portal oficial pueden estar desactualizados (el antiguo DEI hoy es el SAR) — confirma cifras vigentes antes de presupuestar.",
+    fuenteUrl: "https://honduras.eregulations.org/procedure/4/5?l=es",
+    fuenteNombre: "e-Regulations Honduras — Sociedad mercantil (33 pasos)",
   },
   // ── Procesos legales (vía judicial) — pedido del socio: "proceso laboral,
   // me despidieron, ejemplos". Mismos campos: la UI y el checklist se
