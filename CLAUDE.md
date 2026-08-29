@@ -131,16 +131,24 @@ inexistentes / casos propios), prestaciones, plazos y vía procesal.
    `JUSTIHN_DEMO_SESSION=1` en Vercel. Verificado en producción: rutas 200,
    redirects `/portal`→`/abogados`, headers de seguridad, `noindex` de
    validación (quitar al lanzar) y el chat de Jus IA respondiendo con citas.
-3. **🚦 GATE — Validación del socio abogado (decisión Wesley 2026-08-26):** el
-   socio AÚN NO revisa el sistema (https://justihn-app.vercel.app). **Sin su
-   validación no se crean las tablas en Supabase**: los seeds de `src/data/`
-   son el contrato literal del esquema, y su feedback (pantallas, features,
-   planes, cálculo laboral, códigos a priorizar) puede cambiarlo — congelar el
-   contrato antes de su revisión sería construir sobre hipótesis.
+3. [x] ✅ **GATE ABIERTO — el socio abogado revisó el sistema (2026-08-29).**
+   Su feedback no pide cambios a lo construido: pide AGREGADOS (detalle en
+   justihn/CLAUDE.md backlog #1b). Lo relevante para este repo: (a) un vertical
+   nuevo de **trámites administrativos por institución del Estado** (IP, ARSA,
+   MiAmbiente, ONCAE, SAR, municipalidades — permiso de operación, licencia
+   sanitaria/ambiental, tradición de dominio, CAI, RTN, traspaso de vehículos),
+   pariente de la pantalla Procesos pero de fuente institucional, no judicial;
+   (b) la **vía B toma forma**: directorio de abogados por materia + guías
+   ciudadanas que recomiendan abogado (funnel guía→lead) + **plan gratuito y
+   plan pago para el público** (cambio al modelo original); (c) Modelos validada
+   con roadmap de catálogo creciente. Las entidades nuevas (instituciones,
+   trámites, directorio público, planes vía B) se diseñan mock-first ANTES de
+   congelar el esquema completo.
 4. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
    workflow del corpus de Data Table → Postgres + embeddings pgvector (el
-   esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). ⛔ Bloqueado
-   por el gate #3.
+   esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Los seeds
+   del portal de abogados quedaron validados; decidir si las tablas nuevas del
+   feedback entran al esquema inicial o en una migración posterior.
 5. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
    ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende
    del gate: el destino provisional (Data Table de n8n) sigue válido.
