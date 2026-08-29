@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Icono } from "@/components/brand/iconos";
 import { getInstitucion, type Tramite } from "@/data/tramites";
 import { buscarAbogados } from "@/data/directorio";
 import { usePortal } from "@/store/portal";
@@ -28,6 +29,23 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
             {tramite.nombre}
           </h1>
           <p className="mt-2 text-[14px] leading-[1.65] text-texto-2">{tramite.resumen}</p>
+
+          {tramite.fuenteUrl && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[12.5px]">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-exito-bg px-2.5 py-1 font-semibold text-exito">
+                <Icono nombre="check" size={12} strokeWidth={2.6} />
+                Verificado con la fuente oficial
+              </span>
+              <a
+                href={tramite.fuenteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-celeste hover:text-marino"
+              >
+                {tramite.fuenteNombre ?? "Ver la fuente"} →
+              </a>
+            </div>
+          )}
 
           {/* Patrón Jusbrasil: la landing da la probadita (paso 1); la guía
               completa, el checklist y los costos viven en tu cuenta gratis. */}

@@ -137,8 +137,16 @@ export function SeccionTramites({
               <div className="text-[11px] font-bold tracking-[.8px] uppercase" style={{ color: "var(--mint)" }}>
                 {inst.sigla}
               </div>
-              <div className="font-display mt-1 text-[15px] leading-[1.35] font-semibold">
+              <div className="font-display mt-1 flex items-start gap-1.5 text-[15px] leading-[1.35] font-semibold">
                 {t.nombre}
+                {t.fuenteUrl && (
+                  <span
+                    title="Verificado con la fuente oficial"
+                    className="mt-[3px] shrink-0 text-exito"
+                  >
+                    <Icono nombre="check" size={13} strokeWidth={2.6} />
+                  </span>
+                )}
               </div>
               <p className="mt-1.5 flex-1 text-[12.5px] leading-[1.55]" style={{ color: "var(--muted)" }}>
                 {t.paraQuien}

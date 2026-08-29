@@ -41,6 +41,10 @@ export interface Tramite {
   requisitos: string[];
   tasa: string;
   nota?: string;
+  /** Página oficial de la institución (host de la whitelist §3.3). Solo se
+   *  llena cuando el dato fue verificado contra esa fuente. */
+  fuenteUrl?: string;
+  fuenteNombre?: string;
 }
 
 export const INSTITUCIONES: Institucion[] = [
@@ -108,25 +112,40 @@ export const TRAMITES: Tramite[] = [
     institucionId: "sar",
     paraQuien: "Cualquier persona que empieza a trabajar, facturar o abrir un negocio",
     resumen:
-      "El Registro Tributario Nacional es tu identidad ante el SAR — lo necesitas para facturar, abrir cuentas de negocio y casi cualquier trámite económico.",
+      "El Registro Tributario Nacional es tu identidad ante el SAR — es, en palabras del propio SAR, un documento esencial para cualquier transacción comercial o legal en Honduras.",
     materia: "Mercantil",
     pasos: [
       {
+        titulo: "Identifica qué tipo de RTN te toca",
+        detalle:
+          "El SAR distingue cuatro: persona natural SIN obligaciones (no realizas actividad económica), persona natural CON obligaciones (trabajas por tu cuenta), comerciante individual (constituido por escritura pública) y persona jurídica (empresas y organizaciones).",
+      },
+      {
         titulo: "Reúne tu identificación",
-        detalle: "DNI vigente (personas naturales) o escritura de constitución (comerciantes y sociedades).",
+        detalle:
+          "DNI vigente (original y copia) y el comprobante de domicilio que te pidan; para comerciante individual o persona jurídica, la escritura de constitución. Los requisitos exactos por tipo están en las fichas que publica el SAR.",
       },
       {
-        titulo: "Solicita la inscripción ante el SAR",
-        detalle: "Presencial en una oficina del SAR o por la Oficina Virtual, llenando el formulario de inscripción.",
+        titulo: "Haz la preinscripción en la Oficina Virtual",
+        detalle:
+          "En oficinavirtual.sar.gob.hn llenas la solicitud en línea; el SAR llama a esta modalidad 'virtual-presencial'. También puedes hacer todo presencial en una oficina del SAR.",
       },
       {
-        titulo: "Recibe tu RTN",
-        detalle: "El SAR emite el RTN numérico; guárdalo — te lo pedirán en todo trámite económico.",
+        titulo: "Recoge tu certificado de RTN",
+        detalle:
+          "Tras la preinscripción te presentas a la oficina del SAR a retirar el certificado. La primera emisión es de entrega inmediata.",
       },
     ],
-    requisitos: ["DNI vigente", "Datos de tu actividad económica", "[Verificar requisitos vigentes con el SAR]"],
-    tasa: "Sin costo (persona natural)",
-    nota: "Si vas a facturar, el RTN es solo el primer paso — sigue la autorización de facturación (CAI).",
+    requisitos: [
+      "DNI vigente (original y copia)",
+      "Comprobante de domicilio",
+      "Formulario de declaración jurada de inscripción",
+      "Escritura de constitución (comerciante individual o persona jurídica)",
+    ],
+    tasa: "Gratuito — el SAR confirma que el trámite no tiene costo",
+    nota: "La reposición del RTN también es gratis y se descarga desde la Oficina Virtual. Si vas a facturar, el RTN es solo el primer paso: sigue la autorización de facturación (CAI).",
+    fuenteUrl: "https://www.sar.gob.hn/registro-tributario-nacional-rtn/",
+    fuenteNombre: "SAR — Registro Tributario Nacional",
   },
   {
     id: "facturacion-cai",

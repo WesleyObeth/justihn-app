@@ -276,10 +276,30 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
             </div>
           </div>
 
-          <p className="mt-4 rounded-[10px] border border-aviso-borde bg-aviso px-4 py-3 text-[12px] leading-[1.55] text-aviso-cuerpo">
-            <b>Guía de demostración.</b> Orientación general — requisitos y tasas exactos se
-            verifican contra la fuente institucional antes del lanzamiento.
-          </p>
+          {tramite.fuenteUrl ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2.5 rounded-[10px] border border-exito/30 bg-exito-bg/50 px-4 py-3 text-[12.5px] leading-[1.55]">
+              <span className="inline-flex items-center gap-1.5 font-semibold text-exito">
+                <Icono nombre="check" size={13} strokeWidth={2.6} />
+                Verificado con la fuente oficial
+              </span>
+              <a
+                href={tramite.fuenteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-celeste hover:text-marino"
+              >
+                {tramite.fuenteNombre ?? "Ver la fuente"} →
+              </a>
+              <span className="basis-full text-texto-3">
+                Aun así es orientación general: tu caso puede tener condiciones propias.
+              </span>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-[10px] border border-aviso-borde bg-aviso px-4 py-3 text-[12px] leading-[1.55] text-aviso-cuerpo">
+              <b>Guía de demostración.</b> Orientación general — requisitos y tasas exactos se
+              verifican contra la fuente institucional antes del lanzamiento.
+            </p>
+          )}
         </div>
 
         <aside className="flex flex-col gap-4">
