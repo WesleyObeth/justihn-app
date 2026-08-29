@@ -256,21 +256,59 @@ export const TRAMITES: Tramite[] = [
   },
   {
     id: "licencia-sanitaria",
-    nombre: "Licencia y permiso sanitario",
+    nombre: "Licencia y permiso sanitario (ARSA)",
     tipo: "tramite",
     institucionId: "arsa",
-    paraQuien: "Negocios de alimentos, farmacias, clínicas y productos de consumo",
+    paraQuien: "Pulperías, comedores, restaurantes, panaderías, carnicerías, supermercados, bodegas e industria de alimentos",
     resumen:
-      "ARSA autoriza sanitariamente establecimientos y productos: sin licencia sanitaria vigente, el negocio regulado no puede operar legalmente.",
+      "ARSA autoriza sanitariamente establecimientos y productos. Lo que casi nadie sabe antes de ir: la tarifa NO es una sola — depende del tipo de establecimiento, de sus metros cuadrados, de si pides la licencia por 2, 4 o 6 años, de si el trámite es en línea o presencial, y sobre todo de en cuántos días hábiles quieres la resolución. Elegir bien esas cuatro casillas puede dividir el costo entre cuatro.",
     materia: "Contencioso Adm.",
     pasos: [
-      { titulo: "Identifica tu categoría", detalle: "Establecimiento (cafetería, farmacia, clínica) o producto (alimentos, cosméticos, medicamentos) — cada uno tiene su vía." },
-      { titulo: "Prepara el expediente", detalle: "Formulario de solicitud, RTN, permiso de operación, croquis del local y los documentos técnicos de tu categoría." },
-      { titulo: "Solicita ante ARSA y recibe inspección", detalle: "ARSA revisa el expediente e inspecciona el establecimiento antes de emitir la licencia." },
+      {
+        titulo: "Ubica tu categoría y tu clase",
+        detalle:
+          "ARSA clasifica por actividad (almacenan/distribuyen · manipulan y expenden listos para consumo · procesan y envasan preenvasados) y luego por tipo de establecimiento y clase según tamaño: pulpería, abarrotería o tienda de conveniencia; glorieta, comedor o cafetería; restaurante (quiosco/troca vs. pequeño-mediano vs. grandes, buffet y franquicias); panadería; carnicería; supermercado; bodega; distribuidora; industria alimenticia; envasadoras de agua; bares y discotecas. La clase la define la superficie en m² (o el número de empleados, en la industria).",
+      },
+      {
+        titulo: "Decide vigencia, modalidad y velocidad — ahí está el precio",
+        detalle:
+          "La licencia se otorga, a tu elección, por 2, 4 o 6 años. Y la tarifa vigente de ARSA se cruza con dos cosas más: EN LÍNEA sale sistemáticamente más barato que presencial (alrededor de 12% menos), y el precio sube según los días hábiles de resolución que pidas: 60, 40, 20 o 10. Ejemplos reales de licencia nueva por 2 años en línea — pulpería clase I: L 423.79 a 60 días, L 1,695.17 a 10 días. Comedor o cafetería tipo glorieta clase I: L 341.10 a 60 días. Restaurante pequeño-mediano: L 4,370.36 a 60 días, L 17,656.26 a 10 días.",
+      },
+      {
+        titulo: "Arma la solicitud con el título exacto",
+        detalle:
+          "Se presenta una solicitud dirigida a la Agencia de Regulación Sanitaria cuyo título diga literalmente «SE SOLICITA LICENCIA SANITARIA», con: nombre y número de identidad del propietario o representante legal, razón social, nombre del establecimiento, dirección exacta con teléfono, fax y correo, actividades y horario de atención, el tiempo por el que la pides (2, 4 o 6 años), lugar, fecha y firma.",
+      },
+      {
+        titulo: "Adjunta los documentos y paga con TGR-1",
+        detalle:
+          "Fotocopia de la escritura de constitución (sociedad o comerciante individual) debidamente inscrita, croquis de ubicación (cómo llegar), croquis de distribución de áreas internas y externas con fotografías del local, declaración jurada autenticada y la cuota de recuperación por servicios prestados. El pago va por el rubro «12199 - Tasas Varias» del formulario TGR-1.",
+      },
+      {
+        titulo: "Presenta el expediente y espera el dictamen",
+        detalle:
+          "Entra por la ventanilla de Servicio de Atención al Ciudadano (o en línea por SOL-ARSA); Admisiones Legales verifica requisitos y, si falta algo, te notifican para subsanar. La Dirección de Alimentos y Bebidas hace el informe técnico y la Unidad Legal el dictamen y la resolución. ARSA atiende en Tegucigalpa, Comayagua, San Pedro Sula, La Ceiba, Choluteca, Danlí, Santa Rosa de Copán y Juticalpa.",
+      },
+      {
+        titulo: "Si te dicen que no, tienes plazos cortos",
+        detalle:
+          "Ante un informe o dictamen no conforme puedes interponer recurso de reposición en un plazo no mayor a 10 días. Si te lo rechazan, tienes 10 días para apelar, o 60 días hábiles para ir a la vía judicial.",
+      },
     ],
-    requisitos: ["RTN y permiso de operación", "Croquis del establecimiento", "[Documentos técnicos según categoría — verificar con ARSA]"],
-    tasa: "L ___ (según categoría)",
-    nota: "La licencia tiene vigencia limitada — programa la renovación antes del vencimiento.",
+    requisitos: [
+      "Solicitud titulada «SE SOLICITA LICENCIA SANITARIA» con todos los datos del establecimiento y el plazo pedido (2, 4 o 6 años)",
+      "Fotocopia de la escritura de constitución de sociedad o de comerciante individual, inscrita",
+      "Croquis de ubicación (cómo llegar al establecimiento)",
+      "Croquis de distribución de áreas internas y externas + fotografías del local",
+      "Declaración jurada debidamente autenticada",
+      "Comprobante de la cuota de recuperación (TGR-1, rubro 12199 - Tasas Varias)",
+      "Venta en la vía pública, además: carné de salud de manipulador, certificado del curso «Manipulación segura de los alimentos» de ARSA, constancia municipal de que el sitio puede destinarse a eso, y RTN",
+    ],
+    tasa: "Según la tabla vigente de ARSA: desde L 341.10 (comedor/cafetería clase I, 2 años, en línea, 60 días hábiles) hasta L 27,970.32 (supermercado o industria clase III, 6 años, presencial). Pulpería clase I: L 423.79 · Restaurante pequeño-mediano: L 4,370.36 (ambos 2 años, en línea, 60 días)",
+    nota:
+      "🚀 La misma licencia cuesta hasta 4 veces más si la pides a 10 días hábiles en vez de 60, y siempre sale más barata en línea que presencial. Corre la calculadora oficial de ARSA con tus datos antes de presupuestar.\n\n🧑‍🍳 ¿Vas empezando desde tu casa, sin local independiente? Existe el Permiso Sanitario para Microempresa: L 200.00 y te habilita un año mientras obtienes tu licencia. El Registro Sanitario de producto de microempresa también cuesta L 200.00, dura 5 años, solo sirve para mercado nacional y NO es renovable — 6 meses antes de vencer hay que sacar el registro normal.\n\n📅 Vigencias: la licencia de venta de alimentos en la vía pública dura 1 año; el permiso sanitario temporal, 6 meses (renovable una sola vez, pidiéndolo 5 días antes de vencer).",
+    fuenteUrl: "https://arsa.gob.hn/calculadora-de-alimentos-y-bebidas/",
+    fuenteNombre: "ARSA — Calculadora oficial de tarifas + Guía de ayuda al ciudadano (Alimentos y Bebidas)",
   },
   {
     id: "licencia-ambiental",
