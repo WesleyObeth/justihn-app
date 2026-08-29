@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { LandingContenido } from "@/components/landing/landing-content";
 
 export const metadata: Metadata = {
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function PaginaHome() {
-  return <LandingContenido />;
+  return (
+    // Suspense: el directorio lee `?materia=` para llegar filtrado.
+    <Suspense fallback={null}>
+      <LandingContenido />
+    </Suspense>
+  );
 }

@@ -25,6 +25,7 @@ export function NavAurora() {
       </Link>
       <div className="nav-mid">
         <a href="#tramites">Trámites</a>
+        <a href="#procesos">Procesos</a>
         <a href="#consultorio">Consultorio</a>
         <a href="#directorio">Encuentra abogado</a>
       </div>

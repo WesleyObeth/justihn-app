@@ -20,13 +20,15 @@ export function TramitesPersona() {
   const pasosTramite = usePortal((s) => s.pasosTramite);
   const [q, setQ] = useState("");
   const [institucion, setInstitucion] = useState("todas");
+  const [tipo, setTipo] = useState<"todos" | "tramite" | "proceso">("todos");
 
   const termino = normalizar(q.trim());
   const filtrados = TRAMITES.filter((t) => {
+    const porTipo = tipo === "todos" || t.tipo === tipo;
     const porInst = institucion === "todas" || t.institucionId === institucion;
     const porTermino =
       !termino || normalizar(`${t.nombre} ${t.paraQuien} ${t.resumen}`).includes(termino);
-    return porInst && porTermino;
+    return porTipo && porInst && porTermino;
   });
 
   const enProgreso = TRAMITES.filter((t) => (pasosTramite[t.id] ?? []).length > 0);
@@ -35,7 +37,8 @@ export function TramitesPersona() {
     <div className="max-w-[1080px]">
       <h1 className="font-display text-[24px] font-bold">Trámites</h1>
       <p className="mt-1 text-[13px] text-texto-3">
-        Guías paso a paso — marca tu avance y retómalo cuando quieras.
+        Trámites del Estado y procesos legales, paso a paso — marca tu avance y retómalo
+        cuando quieras.
       </p>
 
       {enProgreso.length > 0 && (
@@ -70,6 +73,31 @@ export function TramitesPersona() {
             aria-label="Buscar trámite"
             className="min-w-0 flex-1 border-none bg-transparent text-sm text-marino outline-none"
           />
+        </div>
+        <div className="flex gap-1.5 rounded-full border border-borde bg-white p-1">
+          {(
+            [
+              ["todos", "Todos"],
+              ["tramite", "Trámites"],
+              ["proceso", "Procesos"],
+            ] as const
+          ).map(([valor, etiqueta]) => (
+            <button
+              key={valor}
+              type="button"
+              aria-pressed={tipo === valor}
+              onClick={() => {
+                setTipo(valor);
+                setInstitucion("todas");
+              }}
+              className={cn(
+                "cursor-pointer rounded-full px-3.5 py-1.5 text-[12.5px] font-medium transition-colors",
+                tipo === valor ? "bg-celeste text-white" : "text-texto-3 hover:text-marino",
+              )}
+            >
+              {etiqueta}
+            </button>
+          ))}
         </div>
         <select
           value={institucion}

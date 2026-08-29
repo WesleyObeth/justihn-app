@@ -107,6 +107,15 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   del hero y el de la sección comparten estado (buscar arriba filtra abajo y
   hace scroll). Las rutas viejas redirigen a su ancla; sobreviven como página
   el detalle `/tramites/[id]` (SEO + gate de cuenta) y la calculadora.
+  **Procesos legales ciudadanos (2026-08-29, pedido del socio):** `tramites.ts`
+  gana `tipo: "tramite" | "proceso"` y 4 guías judiciales — me despidieron
+  (Laboral, el ejemplo que pidió), pensión alimenticia, divorcio y herencia —
+  con instituciones nuevas (Juzgados, STSS). Viven en la sección `#procesos`
+  de la landing y comparten TODA la UI (detalle con gate, checklist del
+  portal, buscador). Cada guía cierra con el abogado de esa materia:
+  contacto directo + "Buscar abogado de [materia]" →
+  `/?materia=X#directorio` (el directorio lee el filtro de la URL). El portal
+  ciudadano separa ambos con un toggle Todos/Trámites/Procesos.
 
 ## 2. Stack (pins reales)
 

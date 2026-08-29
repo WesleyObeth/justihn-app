@@ -116,10 +116,10 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
               ))}
             </div>
             <Link
-              href="/#directorio"
+              href={`/?materia=${encodeURIComponent(tramite.materia)}#directorio`}
               className="mt-3 inline-block text-[12.5px]"
             >
-              Ver más abogados de {tramite.materia.toLowerCase()} →
+              Buscar abogado de {tramite.materia.toLowerCase()} →
             </Link>
           </div>
 

@@ -28,6 +28,9 @@ export interface PasoTramite {
 export interface Tramite {
   id: string;
   nombre: string;
+  /** "tramite" = gestión ante una institución · "proceso" = vía judicial
+   *  (el socio los pidió como cosas distintas: "cómo hacer el proceso"). */
+  tipo: "tramite" | "proceso";
   institucionId: string;
   /** A quién le sirve — la gente busca por su situación, no por la sigla. */
   paraQuien: string;
@@ -78,6 +81,18 @@ export const INSTITUCIONES: Institucion[] = [
     descripcion: "Registro de proveedores para venderle al Estado.",
   },
   {
+    id: "poder-judicial",
+    nombre: "Poder Judicial (juzgados)",
+    sigla: "Juzgados",
+    descripcion: "Demandas y procesos ante los juzgados de letras y de paz.",
+  },
+  {
+    id: "trabajo",
+    nombre: "Secretaría de Trabajo y Seguridad Social",
+    sigla: "STSS",
+    descripcion: "Conciliación laboral y reclamos administrativos antes de demandar.",
+  },
+  {
     id: "registro-mercantil",
     nombre: "Registro Mercantil (cámaras de comercio)",
     sigla: "CCIT/CCIC",
@@ -89,6 +104,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "abrir-rtn",
     nombre: "Cómo abrir un RTN",
+    tipo: "tramite",
     institucionId: "sar",
     paraQuien: "Cualquier persona que empieza a trabajar, facturar o abrir un negocio",
     resumen:
@@ -115,6 +131,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "facturacion-cai",
     nombre: "Facturación con CAI",
+    tipo: "tramite",
     institucionId: "sar",
     paraQuien: "Negocios y profesionales que emiten facturas",
     resumen:
@@ -132,6 +149,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "permiso-operacion",
     nombre: "Permiso de operación de negocio",
+    tipo: "tramite",
     institucionId: "municipalidad",
     paraQuien: "Todo negocio con local o actividad en un municipio",
     resumen:
@@ -149,6 +167,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "licencia-sanitaria",
     nombre: "Licencia y permiso sanitario",
+    tipo: "tramite",
     institucionId: "arsa",
     paraQuien: "Negocios de alimentos, farmacias, clínicas y productos de consumo",
     resumen:
@@ -166,6 +185,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "licencia-ambiental",
     nombre: "Licencia ambiental",
+    tipo: "tramite",
     institucionId: "miambiente",
     paraQuien: "Proyectos y negocios con impacto ambiental (construcción, industria, agro)",
     resumen:
@@ -183,6 +203,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "inscripcion-oncae",
     nombre: "Inscripción como proveedor del Estado (ONCAE)",
+    tipo: "tramite",
     institucionId: "oncae",
     paraQuien: "Empresas y profesionales que quieren venderle al Estado",
     resumen:
@@ -200,6 +221,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "tradicion-dominio",
     nombre: "Tradición de dominio de un inmueble",
+    tipo: "tramite",
     institucionId: "ip",
     paraQuien: "Quien compra, vende o hereda una propiedad",
     resumen:
@@ -217,6 +239,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "traspaso-vehiculo",
     nombre: "Traspaso de vehículo",
+    tipo: "tramite",
     institucionId: "ip",
     paraQuien: "Quien compra o vende un carro o moto usados",
     resumen:
@@ -234,6 +257,7 @@ export const TRAMITES: Tramite[] = [
   {
     id: "constituir-sociedad",
     nombre: "Constitución de una sociedad",
+    tipo: "tramite",
     institucionId: "registro-mercantil",
     paraQuien: "Socios que quieren formalizar una empresa (S. de R.L. o S.A.)",
     resumen:
@@ -248,6 +272,181 @@ export const TRAMITES: Tramite[] = [
     requisitos: ["DNI de los socios", "Capital según tipo social", "[Verificar montos y aranceles vigentes]"],
     tasa: "L ___ (notario + registro)",
     nota: "El pacto social mal diseñado cuesta caro al crecer o al pelearse los socios — aquí el abogado mercantil vale cada lempira.",
+  },
+  // ── Procesos legales (vía judicial) — pedido del socio: "proceso laboral,
+  // me despidieron, ejemplos". Mismos campos: la UI y el checklist se
+  // reutilizan; `tipo: "proceso"` los separa en la navegación.
+  {
+    id: "despido-injustificado",
+    nombre: "Me despidieron: cómo reclamar",
+    tipo: "proceso",
+    institucionId: "trabajo",
+    paraQuien: "Trabajadores despedidos sin causa justificada o sin pago de prestaciones",
+    resumen:
+      "Si te despidieron sin causa justificada, la ley te reconoce cesantía, preaviso y proporcionales. El camino empieza gratis en la Secretaría de Trabajo y, si no hay acuerdo, sigue en el juzgado laboral.",
+    materia: "Laboral",
+    pasos: [
+      {
+        titulo: "Reúne y guarda tu evidencia HOY",
+        detalle:
+          "Contrato, recibos de pago, carné, mensajes o carta del despido, nombres de compañeros que puedan declarar. Sin prueba de la relación laboral el reclamo se complica.",
+      },
+      {
+        titulo: "Calcula lo que te corresponde",
+        detalle:
+          "Cesantía, preaviso, vacaciones y aguinaldos proporcionales según tu salario y antigüedad — con ese número negocias, no a ciegas.",
+      },
+      {
+        titulo: "Reclama en la Secretaría de Trabajo (gratis)",
+        detalle:
+          "Presenta tu reclamo en la inspectoría del trabajo de tu ciudad: citan al patrono a una audiencia de conciliación. Muchos casos se resuelven aquí, sin juicio y sin costo.",
+      },
+      {
+        titulo: "Si no hay acuerdo, demanda en el juzgado laboral",
+        detalle:
+          "Con un profesional del derecho se presenta la demanda ordinaria laboral ante el Juzgado de Letras del Trabajo, con el cálculo y las pruebas que reuniste.",
+      },
+      {
+        titulo: "Audiencia, sentencia y cobro",
+        detalle:
+          "El juzgado cita a audiencia; si la sentencia te favorece, ordena el pago de prestaciones y los salarios dejados de percibir hasta que quede firme.",
+      },
+    ],
+    requisitos: [
+      "DNI vigente",
+      "Contrato o prueba de la relación laboral (recibos, carné, mensajes)",
+      "Fecha de ingreso, salario y fecha del despido",
+      "[Verificar el plazo de prescripción vigente del Código del Trabajo]",
+    ],
+    tasa: "Conciliación en Trabajo: gratis · Demanda: honorarios del abogado",
+    nota:
+      "⏳ Los reclamos laborales PRESCRIBEN: no dejes pasar el tiempo. Y ojo — firmar un finiquito por menos de lo que te toca puede cerrarte la puerta.",
+  },
+  {
+    id: "pension-alimenticia",
+    nombre: "Pensión alimenticia: cómo pedirla o exigir su pago",
+    tipo: "proceso",
+    institucionId: "poder-judicial",
+    paraQuien: "Madres, padres o tutores que necesitan fijar o cobrar la pensión de un hijo",
+    resumen:
+      "La pensión alimenticia es un derecho del hijo, no de quien la reclama. Se puede fijar por acuerdo o por juzgado, y si el obligado no paga, existen medidas para hacerla cumplir.",
+    materia: "Familia",
+    pasos: [
+      {
+        titulo: "Reúne los documentos del vínculo y de los gastos",
+        detalle:
+          "Partida de nacimiento del menor, tu DNI y comprobantes de gastos (colegiatura, salud, alimentación) — sustentan el monto que pides.",
+      },
+      {
+        titulo: "Intenta el acuerdo (conciliación)",
+        detalle:
+          "Se puede acordar el monto y la forma de pago ante el juzgado de familia o con asistencia legal; el acuerdo homologado tiene fuerza de sentencia.",
+      },
+      {
+        titulo: "Si no hay acuerdo, demanda de alimentos",
+        detalle:
+          "Se presenta ante el juzgado de familia del domicilio del menor; el juzgado puede fijar una pensión provisional mientras dura el proceso.",
+      },
+      {
+        titulo: "Ejecuta si no cumple",
+        detalle:
+          "Con la pensión fijada y el incumplimiento probado, se solicitan medidas de apremio para hacerla efectiva (retención de salario y otras que la ley prevé).",
+      },
+    ],
+    requisitos: [
+      "Partida de nacimiento del menor",
+      "DNI del solicitante",
+      "Comprobantes de gastos del menor",
+      "Datos e ingresos del obligado (si los conoces)",
+      "[Verificar requisitos del juzgado de familia correspondiente]",
+    ],
+    tasa: "Honorarios del abogado · [tasas judiciales por verificar]",
+    nota:
+      "Guarda constancia de cada pago recibido o incumplido: es la prueba con la que se ejecuta después.",
+  },
+  {
+    id: "divorcio-ciudadano",
+    nombre: "Divorcio: por mutuo acuerdo o por causal",
+    tipo: "proceso",
+    institucionId: "poder-judicial",
+    paraQuien: "Personas casadas que quieren disolver el matrimonio",
+    resumen:
+      "Si ambos están de acuerdo, el divorcio por mutuo consentimiento es el camino más rápido y barato. Si no hay acuerdo, hay que invocar una causal y el proceso es más largo.",
+    materia: "Familia",
+    pasos: [
+      {
+        titulo: "Reúne los documentos del matrimonio y de los hijos",
+        detalle:
+          "Certificación de matrimonio, DNI de ambos y partidas de nacimiento de los hijos si los hay.",
+      },
+      {
+        titulo: "Acuerden lo esencial antes de ir al juzgado",
+        detalle:
+          "Guarda y cuidado de los hijos, pensión alimenticia y reparto de bienes. Ese acuerdo (convenio regulador) es el corazón del divorcio por mutuo consentimiento.",
+      },
+      {
+        titulo: "Presenten la solicitud conjunta",
+        detalle:
+          "Con auxilio de profesional del derecho, ante el juzgado de familia; se acompaña el convenio regulador firmado por ambos.",
+      },
+      {
+        titulo: "Audiencia, sentencia e inscripción",
+        detalle:
+          "Ratifican su voluntad ante el juez; dictada la sentencia, se inscribe en el Registro Nacional de las Personas para que surta efectos.",
+      },
+    ],
+    requisitos: [
+      "Certificación de matrimonio",
+      "DNI de ambos cónyuges",
+      "Partidas de nacimiento de los hijos (si aplica)",
+      "Convenio regulador (mutuo consentimiento)",
+      "[Verificar requisitos vigentes del juzgado]",
+    ],
+    tasa: "Honorarios del abogado · [tasas por verificar]",
+    nota:
+      "Sin acuerdo, el divorcio por causal exige probar los hechos y toma mucho más tiempo — casi siempre conviene negociar primero.",
+  },
+  {
+    id: "herencia-sucesion",
+    nombre: "Herencia: cómo poner los bienes a tu nombre",
+    tipo: "proceso",
+    institucionId: "poder-judicial",
+    paraQuien: "Familiares que heredan una casa, terreno o cuentas de una persona fallecida",
+    resumen:
+      "Heredar no basta con ser familiar: hasta que se declaren los herederos y se inscriba la partición, los bienes siguen a nombre del fallecido y no se pueden vender ni hipotecar.",
+    materia: "Civil",
+    pasos: [
+      {
+        titulo: "Reúne los documentos del fallecido y del vínculo",
+        detalle:
+          "Certificado de defunción, partidas de nacimiento o matrimonio que prueben el parentesco, y los títulos de los bienes (escrituras, folio real).",
+      },
+      {
+        titulo: "Verifica si dejó testamento",
+        detalle:
+          "Con testamento, la sucesión sigue lo que dispuso; sin testamento, la ley define quiénes heredan y en qué proporción.",
+      },
+      {
+        titulo: "Tramita la declaratoria de herederos",
+        detalle:
+          "Se promueve ante juzgado o por vía notarial según el caso; ahí queda oficialmente reconocido quién hereda.",
+      },
+      {
+        titulo: "Inscribe los bienes a nombre de los herederos",
+        detalle:
+          "Con la declaratoria y la partición, se inscribe en el Instituto de la Propiedad — hasta ese momento no puedes vender ni hipotecar el inmueble.",
+      },
+    ],
+    requisitos: [
+      "Certificado de defunción",
+      "Documentos que prueben el parentesco",
+      "Escrituras o folio real de los bienes",
+      "Testamento (si existe)",
+      "[Verificar impuestos y tasas vigentes]",
+    ],
+    tasa: "Honorarios del abogado o notario · [tasas registrales por verificar]",
+    nota:
+      "Dejar la herencia sin tramitar por años multiplica el problema: se suman herederos, se pierden documentos y el inmueble queda inmovilizado.",
   },
 ];
 

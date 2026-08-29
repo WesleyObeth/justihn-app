@@ -8,6 +8,7 @@
  */
 import Link from "next/link";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
 import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
 import { getInstitucion, INSTITUCIONES, TRAMITES } from "@/data/tramites";
@@ -81,8 +82,9 @@ export function SeccionTramites({
 }) {
   const [institucion, setInstitucion] = useState("todas");
 
+  const administrativos = TRAMITES.filter((t) => t.tipo === "tramite");
   const termino = normalizar(q.trim());
-  const filtrados = TRAMITES.filter((t) => {
+  const filtrados = administrativos.filter((t) => {
     const porInst = institucion === "todas" || t.institucionId === institucion;
     const porTermino =
       !termino || normalizar(`${t.nombre} ${t.paraQuien} ${t.resumen}`).includes(termino);
@@ -94,7 +96,7 @@ export function SeccionTramites({
       <TituloSeccion
         eyebrow="Guías de trámites"
         titulo="Cada trámite del Estado, explicado paso a paso"
-        desc={`${TRAMITES.length} guías de ${INSTITUCIONES.length} instituciones: qué necesitas, dónde se hace y cuánto cuesta.`}
+        desc={`${administrativos.length} guías ante las instituciones del Estado: qué necesitas, dónde se hace y cuánto cuesta.`}
       />
 
       <div className="mx-auto mt-7 flex max-w-[440px] items-center gap-2 rounded-full border bg-white px-4 py-2.5" style={{ borderColor: "var(--line)" }}>
@@ -110,10 +112,10 @@ export function SeccionTramites({
 
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         <Chip activo={institucion === "todas"} onClick={() => setInstitucion("todas")}>
-          Todas ({TRAMITES.length})
+          Todas ({administrativos.length})
         </Chip>
         {INSTITUCIONES.map((inst) => {
-          const n = TRAMITES.filter((t) => t.institucionId === inst.id).length;
+          const n = administrativos.filter((t) => t.institucionId === inst.id).length;
           if (n === 0) return null;
           return (
             <Chip
@@ -157,6 +159,79 @@ export function SeccionTramites({
           </p>
         </div>
       )}
+    </section>
+  );
+}
+
+
+// ── Sección Procesos legales ───────────────────────────────────────────────
+
+/**
+ * Lo que pidió el socio: "proceso laboral, me despidieron, ejemplos" — el
+ * paso a paso del proceso judicial y, al final, el abogado de ESA materia
+ * (recomendado o buscado en el directorio).
+ */
+export function SeccionProcesos() {
+  const [materia, setMateria] = useState<Materia | "todas">("todas");
+  const procesos = TRAMITES.filter((t) => t.tipo === "proceso");
+  const materias = [...new Set(procesos.map((p) => p.materia))];
+  const filtrados =
+    materia === "todas" ? procesos : procesos.filter((p) => p.materia === materia);
+
+  return (
+    <section id="procesos" className="scroll-mt-24 py-16">
+      <div className="mx-auto max-w-[1080px] px-5">
+        <TituloSeccion
+          eyebrow="Procesos legales"
+          titulo="¿Te despidieron? ¿Pensión, divorcio, herencia?"
+          desc="El paso a paso de cada proceso, en lenguaje claro — y el abogado de esa materia cuando llegue el momento de dar el paso."
+        />
+
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <Chip activo={materia === "todas"} onClick={() => setMateria("todas")}>
+            Todos ({procesos.length})
+          </Chip>
+          {materias.map((m) => (
+            <Chip key={m} activo={materia === m} onClick={() => setMateria(m)}>
+              {m} ({procesos.filter((p) => p.materia === m).length})
+            </Chip>
+          ))}
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+          {filtrados.map((t) => (
+            <Link key={t.id} href={`/tramites/${t.id}`} className="glass-card flex flex-col p-5.5">
+              <div className="flex items-center gap-2">
+                <span
+                  className="rounded-full px-2.5 py-[3px] text-[11px] font-bold"
+                  style={{ background: "rgba(21,132,199,.1)", color: "var(--mint)" }}
+                >
+                  {t.materia}
+                </span>
+                <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
+                  {t.pasos.length} pasos
+                </span>
+              </div>
+              <div className="font-display mt-2 text-[16.5px] leading-[1.3] font-bold">
+                {t.nombre}
+              </div>
+              <p className="mt-1.5 flex-1 text-[13px] leading-[1.6]" style={{ color: "var(--muted)" }}>
+                {t.resumen}
+              </p>
+              <div className="mt-3 flex items-center gap-2 text-[12.5px]" style={{ color: "var(--mint)" }}>
+                Ver el paso a paso →
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <p className="mt-5 text-center text-[12.5px]" style={{ color: "var(--muted)" }}>
+          ¿Ya sabes que necesitas abogado?{" "}
+          <a href="#directorio" style={{ color: "var(--mint)" }}>
+            Búscalo por materia en el directorio →
+          </a>
+        </p>
+      </div>
     </section>
   );
 }
@@ -228,7 +303,9 @@ export function SeccionConsultorio() {
 
 export function SeccionDirectorio() {
   const mostrarToast = usePortal((s) => s.mostrarToast);
-  const [materia, setMateria] = useState<Materia | "todas">("todas");
+  // `?materia=` permite llegar filtrado desde una guía de proceso.
+  const materiaUrl = useSearchParams().get("materia") as Materia | null;
+  const [materia, setMateria] = useState<Materia | "todas">(materiaUrl ?? "todas");
 
   const materias = [...new Set(DIRECTORIO.flatMap((a) => a.materias))];
   const abogados = buscarAbogados(materia).slice(0, 3);

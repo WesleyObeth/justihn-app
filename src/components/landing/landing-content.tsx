@@ -11,6 +11,7 @@ import { Icono } from "@/components/brand/iconos";
 import {
   SeccionConsultorio,
   SeccionDirectorio,
+  SeccionProcesos,
   SeccionTramites,
 } from "@/components/landing/secciones";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
@@ -97,29 +98,37 @@ export function LandingContenido() {
         <h2 className="font-display text-center text-[26px] font-bold">
           ¿Qué necesitas resolver hoy?
         </h2>
-        <div className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Puerta
             href="#tramites"
             icono="pasos"
             titulo="Hacer un trámite"
-            desc={`RTN, traspasos, permisos y ${TRAMITES.length - 3} guías más — paso a paso, con requisitos y costos.`}
+            desc="RTN, traspasos, permisos y licencias — paso a paso, con requisitos y costos."
+          />
+          <Puerta
+            href="#procesos"
+            icono="juris"
+            titulo="Enfrentar un proceso"
+            desc="Me despidieron, pensión alimenticia, divorcio o herencia — el paso a paso y tu abogado."
           />
           <Puerta
             href="#consultorio"
             icono="leads"
-            titulo="Resolver una duda legal"
+            titulo="Resolver una duda"
             desc="Pregunta gratis en el consultorio y un abogado colegiado te orienta en público."
           />
           <Puerta
             href="#directorio"
             icono="perfil"
             titulo="Encontrar abogado"
-            desc="Por materia y ciudad, con perfiles validados — laboral, familia, mercantil y más."
+            desc="Por materia y ciudad, con perfiles validados: laboral, familia, mercantil y más."
           />
         </div>
       </section>
 
       <SeccionTramites termino={q} onTermino={setQ} />
+
+      <SeccionProcesos />
 
       <SeccionConsultorio />
 
@@ -210,6 +219,7 @@ export function LandingContenido() {
           <div className="flex flex-col gap-1.5 text-[12.5px]" style={{ color: "var(--muted)" }}>
             <span className="text-[11px] font-semibold tracking-[1px] uppercase">Para ti</span>
             <Link href="#tramites">Guías de trámites</Link>
+            <Link href="#procesos">Procesos legales</Link>
             <Link href="#consultorio">Consultorio gratuito</Link>
             <Link href="#directorio">Encuentra abogado</Link>
             <Link href="/persona">Mi cuenta</Link>
@@ -251,7 +261,7 @@ function Puerta({
   desc,
 }: {
   href: string;
-  icono: "pasos" | "leads" | "perfil";
+  icono: "pasos" | "juris" | "leads" | "perfil";
   titulo: string;
   desc: string;
 }) {
