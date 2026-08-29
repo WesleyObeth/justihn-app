@@ -293,18 +293,56 @@ export const TRAMITES: Tramite[] = [
     nombre: "Traspaso de vehículo",
     tipo: "tramite",
     institucionId: "ip",
-    paraQuien: "Quien compra o vende un carro o moto usados",
+    paraQuien: "Quien compra, vende o hereda un carro o una moto",
     resumen:
-      "El vehículo sigue a nombre del vendedor hasta que el traspaso se inscribe en el registro vehicular — con las multas y responsabilidades que eso implica.",
+      "El vehículo sigue siendo del vendedor ante la ley hasta que el traspaso se inscribe en el Registro Vehicular del IP. El trámite cuesta L 300.00 y gira alrededor de un solo papel: el formulario de tradición de dominio con las firmas autenticadas por notario.",
     materia: "Civil",
     pasos: [
-      { titulo: "Verifica el estado del vehículo", detalle: "Matrícula al día, sin multas pendientes ni gravámenes — pide la constancia antes de pagar." },
-      { titulo: "Formaliza la compraventa", detalle: "Documento de traspaso autenticado ante notario, con DNI de ambas partes." },
-      { titulo: "Inscribe el traspaso en el registro vehicular", detalle: "Presenta el documento y paga las tasas; el vehículo queda a tu nombre y las obligaciones dejan de ser del vendedor." },
+      {
+        titulo: "Pide la certificación del vehículo ANTES de pagar",
+        detalle:
+          "Las certificaciones oficiales de registro y las certificaciones íntegras o de tracto sucesivo las puede solicitar CUALQUIER persona — no hace falta ser el dueño. Ahí ves la cadena de propietarios y si el vehículo tiene anotaciones preventivas (bloqueos por prenda, orden judicial, robo o vehículo ilocalizable). Es el único paso que te protege de comprar un carro embargado.",
+      },
+      {
+        titulo: "Identifica cuál de las 14 modalidades es la tuya",
+        detalle:
+          "El IP tiene 14 tipos de traspaso y cada uno pide su propio formulario. Los cuatro comunes: RV-RE-01 (persona natural a persona natural), RV-RE-02 (natural a jurídica), RV-RE-03 (jurídica a natural) y RV-RE-04 (jurídica a jurídica). Herencia, legado o donación usa el RV-RE-13. Se descargan en ip.gob.hn → Registro Vehicular → Formularios Preimpresos.",
+      },
+      {
+        titulo: "Ten tu RTN registrado ante el IP (el requisito que nadie ve venir)",
+        detalle:
+          "El propietario debe tener su RTN declarado ante el Registro Vehicular con el Formulario IP-800: se acompaña con copia del DNI (o pasaporte vigente si eres extranjero), copia del certificado de RTN del SAR y copia de un recibo público — si no tienes recibo público, una constancia de vecindad. Si eres empresa, además la constitución y el poder del representante legal.",
+      },
+      {
+        titulo: "Llena el formulario y autentica las firmas ante notario",
+        detalle:
+          "Firman el tradente (vendedor) y el adquiriente (comprador), y un notario autentica ambas firmas; alternativamente, el traspaso puede constar en instrumento público autorizado por notario. Excepción: no se exige certificado de autenticidad cuando la venta la hace una agencia o distribuidora de vehículos NUEVOS y es el primer registro; si el vehículo es usado, aunque lo venda la agencia, las firmas sí van autenticadas. También vale firmar el formulario presencialmente ante el funcionario registral, que deja constancia de ello en el documento.",
+      },
+      {
+        titulo: "Presenta el expediente en el Registro Vehicular",
+        detalle:
+          "Lleva los documentos en original y fotocopia (el original se te devuelve); si prefieres, puedes presentar fotocopias autenticadas por notario en lugar de los originales. Quien se presente debe identificarse con tarjeta de identidad, carné de residencia vigente, pasaporte vigente y/o licencia de conducir vigente.",
+      },
+      {
+        titulo: "Paga los L 300.00 en el banco, después del trámite",
+        detalle:
+          "El valor del traspaso es de L 300.00 y se paga en cualquier agencia bancaria DESPUÉS de haber realizado el traspaso en Registro Vehicular. La inscripción se perfecciona cuando se acredita el pago: se acompaña el recibo o formulario que lo pruebe (IP-160, recibo de pago de trámites vehiculares).",
+      },
     ],
-    requisitos: ["DNI de comprador y vendedor", "Boleta de revisión y matrícula al día", "[Verificar tasas vigentes del registro]"],
-    tasa: "L ___ (según valor del vehículo)",
-    nota: "Comprar sin traspasar es la fuente clásica de problemas: multas ajenas, embargos y hasta vehículos con reporte.",
+    requisitos: [
+      "Formulario de tradición de dominio que corresponda: RV-RE-01 / 02 / 03 / 04, o RV-RE-13 si es herencia",
+      "Firmas del vendedor (tradente) y del comprador (adquiriente) autenticadas por notario, o instrumento público notarial",
+      "Identificación vigente de quien presenta el trámite: DNI, carné de residencia, pasaporte o licencia de conducir",
+      "Todo en original y fotocopia (el original se devuelve) o fotocopias autenticadas por notario",
+      "RTN del propietario declarado ante el IP con Formulario IP-800, si aún no lo está",
+      "Recibo que acredite el pago de la tasa (IP-160)",
+    ],
+    tasa: "L 300.00 — se paga en cualquier agencia bancaria después de hacer el traspaso en Registro Vehicular",
+    nota:
+      "🏠 Si el vehículo viene de una herencia: no se presenta formulario de traspaso, sino la certificación de la sentencia de declaratoria de herederos (o instrumento público equivalente) inscrita en el Registro de Sentencias del IP. Y si los herederos quieren pasarlo a uno de ellos o a un tercero, primero lo inscriben a nombre de todos por cesión de derechos y después firman la tradición de dominio. En ese trámite el cambio del kit de placas se hace a la vez: hay que marcar ambos trámites en el formulario.\n\n💻 Casi todo el registro vehicular se puede tramitar por correo electrónico ante la Dirección General del Registro de la Propiedad Vehicular — salvo lo que implica entregar o retirar placas, que obligatoriamente es presencial.",
+    fuenteUrl:
+      "https://www.ip.gob.hn/direcciones/registro-vehicular/menu-registro-vehicular/tramites-registro-vehicular",
+    fuenteNombre: "IP — Dirección General de Registro Vehicular (requisitos y formularios oficiales)",
   },
   {
     id: "constituir-sociedad",

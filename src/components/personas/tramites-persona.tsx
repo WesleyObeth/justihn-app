@@ -266,7 +266,7 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
               </div>
               <div className="font-display mt-1.5 text-[16px] font-bold">{tramite.tasa}</div>
               {tramite.nota && (
-                <p className="mt-2 flex items-start gap-2 text-[12px] leading-[1.55] text-aviso-cuerpo">
+                <p className="mt-2 flex items-start gap-2 text-[12px] leading-[1.55] whitespace-pre-line text-aviso-cuerpo">
                   <span className="mt-px grid shrink-0 place-items-center text-dorado">
                     <Icono nombre="alerta" size={12} />
                   </span>
