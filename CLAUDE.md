@@ -77,7 +77,7 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   integración Vía A ↔ Vía B en vivo) · **/calculadora-prestaciones** (usa el
   mismo `lib/prestaciones`, §0.5). Cada guía de trámite recomienda abogados de
   su materia (funnel guía→lead). Planes público: Gratis + pago "en definición".
-- **🏛️ PORTAL CIUDADANO `/persona` (2026-08-29, decisión Wesley):** el patrón
+- **🏛️ PORTAL CIUDADANO `/personas` (2026-08-29, decisión Wesley):** el patrón
   Jusbrasil completo — la landing da la probadita y "crear cuenta gratis" abre
   un portal con shell propio (`components/personas/`, sidebar marino gemelo del
   de abogados; persona demo Carlos Zelaya, `data/persona.ts`). Pantallas:
@@ -85,12 +85,20 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   `pasosTramite` en el store) · Mis consultas (form + respuestas de abogados)
   · Encuentra abogado · Calculadora · Mi plan (Gratis + pago en definición).
   **Gates de la landing:** el detalle de trámite muestra solo el paso 1 (resto
-  difuminado) → CTA `/persona/tramites/[id]`; preguntar en el consultorio
-  "crea la cuenta" y redirige a `/persona/consultas`. Los componentes públicos
+  difuminado) → CTA `/personas/tramites/[id]`; preguntar en el consultorio
+  "crea la cuenta" y redirige a `/personas/consultas`. Los componentes públicos
   compartidos aceptan `enPortal` para rutas/wrapper. **Menú del avatar**
   (patrón abogados) con Mi perfil (actividad real del store), Configuración
   (cuenta + prefs `prefsPersona` + habeas data) y Ayuda (FAQ ciudadana) —
   9 rutas en el portal ciudadano.
+  **Renombrado 2026-08-29:** era `/persona` (singular) y su pantalla de
+  búsqueda era `/persona/abogados`. Ahora **`/personas`** —para leer como
+  pareja de `/abogados`, las dos vías del producto, y para coincidir con
+  `components/personas/`— y **`/personas/directorio`**, que mata la colisión
+  de `/abogados` significando a la vez el portal de suscriptores y una
+  pantalla del ciudadano. El label de la UI sigue siendo "Encuentra abogado".
+  Redirects 308 en `next.config.ts` para las cuatro formas viejas.
+  `data/persona.ts` se queda en singular: es UNA persona demo, no la audiencia.
 - **✨ LANDING AURORA (2026-08-29):** la home se movió al grupo `(landing)` con
   shell propio estilo Jusbrasil: fondo aurora WebGL (three.js, shader FBM
   replicado verbatim de otro proyecto de Wesley — solo se adaptaron los vec3 a
