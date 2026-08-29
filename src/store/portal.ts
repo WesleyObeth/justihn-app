@@ -63,6 +63,8 @@ interface PortalState {
   /** Checklist de trámites del portal ciudadano: pasos completados por trámite.
    *  Un trámite con avance = "en progreso" en el inicio de la persona. */
   pasosTramite: Record<string, number[]>;
+  /** Preferencias de notificación del ciudadano. Persistido. */
+  prefsPersona: Record<string, boolean>;
   escrito: { abierto: boolean; titulo: string; texto: string };
   toast: string;
 
@@ -89,6 +91,7 @@ interface PortalState {
   dejarDeVigilar: (id: string) => void;
   preguntarConsultorio: (materia: Materia, ciudad: string, pregunta: string) => void;
   togglePasoTramite: (tramiteId: string, indice: number) => void;
+  togglePrefPersona: (clave: string) => void;
   abrirEscrito: (titulo: string, texto: string) => void;
   setTextoEscrito: (texto: string) => void;
   cerrarEscrito: () => void;
@@ -132,6 +135,7 @@ export const usePortal = create<PortalState>()(
       nombresVigilados: VIGILADOS_INICIALES,
       preguntasPublico: [],
       pasosTramite: {},
+      prefsPersona: { respuestas: true, tramites: true, novedades: false },
       escrito: { abierto: false, titulo: "", texto: "" },
       toast: "",
 
@@ -209,6 +213,8 @@ export const usePortal = create<PortalState>()(
             : [...actuales, indice];
           return { pasosTramite: { ...s.pasosTramite, [tramiteId]: siguientes } };
         }),
+      togglePrefPersona: (clave) =>
+        set((s) => ({ prefsPersona: { ...s.prefsPersona, [clave]: !s.prefsPersona[clave] } })),
       abrirEscrito: (titulo, texto) => set({ escrito: { abierto: true, titulo, texto } }),
       setTextoEscrito: (texto) => set((s) => ({ escrito: { ...s.escrito, texto } })),
       cerrarEscrito: () => set((s) => ({ escrito: { ...s.escrito, abierto: false } })),
@@ -243,6 +249,7 @@ export const usePortal = create<PortalState>()(
         nombresVigilados: s.nombresVigilados,
         preguntasPublico: s.preguntasPublico,
         pasosTramite: s.pasosTramite,
+        prefsPersona: s.prefsPersona,
         notifsLeidas: s.notifsLeidas,
         notifsLeidasIds: s.notifsLeidasIds,
         sidebarColapsado: s.sidebarColapsado,

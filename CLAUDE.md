@@ -87,7 +87,10 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   **Gates de la landing:** el detalle de trámite muestra solo el paso 1 (resto
   difuminado) → CTA `/persona/tramites/[id]`; preguntar en el consultorio
   "crea la cuenta" y redirige a `/persona/consultas`. Los componentes públicos
-  compartidos aceptan `enPortal` para rutas/wrapper.
+  compartidos aceptan `enPortal` para rutas/wrapper. **Menú del avatar**
+  (patrón abogados) con Mi perfil (actividad real del store), Configuración
+  (cuenta + prefs `prefsPersona` + habeas data) y Ayuda (FAQ ciudadana) —
+  9 rutas en el portal ciudadano.
 
 ## 2. Stack (pins reales)
 
