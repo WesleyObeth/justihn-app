@@ -203,10 +203,15 @@ inexistentes / casos propios), prestaciones, plazos y vía procesal.
    esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Los seeds
    del portal de abogados quedaron validados; decidir si las tablas nuevas del
    feedback entran al esquema inicial o en una migración posterior.
-5. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
+5. **🔎 Verificar las 10 guías de trámites que faltan** contra su fuente
+   oficial (detalle, método y lista en justihn/CLAUDE.md backlog #3c). El
+   contenido vive en `src/data/tramites.ts`; llenar `fuenteUrl`/`fuenteNombre`
+   enciende el sello "Verificado con la fuente oficial" en la UI y el host debe
+   sumarse a la whitelist de `lib/security/sanitize.ts`. Van 3 de 13.
+6. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
    ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende
    del gate: el destino provisional (Data Table de n8n) sigue válido.
-6. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
+7. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
    2026-08-26): "Mis casos" (+agenda de plazos integrada) es la #16 priorizada
    — gancho de retención/uso diario; referidos como card, no pantalla. No
    construir hasta tener feedback de la validación (backlog #4 del producto).
