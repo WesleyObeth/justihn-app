@@ -660,40 +660,53 @@ export const TRAMITES: Tramite[] = [
     institucionId: "poder-judicial",
     paraQuien: "Madres, padres o tutores que necesitan fijar o cobrar la pensión de un hijo",
     resumen:
-      "La pensión alimenticia es un derecho del hijo, no de quien la reclama. Se puede fijar por acuerdo o por juzgado, y si el obligado no paga, existen medidas para hacerla cumplir.",
+      "Es el proceso más accesible del sistema hondureño y casi nadie lo sabe: la demanda de alimentos se puede presentar VERBALMENTE ante el juzgado (art. 207-C del Código de Familia), con la sola partida de nacimiento el juez puede fijar pensión provisional (art. 210), y desde que admite la demanda puede avisar a migración para que el demandado no salga del país sin garantía (art. 210-A).",
     materia: "Familia",
     pasos: [
       {
-        titulo: "Reúne los documentos del vínculo y de los gastos",
+        titulo: "Presenta la demanda — puede ser hablada",
         detalle:
-          "Partida de nacimiento del menor, tu DNI y comprobantes de gastos (colegiatura, salud, alimentación) — sustentan el monto que pides.",
+          "La demanda de alimentos y su contestación pueden presentarse verbalmente o por escrito ante el juzgado competente. Si es verbal, el secretario levanta un acta que firman él y las partes; si es escrita y tiene defectos, el propio secretario la corrige en el acto. Y en el juicio de alimentos NO se admiten excepciones dilatorias — no hay forma de estirarlo con tecnicismos (art. 207-C).",
       },
       {
-        titulo: "Intenta el acuerdo (conciliación)",
+        titulo: "Si no tienes los documentos, el juzgado te los consigue gratis",
         detalle:
-          "Se puede acordar el monto y la forma de pago ante el juzgado de familia o con asistencia legal; el acuerdo homologado tiene fuerza de sentencia.",
+          "Si tu condición económica lo requiere y falta un documento que no estás en posibilidad de presentar, el juez —a solicitud tuya o de oficio— ordena a la autoridad correspondiente que lo expida GRATUITAMENTE y lo remita al despacho (art. 207-C). Quien demanda en favor de un menor puede ser su representante o incluso un simple guardador, probando esa circunstancia (art. 221).",
       },
       {
-        titulo: "Si no hay acuerdo, demanda de alimentos",
+        titulo: "Pide la pensión provisional desde el primer día",
         detalle:
-          "Se presenta ante el juzgado de familia del domicilio del menor; el juzgado puede fijar una pensión provisional mientras dura el proceso.",
+          "Con la sola presentación de la partida de nacimiento el juez puede acordar una pensión provisional dentro del trámite (art. 210). Y desde la admisión de la demanda, si hay prueba siquiera sumaria de la capacidad económica del demandado y de la obligación, puede ordenar alimentos provisionales y dar aviso inmediato a las autoridades migratorias para que el demandado no se ausente del país sin prestar garantía suficiente (art. 210-A).",
       },
       {
-        titulo: "Ejecuta si no cumple",
+        titulo: "¿Y si dice que no gana nada? El juez tiene tres salidas",
         detalle:
-          "Con la pensión fijada y el incumplimiento probado, se solicitan medidas de apremio para hacerla efectiva (retención de salario y otras que la ley prevé).",
+          "(1) Ordenar al patrono que certifique los ingresos del demandado, y el patrono debe remitirla en 2 días hábiles so pena de responsabilidad penal. (2) Pedir a la administración tributaria la constancia de su última declaración de ingresos. (3) Si aun así no se acredita, fijarlos por estudio socioeconómico —patrimonio, posición social, costumbres— y, en todo caso, PRESUMIR que devenga al menos el salario mínimo promedio vigente de la actividad a la que se dedique (art. 207-D).",
+      },
+      {
+        titulo: "Sabe qué incluye la pensión y cómo se paga",
+        detalle:
+          "Alimentos es todo lo indispensable para el desarrollo integral: sustento, habitación, vestido, asistencia médica, formación integral y educación (art. 207-A). También cubre los gastos del embarazo, el parto y sus consecuencias inmediatas (art. 207-B). Se fija en proporción a los recursos de quien la debe y las circunstancias de quien la recibe, y se paga por cuotas semanales, quincenales o mensuales ANTICIPADAS (art. 207). El monto puede modificarse si cambian las circunstancias de cualquiera de los dos (art. 220).",
+      },
+      {
+        titulo: "Si no cumple: las consecuencias que la ley ya le impone",
+        detalle:
+          "Mientras el deudor no cumpla ni se allane a cumplir, NO será escuchado en su reclamación sobre la custodia y el cuidado personal del niño ni en el ejercicio de sus derechos sobre él (art. 207-F). Si estando ausente o presente rehúsa entregar los alimentos, responde por las deudas que cónyuge e hijos contraigan para cubrir esa necesidad, en la cuantía estrictamente necesaria (art. 216). Y si no está acreditada la paternidad, el padre está obligado a someterse a la prueba de ADN (art. 207-B).",
       },
     ],
     requisitos: [
-      "Partida de nacimiento del menor",
-      "DNI del solicitante",
-      "Comprobantes de gastos del menor",
-      "Datos e ingresos del obligado (si los conoces)",
-      "[Verificar requisitos del juzgado de familia correspondiente]",
+      "Partida de nacimiento del menor (basta para pedir la pensión provisional, art. 210)",
+      "DNI del solicitante y prueba de la representación o guarda, si demandas por un menor",
+      "Datos del obligado: dónde trabaja, ingresos conocidos, bienes",
+      "Comprobantes de los gastos del menor (educación, salud, alimentación)",
+      "Si estás en imposibilidad económica de conseguir algún documento, pídelo al juzgado: se ordena su expedición gratuita",
     ],
-    tasa: "Honorarios del abogado · [tasas judiciales por verificar]",
+    tasa: "El Código no fija tasa por el juicio de alimentos; la demanda puede presentarse verbalmente y sin escrito de abogado. Si contratas abogado particular, sus honorarios",
     nota:
-      "Guarda constancia de cada pago recibido o incumplido: es la prueba con la que se ejecuta después.",
+      "⏱️ No se pueden reclamar alimentos pasados, salvo los SEIS MESES anteriores a la demanda, y solo si el alimentario tuvo que contraer deudas para vivir (art. 215). Demorar el reclamo cuesta dinero real.\n\n🚫 El derecho a pedir alimentos no puede renunciarse, cederse ni transmitirse por causa de muerte (art. 209): ningún «acuerdo» en el que la madre o el padre renuncia a la pensión del hijo es válido.\n\n🎓 La obligación no termina automáticamente a los 18: sigue si el hijo no ha terminado estudios superiores iniciados durante la minoría de edad y obtiene buenos rendimientos, o si es inválido (art. 217.6). Y perder o tener suspendida la patria potestad NO extingue la obligación alimentaria — solo la extingue la adopción por otra persona (art. 207-G).\n\n👨‍👩‍👧 Si hay varios obligados, el pago se reparte en proporción a su patrimonio, y en caso de urgencia el juez puede ordenar que uno lo cubra provisionalmente (art. 218).",
+    fuenteUrl:
+      "https://www.poderjudicial.gob.hn/Cedij/Cdigos/Codigo%20de%20Familia%20(Actualizado%20con%20Reformas%20Ley%20de%20Adopciones).pdf",
+    fuenteNombre: "Código de Familia (edición CEDIJ, actualizada con reformas) — Poder Judicial de Honduras",
   },
   {
     id: "divorcio-ciudadano",
