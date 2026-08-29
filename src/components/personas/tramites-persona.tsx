@@ -53,7 +53,7 @@ export function TramitesPersona() {
               return (
                 <Link
                   key={t.id}
-                  href={`/persona/tramites/${t.id}`}
+                  href={`/personas/tramites/${t.id}`}
                   className="rounded-full border border-chip-borde bg-chip px-3.5 py-1.5 text-[12.5px] font-medium text-celeste hover:border-celeste"
                 >
                   {t.nombre} · {hechos}/{t.pasos.length}
@@ -122,7 +122,7 @@ export function TramitesPersona() {
           return (
             <Link
               key={t.id}
-              href={`/persona/tramites/${t.id}`}
+              href={`/personas/tramites/${t.id}`}
               className="flex flex-col rounded-xl border border-borde bg-white p-4.5 text-marino hover:border-celeste"
             >
               <div className="flex items-baseline justify-between gap-2">
@@ -170,7 +170,7 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
 
   return (
     <div className="max-w-[1080px]">
-      <Link href="/persona/tramites" className="text-[13px]">
+      <Link href="/personas/tramites" className="text-[13px]">
         ← Todos los trámites
       </Link>
 
@@ -335,7 +335,7 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
               ))}
             </div>
             <Link
-              href={`/persona/abogados?materia=${encodeURIComponent(tramite.materia)}`}
+              href={`/personas/directorio?materia=${encodeURIComponent(tramite.materia)}`}
               className="mt-3 inline-block text-[12.5px]"
             >
               Ver más de {tramite.materia.toLowerCase()} →
@@ -348,7 +348,7 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
               Pregunta gratis y un abogado colegiado te orienta.
             </p>
             <Link
-              href="/persona/consultas"
+              href="/personas/consultas"
               className="mt-3 inline-block rounded-lg bg-marino px-4 py-2.5 text-[12.5px] font-semibold text-white hover:bg-celeste hover:text-white"
             >
               Hacer una consulta

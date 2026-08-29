@@ -298,7 +298,7 @@ export function SeccionConsultorio() {
                 </div>
               );
             })}
-            <Link href="/persona/consultas" className="text-[13px]" style={{ color: "var(--mint)" }}>
+            <Link href="/personas/consultas" className="text-[13px]" style={{ color: "var(--mint)" }}>
               Ver todas las consultas del consultorio →
             </Link>
           </div>
@@ -404,7 +404,7 @@ export function SeccionDirectorio() {
       </div>
 
       <div className="mt-5 text-center">
-        <Link href="/persona/abogados" className="text-[13px]" style={{ color: "var(--mint)" }}>
+        <Link href="/personas/directorio" className="text-[13px]" style={{ color: "var(--mint)" }}>
           Ver todo el directorio →
         </Link>
       </div>

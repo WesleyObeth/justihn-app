@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Shell del portal ciudadano (`/persona`) — gemelo visual del portal de
+ * Shell del portal ciudadano (`/personas`) — gemelo visual del portal de
  * abogados: sidebar marino en escritorio, barra superior con navegación
  * horizontal en móvil. La "cuenta" es la sesión demo de la persona.
  */
@@ -15,16 +15,16 @@ import { usePortal } from "@/store/portal";
 import { cn } from "@/lib/utils";
 
 const NAV_PERSONA: { href: string; label: string; icono: NombreIcono }[] = [
-  { href: "/persona", label: "Inicio", icono: "dash" },
-  { href: "/persona/tramites", label: "Trámites", icono: "pasos" },
-  { href: "/persona/consultas", label: "Mis consultas", icono: "leads" },
-  { href: "/persona/abogados", label: "Encuentra abogado", icono: "perfil" },
-  { href: "/persona/calculadora", label: "Calculadora", icono: "calc" },
-  { href: "/persona/plan", label: "Mi plan", icono: "planes" },
+  { href: "/personas", label: "Inicio", icono: "dash" },
+  { href: "/personas/tramites", label: "Trámites", icono: "pasos" },
+  { href: "/personas/consultas", label: "Mis consultas", icono: "leads" },
+  { href: "/personas/directorio", label: "Encuentra abogado", icono: "perfil" },
+  { href: "/personas/calculadora", label: "Calculadora", icono: "calc" },
+  { href: "/personas/plan", label: "Mi plan", icono: "planes" },
 ];
 
 function esActiva(pathname: string, href: string): boolean {
-  if (href === "/persona") return pathname === "/persona";
+  if (href === "/personas") return pathname === "/personas";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -113,13 +113,13 @@ function MenuUsuarioPersona() {
               </div>
             </div>
             <div className="my-1 h-px bg-white/[0.1]" />
-            <ItemMenu icono="perfil" onClick={() => ir("/persona/perfil")}>
+            <ItemMenu icono="perfil" onClick={() => ir("/personas/perfil")}>
               Mi perfil
             </ItemMenu>
-            <ItemMenu icono="config" onClick={() => ir("/persona/configuracion")}>
+            <ItemMenu icono="config" onClick={() => ir("/personas/configuracion")}>
               Configuración
             </ItemMenu>
-            <ItemMenu icono="help" onClick={() => ir("/persona/ayuda")}>
+            <ItemMenu icono="help" onClick={() => ir("/personas/ayuda")}>
               Ayuda
             </ItemMenu>
             <div className="my-1 h-px bg-white/[0.1]" />
@@ -192,7 +192,7 @@ export function HeaderMovilPersona() {
           <SimboloJustihn size={26} variante="oscuro" />
         </Link>
         <Link
-          href="/persona/perfil"
+          href="/personas/perfil"
           className="flex items-center gap-2 text-[12px] text-sobre-marino hover:text-white"
         >
           <span className="font-display grid h-7 w-7 place-items-center rounded-full bg-celeste text-[11px] font-semibold text-white">

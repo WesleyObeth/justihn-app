@@ -222,7 +222,7 @@ export function LandingContenido() {
             <Link href="#procesos">Procesos legales</Link>
             <Link href="#consultorio">Consultorio gratuito</Link>
             <Link href="#directorio">Encuentra abogado</Link>
-            <Link href="/persona">Mi cuenta</Link>
+            <Link href="/personas">Mi cuenta</Link>
           </div>
           <div className="flex flex-col gap-1.5 text-[12.5px]" style={{ color: "var(--muted)" }}>
             <span className="text-[11px] font-semibold tracking-[1px] uppercase">Abogados</span>

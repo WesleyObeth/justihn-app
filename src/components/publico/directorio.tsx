@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 
 /** Directorio público: abogados por materia. La prioridad Premium se nota. */
 export function PantallaDirectorio({ enPortal = false }: { enPortal?: boolean }) {
-  const base = enPortal ? "/persona/abogados" : "/directorio";
-  const rutaConsultorio = enPortal ? "/persona/consultas" : "/consultorio";
+  const base = enPortal ? "/personas/directorio" : "/directorio";
+  const rutaConsultorio = enPortal ? "/personas/consultas" : "/consultorio";
   const router = useRouter();
   const params = useSearchParams();
   const mostrarToast = usePortal((s) => s.mostrarToast);

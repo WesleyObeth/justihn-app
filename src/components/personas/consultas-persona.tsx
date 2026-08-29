@@ -67,7 +67,7 @@ export function ConsultasPersona() {
                   </div>
                   <p className="mt-2 text-[13px] leading-[1.65] text-texto-2">{respuesta}</p>
                   <Link
-                    href="/persona/abogados"
+                    href="/personas/directorio"
                     className="mt-2 inline-block text-[12.5px]"
                   >
                     ¿Quieres que lleve tu caso? Contacta desde el directorio →

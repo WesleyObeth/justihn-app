@@ -44,7 +44,7 @@ export function FormularioPregunta({
     setCiudad("");
     if (desdeLanding) {
       mostrarToast("Tu cuenta gratis está lista (demo) — sigue tu consulta en tu portal");
-      router.push("/persona/consultas");
+      router.push("/personas/consultas");
       return;
     }
     mostrarToast("Pregunta publicada — los abogados de la materia ya pueden verla");

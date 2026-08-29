@@ -97,7 +97,7 @@ export function AyudaPersona() {
           </p>
         </div>
         <Link
-          href="/persona/consultas"
+          href="/personas/consultas"
           className="rounded-xl bg-celeste px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
         >
           Hacer una consulta

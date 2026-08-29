@@ -35,7 +35,7 @@ export function InicioPersona() {
               <h2 className="text-[11px] font-semibold tracking-[1.2px] text-texto-4 uppercase">
                 Mis consultas
               </h2>
-              <Link href="/persona/consultas" className="text-[12.5px]">
+              <Link href="/personas/consultas" className="text-[12.5px]">
                 Ver todas →
               </Link>
             </div>
@@ -44,7 +44,7 @@ export function InicioPersona() {
                 {preguntas.slice(0, 2).map((p) => (
                   <Link
                     key={p.id}
-                    href="/persona/consultas"
+                    href="/personas/consultas"
                     className="rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
                   >
                     <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export function InicioPersona() {
                   Aún no has preguntado nada — es gratis y un abogado colegiado te orienta.
                 </p>
                 <Link
-                  href="/persona/consultas"
+                  href="/personas/consultas"
                   className="mt-3 inline-block rounded-lg bg-celeste px-4 py-2 text-[12.5px] font-semibold text-white hover:bg-cruce"
                 >
                   Hacer mi primera consulta
@@ -92,7 +92,7 @@ export function InicioPersona() {
               <h2 className="text-[11px] font-semibold tracking-[1.2px] text-texto-4 uppercase">
                 Mis trámites
               </h2>
-              <Link href="/persona/tramites" className="text-[12.5px]">
+              <Link href="/personas/tramites" className="text-[12.5px]">
                 Ver todos →
               </Link>
             </div>
@@ -103,7 +103,7 @@ export function InicioPersona() {
                   return (
                     <Link
                       key={t.id}
-                      href={`/persona/tramites/${t.id}`}
+                      href={`/personas/tramites/${t.id}`}
                       className="rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
                     >
                       <div className="flex items-baseline justify-between gap-3">
@@ -132,19 +132,19 @@ export function InicioPersona() {
 
         <div className="flex flex-col gap-4">
           <Acceso
-            href="/persona/tramites"
+            href="/personas/tramites"
             icono="pasos"
             titulo="Guías de trámites"
             desc={`${TRAMITES.length} trámites paso a paso con tu avance guardado`}
           />
           <Acceso
-            href="/persona/calculadora"
+            href="/personas/calculadora"
             icono="calc"
             titulo="¿Te despidieron?"
             desc="Calcula tus prestaciones según el Código del Trabajo"
           />
           <Acceso
-            href="/persona/abogados"
+            href="/personas/directorio"
             icono="perfil"
             titulo="Encuentra abogado"
             desc="Por materia y ciudad, con perfiles validados"
@@ -157,7 +157,7 @@ export function InicioPersona() {
             <p className="mt-1 text-[12.5px] leading-[1.55] text-texto-3">
               Guías, consultorio y calculadoras sin costo. El plan de pago está en definición.
             </p>
-            <Link href="/persona/plan" className="mt-2 inline-block text-[12.5px]">
+            <Link href="/personas/plan" className="mt-2 inline-block text-[12.5px]">
               Ver mi plan →
             </Link>
           </div>

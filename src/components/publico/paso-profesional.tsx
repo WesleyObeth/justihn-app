@@ -26,8 +26,8 @@ export function AvisoProfesional({
 
   const href = enPortal
     ? esNotario
-      ? "/persona/abogados?notarios=1"
-      : `/persona/abogados?materia=${encodeURIComponent(materia)}`
+      ? "/personas/directorio?notarios=1"
+      : `/personas/directorio?materia=${encodeURIComponent(materia)}`
     : esNotario
       ? "/?notarios=1#directorio"
       : `/?materia=${encodeURIComponent(materia)}#directorio`;

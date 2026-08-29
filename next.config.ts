@@ -36,6 +36,14 @@ const nextConfig: NextConfig = {
       { source: "/consultorio", destination: "/#consultorio", permanent: false },
       { source: "/directorio", destination: "/#directorio", permanent: false },
       { source: "/portal/:path*", destination: "/abogados/:path*", permanent: true },
+      // El portal ciudadano vivió en /persona hasta el 2026-08-29. Pasó a
+      // /personas para leer como pareja de /abogados (las dos vías del
+      // producto), y su pantalla "abogados" pasó a /directorio: `/abogados`
+      // era a la vez el portal de suscriptores y una pantalla del ciudadano.
+      { source: "/persona/abogados", destination: "/personas/directorio", permanent: true },
+      { source: "/personas/abogados", destination: "/personas/directorio", permanent: true },
+      { source: "/persona", destination: "/personas", permanent: true },
+      { source: "/persona/:path*", destination: "/personas/:path*", permanent: true },
     ];
   },
 };

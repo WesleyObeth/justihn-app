@@ -33,7 +33,7 @@ export function NavAurora() {
         <Link className="nav-login" href="/abogados">
           Para abogados
         </Link>
-        <Link className="nav-cta" href="/persona">
+        <Link className="nav-cta" href="/personas">
           Crear cuenta gratis
           <svg
             viewBox="0 0 24 24"

@@ -39,7 +39,7 @@ export function PerfilPersona() {
             </span>
           </div>
           <Link
-            href="/persona/configuracion"
+            href="/personas/configuracion"
             className="rounded-lg border border-borde bg-lienzo px-3.5 py-2 text-[12.5px] font-medium whitespace-nowrap text-marino hover:border-celeste hover:text-celeste"
           >
             Editar mis datos
@@ -63,10 +63,10 @@ export function PerfilPersona() {
           Mi actividad
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat valor={preguntas.length} etiqueta="Consultas hechas" href="/persona/consultas" />
-          <Stat valor={respondidas} etiqueta="Respondidas por abogados" href="/persona/consultas" />
-          <Stat valor={enProgreso} etiqueta="Trámites en progreso" href="/persona/tramites" />
-          <Stat valor={completados} etiqueta="Trámites completados" href="/persona/tramites" />
+          <Stat valor={preguntas.length} etiqueta="Consultas hechas" href="/personas/consultas" />
+          <Stat valor={respondidas} etiqueta="Respondidas por abogados" href="/personas/consultas" />
+          <Stat valor={enProgreso} etiqueta="Trámites en progreso" href="/personas/tramites" />
+          <Stat valor={completados} etiqueta="Trámites completados" href="/personas/tramites" />
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export function PerfilPersona() {
           </p>
         </div>
         <Link
-          href="/persona/configuracion"
+          href="/personas/configuracion"
           className="rounded-lg border border-borde bg-lienzo px-4 py-2.5 text-[12.5px] font-medium text-marino hover:border-celeste"
         >
           Privacidad y datos

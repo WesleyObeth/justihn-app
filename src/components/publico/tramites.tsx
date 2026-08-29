@@ -93,7 +93,7 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
               consultorio para preguntar gratis.
             </p>
             <Link
-              href={`/persona/tramites/${tramite.id}`}
+              href={`/personas/tramites/${tramite.id}`}
               className="mt-3.5 inline-block rounded-xl bg-celeste px-6 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
             >
               Crear mi cuenta gratis

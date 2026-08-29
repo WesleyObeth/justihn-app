@@ -23,7 +23,7 @@ import { fmtLempiras } from "@/lib/utils";
 export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean }) {
   const router = useRouter();
   const params = useSearchParams();
-  const rutaConsultorio = enPortal ? "/persona/consultas" : "/#consultorio";
+  const rutaConsultorio = enPortal ? "/personas/consultas" : "/#consultorio";
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const [salario, setSalario] = useState(enPortal ? (params.get("salario") ?? "") : "");
   const [anios, setAnios] = useState(enPortal ? (params.get("anios") ?? "") : "");
@@ -36,7 +36,7 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
   const laborales = buscarAbogados("Laboral").slice(0, 2);
 
   /** Con los valores puestos: al entrar ve su propio cálculo hecho. */
-  const destinoConDatos = `/persona/calculadora?salario=${salarioNum}&anios=${aniosNum}`;
+  const destinoConDatos = `/personas/calculadora?salario=${salarioNum}&anios=${aniosNum}`;
 
   const iniciarSesion = () => {
     mostrarToast("Sesión de demostración — el login real llega con la Fase 2");
