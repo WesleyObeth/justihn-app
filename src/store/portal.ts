@@ -14,7 +14,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { CUOTA_BASE, NOTIFICACIONES } from "@/data/catalogo";
 import { VIGILADOS_INICIALES } from "@/data/monitoreo";
-import type { Materia, MensajeChat, NombreVigilado, PlanId } from "@/types/dominio";
+import type { Lead, Materia, MensajeChat, NombreVigilado, PlanId } from "@/types/dominio";
 
 export interface PreferenciasNotificacion {
   digest: boolean;
@@ -57,6 +57,9 @@ interface PortalState {
   leadsRespondidos: Record<string, string>;
   /** Nombres bajo monitoreo (feature Pro). Persistido. */
   nombresVigilados: NombreVigilado[];
+  /** Preguntas hechas desde el consultorio público (Vía B) — aparecen como
+   *  leads en el portal de abogados: es el mismo flujo, visto de ambos lados. */
+  preguntasPublico: Lead[];
   escrito: { abierto: boolean; titulo: string; texto: string };
   toast: string;
 
@@ -81,6 +84,7 @@ interface PortalState {
   responderLead: (leadId: string, respuesta: string) => void;
   vigilarNombre: (nombre: string, tipo: NombreVigilado["tipo"]) => void;
   dejarDeVigilar: (id: string) => void;
+  preguntarConsultorio: (materia: Materia, ciudad: string, pregunta: string) => void;
   abrirEscrito: (titulo: string, texto: string) => void;
   setTextoEscrito: (texto: string) => void;
   cerrarEscrito: () => void;
@@ -122,6 +126,7 @@ export const usePortal = create<PortalState>()(
       pasosHechos: {},
       leadsRespondidos: {},
       nombresVigilados: VIGILADOS_INICIALES,
+      preguntasPublico: [],
       escrito: { abierto: false, titulo: "", texto: "" },
       toast: "",
 
@@ -176,6 +181,21 @@ export const usePortal = create<PortalState>()(
         }),
       dejarDeVigilar: (id) =>
         set((s) => ({ nombresVigilados: s.nombresVigilados.filter((v) => v.id !== id) })),
+      preguntarConsultorio: (materia, ciudad, pregunta) =>
+        set((s) => ({
+          preguntasPublico: [
+            {
+              id: `pub-${Date.now()}`,
+              materia,
+              ciudad,
+              cuando: "reciente",
+              nuevo: true,
+              respuestas: 0,
+              pregunta,
+            },
+            ...s.preguntasPublico,
+          ],
+        })),
       abrirEscrito: (titulo, texto) => set({ escrito: { abierto: true, titulo, texto } }),
       setTextoEscrito: (texto) => set((s) => ({ escrito: { ...s.escrito, texto } })),
       cerrarEscrito: () => set((s) => ({ escrito: { ...s.escrito, abierto: false } })),
@@ -208,6 +228,7 @@ export const usePortal = create<PortalState>()(
         pasosHechos: s.pasosHechos,
         leadsRespondidos: s.leadsRespondidos,
         nombresVigilados: s.nombresVigilados,
+        preguntasPublico: s.preguntasPublico,
         notifsLeidas: s.notifsLeidas,
         notifsLeidasIds: s.notifsLeidasIds,
         sidebarColapsado: s.sidebarColapsado,

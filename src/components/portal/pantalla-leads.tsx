@@ -20,6 +20,10 @@ import type { Lead } from "@/types/dominio";
 export function PantallaLeads() {
   const esPremium = usePortal((s) => s.plan) === "premium";
   const respondidos = usePortal((s) => s.leadsRespondidos);
+  // Las preguntas hechas en el consultorio público entran aquí como leads:
+  // mismo store, dos caras (la integración Vía A ↔ Vía B).
+  const preguntasPublico = usePortal((s) => s.preguntasPublico);
+  const todos = [...preguntasPublico, ...LEADS];
   const router = useRouter();
   const params = useSearchParams();
   // Filtros en la URL (patrón del portal): una notificación puede aterrizar
@@ -35,13 +39,13 @@ export function PantallaLeads() {
     router.replace(`/abogados/leads${query ? `?${query}` : ""}`, { scroll: false });
   };
 
-  const materias = [...new Set(LEADS.map((l) => l.materia))];
-  const filtrados = LEADS.filter((l) => {
+  const materias = [...new Set(todos.map((l) => l.materia))];
+  const filtrados = todos.filter((l) => {
     const porMateria = filtroMateria === "todas" || l.materia === filtroMateria;
     const porNuevo = !soloNuevos || (l.nuevo && !respondidos[l.id]);
     return porMateria && porNuevo;
   });
-  const nuevosSinResponder = LEADS.filter((l) => l.nuevo && !respondidos[l.id]).length;
+  const nuevosSinResponder = todos.filter((l) => l.nuevo && !respondidos[l.id]).length;
 
   return (
     <>
@@ -57,11 +61,11 @@ export function PantallaLeads() {
           activo={filtroMateria === "todas"}
           onClick={() => setFiltros("todas", soloNuevos)}
         >
-          Todas ({LEADS.length})
+          Todas ({todos.length})
         </FiltroChip>
         {materias.map((m) => (
           <FiltroChip key={m} activo={filtroMateria === m} onClick={() => setFiltros(m, soloNuevos)}>
-            {m} ({LEADS.filter((l) => l.materia === m).length})
+            {m} ({todos.filter((l) => l.materia === m).length})
           </FiltroChip>
         ))}
         <span className="mx-1 h-5 w-px bg-borde" />

@@ -63,6 +63,21 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   (`data/jus-ia.ts`) por carga, elegida en cliente tras el mount — unas llevan
   el nombre y otras no.
 
+- **🌐 VÍA B CONSTRUIDA (2026-08-29, decisión Wesley tras el feedback del socio):**
+  el sitio público para la gente común vive en la **raíz** (grupo de rutas
+  `src/app/(publico)/`, shell propio header+footer en `components/publico/`):
+  Home con buscador · **/tramites** (9 guías de 7 instituciones — la lista del
+  socio: RTN, CAI, permiso de operación, ARSA, ambiental, ONCAE, tradición de
+  dominio, traspaso vehicular, constitución de sociedad; seed `data/tramites.ts`,
+  tasas con marcadores "L ___" hasta verificación del socio) · **/directorio**
+  (abogados por materia, `data/directorio.ts` — María Castillo es EL MISMO seed
+  del portal; Premium aparece primero) · **/consultorio** (pregunta pública →
+  entra a `preguntasPublico` del store → **aparece como lead en
+  /abogados/leads**, y la respuesta del abogado aparece pública — la
+  integración Vía A ↔ Vía B en vivo) · **/calculadora-prestaciones** (usa el
+  mismo `lib/prestaciones`, §0.5). Cada guía de trámite recomienda abogados de
+  su materia (funnel guía→lead). Planes público: Gratis + pago "en definición".
+
 ## 2. Stack (pins reales)
 
 Next.js 16.3 (App Router) · React 19.2 · TypeScript 5.9 · Tailwind v4 ·
