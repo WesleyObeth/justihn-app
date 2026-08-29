@@ -7,20 +7,23 @@
  */
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
+import {
+  SeccionConsultorio,
+  SeccionDirectorio,
+  SeccionTramites,
+} from "@/components/landing/secciones";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
-import { SENTENCIAS } from "@/data/sentencias";
 
 const POPULARES = ["abrir-rtn", "traspaso-vehiculo", "permiso-operacion", "constituir-sociedad"];
 
 export function LandingContenido() {
-  const router = useRouter();
+  // Un solo estado de búsqueda: el hero y la sección de trámites filtran lo
+  // mismo — buscar arriba lleva al usuario a los resultados de abajo.
   const [q, setQ] = useState("");
 
   const buscar = () => {
-    const termino = q.trim();
-    router.push(termino ? `/tramites?q=${encodeURIComponent(termino)}` : "/tramites");
+    document.getElementById("tramites")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const destacados = POPULARES.map((id) => TRAMITES.find((t) => t.id === id)!);
@@ -96,19 +99,19 @@ export function LandingContenido() {
         </h2>
         <div className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-3">
           <Puerta
-            href="/tramites"
+            href="#tramites"
             icono="pasos"
             titulo="Hacer un trámite"
             desc={`RTN, traspasos, permisos y ${TRAMITES.length - 3} guías más — paso a paso, con requisitos y costos.`}
           />
           <Puerta
-            href="/consultorio"
+            href="#consultorio"
             icono="leads"
             titulo="Resolver una duda legal"
             desc="Pregunta gratis en el consultorio y un abogado colegiado te orienta en público."
           />
           <Puerta
-            href="/directorio"
+            href="#directorio"
             icono="perfil"
             titulo="Encontrar abogado"
             desc="Por materia y ciudad, con perfiles validados — laboral, familia, mercantil y más."
@@ -116,40 +119,9 @@ export function LandingContenido() {
         </div>
       </section>
 
-      {/* ── Trámites por institución ── */}
-      <section className="mx-auto max-w-[1080px] px-5 py-10">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="font-display text-[24px] font-bold">Trámites por institución</h2>
-          <Link href="/tramites" className="text-[13px]" style={{ color: "var(--mint)" }}>
-            Ver todos →
-          </Link>
-        </div>
-        <div className="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-          {INSTITUCIONES.slice(0, 6).map((inst) => {
-            const n = TRAMITES.filter((t) => t.institucionId === inst.id).length;
-            return (
-              <Link
-                key={inst.id}
-                href={`/tramites?institucion=${inst.id}`}
-                className="glass-card block p-5"
-              >
-                <div className="text-[11px] font-bold tracking-[1px] uppercase" style={{ color: "var(--mint)" }}>
-                  {inst.sigla}
-                </div>
-                <div className="font-display mt-1.5 text-[15px] leading-[1.35] font-semibold">
-                  {inst.nombre}
-                </div>
-                <div className="mt-1 text-[12.5px] leading-[1.5]" style={{ color: "var(--muted)" }}>
-                  {inst.descripcion}
-                </div>
-                <div className="mt-2.5 text-[12px]" style={{ color: "var(--mint)" }}>
-                  {n} {n === 1 ? "trámite" : "trámites"} →
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+      <SeccionTramites termino={q} onTermino={setQ} />
+
+      <SeccionConsultorio />
 
       {/* ── ¿Te despidieron? ── */}
       <section className="mx-auto max-w-[1080px] px-5 py-10">
@@ -176,6 +148,8 @@ export function LandingContenido() {
         </div>
       </section>
 
+      <SeccionDirectorio />
+
       {/* ── Para abogados ── */}
       <section className="mx-auto max-w-[1080px] px-5 py-10">
         <div className="glass-card p-7 md:p-9">
@@ -189,7 +163,7 @@ export function LandingContenido() {
               </h2>
               <ul className="mt-4 flex flex-col gap-2 text-[13.5px]" style={{ color: "var(--muted)" }}>
                 {[
-                  `Jus IA responde citando las ${SENTENCIAS.length > 0 ? "20,202" : ""} sentencias del corpus oficial — nunca inventa`,
+                  "Jus IA responde citando las 20,202 sentencias del corpus oficial — nunca inventa",
                   "Alertas de La Gaceta por materia y monitoreo de nombres",
                   "Modelos de escritos, calculadoras y los leads de este consultorio",
                 ].map((f) => (
@@ -235,9 +209,9 @@ export function LandingContenido() {
           </div>
           <div className="flex flex-col gap-1.5 text-[12.5px]" style={{ color: "var(--muted)" }}>
             <span className="text-[11px] font-semibold tracking-[1px] uppercase">Para ti</span>
-            <Link href="/tramites">Guías de trámites</Link>
-            <Link href="/consultorio">Consultorio gratuito</Link>
-            <Link href="/directorio">Encuentra abogado</Link>
+            <Link href="#tramites">Guías de trámites</Link>
+            <Link href="#consultorio">Consultorio gratuito</Link>
+            <Link href="#directorio">Encuentra abogado</Link>
             <Link href="/persona">Mi cuenta</Link>
           </div>
           <div className="flex flex-col gap-1.5 text-[12.5px]" style={{ color: "var(--muted)" }}>

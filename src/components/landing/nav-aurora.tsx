@@ -24,9 +24,9 @@ export function NavAurora() {
         <span className="wm">Justihn</span>
       </Link>
       <div className="nav-mid">
-        <Link href="/tramites">Trámites</Link>
-        <Link href="/consultorio">Consultorio</Link>
-        <Link href="/directorio">Encuentra abogado</Link>
+        <a href="#tramites">Trámites</a>
+        <a href="#consultorio">Consultorio</a>
+        <a href="#directorio">Encuentra abogado</a>
       </div>
       <div className="nav-right" style={{ display: "flex", alignItems: "center", gap: 18 }}>
         <Link className="nav-login" href="/abogados">

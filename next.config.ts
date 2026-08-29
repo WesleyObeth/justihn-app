@@ -30,6 +30,11 @@ const nextConfig: NextConfig = {
       { source: "/portal/plantillas", destination: "/abogados/modelos", permanent: true },
       { source: "/abogados/plantillas", destination: "/abogados/modelos", permanent: true },
       { source: "/portal", destination: "/abogados", permanent: true },
+      // Las tres experiencias públicas viven como secciones de la landing
+      // (decisión Wesley 2026-08-29); el detalle /tramites/[id] se mantiene.
+      { source: "/tramites", destination: "/#tramites", permanent: false },
+      { source: "/consultorio", destination: "/#consultorio", permanent: false },
+      { source: "/directorio", destination: "/#directorio", permanent: false },
       { source: "/portal/:path*", destination: "/abogados/:path*", permanent: true },
     ];
   },

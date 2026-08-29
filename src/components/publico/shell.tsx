@@ -11,9 +11,9 @@ import { LogoJustihn } from "@/components/brand/logos";
 import { cn } from "@/lib/utils";
 
 const NAV_PUBLICA = [
-  { href: "/tramites", label: "Trámites" },
-  { href: "/consultorio", label: "Consultorio" },
-  { href: "/directorio", label: "Encuentra abogado" },
+  { href: "/#tramites", label: "Trámites" },
+  { href: "/#consultorio", label: "Consultorio" },
+  { href: "/#directorio", label: "Encuentra abogado" },
 ];
 
 export function HeaderPublico() {
@@ -33,7 +33,7 @@ export function HeaderPublico() {
               href={item.href}
               className={cn(
                 "rounded-lg px-3 py-1.5 text-[13.5px] font-medium",
-                pathname.startsWith(item.href)
+                pathname.startsWith(item.href.replace("/#", "/"))
                   ? "bg-chip text-celeste"
                   : "text-texto-2 hover:bg-lienzo hover:text-marino",
               )}
@@ -78,9 +78,9 @@ export function FooterPublico() {
           <span className="text-[11px] font-semibold tracking-[1px] text-texto-4 uppercase">
             Para ti
           </span>
-          <Link href="/tramites">Guías de trámites</Link>
-          <Link href="/consultorio">Consultorio gratuito</Link>
-          <Link href="/directorio">Encuentra abogado</Link>
+          <Link href="/#tramites">Guías de trámites</Link>
+          <Link href="/#consultorio">Consultorio gratuito</Link>
+          <Link href="/#directorio">Encuentra abogado</Link>
         </div>
         <div className="flex flex-col gap-1.5 text-[12.5px]">
           <span className="text-[11px] font-semibold tracking-[1px] text-texto-4 uppercase">

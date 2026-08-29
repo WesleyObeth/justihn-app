@@ -100,6 +100,13 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   landing.css scopeado bajo .landing-aurora). Stacking: fondo z-0 ·
   canvas+scrim z-1 · contenido z-2 · nav z-100. Las páginas públicas
   interiores conservan el shell claro de `(publico)`.
+  **Secciones en la landing (2026-08-29, decisión Wesley):** trámites,
+  consultorio y directorio dejaron de ser páginas propias y viven como
+  SECCIONES interactivas de la home (`components/landing/secciones.tsx`, ids
+  `#tramites/#consultorio/#directorio`, nav y footer con anclas). El buscador
+  del hero y el de la sección comparten estado (buscar arriba filtra abajo y
+  hace scroll). Las rutas viejas redirigen a su ancla; sobreviven como página
+  el detalle `/tramites/[id]` (SEO + gate de cuenta) y la calculadora.
 
 ## 2. Stack (pins reales)
 

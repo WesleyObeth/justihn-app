@@ -1,157 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Icono } from "@/components/brand/iconos";
-import { getInstitucion, INSTITUCIONES, TRAMITES, type Tramite } from "@/data/tramites";
+import { getInstitucion, type Tramite } from "@/data/tramites";
 import { buscarAbogados } from "@/data/directorio";
 import { usePortal } from "@/store/portal";
-import { cn } from "@/lib/utils";
 
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "");
-}
-
-/** Índice de trámites: buscador + filtro por institución, todo en la URL. */
-export function IndiceTramites() {
-  const router = useRouter();
-  const params = useSearchParams();
-  const [q, setQ] = useState(params.get("q") ?? "");
-  const institucion = params.get("institucion") ?? "todas";
-
-  const actualizarUrl = (termino: string, inst: string) => {
-    const p = new URLSearchParams();
-    if (termino.trim()) p.set("q", termino.trim());
-    if (inst !== "todas") p.set("institucion", inst);
-    const query = p.toString();
-    router.replace(`/tramites${query ? `?${query}` : ""}`, { scroll: false });
-  };
-
-  const termino = normalizar(q.trim());
-  const filtrados = TRAMITES.filter((t) => {
-    const porInst = institucion === "todas" || t.institucionId === institucion;
-    const porTermino =
-      !termino ||
-      normalizar(`${t.nombre} ${t.paraQuien} ${t.resumen} ${getInstitucion(t.institucionId)?.nombre}`).includes(
-        termino,
-      );
-    return porInst && porTermino;
-  });
-
-  return (
-    <div className="mx-auto max-w-[1140px] px-4 py-8 md:px-6">
-      <h1 className="font-display text-[26px] font-bold">Guías de trámites</h1>
-      <p className="mt-1 text-[13.5px] text-texto-3">
-        Paso a paso, requisitos y en qué institución — orientación general verificada con
-        profesionales del derecho.
-      </p>
-
-      <div className="mt-5 flex min-w-[220px] items-center gap-2 rounded-xl border border-borde bg-white px-4 py-3 focus-within:border-celeste sm:max-w-[480px]">
-        <Icono nombre="buscar" size={16} className="shrink-0 text-texto-4" />
-        <input
-          value={q}
-          onChange={(e) => {
-            setQ(e.target.value);
-            actualizarUrl(e.target.value, institucion);
-          }}
-          placeholder="Busca tu trámite…"
-          aria-label="Buscar trámite"
-          className="min-w-0 flex-1 border-none bg-transparent text-sm text-marino outline-none"
-        />
-      </div>
-
-      <div className="mt-3.5 flex flex-wrap gap-2">
-        <ChipInstitucion activo={institucion === "todas"} onClick={() => actualizarUrl(q, "todas")}>
-          Todas ({TRAMITES.length})
-        </ChipInstitucion>
-        {INSTITUCIONES.map((inst) => {
-          const n = TRAMITES.filter((t) => t.institucionId === inst.id).length;
-          if (n === 0) return null;
-          return (
-            <ChipInstitucion
-              key={inst.id}
-              activo={institucion === inst.id}
-              onClick={() => actualizarUrl(q, inst.id)}
-            >
-              {inst.sigla} ({n})
-            </ChipInstitucion>
-          );
-        })}
-      </div>
-
-      <div className="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-        {filtrados.map((t) => {
-          const inst = getInstitucion(t.institucionId)!;
-          return (
-            <Link
-              key={t.id}
-              href={`/tramites/${t.id}`}
-              className="flex flex-col rounded-xl border border-borde bg-white p-4.5 text-marino hover:border-celeste"
-            >
-              <div className="text-[11px] font-bold tracking-[.8px] text-celeste uppercase">
-                {inst.sigla}
-              </div>
-              <div className="font-display mt-1 text-[15.5px] leading-[1.35] font-semibold">
-                {t.nombre}
-              </div>
-              <p className="mt-1.5 flex-1 text-[12.5px] leading-[1.55] text-texto-3">
-                {t.paraQuien}
-              </p>
-              <div className="mt-2.5 text-[12.5px] text-celeste">
-                Ver la guía ({t.pasos.length} pasos) →
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {filtrados.length === 0 && (
-        <div className="mt-5 rounded-xl border border-borde bg-white px-6 py-10 text-center">
-          <p className="text-[13.5px] text-texto-3">
-            Aún no tenemos una guía para «{q.trim()}». Pregunta en el consultorio y un abogado te
-            orienta gratis — y tu pregunta nos dice qué guía escribir después.
-          </p>
-          <Link
-            href="/consultorio"
-            className="mt-4 inline-block rounded-xl bg-celeste px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
-          >
-            Preguntar en el consultorio
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ChipInstitucion({
-  activo,
-  onClick,
-  children,
-}: {
-  activo: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={activo}
-      onClick={onClick}
-      className={cn(
-        "cursor-pointer rounded-full border px-3.5 py-[7px] text-[12.5px] font-medium transition-colors",
-        activo
-          ? "border-celeste bg-celeste text-white"
-          : "border-borde bg-white text-texto-3 hover:border-celeste",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
 
 // ── Detalle de un trámite ──────────────────────────────────────────────────
 
@@ -162,7 +15,7 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
 
   return (
     <div className="mx-auto max-w-[1140px] px-4 py-8 md:px-6">
-      <Link href="/tramites" className="text-[13px]">
+      <Link href="/#tramites" className="text-[13px]">
         ← Todas las guías
       </Link>
 
@@ -263,7 +116,7 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
               ))}
             </div>
             <Link
-              href={`/directorio?materia=${encodeURIComponent(tramite.materia)}`}
+              href="/#directorio"
               className="mt-3 inline-block text-[12.5px]"
             >
               Ver más abogados de {tramite.materia.toLowerCase()} →
@@ -276,7 +129,7 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
               Pregunta gratis en el consultorio y un abogado colegiado te orienta.
             </p>
             <Link
-              href="/consultorio"
+              href="/#consultorio"
               className="mt-3 inline-block rounded-lg bg-marino px-4 py-2.5 text-[12.5px] font-semibold text-white hover:bg-celeste hover:text-white"
             >
               Ir al consultorio

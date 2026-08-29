@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Icono } from "@/components/brand/iconos";
 import { ABOGADA_DEMO } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
-import { FormularioPregunta } from "@/components/publico/consultorio";
+import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
 
 /**
  * Mis consultas — el otro lado de la pantalla Leads del portal de abogados:

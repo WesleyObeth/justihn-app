@@ -14,7 +14,7 @@ import { fmtLempiras } from "@/lib/utils";
  * mismo número.
  */
 export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean }) {
-  const rutaConsultorio = enPortal ? "/persona/consultas" : "/consultorio";
+  const rutaConsultorio = enPortal ? "/persona/consultas" : "/#consultorio";
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const [salario, setSalario] = useState("");
   const [anios, setAnios] = useState("");
