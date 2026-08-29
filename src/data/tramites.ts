@@ -24,9 +24,23 @@ export interface Institucion {
   descripcion: string;
 }
 
+/**
+ * Profesional que un paso concreto exige. Se marca SOLO cuando la fuente
+ * oficial lo dice literalmente ("autenticadas por Notario", "a favor de un
+ * profesional del derecho") — no por criterio propio.
+ *
+ * `notario` NO es lo mismo que un abogado de materia "Notarial": es una
+ * credencial aparte (ver `HabilitacionNotarial` en `data/directorio.ts`), y
+ * por eso la UI resuelve estos pasos con `buscarNotarios()`.
+ */
+export type ProfesionalRequerido = "notario" | "abogado";
+
 export interface PasoTramite {
   titulo: string;
   detalle: string;
+  /** Si el paso exige un profesional, la guía lo dice EN el paso — no solo
+   *  en una tarjeta al pie que el usuario ve cuando ya se atascó. */
+  profesional?: ProfesionalRequerido;
 }
 
 export interface Tramite {
@@ -390,6 +404,7 @@ export const TRAMITES: Tramite[] = [
         titulo: "Llena los formularios RP",
         detalle:
           "F-1RP solicitud de inscripción · F-2RP información del solicitante, donde detallas el bien o servicio al que te quieres certificar · F-3RP carta poder (o poder en escritura pública) a favor de un profesional del derecho, adjuntando su carné vigente del Colegio de Abogados · F-5RP declaración jurada de no estar en las prohibiciones o inhabilidades de los artículos 15 y 16 de la Ley de Contratación del Estado (para sociedades, también el art. 439 del Código Penal, lavado de activos). Las personas jurídicas suman el F-4RP con la certificación de su composición social.",
+        profesional: "abogado",
       },
       {
         titulo: "Ojo con las auténticas: son dos, y así es como se rechazan",
@@ -453,6 +468,7 @@ export const TRAMITES: Tramite[] = [
         titulo: "Otorga la escritura pública ante notario",
         detalle:
           "El notario redacta y autoriza la escritura de compraventa. Ojo: el IP exige presentar la escritura de compra-venta ORIGINAL al inscribirla — no una copia.",
+        profesional: "notario",
       },
       {
         titulo: "Paga los impuestos ANTES de ir al registro",
@@ -468,6 +484,7 @@ export const TRAMITES: Tramite[] = [
         titulo: "Si lo que necesitas es el trámite de tradición de dominio",
         detalle:
           "Es un trámite registral distinto (por ejemplo, para ordenar la cadena de dominio de un inmueble heredado). Se presenta solicitud de tradición de dominio —adjuntando el testamento si es testamentaria—, recibo de pago de L 200.00 con su copia, y copias del DNI de los solicitantes. Si el inmueble está inscrito en otra circunscripción, se acompaña la certificación íntegra de la sentencia. Y si la solicitud la firma un profesional del derecho, debe acreditar su representación con poder o, en su defecto, carta poder.",
+        profesional: "abogado",
       },
     ],
     requisitos: [
@@ -513,6 +530,7 @@ export const TRAMITES: Tramite[] = [
         titulo: "Llena el formulario y autentica las firmas ante notario",
         detalle:
           "Firman el tradente (vendedor) y el adquiriente (comprador), y un notario autentica ambas firmas; alternativamente, el traspaso puede constar en instrumento público autorizado por notario. Excepción: no se exige certificado de autenticidad cuando la venta la hace una agencia o distribuidora de vehículos NUEVOS y es el primer registro; si el vehículo es usado, aunque lo venda la agencia, las firmas sí van autenticadas. También vale firmar el formulario presencialmente ante el funcionario registral, que deja constancia de ello en el documento.",
+        profesional: "notario",
       },
       {
         titulo: "Presenta el expediente en el Registro Vehicular",
@@ -554,11 +572,13 @@ export const TRAMITES: Tramite[] = [
         titulo: "Deposita el capital y obtén el certificado",
         detalle:
           "El notario emite la nota para el certificado de depósito y depositas el aporte en numerario en un banco del sistema. Con ese certificado arranca todo lo demás.",
+        profesional: "notario",
       },
       {
         titulo: "Otorga la escritura pública de constitución",
         detalle:
           "El notario elabora la escritura con los datos fundamentales: socios, capital, tipo de sociedad y representación legal. Firmas, recibes el aviso de constitución y retiras el testimonio.",
+        profesional: "notario",
       },
       {
         titulo: "Inscribe la sociedad en el Registro Mercantil",
@@ -642,6 +662,7 @@ export const TRAMITES: Tramite[] = [
         titulo: "Si no hay acuerdo, demanda ante el Juzgado de Letras del Trabajo",
         detalle:
           "Para litigar se requiere abogado en ejercicio, con dos excepciones importantes: las partes pueden actuar por sí mismas en los juicios de única instancia y en las audiencias de conciliación (art. 711). Y ojo con un detalle del art. 638: la Procuraduría puede negarse a representarte si pretendes que concurra al juicio junto con defensores particulares — o vas con ella, o vas con tu abogado.",
+        profesional: "abogado",
       },
     ],
     requisitos: [
@@ -731,6 +752,7 @@ export const TRAMITES: Tramite[] = [
         titulo: "Presenten la solicitud personalmente y por escrito",
         detalle:
           "Ante el juez competente del domicilio, acompañando: (1) certificaciones del Registro Civil que acrediten su edad y su calidad de casados, (2) certificación de las actas de nacimiento de los hijos menores, si los hay, y (3) la propuesta de convenio regulador, cuyo contenido debe ajustarse a lo que establece el Código Procesal Civil (art. 244).",
+        profesional: "abogado",
       },
       {
         titulo: "Audiencia el mismo día — y sentencia inmediata si no hay hijos menores",
@@ -791,6 +813,7 @@ export const TRAMITES: Tramite[] = [
         titulo: "Tramita la declaratoria de herederos",
         detalle:
           "Es un acto de jurisdicción voluntaria. Como aún no existe la Ley de Jurisdicción Voluntaria, siguen vigentes las disposiciones del Código de Procedimientos Civiles de 1906, Libro IV «Actos Judiciales no Contenciosos» (art. 919 del CPC de 2018). El resultado es la sentencia de declaratoria de herederos, que es el documento con el que se mueve todo lo demás.",
+        profesional: "abogado",
       },
       {
         titulo: "Inscribe la posesión efectiva de herencia en el Instituto de la Propiedad",

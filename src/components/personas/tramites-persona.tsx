@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
 import { getInstitucion, INSTITUCIONES, TRAMITES, type Tramite } from "@/data/tramites";
 import { buscarAbogados } from "@/data/directorio";
+import { AvisoProfesional } from "@/components/publico/paso-profesional";
 import { usePortal } from "@/store/portal";
 import { cn } from "@/lib/utils";
 
@@ -224,6 +225,13 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
                     <p className="mt-[3px] text-[13px] leading-[1.55] text-texto-3">
                       {paso.detalle}
                     </p>
+                    {paso.profesional && !hecho && (
+                      <AvisoProfesional
+                        profesional={paso.profesional}
+                        materia={tramite.materia}
+                        enPortal
+                      />
+                    )}
                   </div>
                 </li>
               );

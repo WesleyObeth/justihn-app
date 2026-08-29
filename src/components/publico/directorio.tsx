@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
-import { buscarAbogados, DIRECTORIO } from "@/data/directorio";
+import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
+import { InsigniaNotario } from "@/components/publico/paso-profesional";
 import { usePortal } from "@/store/portal";
 import type { Materia } from "@/types/dominio";
 import { cn } from "@/lib/utils";
@@ -15,16 +16,19 @@ export function PantallaDirectorio({ enPortal = false }: { enPortal?: boolean })
   const router = useRouter();
   const params = useSearchParams();
   const mostrarToast = usePortal((s) => s.mostrarToast);
+  // `?notarios=1` llega desde un paso de trámite que exige notario.
+  const soloNotarios = params.get("notarios") === "1";
   const materia = (params.get("materia") as Materia | null) ?? "todas";
 
   const materias = [...new Set(DIRECTORIO.flatMap((a) => a.materias))];
-  const abogados = buscarAbogados(materia as Materia | "todas");
+  const abogados = soloNotarios ? buscarNotarios() : buscarAbogados(materia as Materia | "todas");
 
   const setMateria = (m: string) => {
     router.replace(m === "todas" ? base : `${base}?materia=${encodeURIComponent(m)}`, {
       scroll: false,
     });
   };
+  const verNotarios = () => router.replace(`${base}?notarios=1`, { scroll: false });
 
   return (
     <div className={enPortal ? "max-w-[1080px]" : "mx-auto max-w-[1140px] px-4 py-8 md:px-6"}>
@@ -33,13 +37,31 @@ export function PantallaDirectorio({ enPortal = false }: { enPortal?: boolean })
         Profesionales del derecho por materia y ciudad. Los perfiles con insignia están
         validados con su colegiación al día.
       </p>
+      {soloNotarios && (
+        <p className="mt-2 rounded-[10px] border border-aviso-borde bg-aviso px-3.5 py-2.5 text-[12.5px] leading-[1.55] text-aviso-cuerpo">
+          Ser notario no es una especialidad: es una habilitación aparte del Colegio de
+          Abogados. Aquí la habilitación es <b>declarada por el profesional</b> — todavía
+          no la contrastamos con la Contraloría del Notariado. Pídele su carné antes de
+          firmar.
+        </p>
+      )}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <ChipMateriaFiltro activo={materia === "todas"} onClick={() => setMateria("todas")}>
+        <ChipMateriaFiltro
+          activo={!soloNotarios && materia === "todas"}
+          onClick={() => setMateria("todas")}
+        >
           Todas
         </ChipMateriaFiltro>
+        <ChipMateriaFiltro activo={soloNotarios} onClick={verNotarios}>
+          Notarios
+        </ChipMateriaFiltro>
         {materias.map((m) => (
-          <ChipMateriaFiltro key={m} activo={materia === m} onClick={() => setMateria(m)}>
+          <ChipMateriaFiltro
+            key={m}
+            activo={!soloNotarios && materia === m}
+            onClick={() => setMateria(m)}
+          >
             {m}
           </ChipMateriaFiltro>
         ))}
@@ -64,6 +86,7 @@ export function PantallaDirectorio({ enPortal = false }: { enPortal?: boolean })
                       Validado
                     </span>
                   )}
+                  {a.notario && <InsigniaNotario verificado={a.notario.verificado} />}
                 </div>
                 <div className="text-[12px] text-texto-4">
                   {a.ciudad} · ★ {a.valoracion} · {a.contactos} contactos

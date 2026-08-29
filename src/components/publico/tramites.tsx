@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Icono } from "@/components/brand/iconos";
 import { getInstitucion, type Tramite } from "@/data/tramites";
 import { buscarAbogados } from "@/data/directorio";
+import { AvisoProfesional } from "@/components/publico/paso-profesional";
 import { usePortal } from "@/store/portal";
 
 
@@ -59,6 +60,12 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
                 <p className="mt-1 text-[13.5px] leading-[1.6] text-texto-3">
                   {tramite.pasos[0]!.detalle}
                 </p>
+                {tramite.pasos[0]!.profesional && (
+                  <AvisoProfesional
+                    profesional={tramite.pasos[0]!.profesional}
+                    materia={tramite.materia}
+                  />
+                )}
               </div>
             </li>
           </ol>

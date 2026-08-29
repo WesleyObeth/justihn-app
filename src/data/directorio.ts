@@ -13,11 +13,33 @@ import type { Materia } from "@/types/dominio";
  * TODO(data): vista pública de la tabla `abogados` (perfil del suscriptor),
  * ordenada por plan (prioridad Premium) + valoración.
  */
+/**
+ * Habilitación notarial. En Honduras ser notario NO es una especialidad del
+ * derecho sino una credencial aparte: el Instituto de la Propiedad exige al
+ * notario que tramita electrónicamente DOS carnés distintos, el del Colegio de
+ * Abogados y el de la Contraloría del Notariado (Notas Importantes 2 del
+ * Registro Vehicular). Por eso vive fuera de `materias` — un abogado de
+ * materia "Notarial" no es, por ese solo hecho, notario habilitado.
+ */
+export interface HabilitacionNotarial {
+  /** Nº de exequátur declarado por el profesional. */
+  exequatur: string;
+  /**
+   * ¿Contrastado contra la Contraloría del Notariado?
+   * Hoy siempre `false`: el Poder Judicial no publica un padrón notarial
+   * consultable, así que la habilitación es DECLARADA, no verificada. La UI
+   * tiene que decirlo — misma regla que las guías: sin fuente, no se afirma.
+   * ⚙️ Pendiente del socio: cómo se comprueba una habilitación vigente.
+   */
+  verificado: boolean;
+}
+
 export interface AbogadoDirectorio {
   id: string;
   nombre: string;
   iniciales: string;
   ciudad: string;
+  /** Áreas de práctica. NO confundir con la habilitación notarial. */
   materias: Materia[];
   bio: string;
   valoracion: string;
@@ -25,6 +47,8 @@ export interface AbogadoDirectorio {
   validado: boolean;
   /** Premium = prioridad en el directorio (feature del plan). */
   premium: boolean;
+  /** Credencial de notario, independiente de `materias`. */
+  notario?: HabilitacionNotarial;
 }
 
 export const DIRECTORIO: AbogadoDirectorio[] = [
@@ -51,6 +75,7 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     contactos: 21,
     validado: true,
     premium: true,
+    notario: { exequatur: "N-2014-0731", verificado: false },
   },
   {
     id: "lucia-fernandez",
@@ -75,6 +100,9 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     contactos: 9,
     validado: true,
     premium: false,
+    // Es notario aunque su práctica esté en Civil y Familia: la credencial no
+    // se deduce de la materia. Este perfil existe justamente para probarlo.
+    notario: { exequatur: "N-2011-0288", verificado: false },
   },
   {
     id: "ana-varela",
@@ -90,13 +118,27 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
   },
 ];
 
+/**
+ * Notarios habilitados. Se usa donde un PASO del trámite exige notario
+ * (escritura pública, autenticación de firmas) — nunca `buscarAbogados`, que
+ * filtra por área de práctica y devolvería abogados sin habilitación.
+ */
+export function buscarNotarios(): AbogadoDirectorio[] {
+  return ordenar(DIRECTORIO.filter((a) => Boolean(a.notario)));
+}
+
 /** Premium primero (feature del plan), luego por valoración. */
 export function buscarAbogados(materia?: Materia | "todas"): AbogadoDirectorio[] {
-  const filtrados =
+  return ordenar(
     !materia || materia === "todas"
       ? DIRECTORIO
-      : DIRECTORIO.filter((a) => a.materias.includes(materia));
-  return [...filtrados].sort(
+      : DIRECTORIO.filter((a) => a.materias.includes(materia)),
+  );
+}
+
+/** Orden único del directorio: Premium primero, luego valoración. */
+function ordenar(lista: AbogadoDirectorio[]): AbogadoDirectorio[] {
+  return [...lista].sort(
     (a, b) => Number(b.premium) - Number(a.premium) || Number(b.valoracion) - Number(a.valoracion),
   );
 }

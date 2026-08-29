@@ -12,7 +12,8 @@ import { useSearchParams } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
 import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
 import { getInstitucion, INSTITUCIONES, TRAMITES } from "@/data/tramites";
-import { buscarAbogados, DIRECTORIO } from "@/data/directorio";
+import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
+import { InsigniaNotario } from "@/components/publico/paso-profesional";
 import { LEADS, ABOGADA_DEMO } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
 import type { Materia } from "@/types/dominio";
@@ -311,12 +312,19 @@ export function SeccionConsultorio() {
 
 export function SeccionDirectorio() {
   const mostrarToast = usePortal((s) => s.mostrarToast);
-  // `?materia=` permite llegar filtrado desde una guía de proceso.
-  const materiaUrl = useSearchParams().get("materia") as Materia | null;
+  // `?materia=` y `?notarios=1` permiten llegar filtrado desde un paso de guía.
+  const params = useSearchParams();
+  const materiaUrl = params.get("materia") as Materia | null;
   const [materia, setMateria] = useState<Materia | "todas">(materiaUrl ?? "todas");
+  const [soloNotarios, setSoloNotarios] = useState(params.get("notarios") === "1");
 
   const materias = [...new Set(DIRECTORIO.flatMap((a) => a.materias))];
-  const abogados = buscarAbogados(materia).slice(0, 3);
+  const abogados = (soloNotarios ? buscarNotarios() : buscarAbogados(materia)).slice(0, 3);
+
+  const elegirMateria = (m: Materia | "todas") => {
+    setSoloNotarios(false);
+    setMateria(m);
+  };
 
   return (
     <section id="directorio" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-16">
@@ -327,11 +335,14 @@ export function SeccionDirectorio() {
       />
 
       <div className="mt-6 flex flex-wrap justify-center gap-2">
-        <Chip activo={materia === "todas"} onClick={() => setMateria("todas")}>
+        <Chip activo={!soloNotarios && materia === "todas"} onClick={() => elegirMateria("todas")}>
           Todas
         </Chip>
+        <Chip activo={soloNotarios} onClick={() => setSoloNotarios(true)}>
+          Notarios
+        </Chip>
         {materias.map((m) => (
-          <Chip key={m} activo={materia === m} onClick={() => setMateria(m)}>
+          <Chip key={m} activo={!soloNotarios && materia === m} onClick={() => elegirMateria(m)}>
             {m}
           </Chip>
         ))}
@@ -356,6 +367,7 @@ export function SeccionDirectorio() {
                       Validado
                     </span>
                   )}
+                  {a.notario && <InsigniaNotario verificado={a.notario.verificado} />}
                 </div>
                 <div className="text-[12px]" style={{ color: "var(--muted)" }}>
                   {a.ciudad} · ★ {a.valoracion}
