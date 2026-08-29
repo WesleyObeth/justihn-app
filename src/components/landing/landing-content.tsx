@@ -32,16 +32,22 @@ export function LandingContenido() {
         <p className="text-[12px] font-semibold tracking-[2.5px] uppercase" style={{ color: "var(--mint)" }}>
           Justicia e información legal de Honduras
         </p>
-        <h1 className="font-display mx-auto mt-3 max-w-[760px] text-[clamp(30px,5.5vw,52px)] leading-[1.12] font-bold text-balance">
-          Tus derechos, tus trámites y un abogado cuando lo necesitas
+        {/* Dos líneas fijas en escritorio: el quiebre es de composición, no
+            del ancho disponible. En móvil fluye natural. */}
+        <h1 className="font-display mx-auto mt-3 max-w-[860px] text-[clamp(30px,5.5vw,52px)] leading-[1.12] font-bold text-balance">
+          Tus derechos, tus trámites
+          <br className="hidden md:block" />{" "}
+          <span>y un abogado cuando lo necesitas</span>
         </h1>
         <p className="mx-auto mt-4 max-w-[560px] text-[15.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
           Guías paso a paso con fuentes oficiales, un consultorio gratuito con abogados
           colegiados y la jurisprudencia del país en un solo lugar.
         </p>
 
-        <div className="mx-auto mt-8 flex max-w-[620px] items-center gap-2 rounded-[16px] bg-white p-2 pl-4 border border-borde shadow-[0_16px_48px_rgba(13,33,68,.14)]">
-          <Icono nombre="buscar" size={18} className="shrink-0 text-texto-4" />
+        {/* Buscador con el borde aurora canónico de Jus IA: la puerta de
+            entrada se reconoce como la misma superficie inteligente. */}
+        <div className="relative mx-auto mt-8 flex max-w-[620px] items-center gap-2 rounded-full border border-borde bg-white py-2 pr-2 pl-5 shadow-[0_16px_48px_rgba(13,33,68,.14)]">
+          <span aria-hidden className="borde-aurora" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -53,20 +59,20 @@ export function LandingContenido() {
           <button
             type="button"
             onClick={buscar}
-            className="cursor-pointer rounded-[12px] px-5 py-3 text-[14px] font-semibold text-white"
+            aria-label="Buscar"
+            className="grid h-11 w-11 min-w-11 cursor-pointer place-items-center rounded-full text-white transition-colors"
             style={{ background: "var(--turq)" }}
           >
-            Buscar
+            <Icono nombre="buscar" size={18} strokeWidth={2.2} />
           </button>
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[12.5px]">
-          <span style={{ color: "var(--muted)" }}>Populares:</span>
           {destacados.map((t) => (
             <Link
               key={t.id}
               href={`/tramites/${t.id}`}
-              className="rounded-full border px-3 py-1 transition-colors"
+              className="rounded-full border px-3.5 py-1.5 transition-colors hover:border-celeste hover:text-celeste"
               style={{ borderColor: "var(--line)", color: "var(--muted)" }}
             >
               {t.nombre}

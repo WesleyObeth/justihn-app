@@ -26,12 +26,11 @@ export function NavAurora() {
       <div className="nav-mid">
         <Link href="/tramites">Trámites</Link>
         <Link href="/consultorio">Consultorio</Link>
-        <Link href="/directorio">Abogados</Link>
-        <Link href="/abogados">Para abogados</Link>
+        <Link href="/directorio">Encuentra abogado</Link>
       </div>
       <div className="nav-right" style={{ display: "flex", alignItems: "center", gap: 18 }}>
-        <Link className="nav-login" href="/persona">
-          Entrar
+        <Link className="nav-login" href="/abogados">
+          Para abogados
         </Link>
         <Link className="nav-cta" href="/persona">
           Crear cuenta gratis
