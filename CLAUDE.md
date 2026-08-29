@@ -2,7 +2,7 @@
 
 > Cerebro técnico del portal. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25**.
+> Creado: **2026-08-25** · Última actualización: **2026-08-29**.
 
 ---
 
@@ -203,11 +203,25 @@ inexistentes / casos propios), prestaciones, plazos y vía procesal.
    esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Los seeds
    del portal de abogados quedaron validados; decidir si las tablas nuevas del
    feedback entran al esquema inicial o en una migración posterior.
-5. **🔎 Verificar las 10 guías de trámites que faltan** contra su fuente
-   oficial (detalle, método y lista en justihn/CLAUDE.md backlog #3c). El
-   contenido vive en `src/data/tramites.ts`; llenar `fuenteUrl`/`fuenteNombre`
-   enciende el sello "Verificado con la fuente oficial" en la UI y el host debe
-   sumarse a la whitelist de `lib/security/sanitize.ts`. Van 3 de 13.
+5. [x] ✅ **LAS 13 GUÍAS DE TRÁMITES VERIFICADAS** (2026-08-29, backlog #3c
+   cerrado). `src/data/tramites.ts` ya no tiene marcadores "L ___": las 13
+   guías llevan `fuenteUrl`/`fuenteNombre` y encienden el sello "Verificado
+   con la fuente oficial". Hosts nuevos en la whitelist de
+   `lib/security/sanitize.ts`: `ip.gob.hn`, `arsa.gob.hn`, `oncae.gob.hn`,
+   `honducompras.gob.hn`. Detalle de fuentes y muros en justihn/CLAUDE.md §3.
+   **Regla de edición desde ahora:** al tocar una guía, o se mantiene su
+   fuente, o se quita el sello — nunca texto sin respaldo.
+   ⚠️ **Deuda que dejó la verificación:** `lib/prestaciones.ts` calcula el
+   preaviso como "1 mes si <2 años, 2 meses si ≥2" y la cesantía sin los
+   tramos cortos, pero la guía de despido ya publica la escalera literal del
+   Código del Trabajo — preaviso art. 116 (24 h · 1 semana · 2 semanas ·
+   1 mes · 2 meses) y cesantía art. 120 (10 días de 3-6 meses · 20 días de
+   6-12 · 1 mes por año después, tope 25 meses, 15 si el patrono es
+   microempresa de ≤10 empleados, art. 120-A). **Hoy la calculadora
+   contradice a la guía dentro del mismo producto.** No se corrigió porque
+   el cálculo laboral está gated a la validación del socio (§7.6); el texto
+   oficial ya está localizado, así que es un cambio corto.
+
 6. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
    ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende
    del gate: el destino provisional (Data Table de n8n) sigue válido.
