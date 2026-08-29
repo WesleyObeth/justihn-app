@@ -372,18 +372,63 @@ export const TRAMITES: Tramite[] = [
     nombre: "Inscripción como proveedor del Estado (ONCAE)",
     tipo: "tramite",
     institucionId: "oncae",
-    paraQuien: "Empresas y profesionales que quieren venderle al Estado",
+    paraQuien: "Empresas, comerciantes y profesionales que quieren venderle al Estado",
     resumen:
-      "Para participar en compras y licitaciones públicas necesitas estar inscrito en el registro de proveedores del Estado que administra la ONCAE.",
+      "Para participar en licitaciones y concursos hay que estar certificado en el Registro de Proveedores del Estado. La certificación vale 3 años y cuesta L 400.00 — pero el expediente se rechaza por detalles notariales, no por el dinero: dos auténticas distintas, media firma y sello ORIGINAL en cada hoja, y un TGR-01 que debe ser del mes en que entregas.",
     materia: "Contencioso Adm.",
     pasos: [
-      { titulo: "Ten tu situación legal y tributaria al día", detalle: "RTN, permisos vigentes y solvencias — el registro valida que puedas contratar con el Estado." },
-      { titulo: "Regístrate en la plataforma de la ONCAE", detalle: "Crea el perfil de proveedor con tus documentos legales, financieros y de experiencia." },
-      { titulo: "Mantén el registro vigente", detalle: "Actualiza documentos y solvencias — un registro vencido te saca de las licitaciones." },
+      {
+        titulo: "Identifica bajo qué figura te vas a inscribir",
+        detalle:
+          "ONCAE tiene cinco juegos de requisitos: persona natural, comerciante individual, sociedad mercantil, ONG (que solo puede inscribirse bajo el rubro CONSULTORÍA) y empresa extranjera (con escrituras apostilladas). Los documentos cambian bastante entre uno y otro.",
+      },
+      {
+        titulo: "Llena los formularios RP",
+        detalle:
+          "F-1RP solicitud de inscripción · F-2RP información del solicitante, donde detallas el bien o servicio al que te quieres certificar · F-3RP carta poder (o poder en escritura pública) a favor de un profesional del derecho, adjuntando su carné vigente del Colegio de Abogados · F-5RP declaración jurada de no estar en las prohibiciones o inhabilidades de los artículos 15 y 16 de la Ley de Contratación del Estado (para sociedades, también el art. 439 del Código Penal, lavado de activos). Las personas jurídicas suman el F-4RP con la certificación de su composición social.",
+      },
+      {
+        titulo: "Ojo con las auténticas: son dos, y así es como se rechazan",
+        detalle:
+          "Una auténtica DE COPIAS, con la media firma y el sello del notario en CADA hoja, y otra auténtica DE FIRMAS para los formularios. La media firma y el sello deben ser originales — escaneados no se aceptan. Y la auténtica tiene que detallar cada documento: si autentica una copia de identidad, debe decir el nombre completo y el número correcto; si no, te lo requieren.",
+      },
+      {
+        titulo: "Reúne solvencias, RTN y acreditación del rubro",
+        detalle:
+          "Solvencia fiscal del SAR verificable por código QR (a nombre de la empresa si eres comerciante o sociedad); DNI y RTN autenticados del representante legal y, en sociedades, DNI y RTN de TODOS los socios; escritura de constitución con su última modificación que contenga el capital social actual; permiso de operación municipal vigente; y la acreditación vigente de tu rubro (constancia de inscripción, licencia, permisos especiales, colegiación). Persona natural sin colegio profesional: título universitario autenticado, revalidado por Educación si es extranjero.",
+      },
+      {
+        titulo: "Paga el TGR-01 del mes correcto",
+        detalle:
+          "L 400.00 a nombre de la Secretaría de Finanzas, código de institución 100, código 12121 «emisión, constancias, certificaciones y otros». El recibo debe ser del MISMO MES en que presentas la documentación: si llevas uno del mes anterior, te lo requieren de nuevo. Se genera en el sistema TGR-1 de SEFIN.",
+      },
+      {
+        titulo: "Pre-registro en línea, cita y entrega presencial",
+        detalle:
+          "Haces el registro electrónico en el portal de ONCAE: el sistema genera tu número de expediente y tu cita. Después entregas la documentación EN FÍSICO en las oficinas de Registro de Proveedores — los expedientes de proveedores certificados no se crean por ticket ni por correo. Al presentar los papeles con el TGR-1 pagado te emiten la constancia en trámite de forma electrónica, y el expediente se sigue desde el portal.",
+      },
+      {
+        titulo: "Si te hacen un requerimiento, corre el reloj",
+        detalle:
+          "Tienes 10 días hábiles desde la emisión del requerimiento para subsanar (art. 48 de la Ley de Procedimiento Administrativo). Se puede pedir prórroga, pero por escrito y presentada ANTES de la fecha de vencimiento.",
+      },
     ],
-    requisitos: ["RTN y solvencias", "Documentos legales de la empresa", "[Verificar documentos vigentes con ONCAE]"],
-    tasa: "L ___",
-    nota: "Las bases de cada licitación agregan requisitos propios — el registro es la puerta de entrada, no el final.",
+    requisitos: [
+      "Formularios F-1RP, F-2RP, F-3RP y F-5RP autenticados (F-4RP además, si eres persona jurídica)",
+      "Dos auténticas: una de copias (media firma y sello original en cada hoja) y otra de firmas",
+      "DNI y RTN autenticados del representante legal — y de todos los socios, en sociedades",
+      "Escritura de constitución con su última modificación y escritura que acredite la representación legal",
+      "Solvencia fiscal del SAR verificable por código QR",
+      "Permiso de operación municipal vigente (comerciante individual y sociedad mercantil)",
+      "Acreditación vigente del rubro: constancia, licencia, permiso especial o colegiación",
+      "Recibo TGR-01 de L 400.00, del mes de presentación",
+      "Carné vigente del Colegio de Abogados del profesional del derecho apoderado",
+    ],
+    tasa: "L 400.00 (TGR-01, SEFIN institución 100, código 12121) por la inscripción · L 200.00 para actualizar la certificación vigente o ampliar CUBS",
+    nota:
+      "📅 La inscripción en el Registro de Proveedores y Contratistas tiene una vigencia de 3 años.\n\n🏪 Si eres MIPYME también te dan constancia en trámite, y una vez inscrita recibes la Constancia de Inscripción MIPYME para Compras Menores.\n\n🧾 El registro es la puerta de entrada, no el final: cada proceso agrega sus propias bases. Los procedimientos de contratación del art. 38 de la Ley de Contratación del Estado son licitación pública, licitación privada, concurso público, concurso privado y contratación directa.\n\n📍 Registro de Proveedores: Col. Florencia Norte, Edificio EDUCRÉDITO 2.º nivel, contiguo al Colegio de Ingenieros Civiles, Tegucigalpa. Lunes a viernes, 8:00 a.m. a 4:00 p.m.",
+    fuenteUrl: "https://oncae.gob.hn/como-ser-proveedor/requisitos-para-certificarse-como-proveedor-del-estado/",
+    fuenteNombre: "ONCAE — Requisitos para certificarse como proveedor del Estado + preguntas frecuentes",
   },
   {
     id: "tradicion-dominio",
