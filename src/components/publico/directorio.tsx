@@ -9,7 +9,9 @@ import type { Materia } from "@/types/dominio";
 import { cn } from "@/lib/utils";
 
 /** Directorio público: abogados por materia. La prioridad Premium se nota. */
-export function PantallaDirectorio() {
+export function PantallaDirectorio({ enPortal = false }: { enPortal?: boolean }) {
+  const base = enPortal ? "/persona/abogados" : "/directorio";
+  const rutaConsultorio = enPortal ? "/persona/consultas" : "/consultorio";
   const router = useRouter();
   const params = useSearchParams();
   const mostrarToast = usePortal((s) => s.mostrarToast);
@@ -19,13 +21,13 @@ export function PantallaDirectorio() {
   const abogados = buscarAbogados(materia as Materia | "todas");
 
   const setMateria = (m: string) => {
-    router.replace(m === "todas" ? "/directorio" : `/directorio?materia=${encodeURIComponent(m)}`, {
+    router.replace(m === "todas" ? base : `${base}?materia=${encodeURIComponent(m)}`, {
       scroll: false,
     });
   };
 
   return (
-    <div className="mx-auto max-w-[1140px] px-4 py-8 md:px-6">
+    <div className={enPortal ? "max-w-[1080px]" : "mx-auto max-w-[1140px] px-4 py-8 md:px-6"}>
       <h1 className="font-display text-[26px] font-bold">Encuentra abogado</h1>
       <p className="mt-1 text-[13.5px] text-texto-3">
         Profesionales del derecho por materia y ciudad. Los perfiles con insignia están
@@ -103,7 +105,7 @@ export function PantallaDirectorio() {
           </p>
         </div>
         <Link
-          href="/consultorio"
+          href={rutaConsultorio}
           className="rounded-xl bg-marino px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-celeste hover:text-white"
         >
           Ir al consultorio

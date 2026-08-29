@@ -13,7 +13,8 @@ import { fmtLempiras } from "@/lib/utils";
  * de abogados (§0.5: un solo lugar por dato): la persona y su abogado ven el
  * mismo número.
  */
-export function CalculadoraPublica() {
+export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean }) {
+  const rutaConsultorio = enPortal ? "/persona/consultas" : "/consultorio";
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const [salario, setSalario] = useState("");
   const [anios, setAnios] = useState("");
@@ -25,7 +26,7 @@ export function CalculadoraPublica() {
   const laborales = buscarAbogados("Laboral").slice(0, 2);
 
   return (
-    <div className="mx-auto max-w-[860px] px-4 py-8 md:px-6">
+    <div className={enPortal ? "max-w-[860px]" : "mx-auto max-w-[860px] px-4 py-8 md:px-6"}>
       <h1 className="font-display text-[26px] leading-[1.25] font-bold">
         ¿Te despidieron? Esto es lo que te corresponde por ley
       </h1>
@@ -127,7 +128,7 @@ export function CalculadoraPublica() {
               </div>
             ))}
           </div>
-          <Link href="/consultorio" className="mt-3.5 inline-block text-[13px]">
+          <Link href={rutaConsultorio} className="mt-3.5 inline-block text-[13px]">
             ¿Dudas sobre tu caso? Pregunta gratis en el consultorio →
           </Link>
         </div>

@@ -176,60 +176,52 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
           </h1>
           <p className="mt-2 text-[14px] leading-[1.65] text-texto-2">{tramite.resumen}</p>
 
+          {/* Patrón Jusbrasil: la landing da la probadita (paso 1); la guía
+              completa, el checklist y los costos viven en tu cuenta gratis. */}
           <ol className="mt-5 flex flex-col">
-            {tramite.pasos.map((paso, i) => (
-              <li
-                key={paso.titulo}
-                className="flex gap-3.5 border-b border-borde-suave py-4 last:border-b-0"
-              >
+            <li className="flex gap-3.5 py-4">
+              <span className="grid h-[28px] w-[28px] min-w-[28px] place-items-center rounded-full bg-chip text-[13px] font-bold text-celeste">
+                1
+              </span>
+              <div>
+                <div className="text-[14.5px] font-semibold">{tramite.pasos[0]!.titulo}</div>
+                <p className="mt-1 text-[13.5px] leading-[1.6] text-texto-3">
+                  {tramite.pasos[0]!.detalle}
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <div aria-hidden className="pointer-events-none flex flex-col gap-3 opacity-50 blur-[3px] select-none">
+            {tramite.pasos.slice(1, 3).map((paso, i) => (
+              <div key={paso.titulo} className="flex gap-3.5 border-t border-borde-suave py-4">
                 <span className="grid h-[28px] w-[28px] min-w-[28px] place-items-center rounded-full bg-chip text-[13px] font-bold text-celeste">
-                  {i + 1}
+                  {i + 2}
                 </span>
                 <div>
                   <div className="text-[14.5px] font-semibold">{paso.titulo}</div>
-                  <p className="mt-1 text-[13.5px] leading-[1.6] text-texto-3">{paso.detalle}</p>
+                  <p className="mt-1 text-[13.5px] leading-[1.6] text-texto-3">████ ███ ██████</p>
                 </div>
-              </li>
+              </div>
             ))}
-          </ol>
-
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded-[10px] bg-lienzo p-4">
-              <div className="text-[10.5px] font-semibold tracking-[.8px] text-texto-4 uppercase">
-                Requisitos
-              </div>
-              <ul className="mt-2 flex flex-col gap-1.5">
-                {tramite.requisitos.map((r) => (
-                  <li key={r} className="flex items-start gap-2 text-[13px] text-texto-2">
-                    <span className="mt-px grid shrink-0 place-items-center text-celeste">
-                      <Icono nombre="check" size={12} strokeWidth={2.4} />
-                    </span>
-                    {r}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-[10px] bg-lienzo p-4">
-              <div className="text-[10.5px] font-semibold tracking-[.8px] text-texto-4 uppercase">
-                Costo aproximado
-              </div>
-              <div className="font-display mt-1.5 text-[17px] font-bold">{tramite.tasa}</div>
-              {tramite.nota && (
-                <p className="mt-2 flex items-start gap-2 text-[12.5px] leading-[1.55] text-aviso-cuerpo">
-                  <span className="mt-px grid shrink-0 place-items-center text-dorado">
-                    <Icono nombre="alerta" size={12} />
-                  </span>
-                  {tramite.nota}
-                </p>
-              )}
-            </div>
           </div>
 
-          <p className="mt-4 rounded-[10px] border border-aviso-borde bg-aviso px-4 py-3 text-[12px] leading-[1.55] text-aviso-cuerpo">
-            <b>Guía de demostración.</b> Orientación general — los requisitos y tasas exactos los
-            verifica nuestro equipo legal contra la fuente institucional antes del lanzamiento, y
-            pueden variar según tu caso.
-          </p>
+          <div className="mt-[-8px] rounded-xl border border-chip-borde bg-chip/60 p-5 text-center">
+            <div className="font-display text-[16px] font-bold">
+              Crea tu cuenta gratis para ver la guía completa
+            </div>
+            <p className="mx-auto mt-1 max-w-[420px] text-[12.5px] leading-[1.55] text-texto-3">
+              Los {tramite.pasos.length} pasos con requisitos y costos, tu avance guardado, y el
+              consultorio para preguntar gratis.
+            </p>
+            <Link
+              href={`/persona/tramites/${tramite.id}`}
+              className="mt-3.5 inline-block rounded-xl bg-celeste px-6 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
+            >
+              Crear mi cuenta gratis
+            </Link>
+            <p className="mt-2 text-[11px] text-texto-4">Sin tarjeta · demo de validación</p>
+          </div>
         </article>
 
         {/* ── Lateral: el funnel — abogados de la materia ── */}

@@ -77,6 +77,17 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   integración Vía A ↔ Vía B en vivo) · **/calculadora-prestaciones** (usa el
   mismo `lib/prestaciones`, §0.5). Cada guía de trámite recomienda abogados de
   su materia (funnel guía→lead). Planes público: Gratis + pago "en definición".
+- **🏛️ PORTAL CIUDADANO `/persona` (2026-08-29, decisión Wesley):** el patrón
+  Jusbrasil completo — la landing da la probadita y "crear cuenta gratis" abre
+  un portal con shell propio (`components/personas/`, sidebar marino gemelo del
+  de abogados; persona demo Carlos Zelaya, `data/persona.ts`). Pantallas:
+  Inicio · Trámites (guías completas con **checklist persistido**,
+  `pasosTramite` en el store) · Mis consultas (form + respuestas de abogados)
+  · Encuentra abogado · Calculadora · Mi plan (Gratis + pago en definición).
+  **Gates de la landing:** el detalle de trámite muestra solo el paso 1 (resto
+  difuminado) → CTA `/persona/tramites/[id]`; preguntar en el consultorio
+  "crea la cuenta" y redirige a `/persona/consultas`. Los componentes públicos
+  compartidos aceptan `enPortal` para rutas/wrapper.
 
 ## 2. Stack (pins reales)
 

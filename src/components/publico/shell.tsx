@@ -47,9 +47,15 @@ export function HeaderPublico() {
 
         <Link
           href="/abogados"
-          className="rounded-lg bg-marino px-3.5 py-2 text-[12.5px] font-semibold whitespace-nowrap text-white hover:bg-celeste hover:text-white"
+          className="rounded-lg px-3 py-2 text-[12.5px] font-medium whitespace-nowrap text-texto-2 hover:bg-lienzo hover:text-marino"
         >
-          Soy abogado — ir al portal
+          Soy abogado
+        </Link>
+        <Link
+          href="/persona"
+          className="rounded-lg bg-celeste px-3.5 py-2 text-[12.5px] font-semibold whitespace-nowrap text-white hover:bg-cruce"
+        >
+          Crear cuenta gratis
         </Link>
       </div>
     </header>

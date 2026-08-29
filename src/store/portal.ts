@@ -60,6 +60,9 @@ interface PortalState {
   /** Preguntas hechas desde el consultorio público (Vía B) — aparecen como
    *  leads en el portal de abogados: es el mismo flujo, visto de ambos lados. */
   preguntasPublico: Lead[];
+  /** Checklist de trámites del portal ciudadano: pasos completados por trámite.
+   *  Un trámite con avance = "en progreso" en el inicio de la persona. */
+  pasosTramite: Record<string, number[]>;
   escrito: { abierto: boolean; titulo: string; texto: string };
   toast: string;
 
@@ -85,6 +88,7 @@ interface PortalState {
   vigilarNombre: (nombre: string, tipo: NombreVigilado["tipo"]) => void;
   dejarDeVigilar: (id: string) => void;
   preguntarConsultorio: (materia: Materia, ciudad: string, pregunta: string) => void;
+  togglePasoTramite: (tramiteId: string, indice: number) => void;
   abrirEscrito: (titulo: string, texto: string) => void;
   setTextoEscrito: (texto: string) => void;
   cerrarEscrito: () => void;
@@ -127,6 +131,7 @@ export const usePortal = create<PortalState>()(
       leadsRespondidos: {},
       nombresVigilados: VIGILADOS_INICIALES,
       preguntasPublico: [],
+      pasosTramite: {},
       escrito: { abierto: false, titulo: "", texto: "" },
       toast: "",
 
@@ -196,6 +201,14 @@ export const usePortal = create<PortalState>()(
             ...s.preguntasPublico,
           ],
         })),
+      togglePasoTramite: (tramiteId, indice) =>
+        set((s) => {
+          const actuales = s.pasosTramite[tramiteId] ?? [];
+          const siguientes = actuales.includes(indice)
+            ? actuales.filter((i) => i !== indice)
+            : [...actuales, indice];
+          return { pasosTramite: { ...s.pasosTramite, [tramiteId]: siguientes } };
+        }),
       abrirEscrito: (titulo, texto) => set({ escrito: { abierto: true, titulo, texto } }),
       setTextoEscrito: (texto) => set((s) => ({ escrito: { ...s.escrito, texto } })),
       cerrarEscrito: () => set((s) => ({ escrito: { ...s.escrito, abierto: false } })),
@@ -229,6 +242,7 @@ export const usePortal = create<PortalState>()(
         leadsRespondidos: s.leadsRespondidos,
         nombresVigilados: s.nombresVigilados,
         preguntasPublico: s.preguntasPublico,
+        pasosTramite: s.pasosTramite,
         notifsLeidas: s.notifsLeidas,
         notifsLeidasIds: s.notifsLeidasIds,
         sidebarColapsado: s.sidebarColapsado,

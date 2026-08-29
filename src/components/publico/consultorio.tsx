@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
 import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
@@ -36,7 +37,7 @@ export function PantallaConsultorio() {
 
       <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-4">
-          <FormularioPregunta />
+          <FormularioPregunta desdeLanding />
 
           <h2 className="font-display mt-2 text-[17px] font-bold">Preguntas recientes</h2>
           {preguntas.map((lead) => {
@@ -130,7 +131,8 @@ export function PantallaConsultorio() {
   );
 }
 
-function FormularioPregunta() {
+export function FormularioPregunta({ desdeLanding = false }: { desdeLanding?: boolean }) {
+  const router = useRouter();
   const preguntarConsultorio = usePortal((s) => s.preguntarConsultorio);
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const [materia, setMateria] = useState<Materia>("Laboral");
@@ -146,6 +148,12 @@ function FormularioPregunta() {
     preguntarConsultorio(materia, ciudad.trim() || "Honduras", texto);
     setPregunta("");
     setCiudad("");
+    if (desdeLanding) {
+      // Patrón Jusbrasil: preguntar crea tu cuenta y sigues tu consulta adentro.
+      mostrarToast("Tu cuenta gratis está lista (demo) — sigue tu consulta en tu portal");
+      router.push("/persona/consultas");
+      return;
+    }
     mostrarToast("Pregunta publicada — los abogados de la materia ya pueden verla");
   };
 
