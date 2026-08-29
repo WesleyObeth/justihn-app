@@ -606,44 +606,52 @@ export const TRAMITES: Tramite[] = [
     institucionId: "trabajo",
     paraQuien: "Trabajadores despedidos sin causa justificada o sin pago de prestaciones",
     resumen:
-      "Si te despidieron sin causa justificada, la ley te reconoce cesantía, preaviso y proporcionales. El camino empieza gratis en la Secretaría de Trabajo y, si no hay acuerdo, sigue en el juzgado laboral.",
+      "Dos datos que cambian todo y casi nadie conoce: tu reclamo por despido injustificado PRESCRIBE EN DOS MESES desde que terminó el contrato (art. 864 del Código del Trabajo), y la Procuraduría del Trabajo te asiste de forma absolutamente gratuita, dentro y fuera del juzgado (art. 641).",
     materia: "Laboral",
     pasos: [
       {
-        titulo: "Reúne y guarda tu evidencia HOY",
+        titulo: "Cuenta los días: tienes 2 meses",
         detalle:
-          "Contrato, recibos de pago, carné, mensajes o carta del despido, nombres de compañeros que puedan declarar. Sin prueba de la relación laboral el reclamo se complica.",
+          "El art. 864 es tajante: los derechos y acciones de los trabajadores para reclamar contra los despidos injustificados prescriben en el término de dos (2) meses, contados a partir de la terminación del contrato. Si te separaste tú por culpa del patrono (despido indirecto), el plazo es aún más corto: un (1) mes desde que el patrono dio el motivo (art. 865).",
       },
       {
-        titulo: "Calcula lo que te corresponde",
+        titulo: "Reúne y guarda tu evidencia hoy",
         detalle:
-          "Cesantía, preaviso, vacaciones y aguinaldos proporcionales según tu salario y antigüedad — con ese número negocias, no a ciegas.",
+          "Contrato, recibos de pago, carné, mensajes o carta del despido, fecha de ingreso y de salida, y nombres de compañeros que puedan declarar. Necesitas también el promedio de tus salarios de los últimos 6 meses: es la base con la que se calcula la indemnización (art. 123 b).",
       },
       {
-        titulo: "Reclama en la Secretaría de Trabajo (gratis)",
+        titulo: "Calcula tu auxilio de cesantía (art. 120)",
         detalle:
-          "Presenta tu reclamo en la inspectoría del trabajo de tu ciudad: citan al patrono a una audiencia de conciliación. Muchos casos se resuelven aquí, sin juicio y sin costo.",
+          "De 3 a 6 meses trabajados: 10 días de salario. Más de 6 meses y menos de un año: 20 días. Más de un año: un (1) mes de salario por cada año, y proporcional si la fracción no llega al año. Tope general: 25 meses de salario — 15 meses si el patrono es una microempresa de hasta 10 empleados (art. 120-A). Se paga aunque al día siguiente entres a trabajar con otro patrono.",
       },
       {
-        titulo: "Si no hay acuerdo, demanda en el juzgado laboral",
+        titulo: "Y tu preaviso, que depende de la antigüedad (art. 116)",
         detalle:
-          "Con un profesional del derecho se presenta la demanda ordinaria laboral ante el Juzgado de Letras del Trabajo, con el cálculo y las pruebas que reuniste.",
+          "El aviso previo es de 24 horas si serviste menos de 3 meses; 1 semana de 3 a 6 meses; 2 semanas de 6 meses a 1 año; 1 mes de 1 a 2 años; y 2 meses si serviste más de 2 años. Si el patrono no te lo dio, debe pagarte una cantidad equivalente a tu salario durante ese término (art. 118).",
       },
       {
-        titulo: "Audiencia, sentencia y cobro",
+        titulo: "Ve a la Procuraduría del Trabajo — es gratis",
         detalle:
-          "El juzgado cita a audiencia; si la sentencia te favorece, ordena el pago de prestaciones y los salarios dejados de percibir hasta que quede firme.",
+          "La Procuraduría del Trabajo de la Secretaría de Trabajo presta a los trabajadores asistencia «absolutamente gratuita», judicial o extrajudicial, y cubre expresamente las indemnizaciones por despido, el cobro de salarios, vacaciones, horas extras, trabajo nocturno, días feriados y descuentos indebidos (art. 641). Además puede citar al patrono para avenirlos (art. 639) y, si acepta la propuesta conciliatoria, se levanta acta y el asunto concluye (art. 640). La Inspectoría General de Trabajo también interviene conciliatoriamente en los conflictos obrero-patronales (art. 614.III).",
+      },
+      {
+        titulo: "Si no hay acuerdo, demanda ante el Juzgado de Letras del Trabajo",
+        detalle:
+          "Para litigar se requiere abogado en ejercicio, con dos excepciones importantes: las partes pueden actuar por sí mismas en los juicios de única instancia y en las audiencias de conciliación (art. 711). Y ojo con un detalle del art. 638: la Procuraduría puede negarse a representarte si pretendes que concurra al juicio junto con defensores particulares — o vas con ella, o vas con tu abogado.",
       },
     ],
     requisitos: [
       "DNI vigente",
       "Contrato o prueba de la relación laboral (recibos, carné, mensajes)",
-      "Fecha de ingreso, salario y fecha del despido",
-      "[Verificar el plazo de prescripción vigente del Código del Trabajo]",
+      "Fecha de ingreso, fecha del despido y motivo alegado",
+      "Comprobantes del salario de los últimos 6 meses (base del cálculo, art. 123 b)",
+      "Carta o constancia del despido, si la hay, y testigos",
     ],
-    tasa: "Conciliación en Trabajo: gratis · Demanda: honorarios del abogado",
+    tasa: "La asistencia de la Procuraduría del Trabajo es absolutamente gratuita (art. 641). Si contratas abogado particular, sus honorarios",
     nota:
-      "⏳ Los reclamos laborales PRESCRIBEN: no dejes pasar el tiempo. Y ojo — firmar un finiquito por menos de lo que te toca puede cerrarte la puerta.",
+      "⏳ DOS MESES. Es el plazo del art. 864 y corre desde que terminó el contrato — es la razón #1 por la que se pierden reclamos legítimos en Honduras.\n\n✍️ Cuidado con el finiquito: el preaviso, el auxilio de cesantía y la indemnización no pueden ser objeto de compensación, venta o cesión, ni ser embargados, salvo en la mitad por pensiones alimenticias (art. 123 a). Y es absolutamente nula la cláusula del contrato que pretenda interrumpir la continuidad de tus servicios (art. 123 d): la antigüedad no se «reinicia» por firmar contratos nuevos.\n\n🩺 La continuidad del trabajo no se interrumpe por enfermedad, vacaciones, huelga o paros legales (art. 123 c).",
+    fuenteUrl: "https://www.poderjudicial.gob.hn/Cedij/Cdigos/Codigo%20del%20Trabajo%20(mayo%202018).pdf",
+    fuenteNombre: "Código del Trabajo (edición CEDIJ, mayo 2018) — Poder Judicial de Honduras",
   },
   {
     id: "pension-alimenticia",
