@@ -715,40 +715,53 @@ export const TRAMITES: Tramite[] = [
     institucionId: "poder-judicial",
     paraQuien: "Personas casadas que quieren disolver el matrimonio",
     resumen:
-      "Si ambos están de acuerdo, el divorcio por mutuo consentimiento es el camino más rápido y barato. Si no hay acuerdo, hay que invocar una causal y el proceso es más largo.",
+      "Si ambos están de acuerdo y ya pasaron 2 años del matrimonio, el divorcio por mutuo consentimiento es asombrosamente rápido: sin hijos menores, el juez cita a audiencia el MISMO día de la solicitud y dicta sentencia de inmediato (arts. 243-245 del Código de Familia). Con hijos menores hay una segunda audiencia a los 15 días. Sin acuerdo, hay que invocar una causal y el reloj de un año empieza a correr.",
     materia: "Familia",
     pasos: [
       {
-        titulo: "Reúne los documentos del matrimonio y de los hijos",
+        titulo: "Confirma que califican para el mutuo consentimiento",
         detalle:
-          "Certificación de matrimonio, DNI de ambos y partidas de nacimiento de los hijos si los hay.",
+          "Se exige que hayan transcurrido dos (2) años desde que se celebró el matrimonio y que ambos cónyuges sean mayores de edad (art. 243). Si no se cumple, el camino es el divorcio contencioso por causal.",
       },
       {
-        titulo: "Acuerden lo esencial antes de ir al juzgado",
+        titulo: "Presenten la solicitud personalmente y por escrito",
         detalle:
-          "Guarda y cuidado de los hijos, pensión alimenticia y reparto de bienes. Ese acuerdo (convenio regulador) es el corazón del divorcio por mutuo consentimiento.",
+          "Ante el juez competente del domicilio, acompañando: (1) certificaciones del Registro Civil que acrediten su edad y su calidad de casados, (2) certificación de las actas de nacimiento de los hijos menores, si los hay, y (3) la propuesta de convenio regulador, cuyo contenido debe ajustarse a lo que establece el Código Procesal Civil (art. 244).",
       },
       {
-        titulo: "Presenten la solicitud conjunta",
+        titulo: "Audiencia el mismo día — y sentencia inmediata si no hay hijos menores",
         detalle:
-          "Con auxilio de profesional del derecho, ante el juzgado de familia; se acompaña el convenio regulador firmado por ambos.",
+          "En la misma fecha de presentación, el juez los cita a una audiencia que se celebra de inmediato, donde les hace las reflexiones que considere oportunas sobre las consecuencias del divorcio. Si insisten y NO hay hijos menores ni incapacitados, dicta la sentencia en forma inmediata, pronunciándose además sobre el convenio regulador (art. 245).",
       },
       {
-        titulo: "Audiencia, sentencia e inscripción",
+        titulo: "Con hijos menores: segunda audiencia a los 15 días",
         detalle:
-          "Ratifican su voluntad ante el juez; dictada la sentencia, se inscribe en el Registro Nacional de las Personas para que surta efectos.",
+          "El juez cita a una nueva audiencia que se celebra en quince (15) días. Dentro de ese plazo el Ministerio Público debe rendir opinión razonada sobre el convenio regulador, y el juez oirá a los hijos menores si tuvieren suficiente juicio (art. 246). Después dicta sentencia en la misma audiencia o dentro de los 5 días siguientes (art. 247).",
+      },
+      {
+        titulo: "Inscripción: la sentencia no basta por sí sola",
+        detalle:
+          "Al declarar disuelto el matrimonio, el juez ordena inscribir la sentencia en el Registro Civil correspondiente y, cuando el convenio reparte inmuebles, mandar a inscribir la escritura de división en el Registro de la Propiedad Inmueble (art. 247). Sin esas inscripciones el divorcio no surte todos sus efectos frente a terceros.",
+      },
+      {
+        titulo: "Si no hay acuerdo: causal, plazo y cónyuge inocente",
+        detalle:
+          "Las causales del art. 238 son ocho, entre ellas la infidelidad; los malos tratos físicos, psicológicos, sexuales, patrimoniales o económicos contra el cónyuge o los hijos; el abandono manifiesto por más de 2 años sin comunicación; la negativa injustificada a cumplir los deberes de asistencia, educación y alimentación; y la separación de hecho durante 2 años consecutivos. La acción solo la puede deducir el cónyuge inocente, salvo en la separación de hecho, que la puede pedir cualquiera (art. 239).",
       },
     ],
     requisitos: [
-      "Certificación de matrimonio",
+      "Certificaciones del Registro Civil de edad y calidad de casados",
+      "Certificación de actas de nacimiento de los hijos menores, si los hay",
+      "Propuesta de convenio regulador conforme al Código Procesal Civil",
       "DNI de ambos cónyuges",
-      "Partidas de nacimiento de los hijos (si aplica)",
-      "Convenio regulador (mutuo consentimiento)",
-      "[Verificar requisitos vigentes del juzgado]",
+      "Presentación personal y por escrito ante el juez del domicilio",
     ],
-    tasa: "Honorarios del abogado · [tasas por verificar]",
+    tasa: "El Código no fija tasa por el proceso; los honorarios del abogado son el costo real",
     nota:
-      "Sin acuerdo, el divorcio por causal exige probar los hechos y toma mucho más tiempo — casi siempre conviene negociar primero.",
+      "⏳ El divorcio contencioso tiene plazo: no puede entablarse después de UN (1) AÑO desde que se tuvo conocimiento de la causa, salvo infidelidad, malos tratos, abandono y adicciones (numerales 1, 2, 4 y 6), que pueden alegarse en cualquier tiempo mientras persistan los hechos (art. 240).\n\n🚫 No podrá declararse el divorcio si hubo reconciliación o vida marital entre los cónyuges, sea después de los hechos que lo autorizaban o después de la demanda (art. 241).\n\n👶 Presentada la demanda, el juez dicta provisionalmente las providencias necesarias para proteger los derechos de los hijos (art. 253). Y si la cónyuge descubre estar embarazada, debe comunicarlo por escrito en 7 días a su cónyuge o al juez (art. 242-A).\n\n💍 Si el convenio no se aprueba en todo o en parte, hay 10 días para presentar uno nuevo y el juez resuelve en 3 días (art. 248). El cónyuge inocente goza de pensión mientras esté imposibilitado de agenciarse ingresos y no contraiga nuevo matrimonio (art. 255).",
+    fuenteUrl:
+      "https://www.poderjudicial.gob.hn/Cedij/Cdigos/Codigo%20de%20Familia%20(Actualizado%20con%20Reformas%20Ley%20de%20Adopciones).pdf",
+    fuenteNombre: "Código de Familia (edición CEDIJ, actualizada con reformas) — Poder Judicial de Honduras",
   },
   {
     id: "herencia-sucesion",
