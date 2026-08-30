@@ -1,3 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-<rect width="48" height="48" rx="12" fill="#0d2144"/><rect x="11.7" y="6" width="12.6" height="34" rx="6.3" fill="#fff" transform="rotate(-26 18 23)"/><rect x="23.7" y="6" width="12.6" height="34" rx="6.3" fill="#1584c7" transform="rotate(26 30 23)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="5.5 4.5 37 37">
+<!-- Símbolo Justihn sin caja: dos trazos en V. Variante favicon (≤32px):
+     sin el cruce #0e5f92, que a ese tamaño solo ensucia.
+     La barra izquierda es marino en pestaña clara y se aclara en pestaña
+     oscura — sin la caja marina de fondo, si no, desaparecería. -->
+<style>.jh-a{fill:#0d2144}@media (prefers-color-scheme:dark){.jh-a{fill:#f2f7fb}}</style>
+<rect class="jh-a" x="11.7" y="6" width="12.6" height="34" rx="6.3" transform="rotate(-26 18 23)"/>
+<rect x="23.7" y="6" width="12.6" height="34" rx="6.3" fill="#1584c7" transform="rotate(26 30 23)"/>
 </svg>
