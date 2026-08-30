@@ -2,8 +2,8 @@
 
 > Cerebro técnico del portal. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-29** (refinado de
-> landings: hero, marca, SSR, demos animados y puerta de cuenta).
+> Creado: **2026-08-25** · Última actualización: **2026-08-30** (end-to-end de
+> `/para-abogados`: simetría, planes rediseñados y sección FAQ).
 
 ---
 
@@ -145,6 +145,31 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     la referencia —"tu próximo cliente ya está preguntando"— porque los leads
     del consultorio son seed: sería la misma sobreventa del corpus.
 
+  **End-to-end 2026-08-30 (sesión con Wesley):**
+  - **Encabezado canónico** (`Encabezado` en `landing-profesional.tsx`): las
+    secciones centradas (Cómo cita · Qué incluye · Planes · FAQ) llevan el
+    mismo patrón eyebrow + título + bajada — antes cada una tenía jerarquía
+    distinta y Capacidades ni subtítulo tenía. Las secciones de demo conservan
+    su eyebrow a la izquierda.
+  - **Planes rediseñados:** (a) las TRES cards llevan siempre la línea bajo el
+    precio (pago = anual −33% · Gratis = "para siempre — sin tarjeta") para
+    que las features arranquen a la misma altura; (b) tagline `resumen` por
+    plan, nuevo campo en `Plan`/`data/catalogo.ts` (fuente única); (c) features
+    acumulativas ("Todo lo del plan X, y además:"); (d) Premium destacado con
+    anillo por box-shadow — NO border-2, que encogería el contenido 1px y
+    desalinearía las cards; (e) los CTAs van a `/crear-cuenta` (antes
+    `/abogados/planes`, que saltaba la puerta de cuenta); (f) nota del ancla
+    L25 + anual bajo el grid. El subtítulo ya no dice "todo el contenido está
+    en todos los planes" — la card Gratis dice "búsqueda limitada" y se
+    contradecía a sí misma.
+  - **Sección FAQ** (`#faq`, entre Planes y el CTA final): 6 preguntas con
+    `<details>` nativo (server-rendered, cero JS, el crawler lee todo), copy
+    `FAQ_LANDING` local a la landing — NO reutiliza `FAQS` del catálogo, que
+    son dudas de uso interno del portal. Precios interpolados de
+    `PLANES`/`OFERTA`, nada escrito a mano. En la nav ("Preguntas") y el footer.
+  - **Footer:** enlaces de sección a anclas de esta página (un visitante sin
+    cuenta no cae dentro del portal por accidente; "Portal" sí queda como
+    entrada deliberada) + fila de cierre con copyright.
   ⚠️ **Trampa de esta landing:** `.landing-aurora a { color: inherit }` le gana
   por especificidad a `text-white` de Tailwind. Cualquier utilidad de color
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.

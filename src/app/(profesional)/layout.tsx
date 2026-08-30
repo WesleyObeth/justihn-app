@@ -20,6 +20,7 @@ export default function LayoutProfesional({ children }: { children: React.ReactN
           { href: "#fuentes", label: "Cómo cita" },
           { href: "#leads", label: "Clientes" },
           { href: "#planes", label: "Planes" },
+          { href: "#faq", label: "Preguntas" },
         ]}
         secundario={{ href: "/", label: "Para personas" }}
         cta={{ href: "/abogados", label: "Entrar al portal" }}

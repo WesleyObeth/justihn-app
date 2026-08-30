@@ -18,6 +18,7 @@ export const PLANES: Plan[] = [
   {
     id: "gratis",
     nombre: "Gratis",
+    resumen: "Para conocer el sistema",
     precioLempiras: 0,
     precioEtiqueta: "L0",
     periodo: "/mes",
@@ -36,6 +37,7 @@ export const PLANES: Plan[] = [
   {
     id: "profesional",
     nombre: "Profesional",
+    resumen: "Para el ejercicio de todos los días",
     precioLempiras: 147,
     precioEtiqueta: "L147",
     periodo: "/mes",
@@ -55,6 +57,7 @@ export const PLANES: Plan[] = [
   {
     id: "premium",
     nombre: "Premium",
+    resumen: "Para quien vive de litigar",
     precioLempiras: 267,
     precioEtiqueta: "L267",
     periodo: "/mes",

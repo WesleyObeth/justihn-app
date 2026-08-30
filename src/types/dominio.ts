@@ -145,6 +145,8 @@ export interface Notificacion {
 export interface Plan {
   id: PlanId;
   nombre: string;
+  /** Para quién es el plan, en una línea — se muestra bajo el nombre. */
+  resumen: string;
   precioLempiras: number;
   precioEtiqueta: string;
   periodo: string;
