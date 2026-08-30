@@ -31,8 +31,11 @@ export function ComposerJusIA() {
 
   return (
     <>
+      {/* TEST 2026-08-29: sin `borde-aurora`. Se retiró para comparar contra la
+          versión con el anillo animado — es también donde apareció el fallo
+          transitorio de composición. Para revolverlo, basta reponer:
+          <span aria-hidden className="borde-aurora" /> como primer hijo. */}
       <div className="relative mx-auto mt-8 max-w-[660px] rounded-[20px] border border-borde bg-white p-4 text-left shadow-[0_16px_48px_rgba(13,33,68,.14)]">
-        <span aria-hidden className="borde-aurora" />
         <textarea
           value={q}
           onChange={(e) => setQ(e.target.value)}
