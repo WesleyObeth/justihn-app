@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
-import { TRAMITES } from "@/data/tramites";
+import { RUTAS_TRAMITE, TRAMITES } from "@/data/tramites";
 import { isFuenteOficial } from "@/lib/security/sanitize";
 
 /**
@@ -95,5 +95,37 @@ describe("notario ≠ materia (la credencial no se deduce de la especialidad)", 
     for (const a of DIRECTORIO) {
       if (a.notario) expect(a.notario.exequatur, a.nombre).toMatch(/\S/);
     }
+  });
+});
+
+/**
+ * La home ciudadana muestra los trámites AGRUPADOS EN RUTAS, no como lista
+ * plana. Consecuencia: una guía que no esté en ninguna ruta existe en el seed
+ * y en su URL, pero **desaparece de la home** — nadie la encuentra navegando.
+ * Es invisible leyendo el código y no rompe nada, así que se topa aquí.
+ */
+describe("rutas de trámites de la home", () => {
+  const administrativos = TRAMITES.filter((t) => t.tipo === "tramite");
+  const enRutas = RUTAS_TRAMITE.flatMap((r) => r.pasos.map((p) => p.tramiteId));
+
+  it("cada trámite administrativo está en alguna ruta", () => {
+    const huerfanos = administrativos.filter((t) => !enRutas.includes(t.id));
+    expect(huerfanos.map((t) => t.id)).toEqual([]);
+  });
+
+  it("ninguna ruta repite un trámite ni apunta a uno inexistente", () => {
+    expect(enRutas.length).toBe(new Set(enRutas).size);
+    const inventados = enRutas.filter((id) => !TRAMITES.some((t) => t.id === id));
+    expect(inventados).toEqual([]);
+  });
+
+  it("las rutas no incluyen procesos judiciales — esos van en su sección", () => {
+    const procesos = TRAMITES.filter((t) => t.tipo === "proceso").map((t) => t.id);
+    expect(enRutas.filter((id) => procesos.includes(id))).toEqual([]);
+  });
+
+  it("toda guía lleva su costo resumido para la fila", () => {
+    const sinCorta = TRAMITES.filter((t) => !t.tasaCorta?.trim());
+    expect(sinCorta.map((t) => t.id)).toEqual([]);
   });
 });

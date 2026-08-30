@@ -58,6 +58,10 @@ export interface Tramite {
   pasos: PasoTramite[];
   requisitos: string[];
   tasa: string;
+  /** La `tasa` en una línea, para listas y tarjetas. NO es un dato nuevo:
+   *  condensa lo ya verificado ("Gratuito", "L 300", "Desde L 341"). Al
+   *  editar `tasa` hay que revisar esta — no pueden decir cosas distintas. */
+  tasaCorta: string;
   nota?: string;
   /** Página oficial de la institución (host de la whitelist §3.3). Solo se
    *  llena cuando el dato fue verificado contra esa fuente. */
@@ -161,6 +165,7 @@ export const TRAMITES: Tramite[] = [
       "Escritura de constitución (comerciante individual o persona jurídica)",
     ],
     tasa: "Gratuito — el SAR confirma que el trámite no tiene costo",
+    tasaCorta: "Gratuito",
     nota: "La reposición del RTN también es gratis y se descarga desde la Oficina Virtual. Si vas a facturar, el RTN es solo el primer paso: sigue la autorización de facturación (CAI).",
     fuenteUrl: "https://www.sar.gob.hn/registro-tributario-nacional-rtn/",
     fuenteNombre: "SAR — Registro Tributario Nacional",
@@ -216,6 +221,7 @@ export const TRAMITES: Tramite[] = [
       "Modalidad autoimpresor: cada máquina registradora o sistema computarizado registrado",
     ],
     tasa: "El Reglamento del Régimen de Facturación no fija tasa por la autorización: lo que se paga es la impresión a la imprenta certificada, o el sistema propio si eres autoimpresor",
+    tasaCorta: "Sin tasa oficial",
     nota:
       "⏰ Emitir con la vigencia vencida es el error clásico: los comprobantes «perderán su validez y no podrán ser utilizados cuando se haya vencido el plazo de tiempo autorizado» (art. 62). Pide la renovación dentro de los 2 meses previos a la fecha límite.\n\n↩️ Si te rechazan la solicitud tienes un plazo perentorio de 10 días hábiles desde la comunicación para regularizar tu situación o pedir la verificación de la gestión (art. 64).\n\n📄 Marco legal: Acuerdo 481-2017 (Reglamento del Régimen de Facturación, Otros Documentos Fiscales y Registro Fiscal de Imprentas) y sus reformas — Acuerdos 609-2017, 725-2018 y 817-2018.",
     fuenteUrl: "https://www.sar.gob.hn/facturacion/",
@@ -267,6 +273,7 @@ export const TRAMITES: Tramite[] = [
       "Si va un gestor: carta poder autenticada FIRMADA POR EL PROPIETARIO (no por el gestor), su DNI y su solvencia",
     ],
     tasa: "Impuestos y tasas municipales según tu volumen de ventas declarado",
+    tasaCorta: "Según tus ventas",
     nota:
       "Si estás registrado como MYPE (Decreto 145-2018 / 48-2022) presenta el certificado de SENPRENDE y la constancia vigente de SEFIN. Y ojo: la carta poder la firma el dueño, no quien hace la fila — es motivo común de rechazo.",
     fuenteUrl: "https://gac.amdc.hn/tramites/apertura-de-negocios/",
@@ -323,6 +330,7 @@ export const TRAMITES: Tramite[] = [
       "Venta en la vía pública, además: carné de salud de manipulador, certificado del curso «Manipulación segura de los alimentos» de ARSA, constancia municipal de que el sitio puede destinarse a eso, y RTN",
     ],
     tasa: "Según la tabla vigente de ARSA: desde L 341.10 (comedor/cafetería clase I, 2 años, en línea, 60 días hábiles) hasta L 27,970.32 (supermercado o industria clase III, 6 años, presencial). Pulpería clase I: L 423.79 · Restaurante pequeño-mediano: L 4,370.36 (ambos 2 años, en línea, 60 días)",
+    tasaCorta: "Desde L 341",
     nota:
       "🚀 La misma licencia cuesta hasta 4 veces más si la pides a 10 días hábiles en vez de 60, y siempre sale más barata en línea que presencial. Corre la calculadora oficial de ARSA con tus datos antes de presupuestar.\n\n🧑‍🍳 ¿Vas empezando desde tu casa, sin local independiente? Existe el Permiso Sanitario para Microempresa: L 200.00 y te habilita un año mientras obtienes tu licencia. El Registro Sanitario de producto de microempresa también cuesta L 200.00, dura 5 años, solo sirve para mercado nacional y NO es renovable — 6 meses antes de vencer hay que sacar el registro normal.\n\n📅 Vigencias: la licencia de venta de alimentos en la vía pública dura 1 año; el permiso sanitario temporal, 6 meses (renovable una sola vez, pidiéndolo 5 días antes de vencer).",
     fuenteUrl: "https://arsa.gob.hn/calculadora-de-alimentos-y-bebidas/",
@@ -380,6 +388,7 @@ export const TRAMITES: Tramite[] = [
       "Constancias según el proyecto: ICF, INSEP, UMA municipal, Instituto Hondureño de Antropología e Historia",
     ],
     tasa: "No hay tarifa fija publicada: el monto de «Inversión por Licenciamiento» y el «Pago primera visita DECA» los calcula el Sistema en línea de Licenciamiento Ambiental según tu proyecto, y se suman la garantía bancaria y los honorarios del PSA",
+    tasaCorta: "Lo calcula el sistema",
     nota:
       "📊 La categoría manda. El Acuerdo Ministerial 016-2015 (Tabla de Categorización Ambiental) clasifica los proyectos en categorías 1 a 4 según su magnitud e impacto, y de ahí salen los estudios que te van a pedir. Las categorías 1 y 2 siguen exactamente la misma ruta de 16 pasos; lo que cambia es la profundidad técnica del trabajo del PSA.\n\n⚖️ Base legal: Ley General del Ambiente (art. 5), Acuerdo Ejecutivo 008-2015 (Reglamento del SINEIA), Acuerdo Ministerial 016-2015 (Tabla de Categorización, Anexo 3) y art. 60 de la Ley de Fortalecimiento de los Ingresos.\n\n⚠️ Verifica en MiAmbiente el número de cuenta de BANADESA y los formularios antes de pagar: el portal de trámites del Estado puede estar desactualizado.",
     fuenteUrl: "https://honduras.eregulations.org/procedure/373/586?l=es",
@@ -444,6 +453,7 @@ export const TRAMITES: Tramite[] = [
       "Carné vigente del Colegio de Abogados del profesional del derecho apoderado",
     ],
     tasa: "L 400.00 (TGR-01, SEFIN institución 100, código 12121) por la inscripción · L 200.00 para actualizar la certificación vigente o ampliar CUBS",
+    tasaCorta: "L 400",
     nota:
       "📅 La inscripción en el Registro de Proveedores y Contratistas tiene una vigencia de 3 años.\n\n🏪 Si eres MIPYME también te dan constancia en trámite, y una vez inscrita recibes la Constancia de Inscripción MIPYME para Compras Menores.\n\n🧾 El registro es la puerta de entrada, no el final: cada proceso agrega sus propias bases. Los procedimientos de contratación del art. 38 de la Ley de Contratación del Estado son licitación pública, licitación privada, concurso público, concurso privado y contratación directa.\n\n📍 Registro de Proveedores: Col. Florencia Norte, Edificio EDUCRÉDITO 2.º nivel, contiguo al Colegio de Ingenieros Civiles, Tegucigalpa. Lunes a viernes, 8:00 a.m. a 4:00 p.m.",
     fuenteUrl: "https://oncae.gob.hn/como-ser-proveedor/requisitos-para-certificarse-como-proveedor-del-estado/",
@@ -496,6 +506,7 @@ export const TRAMITES: Tramite[] = [
       "Para el trámite de tradición de dominio: solicitud, recibo de L 200.00 y copia, DNI de los solicitantes, testamento si es testamentaria, y poder o carta poder si actúa un abogado",
     ],
     tasa: "Tasa base registral L 200.00 (más L 1.50 por millar o fracción cuando el valor excede L 1,000.00) + Impuesto de Tradición del 1.5% del valor de la transacción (art. 53 de la Ley de Propiedad, según la tabla de tasas del IP)",
+    tasaCorta: "L 200 + 1.5%",
     nota:
       "🏠 Si el inmueble viene de una herencia, el trámite registral es la posesión efectiva de herencia: L 200.00, con la certificación de sentencia original y copia legible (testamentaria o abintestato).\n\n⚠️ Para propiedades con valor superior a L 300,000.00 el IP aplica tasas proporcionales según la tabla registral vigente, y advierte que las tasas pueden modificarse — confirma el monto en ventanilla antes de presupuestar.",
     fuenteUrl: "https://www.ip.gob.hn/direcciones/registro-inmueble/tramites-inmueble",
@@ -552,6 +563,7 @@ export const TRAMITES: Tramite[] = [
       "Recibo que acredite el pago de la tasa (IP-160)",
     ],
     tasa: "L 300.00 — se paga en cualquier agencia bancaria después de hacer el traspaso en Registro Vehicular",
+    tasaCorta: "L 300",
     nota:
       "🏠 Si el vehículo viene de una herencia: no se presenta formulario de traspaso, sino la certificación de la sentencia de declaratoria de herederos (o instrumento público equivalente) inscrita en el Registro de Sentencias del IP. Y si los herederos quieren pasarlo a uno de ellos o a un tercero, primero lo inscriben a nombre de todos por cesión de derechos y después firman la tradición de dominio. En ese trámite el cambio del kit de placas se hace a la vez: hay que marcar ambos trámites en el formulario.\n\n💻 Casi todo el registro vehicular se puede tramitar por correo electrónico ante la Dirección General del Registro de la Propiedad Vehicular — salvo lo que implica entregar o retirar placas, que obligatoriamente es presencial.",
     fuenteUrl:
@@ -615,6 +627,7 @@ export const TRAMITES: Tramite[] = [
       "Formularios: inscripción tributaria, inscripción patronal IHSS, planilla y RAP",
     ],
     tasa: "≈ L 2,040 en tasas oficiales (sin honorarios de abogado ni notario)",
+    tasaCorta: "≈ L 2,040",
     nota:
       "⏱️ Cuenta con 34 a 54 días. Ojo: los montos y formularios del portal oficial pueden estar desactualizados (el antiguo DEI hoy es el SAR) — confirma cifras vigentes antes de presupuestar.",
     fuenteUrl: "https://honduras.eregulations.org/procedure/4/5?l=es",
@@ -673,6 +686,7 @@ export const TRAMITES: Tramite[] = [
       "Carta o constancia del despido, si la hay, y testigos",
     ],
     tasa: "La asistencia de la Procuraduría del Trabajo es absolutamente gratuita (art. 641). Si contratas abogado particular, sus honorarios",
+    tasaCorta: "Procuraduría gratuita",
     nota:
       "⏳ DOS MESES. Es el plazo del art. 864 y corre desde que terminó el contrato — es la razón #1 por la que se pierden reclamos legítimos en Honduras.\n\n✍️ Cuidado con el finiquito: el preaviso, el auxilio de cesantía y la indemnización no pueden ser objeto de compensación, venta o cesión, ni ser embargados, salvo en la mitad por pensiones alimenticias (art. 123 a). Y es absolutamente nula la cláusula del contrato que pretenda interrumpir la continuidad de tus servicios (art. 123 d): la antigüedad no se «reinicia» por firmar contratos nuevos.\n\n🩺 La continuidad del trabajo no se interrumpe por enfermedad, vacaciones, huelga o paros legales (art. 123 c).",
     fuenteUrl: "https://www.poderjudicial.gob.hn/Cedij/Cdigos/Codigo%20del%20Trabajo%20(mayo%202018).pdf",
@@ -727,6 +741,7 @@ export const TRAMITES: Tramite[] = [
       "Si estás en imposibilidad económica de conseguir algún documento, pídelo al juzgado: se ordena su expedición gratuita",
     ],
     tasa: "El Código no fija tasa por el juicio de alimentos; la demanda puede presentarse verbalmente y sin escrito de abogado. Si contratas abogado particular, sus honorarios",
+    tasaCorta: "Sin tasa judicial",
     nota:
       "⏱️ No se pueden reclamar alimentos pasados, salvo los SEIS MESES anteriores a la demanda, y solo si el alimentario tuvo que contraer deudas para vivir (art. 215). Demorar el reclamo cuesta dinero real.\n\n🚫 El derecho a pedir alimentos no puede renunciarse, cederse ni transmitirse por causa de muerte (art. 209): ningún «acuerdo» en el que la madre o el padre renuncia a la pensión del hijo es válido.\n\n🎓 La obligación no termina automáticamente a los 18: sigue si el hijo no ha terminado estudios superiores iniciados durante la minoría de edad y obtiene buenos rendimientos, o si es inválido (art. 217.6). Y perder o tener suspendida la patria potestad NO extingue la obligación alimentaria — solo la extingue la adopción por otra persona (art. 207-G).\n\n👨‍👩‍👧 Si hay varios obligados, el pago se reparte en proporción a su patrimonio, y en caso de urgencia el juez puede ordenar que uno lo cubra provisionalmente (art. 218).",
     fuenteUrl:
@@ -783,6 +798,7 @@ export const TRAMITES: Tramite[] = [
       "Presentación personal y por escrito ante el juez del domicilio",
     ],
     tasa: "El Código no fija tasa por el proceso; los honorarios del abogado son el costo real",
+    tasaCorta: "Sin tasa judicial",
     nota:
       "⏳ El divorcio contencioso tiene plazo: no puede entablarse después de UN (1) AÑO desde que se tuvo conocimiento de la causa, salvo infidelidad, malos tratos, abandono y adicciones (numerales 1, 2, 4 y 6), que pueden alegarse en cualquier tiempo mientras persistan los hechos (art. 240).\n\n🚫 No podrá declararse el divorcio si hubo reconciliación o vida marital entre los cónyuges, sea después de los hechos que lo autorizaban o después de la demanda (art. 241).\n\n👶 Presentada la demanda, el juez dicta provisionalmente las providencias necesarias para proteger los derechos de los hijos (art. 253). Y si la cónyuge descubre estar embarazada, debe comunicarlo por escrito en 7 días a su cónyuge o al juez (art. 242-A).\n\n💍 Si el convenio no se aprueba en todo o en parte, hay 10 días para presentar uno nuevo y el juez resuelve en 3 días (art. 248). El cónyuge inocente goza de pensión mientras esté imposibilitado de agenciarse ingresos y no contraiga nuevo matrimonio (art. 255).",
     fuenteUrl:
@@ -845,11 +861,81 @@ export const TRAMITES: Tramite[] = [
       "Para vehículos: esa misma certificación inscrita en el Registro de Sentencias del IP",
     ],
     tasa: "Posesión efectiva de herencia en el Registro Inmueble: L 200.00 · Traspaso de vehículo por herencia: L 300.00 · Certificación íntegra del inmueble: L 300.00 · Más los honorarios del abogado o notario que tramite la declaratoria",
+    tasaCorta: "L 200 + L 300",
     nota:
       "⏳ Dejar la herencia sin tramitar por años multiplica el problema: se suman herederos (los que van falleciendo dejan a su vez sus propios herederos), se pierden documentos y el inmueble queda inmovilizado — no se puede vender ni hipotecar.\n\n📜 Dato de contexto: la declaratoria de herederos se rige todavía por un código de 1906 porque la Ley de Jurisdicción Voluntaria que el CPC de 2018 anunció nunca se aprobó (art. 919). Por eso conviene un profesional que conozca ese procedimiento antiguo.",
     fuenteUrl: "https://www.poderjudicial.gob.hn/Cedij/Cdigos/Codigo%20Procesal%20Civil%20(2018).pdf",
     fuenteNombre:
       "Código Procesal Civil (edición CEDIJ, 2018), arts. 601-606 y 919 — Poder Judicial · tasas del Instituto de la Propiedad",
+  },
+];
+
+/**
+ * Rutas de trámites — cómo se agrupan en la home ciudadana (decisión Wesley
+ * 2026-08-30, tras comparar tres estructuras en un prototipo).
+ *
+ * Agrupan por **situación de vida**, no por institución: nadie busca "un
+ * trámite de ONCAE", busca "voy a abrir un negocio". Y llevan **orden**,
+ * porque en la vida real lo tienen — el RTN habilita el CAI y el CAI el
+ * permiso de operación. Eso es justo lo que no se encuentra googleando: hay
+ * que reconstruirlo leyendo tres portales del Estado.
+ *
+ * ⚠️ Un trámite fuera de toda ruta DESAPARECE de la home. Hay un test que lo
+ * impide (`tramites.test.ts`): cada guía de tipo "tramite" pertenece a
+ * exactamente una ruta.
+ */
+export interface PasoRuta {
+  tramiteId: string;
+  /** Por qué está aquí y en este lugar del orden. */
+  nota: string;
+  /** Solo aplica a algunos giros — se dibuja aparte, no como paso obligado. */
+  condicional?: boolean;
+}
+
+export interface RutaTramite {
+  id: string;
+  etiqueta: string;
+  titulo: string;
+  intro: string;
+  pasos: PasoRuta[];
+}
+
+export const RUTAS_TRAMITE: RutaTramite[] = [
+  {
+    id: "negocio",
+    etiqueta: "Abrir un negocio",
+    titulo: "De no tener nada a poder facturar",
+    intro:
+      "Van en este orden y cada uno pide el anterior. Los dos últimos, solo si tu giro los exige.",
+    pasos: [
+      { tramiteId: "abrir-rtn", nota: "Sin esto no puedes hacer lo que sigue" },
+      { tramiteId: "facturacion-cai", nota: "Te habilita a emitir factura válida" },
+      { tramiteId: "permiso-operacion", nota: "Lo pide tu alcaldía, y se renueva cada año" },
+      { tramiteId: "licencia-sanitaria", nota: "Si manejas alimentos o bebidas", condicional: true },
+      { tramiteId: "licencia-ambiental", nota: "Si tu actividad impacta el ambiente", condicional: true },
+    ],
+  },
+  {
+    id: "comprar",
+    etiqueta: "Comprar o vender algo",
+    titulo: "Que lo que compraste quede a tu nombre",
+    intro:
+      "Pagar no es ser dueño: mientras no se inscriba, el bien sigue registrado a nombre de otro.",
+    pasos: [
+      { tramiteId: "traspaso-vehiculo", nota: "Vehículos, en el Registro Vehicular" },
+      { tramiteId: "tradicion-dominio", nota: "Casas y terrenos, en el Registro Inmueble" },
+    ],
+  },
+  {
+    id: "crecer",
+    etiqueta: "Formalizar y vender al Estado",
+    titulo: "De comerciante individual a empresa proveedora",
+    intro:
+      "El Estado solo compra a proveedores inscritos, y para inscribirte necesitas estar constituido.",
+    pasos: [
+      { tramiteId: "constituir-sociedad", nota: "Ante notario y Registro Mercantil" },
+      { tramiteId: "inscripcion-oncae", nota: "Te habilita a participar en licitaciones" },
+    ],
   },
 ];
 

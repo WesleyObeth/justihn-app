@@ -186,6 +186,31 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **🗺️ TRÁMITES EN RUTAS, no en 9 cards (2026-08-30, decisión Wesley tras
+  comparar tres estructuras en un prototipo):** la sección `#tramites` de la
+  home agrupa las guías por **situación de vida** —Abrir un negocio · Comprar
+  o vender · Formalizar y vender al Estado— y las muestra **numeradas y
+  encadenadas** con un riel: el RTN habilita el CAI, el CAI el permiso de
+  operación. Ese orden es lo que no se encuentra googleando (hay que
+  reconstruirlo leyendo tres portales del Estado) y es la promesa del producto
+  hecha visible: asesoría, no directorio de links.
+  - **Van APILADAS, sin chips de filtro.** Con chips solo se renderiza la ruta
+    activa y 4 de las 9 guías no llegarían al HTML del servidor — en esta
+    página eso ya costó un incidente (130 → 7.452 caracteres). Verificado: las
+    9 guías, sus 3 encabezados y sus costos salen en el SSR.
+  - **Buscar rompe el orden a propósito:** con término, resultados planos —
+    quien escribe "RTN" quiere su guía, no la ruta entera. Sin término, rutas.
+  - **Fuera el filtro por institución.** Pensaba como burócrata: nadie busca
+    "un trámite de ONCAE", busca "voy a abrir un negocio".
+  - **`tasaCorta` nuevo en el seed** (§0.5): la `tasa` verificada condensada a
+    una línea ("Gratuito", "L 300", "Desde L 341"). No es dato nuevo — al
+    editar `tasa` hay que revisarla, no pueden decir cosas distintas.
+  - **`RUTAS_TRAMITE` vive en `data/tramites.ts`**, junto a lo que agrupa.
+    ⚠️ Una guía fuera de toda ruta **desaparece de la home** aunque exista en
+    el seed y en su URL: invisible leyendo el código, así que `tramites.test.ts`
+    lo topa (cada trámite en exactamente una ruta, sin repetir, sin inventar
+    ids, sin colar procesos judiciales, y todas con `tasaCorta`).
+
 - **🏠 HOME CIUDADANA REESTRUCTURADA como la de abogados (2026-08-30, pedido
   de Wesley):** la vía B pasa a tener la misma arquitectura persuasiva de
   `/para-abogados`, **manteniendo el hero intacto**. Se suman: encabezado a

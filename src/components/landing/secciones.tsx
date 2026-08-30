@@ -11,7 +11,13 @@ import { useMemo, useState } from "react";
 import { useBusquedaUrl } from "@/hooks/use-busqueda-url";
 import { Icono } from "@/components/brand/iconos";
 import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
-import { getInstitucion, INSTITUCIONES, TRAMITES } from "@/data/tramites";
+import {
+  getInstitucion,
+  getTramite,
+  RUTAS_TRAMITE,
+  TRAMITES,
+} from "@/data/tramites";
+import type { RutaTramite, Tramite } from "@/data/tramites";
 import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
 import { InsigniaNotario } from "@/components/publico/paso-profesional";
 import { LEADS, ABOGADA_DEMO } from "@/data/catalogo";
@@ -81,26 +87,25 @@ export function SeccionTramites({
   termino: string;
   onTermino: (v: string) => void;
 }) {
-  const [institucion, setInstitucion] = useState("todas");
-
   const administrativos = TRAMITES.filter((t) => t.tipo === "tramite");
   const termino = normalizar(q.trim());
-  const filtrados = administrativos.filter((t) => {
-    const porInst = institucion === "todas" || t.institucionId === institucion;
-    const porTermino =
-      !termino || normalizar(`${t.nombre} ${t.paraQuien} ${t.resumen}`).includes(termino);
-    return porInst && porTermino;
-  });
+  const buscando = termino.length > 0;
+  const encontrados = administrativos.filter((t) =>
+    normalizar(`${t.nombre} ${t.paraQuien} ${t.resumen}`).includes(termino),
+  );
 
   return (
     <section id="tramites" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-16">
       <TituloSeccion
         eyebrow="Guías de trámites"
         titulo="Cada trámite del Estado, explicado paso a paso"
-        desc={`${administrativos.length} guías ante las instituciones del Estado: qué necesitas, dónde se hace y cuánto cuesta.`}
+        desc={`${administrativos.length} guías con lo que necesitas, dónde se hace y cuánto cuesta — agrupadas por lo que vas a resolver, y en el orden en que van.`}
       />
 
-      <div className="mx-auto mt-7 flex max-w-[440px] items-center gap-2 rounded-full border bg-white px-4 py-2.5" style={{ borderColor: "var(--line)" }}>
+      <div
+        className="mx-auto mt-7 flex max-w-[440px] items-center gap-2 rounded-full border bg-white px-4 py-2.5"
+        style={{ borderColor: "var(--line)" }}
+      >
         <Icono nombre="buscar" size={15} className="shrink-0 text-texto-4" />
         <input
           value={q}
@@ -109,66 +114,143 @@ export function SeccionTramites({
           aria-label="Buscar trámite"
           className="min-w-0 flex-1 border-none bg-transparent text-[13.5px] text-marino outline-none"
         />
+        {buscando && (
+          <button
+            type="button"
+            onClick={() => setQ("")}
+            aria-label="Limpiar búsqueda"
+            className="shrink-0 cursor-pointer text-texto-4 transition-colors hover:text-marino"
+          >
+            <Icono nombre="cerrar" size={14} />
+          </button>
+        )}
       </div>
 
-      <div className="mt-4 flex flex-wrap justify-center gap-2">
-        <Chip activo={institucion === "todas"} onClick={() => setInstitucion("todas")}>
-          Todas ({administrativos.length})
-        </Chip>
-        {INSTITUCIONES.map((inst) => {
-          const n = administrativos.filter((t) => t.institucionId === inst.id).length;
-          if (n === 0) return null;
-          return (
-            <Chip
-              key={inst.id}
-              activo={institucion === inst.id}
-              onClick={() => setInstitucion(inst.id)}
-            >
-              {inst.sigla} ({n})
-            </Chip>
-          );
-        })}
-      </div>
-
-      <div className="mt-6 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-        {filtrados.map((t) => {
-          const inst = getInstitucion(t.institucionId)!;
-          return (
-            <Link key={t.id} href={`/tramites/${t.id}`} className="glass-card flex flex-col p-5">
-              <div className="text-[11px] font-bold tracking-[.8px] uppercase" style={{ color: "var(--mint)" }}>
-                {inst.sigla}
-              </div>
-              <div className="font-display mt-1 flex items-start gap-1.5 text-[15px] leading-[1.35] font-semibold">
-                {t.nombre}
-                {t.fuenteUrl && (
-                  <span
-                    title="Verificado con la fuente oficial"
-                    className="mt-[3px] shrink-0 text-exito"
-                  >
-                    <Icono nombre="check" size={13} strokeWidth={2.6} />
-                  </span>
-                )}
-              </div>
-              <p className="mt-1.5 flex-1 text-[12.5px] leading-[1.55]" style={{ color: "var(--muted)" }}>
-                {t.paraQuien}
+      {/* Buscando se rompe el orden a propósito: quien escribe "RTN" quiere su
+          guía, no la ruta entera. Navegando, en cambio, las rutas cuentan algo
+          que una lista no puede — que los trámites se encadenan. */}
+      {buscando ? (
+        <div className="mx-auto mt-7 max-w-[720px]">
+          {encontrados.length > 0 ? (
+            <div className="flex flex-col gap-2.5">
+              {encontrados.map((t) => (
+                <FilaTramite key={t.id} tramite={t} />
+              ))}
+            </div>
+          ) : (
+            <div className="glass-card px-6 py-10 text-center">
+              <p className="text-[13.5px]" style={{ color: "var(--muted)" }}>
+                Aún no tenemos una guía para «{q.trim()}» — pregunta abajo en el consultorio y
+                un abogado te orienta gratis.
               </p>
-              <div className="mt-2.5 text-[12px]" style={{ color: "var(--mint)" }}>
-                Ver la guía ({t.pasos.length} pasos) →
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {filtrados.length === 0 && (
-        <div className="glass-card mt-6 px-6 py-10 text-center">
-          <p className="text-[13.5px]" style={{ color: "var(--muted)" }}>
-            Aún no tenemos una guía para «{q.trim()}» — pregunta abajo en el consultorio y un
-            abogado te orienta gratis.
-          </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="mx-auto mt-9 flex max-w-[760px] flex-col gap-11">
+          {RUTAS_TRAMITE.map((ruta) => (
+            <Ruta key={ruta.id} ruta={ruta} />
+          ))}
         </div>
       )}
     </section>
+  );
+}
+
+/** Una ruta: su encabezado y los trámites encadenados por el riel numerado. */
+function Ruta({ ruta }: { ruta: RutaTramite }) {
+  return (
+    <div>
+      <p
+        className="text-[11px] font-bold tracking-[2px] uppercase"
+        style={{ color: "var(--mint)" }}
+      >
+        {ruta.etiqueta}
+      </p>
+      <h3 className="font-display mt-1.5 text-[19px] leading-[1.3] font-bold">{ruta.titulo}</h3>
+      <p className="mt-1.5 text-[13px] leading-[1.6]" style={{ color: "var(--muted)" }}>
+        {ruta.intro}
+      </p>
+
+      <ol className="mt-5 flex flex-col">
+        {ruta.pasos.map((paso, i) => {
+          const t = getTramite(paso.tramiteId);
+          if (!t) return null;
+          return (
+            <li key={paso.tramiteId} className="flex gap-4">
+              {/* Riel: el número y la línea que encadena con el siguiente. */}
+              <div className="flex flex-col items-center" aria-hidden>
+                <span
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[13px] font-bold"
+                  style={
+                    paso.condicional
+                      ? {
+                          background: "rgba(255,255,255,.7)",
+                          border: "1.5px dashed var(--line)",
+                          color: "var(--muted)",
+                        }
+                      : { background: "var(--turq)", color: "#fff" }
+                  }
+                >
+                  {i + 1}
+                </span>
+                {i < ruta.pasos.length - 1 && (
+                  <span
+                    className="w-px flex-1"
+                    style={{ background: "var(--line)", minHeight: 22 }}
+                  />
+                )}
+              </div>
+              <div className="mb-3 min-w-0 flex-1">
+                <FilaTramite tramite={t} nota={paso.nota} />
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+/** Fila de trámite: nombre + sello, su institución (o la nota de la ruta),
+ *  el costo de un vistazo y cuántos pasos tiene. */
+function FilaTramite({ tramite: t, nota }: { tramite: Tramite; nota?: string }) {
+  const inst = getInstitucion(t.institucionId)!;
+  const gratis = /^gratuito/i.test(t.tasaCorta);
+
+  return (
+    <Link
+      href={`/tramites/${t.id}`}
+      className="glass-card flex flex-wrap items-center gap-x-4 gap-y-1.5 p-4"
+    >
+      <div className="min-w-[190px] flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="font-display text-[15px] leading-[1.3] font-semibold">{t.nombre}</span>
+          {t.fuenteUrl && (
+            <span className="shrink-0 text-exito" title="Verificado con la fuente oficial">
+              <Icono nombre="check" size={12} strokeWidth={2.8} />
+            </span>
+          )}
+        </div>
+        <p className="mt-0.5 text-[12px]" style={{ color: "var(--muted)" }}>
+          {inst.sigla}
+          {nota ? ` · ${nota}` : ""}
+        </p>
+      </div>
+      <span
+        className="rounded-full px-3 py-1 text-[12px] font-semibold"
+        style={
+          gratis
+            ? { background: "var(--color-exito-bg)", color: "var(--color-exito)" }
+            : { background: "var(--color-chip)", color: "var(--mint)" }
+        }
+      >
+        {t.tasaCorta}
+      </span>
+      <span className="text-[12px] whitespace-nowrap" style={{ color: "var(--mint)" }}>
+        {t.pasos.length} pasos →
+      </span>
+    </Link>
   );
 }
 
