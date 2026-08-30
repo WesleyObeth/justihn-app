@@ -40,8 +40,13 @@ export function FormularioPregunta({
 
   const publicar = () => {
     const texto = pregunta.trim();
-    if (texto.length < 15) {
-      mostrarToast("Cuéntanos un poco más — mínimo unas dos líneas");
+    // Umbral bajo a propósito: pedía 15 caracteres y rebotaba preguntas
+    // legítimas como "sacar rtn?". Una duda corta es respondible —y el
+    // abogado puede repreguntar—; rebotar a quien sí quería preguntar cuesta
+    // más que recibir una consulta escueta. Solo se frena lo que no es
+    // pregunta ("hola", "?").
+    if (texto.length < 6) {
+      mostrarToast("Escribe tu pregunta — con una línea basta");
       return;
     }
     preguntarConsultorio(materia, ciudad.trim() || "Honduras", texto);
@@ -93,7 +98,7 @@ export function FormularioPregunta({
         value={pregunta}
         onChange={(e) => setPregunta(e.target.value)}
         rows={3}
-        placeholder="Cuenta tu situación en tus palabras — sin nombres completos ni datos sensibles…"
+        placeholder="¿Qué necesitas saber? Ej. cómo saco el RTN — sin nombres completos ni datos sensibles"
         aria-label="Tu pregunta"
         className="mt-3 w-full resize-y rounded-lg border border-borde bg-white px-3.5 py-2.5 text-[13.5px] leading-[1.6] text-marino outline-none focus:border-celeste"
       />
