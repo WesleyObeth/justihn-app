@@ -126,6 +126,19 @@ export function SeccionTramites({
         )}
       </div>
 
+      {!buscando && (
+        <nav
+          aria-label="Categorías de trámites"
+          className="mt-4 flex flex-wrap justify-center gap-2 text-[12.5px]"
+        >
+          {RUTAS_TRAMITE.map((r) => (
+            <a key={r.id} href={`#ruta-${r.id}`} className="chip-tramite rounded-full px-3.5 py-1.5">
+              {r.etiqueta} ({r.pasos.length})
+            </a>
+          ))}
+        </nav>
+      )}
+
       {/* Buscando se rompe el orden a propósito: quien escribe "RTN" quiere su
           guía, no la ruta entera. Navegando, en cambio, las rutas cuentan algo
           que una lista no puede — que los trámites se encadenan. */}
@@ -160,7 +173,7 @@ export function SeccionTramites({
 /** Una ruta: su encabezado y los trámites encadenados por el riel numerado. */
 function Ruta({ ruta }: { ruta: RutaTramite }) {
   return (
-    <div>
+    <div id={`ruta-${ruta.id}`} className="scroll-mt-28">
       <p
         className="text-[11px] font-bold tracking-[2px] uppercase"
         style={{ color: "var(--mint)" }}
