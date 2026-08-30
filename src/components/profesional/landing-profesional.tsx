@@ -64,7 +64,7 @@ export function LandingProfesional() {
       {/* ── Hero ── */}
       <section className="mx-auto max-w-[880px] px-5 pt-[150px] pb-8 text-center md:pt-[176px]">
         <h1 className="font-display mx-auto max-w-[820px] text-[clamp(32px,5.5vw,52px)] leading-[1.12] font-bold text-balance">
-          La IA jurídica que no inventa jurisprudencia
+          Tu investigación jurídica empieza en Justihn
         </h1>
         <p
           className="mx-auto mt-5 max-w-[580px] text-[15.5px] leading-[1.65]"
