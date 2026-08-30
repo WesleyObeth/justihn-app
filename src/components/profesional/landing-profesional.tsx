@@ -70,8 +70,8 @@ export function LandingProfesional() {
           className="mx-auto mt-5 max-w-[580px] text-[15.5px] leading-[1.65]"
           style={{ color: "var(--muted)" }}
         >
-          Cada respuesta trae enlazado el documento que la respalda. Y cuando no lo hay,
-          Jus IA lo dice — antes que inventarlo.
+          Pregunta por jurisprudencia, legislación, La Gaceta, procesos y modelos de
+          escritos. Cada respuesta llega con su fuente.
         </p>
 
         {/* La caja ES la demostración: pregunta algo real y mira con qué
