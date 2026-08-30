@@ -22,8 +22,20 @@ import {
   DemoGuiaTramite,
 } from "@/components/publico/demos-personas";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
+import { getPlan, OFERTA } from "@/data/catalogo";
 
 const POPULARES = ["abrir-rtn", "traspaso-vehiculo", "permiso-operacion", "constituir-sociedad"];
+
+/**
+ * El plan que enseña el puente hacia la vía A. Es el **Profesional**: el de
+ * entrada al pago, no el tope de la escalera.
+ * ⚠️ Ojo: en `/para-abogados` la insignia "Recomendado" la lleva Premium
+ * (`destacado: true` en el catálogo). Aquí no se pone insignia para no
+ * contradecir esa página — si algún día el recomendado pasa a ser Profesional,
+ * se cambia `destacado` en `data/catalogo.ts` y las dos páginas se mueven
+ * juntas.
+ */
+const PLAN_PUENTE = getPlan("profesional")!;
 
 /**
  * FAQ de la landing ciudadana: responde a quien AÚN no tiene cuenta. No
@@ -454,22 +466,50 @@ export function LandingContenido() {
                 ))}
               </ul>
             </div>
+            {/* Un solo plan, no dos precios sueltos: esta card es un puente a
+                la otra vía, no una tabla de tarifas — quien la lee todavía no
+                está eligiendo tier. Se enseña el Profesional, que es el de
+                entrada al pago y el que cubre el ejercicio diario.
+                Todo sale de `data/catalogo` (§0.5): antes "L147" y "L267"
+                estaban escritos a mano aquí y habrían quedado desfasados en
+                cuanto cambiara el precio. */}
             <div className="flex flex-col items-start gap-3">
               <div>
-                <span className="font-display text-[30px] font-bold">L147</span>
-                <span className="text-[13px]" style={{ color: "var(--muted)" }}>
-                  /mes · Premium L267
+                <span
+                  className="text-[11px] font-bold tracking-[1.2px] uppercase"
+                  style={{ color: "var(--mint)" }}
+                >
+                  Plan {PLAN_PUENTE.nombre}
                 </span>
+                <div className="mt-1 flex items-end gap-1">
+                  <span className="font-display text-[30px] leading-none font-bold">
+                    {PLAN_PUENTE.precioEtiqueta}
+                  </span>
+                  <span className="text-[13px]" style={{ color: "var(--muted)" }}>
+                    {PLAN_PUENTE.periodo}
+                  </span>
+                </div>
+                <p className="mt-1.5 text-[12.5px]" style={{ color: "var(--muted)" }}>
+                  {PLAN_PUENTE.resumen}
+                </p>
+                <p className="mt-0.5 text-[12px]" style={{ color: "var(--muted)" }}>
+                  o {PLAN_PUENTE.precioAnualEtiqueta}
+                  {PLAN_PUENTE.periodoAnual} ({OFERTA.descuentoAnual})
+                </p>
               </div>
+              {/* ⚠️ El blanco va INLINE: `.landing-aurora a { color: inherit }`
+                  le gana por especificidad a `text-white` de Tailwind, y el
+                  texto salía marino sobre el azul. Es la misma trampa del CTA
+                  de la landing de abogados. */}
               <Link
                 href="/para-abogados"
-                className="rounded-[12px] px-6 py-3.5 text-[14px] font-semibold text-white"
-                style={{ background: "var(--turq)" }}
+                className="magnetic rounded-[12px] px-6 py-3.5 text-[14px] font-semibold"
+                style={{ background: "var(--turq)", color: "#fff" }}
               >
                 Conocer Justihn para abogados
               </Link>
               <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
-                Primer mes a L25 en tu primera suscripción
+                Primer mes a {OFERTA.anclaPrimerMes} en tu primera suscripción
               </span>
             </div>
           </div>
