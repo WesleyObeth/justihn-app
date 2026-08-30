@@ -188,10 +188,17 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
 
 - **🏠 HOME CIUDADANA REESTRUCTURADA como la de abogados (2026-08-30, pedido
   de Wesley):** la vía B pasa a tener la misma arquitectura persuasiva de
-  `/para-abogados`, **manteniendo el hero intacto**. Se suman: 3 **pilares**
-  ("Por qué confiar", gemelos de "Cómo cita"), encabezado a las puertas de
-  entrada, **3 secciones con demostración**, **plan** y **FAQ** ciudadano y
-  **CTA final oscuro**. Las 4 secciones interactivas de verdad (Trámites,
+  `/para-abogados`, **manteniendo el hero intacto**. Se suman: encabezado a
+  las puertas de entrada, **3 secciones con demostración**, **plan** y **FAQ**
+  ciudadano y **CTA final oscuro**.
+  **Recorte 2026-08-30 (Wesley):** los 3 pilares "Por qué confiar" existieron
+  y **se quitaron** — la home llegaba larga y ese argumento ya lo repiten el
+  sello de fuente de cada guía y el FAQ. Y las cuatro cards de "¿Qué necesitas
+  resolver hoy?" **dejaron de navegar**: eran enlaces con "Empezar →" que
+  competían con las secciones reales de justo debajo, así que el visitante
+  decidía dos veces lo mismo. Llevan `glass-card--estatica`, que les quita el
+  hover que levanta la card — en algo no clicable ese gesto promete un clic
+  que no existe. Las 4 secciones interactivas de verdad (Trámites,
   Procesos, Consultorio, Directorio) **se conservan** — son la sustancia del
   producto y el motor SEO; los demos van ANTES y enseñan lo que hay detrás de
   la cuenta gratis (que es lo que la landing gatea), no lo mismo dos veces.
