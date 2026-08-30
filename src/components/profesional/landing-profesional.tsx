@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { OFERTA, PLANES } from "@/data/catalogo";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
+import { ComposerJusIA } from "@/components/profesional/composer-jus-ia";
 
 /**
  * Landing de la vía A: el abogado que todavía no es suscriptor.
@@ -82,25 +83,16 @@ export function LandingProfesional() {
           compruebes tú y no tengas que confiar en nuestra palabra.
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/abogados"
-            className="rounded-[12px] px-6 py-3.5 text-[14.5px] font-semibold text-white"
-            style={{ background: "var(--turq)" }}
-          >
-            Ver el portal por dentro
-          </Link>
-          <a
-            href="#planes"
-            className="rounded-[12px] border px-6 py-3.5 text-[14.5px] font-semibold"
-            style={{ borderColor: "var(--line)", color: "var(--muted)" }}
-          >
+        {/* La caja ES la demostración: pregunta algo real y mira con qué
+            fuentes responde. Gemela del buscador de la home ciudadana. */}
+        <ComposerJusIA />
+
+        <p className="mt-6 text-[12.5px]" style={{ color: "var(--muted)" }}>
+          Primer mes a {OFERTA.anclaPrimerMes} · anual {OFERTA.descuentoAnual} · sin tarjeta
+          para probar ·{" "}
+          <a href="#planes" className="font-semibold" style={{ color: "var(--mint)" }}>
             Ver planes
           </a>
-        </div>
-        <p className="mt-3 text-[12.5px]" style={{ color: "var(--muted)" }}>
-          Primer mes a {OFERTA.anclaPrimerMes} · anual {OFERTA.descuentoAnual} · sin tarjeta
-          para probar
         </p>
       </section>
 
