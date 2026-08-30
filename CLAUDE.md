@@ -175,6 +175,38 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **🏠 HOME CIUDADANA REESTRUCTURADA como la de abogados (2026-08-30, pedido
+  de Wesley):** la vía B pasa a tener la misma arquitectura persuasiva de
+  `/para-abogados`, **manteniendo el hero intacto**. Se suman: 3 **pilares**
+  ("Por qué confiar", gemelos de "Cómo cita"), encabezado a las puertas de
+  entrada, **3 secciones con demostración**, **plan** y **FAQ** ciudadano y
+  **CTA final oscuro**. Las 4 secciones interactivas de verdad (Trámites,
+  Procesos, Consultorio, Directorio) **se conservan** — son la sustancia del
+  producto y el motor SEO; los demos van ANTES y enseñan lo que hay detrás de
+  la cuenta gratis (que es lo que la landing gatea), no lo mismo dos veces.
+  - **Marco de demo compartido** en `components/landing/demo-marco.tsx`
+    (`Ventana` + `SeccionDemo`), extraído de `profesional/demos.tsx` — las dos
+    landings usan el mismo chrome y cada una pone su contenido.
+  - **`components/publico/demos-personas.tsx`** con la misma regla de la vía A
+    (**datos reales del seed, nunca maquetas**): guía del RTN con checklist
+    (verificada contra el SAR) · consulta del `LEADS` respondida por la
+    colegiada del directorio · cálculo hecho por **`lib/prestaciones`**, el
+    mismo módulo de la calculadora real (§0.5) — si la fórmula cambia, la demo
+    cambia con ella y no puede quedar enseñando una cifra que el producto ya
+    no da.
+  - **Planes: UNA card y es gratis** (decisión Wesley). Tres cards inventarían
+    una decisión que la persona no tiene. El plan de pago que pidió el socio
+    se nombra al pie con **las mismas palabras que usa el portal ciudadano**
+    ("en definición"), para que las dos pantallas no se contradigan.
+  - ⚠️ **Honestidad:** el copy de la demo de calculadora NO dice "usa el
+    Código del Trabajo" ni "el mismo número que vería tu abogado" — sería
+    sobreventa mientras `lib/prestaciones` siga sin validar con el socio y
+    contradiga la escalera literal que ya publica la guía de despido (ver
+    §8, deuda conocida). Dice "desglose orientativo".
+  - **SSR verificado: 7.452 → 12.597 caracteres** de texto en el HTML del
+    servidor. Todo lo nuevo lo lee el crawler (la home ya tuvo un incidente de
+    contenido invisible — ver la nota de `useSearchParams` bajo Suspense).
+
 - **🧲 BOTÓN MAGNÉTICO (GSAP) — `components/landing/magnetico.tsx` (2026-08-30):**
   los elementos con clase **`.magnetic`** se van hacia el cursor (factor
   **0.35**) con `gsap.quickTo` y ease **`elastic.out(1,0.4)`**, y vuelven a

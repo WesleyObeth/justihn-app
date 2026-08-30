@@ -19,6 +19,7 @@ const ENLACES_CIUDADANO: EnlaceNav[] = [
   { href: "#procesos", label: "Procesos" },
   { href: "#consultorio", label: "Consultorio" },
   { href: "#directorio", label: "Encuentra abogado" },
+  { href: "#faq", label: "Preguntas" },
 ];
 
 export function NavAurora({

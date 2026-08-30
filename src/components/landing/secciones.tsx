@@ -54,7 +54,7 @@ function Chip({
   );
 }
 
-function TituloSeccion({ eyebrow, titulo, desc }: { eyebrow: string; titulo: string; desc: string }) {
+export function TituloSeccion({ eyebrow, titulo, desc }: { eyebrow: string; titulo: string; desc: string }) {
   return (
     <div className="text-center">
       <p className="text-[11px] font-bold tracking-[2px] uppercase" style={{ color: "var(--mint)" }}>
