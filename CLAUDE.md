@@ -186,6 +186,30 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **💬 CONSULTORIO: la conversación primero (2026-08-30, elegido de un
+  prototipo de tres):** la sección `#consultorio` abre con un **intercambio
+  real** —consulta ciudadana + respuesta firmada por la colegiada, con su
+  número CAH y sus materias— y el formulario va debajo. El obstáculo aquí no
+  es que la persona no sepa dónde escribir: es que no cree que alguien vaya a
+  responderle. Si el visitante ya preguntó en esta sesión, se muestra SU
+  consulta en vez del ejemplo.
+  - ⚠️ **Hallazgo de fondo:** `leadsRespondidos` arranca vacío, así que la
+    sección prometía "te responde un abogado colegiado" y enseñaba preguntas
+    SIN contestar — probaba lo contrario de su título. Se añadió
+    **`respuestaDemo`** a los leads del seed (orientaciones generales, sin
+    citar artículos sin verificar). ⚙️ **Pendiente del socio: revisarlas.**
+  - **Fuera el demo duplicado.** El bloque *"Tu duda, respondida por un
+    abogado colegiado"* repetía esta sección y además fallaba el criterio de
+    los demos —enseñar lo que hay DETRÁS de la cuenta gratis—, porque
+    preguntar es gratis SIN cuenta. Lo sustituye **"Los trámites no se hacen
+    de una sentada"** (`DemoMisTramites`): el panel con el avance guardado,
+    que es lo único genuinamente tras la cuenta y no vivía en ningún otro
+    sitio de la home. Responde la pregunta que provoca la card del plan: si
+    todo es gratis, ¿para qué me registro?
+  - También se quitaron dos salidas que competían con el paso siguiente: "Ver
+    todas las consultas del consultorio" y el enlace al directorio bajo las
+    guías de procesos (cada guía ya cierra recomendando abogado de su materia).
+
 - **🗺️ TRÁMITES EN RUTAS, no en 9 cards (2026-08-30, decisión Wesley tras
   comparar tres estructuras en un prototipo):** la sección `#tramites` de la
   home agrupa las guías por **situación de vida** —Abrir un negocio · Comprar

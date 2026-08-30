@@ -22,7 +22,7 @@ import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
 import { InsigniaNotario } from "@/components/publico/paso-profesional";
 import { LEADS, ABOGADA_DEMO } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
-import type { Materia } from "@/types/dominio";
+import type { Lead, Materia } from "@/types/dominio";
 import { cn } from "@/lib/utils";
 
 function normalizar(texto: string): string {
@@ -345,10 +345,27 @@ export function SeccionProcesos() {
 
 // ── Sección Consultorio ────────────────────────────────────────────────────
 
+/**
+ * Consultorio: **la conversación primero** (estructura elegida por Wesley
+ * 2026-08-30, tras comparar tres prototipos).
+ *
+ * El obstáculo aquí no es que la persona no sepa dónde escribir — es que no
+ * cree que alguien le vaya a responder. Por eso arriba va un intercambio de
+ * verdad, firmado por una colegiada, y el formulario debajo: se enseña qué
+ * recibes ANTES de pedirte que escribas.
+ *
+ * Las respuestas salen de `respuestaDemo` en el seed. Antes esta sección
+ * mostraba preguntas SIN contestar (porque `leadsRespondidos` arranca vacío)
+ * y probaba justo lo contrario de lo que su título promete.
+ */
 export function SeccionConsultorio() {
   const preguntasPublico = usePortal((s) => s.preguntasPublico);
   const respondidos = usePortal((s) => s.leadsRespondidos);
-  const preguntas = [...preguntasPublico, ...LEADS].slice(0, 4);
+
+  // Si el visitante ya preguntó en esta sesión, su consulta manda: ver la
+  // propia publicada es mejor prueba que cualquier ejemplo.
+  const propia = preguntasPublico[0];
+  const ejemplo = LEADS.find((l) => l.respuestaDemo);
 
   return (
     <section id="consultorio" className="scroll-mt-24 py-16">
@@ -359,49 +376,99 @@ export function SeccionConsultorio() {
           desc="La orientación es pública y sin costo. Para tu caso concreto, contactas al abogado que te convenció."
         />
 
-        <div className="mt-7 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <FormularioPregunta desdeLanding claro />
+        <div className="mx-auto mt-8 max-w-[720px]">
+          {propia ? (
+            <Intercambio
+              lead={propia}
+              respuesta={respondidos[propia.id]}
+              etiqueta="Tu consulta"
+            />
+          ) : (
+            ejemplo && <Intercambio lead={ejemplo} respuesta={ejemplo.respuestaDemo} />
+          )}
 
-          <div className="flex flex-col gap-3">
-            {preguntas.map((lead) => {
-              const respuesta = respondidos[lead.id];
-              return (
-                <div key={lead.id} className="glass-card p-4.5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className="rounded-full px-2.5 py-[3px] text-[11.5px] font-medium"
-                      style={{ background: "rgba(21,132,199,.1)", color: "var(--mint)" }}
-                    >
-                      {lead.materia}
-                    </span>
-                    <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
-                      {lead.ciudad} · {lead.cuando}
-                    </span>
-                    {respuesta && (
-                      <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-exito">
-                        <Icono nombre="check" size={9} strokeWidth={2.6} />
-                        Respondida
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-2 line-clamp-2 text-[13.5px] leading-[1.55]">{lead.pregunta}</p>
-                  {respuesta && (
-                    <p
-                      className="mt-2 line-clamp-2 border-l-[3px] pl-3 text-[12.5px] leading-[1.55]"
-                      style={{ borderColor: "var(--mint)", color: "var(--muted)" }}
-                    >
-                      <b>{ABOGADA_DEMO.nombre}:</b> {respuesta}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
+          <div className="glass-card mt-5 p-6">
+            <h3 className="font-display text-[17px] font-bold">
+              {propia ? "¿Otra duda?" : "Ahora la tuya"}
+            </h3>
+            <p className="mt-1 text-[13px]" style={{ color: "var(--muted)" }}>
+              {/* No dice "sin cuenta": publicar lleva a `/personas/consultas`,
+                  que es donde se sigue la respuesta. */}
+              Publicarla es gratis. Te llevamos a tus consultas para que sigas la respuesta.
+            </p>
+            <div className="mt-4">
+              <FormularioPregunta desdeLanding claro />
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
 }
+
+/** Un intercambio del consultorio: la consulta y la respuesta con su firma. */
+function Intercambio({
+  lead,
+  respuesta,
+  etiqueta,
+}: {
+  lead: Lead;
+  respuesta?: string;
+  etiqueta?: string;
+}) {
+  return (
+    <div className="glass-card p-5 md:p-6">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-chip px-2.5 py-[2px] text-[11px] font-semibold text-celeste">
+          {lead.materia}
+        </span>
+        <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
+          {etiqueta ? `${etiqueta} · ` : ""}
+          {lead.ciudad ? `${lead.ciudad} · ` : ""}
+          {lead.cuando}
+        </span>
+        {respuesta && (
+          <span className="ml-auto inline-flex items-center gap-1 text-[11.5px] font-bold text-exito">
+            <Icono nombre="check" size={10} strokeWidth={2.8} />
+            Respondida
+          </span>
+        )}
+      </div>
+
+      <p className="mt-2.5 text-[14.5px] leading-[1.55]">“{lead.pregunta}”</p>
+
+      {respuesta ? (
+        <div className="mt-4 border-t pt-4" style={{ borderColor: "var(--line)" }}>
+          <div className="flex items-center gap-2.5">
+            <span
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-bold text-white"
+              style={{ background: "var(--color-celeste)" }}
+            >
+              {ABOGADA_DEMO.iniciales}
+            </span>
+            <div className="min-w-0">
+              <p className="text-[13px] leading-[1.3] font-semibold">{ABOGADA_DEMO.nombre}</p>
+              <p className="text-[11.5px] leading-[1.3]" style={{ color: "var(--muted)" }}>
+                {ABOGADA_DEMO.colegiacion} · {ABOGADA_DEMO.especialidades.join(" · ")}
+              </p>
+            </div>
+          </div>
+          <p className="mt-2.5 text-[13.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
+            {respuesta}
+          </p>
+        </div>
+      ) : (
+        <p
+          className="mt-3 border-t pt-3 text-[12.5px]"
+          style={{ borderColor: "var(--line)", color: "var(--muted)" }}
+        >
+          Publicada — un abogado colegiado te responderá aquí mismo.
+        </p>
+      )}
+    </div>
+  );
+}
+
 
 // ── Sección Directorio ─────────────────────────────────────────────────────
 

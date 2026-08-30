@@ -18,7 +18,6 @@
  */
 import { Icono } from "@/components/brand/iconos";
 import { Ventana } from "@/components/landing/demo-marco";
-import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
 import { TRAMITES } from "@/data/tramites";
 import { calcularPrestaciones } from "@/lib/prestaciones";
 import { fmtLempiras } from "@/lib/utils";
@@ -90,62 +89,70 @@ export function DemoGuiaTramite() {
   );
 }
 
-/** Consultorio: la pregunta de una persona y la respuesta de una colegiada. */
-export function DemoConsultorio() {
-  const lead = LEADS.find((l) => l.materia === "Familia") ?? LEADS[0]!;
+/**
+ * Mis trámites: el panel del portal ciudadano con el avance guardado.
+ *
+ * Es EL argumento de la cuenta gratis, y el único que no vive en ninguna otra
+ * parte de la home. Antes este hueco lo ocupaba el consultorio, que además de
+ * repetir la sección de abajo fallaba el criterio de estos demos: preguntar
+ * es gratis SIN cuenta, así que no enseñaba nada que exigiera registrarse.
+ *
+ * El avance es de demostración —`pasosTramite` es por usuario y arranca
+ * vacío— pero los trámites, sus nombres y su número de pasos salen del seed.
+ */
+const AVANCE_DEMO: { id: string; hechos: number }[] = [
+  { id: "abrir-rtn", hechos: 3 },
+  { id: "permiso-operacion", hechos: 1 },
+];
+
+export function DemoMisTramites() {
+  const enProgreso = AVANCE_DEMO.map((a) => ({
+    tramite: TRAMITES.find((t) => t.id === a.id)!,
+    hechos: a.hechos,
+  }));
 
   return (
-    <Ventana etiqueta="Consultorio gratuito">
-      <div className="demo-paso demo-paso-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-chip px-2.5 py-[2px] text-[10.5px] font-semibold text-celeste">
-            {lead.materia}
-          </span>
-          <span className="text-[10.5px]" style={{ color: "var(--muted)" }}>
-            {lead.ciudad} · {lead.cuando}
-          </span>
-        </div>
-        <p className="mt-2 text-[13px] leading-[1.55] text-texto-2">“{lead.pregunta}”</p>
-      </div>
-
-      {/* Mientras "llega" la respuesta. Alto 0 para no empujar nada al irse. */}
-      <div className="demo-pensando pointer-events-none mt-2 flex h-0 items-center gap-1.5 text-[11.5px] text-texto-4">
-        Un abogado está respondiendo
-        <span className="h-1 w-1 rounded-full bg-celeste" />
-        <span className="h-1 w-1 rounded-full bg-celeste" />
-        <span className="h-1 w-1 rounded-full bg-celeste" />
-      </div>
-
-      <div className="demo-paso demo-paso-2 caja-panel mt-3 rounded-[10px] border px-3 py-2.5">
-        <div className="flex items-center gap-2">
-          <span
-            className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[10.5px] font-bold text-white"
-            style={{ background: "var(--color-celeste)" }}
+    <Ventana etiqueta="Mis trámites">
+      <div className="flex flex-col gap-2.5">
+        {enProgreso.map(({ tramite: t, hechos }, i) => (
+          <div
+            key={t.id}
+            className={`demo-paso demo-paso-${i + 1} caja-panel rounded-[10px] border px-3.5 py-3`}
           >
-            {ABOGADA_DEMO.iniciales}
-          </span>
-          <div className="min-w-0">
-            <p className="text-[12px] leading-[1.3] font-semibold text-marino">
-              {ABOGADA_DEMO.nombre}
-            </p>
-            <p className="text-[10.5px] leading-[1.3] text-texto-4">
-              {ABOGADA_DEMO.colegiacion} · {ABOGADA_DEMO.especialidades.join(" · ")}
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[13px] leading-[1.35] font-semibold text-marino">
+                {t.nombre}
+              </span>
+              <span className="text-[11.5px] whitespace-nowrap text-celeste">
+                {hechos}/{t.pasos.length} pasos
+              </span>
+            </div>
+            <div className="mt-2 h-1 overflow-hidden rounded" style={{ background: "var(--color-chip)" }}>
+              <div
+                className="h-full rounded bg-celeste"
+                style={{ width: `${(hechos / t.pasos.length) * 100}%` }}
+              />
+            </div>
+            <p className="mt-1.5 text-[11.5px] text-texto-4">
+              {hechos === 0
+                ? "Sin empezar"
+                : `Sigue en: ${t.pasos[hechos]?.titulo ?? "el último paso"}`}
             </p>
           </div>
-        </div>
-        <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-2">
-          Puedes pedir la ejecución de la pensión ante el mismo juzgado que dictó la
-          resolución. Lleva el acta o la sentencia y el detalle de los meses no pagados —
-          el juez puede ordenar retención del salario.
-        </p>
+        ))}
       </div>
 
-      <p
-        className="demo-paso demo-paso-3 mt-2.5 text-center text-[11px]"
-        style={{ color: "var(--muted)" }}
-      >
-        Preguntar es gratis · orientación pública, no sustituye asesoría sobre tu caso
-      </p>
+      <div className="demo-paso demo-paso-3 mt-3 flex items-center justify-between gap-2">
+        <span className="text-[11px]" style={{ color: "var(--muted)" }}>
+          Se guarda solo · retomas desde cualquier teléfono
+        </span>
+        <span
+          className="rounded-[8px] px-3 py-1.5 text-[11.5px] font-semibold text-white"
+          style={{ background: "var(--turq)" }}
+        >
+          Retomar
+        </span>
+      </div>
     </Ventana>
   );
 }

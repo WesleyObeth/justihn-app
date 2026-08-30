@@ -18,8 +18,8 @@ import {
 import { SeccionDemo } from "@/components/landing/demo-marco";
 import {
   DemoCalculadora,
-  DemoConsultorio,
   DemoGuiaTramite,
+  DemoMisTramites,
 } from "@/components/publico/demos-personas";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
 import { OFERTA, PLANES } from "@/data/catalogo";
@@ -181,15 +181,15 @@ export function LandingContenido() {
       />
 
       <SeccionDemo
-        eyebrow="Consultorio gratuito"
-        titulo="Tu duda, respondida por un abogado colegiado"
-        descripcion="Escribes lo que te pasa y un profesional colegiado te orienta en público — sin costo y sin tener que explicar tu caso tres veces. Si se complica, contactas al que te convenció."
+        eyebrow="Tu cuenta gratis"
+        titulo="Los trámites no se hacen de una sentada"
+        descripcion="Un permiso lleva días y cinco ventanillas. Con tu cuenta vas marcando lo que ya hiciste y el avance queda guardado: vuelves y sigues donde lo dejaste, no donde empezaste."
         puntos={[
-          { icono: "leads", texto: "Preguntar es gratis, sin límite y sin tarjeta" },
-          { icono: "perfil", texto: "Responde un colegiado con su nombre y su materia" },
-          { icono: "correo", texto: "Te avisamos cuando tu consulta tenga respuesta" },
+          { icono: "pasos", texto: "Marca cada paso y ve cuánto te falta" },
+          { icono: "reloj", texto: "Se guarda solo — retomas desde cualquier teléfono" },
+          { icono: "documento", texto: "Con los requisitos y las tasas siempre a mano" },
         ]}
-        demo={<DemoConsultorio />}
+        demo={<DemoMisTramites />}
         invertida
       />
 
