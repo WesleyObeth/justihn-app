@@ -15,7 +15,10 @@
  * TODO(auth): Supabase Auth — `signUp({ email, password })` + fila en
  * `personas` con el nombre; sin ficha de abogado, que es lo que después hace
  * que el login resuelva el destino a `/personas`. Conservar el redirect al
- * portal tras el alta.
+ * portal tras el alta. ⚠️ Con `desde=consultorio` la consulta ya se publicó
+ * ANTES del alta: al cablear Supabase hay que asignarle el dueño en cuanto
+ * exista la cuenta (y decidir qué pasa si el visitante abandona el alta —
+ * hoy queda publicada y anónima, que es lo que la sección promete).
  */
 import Link from "next/link";
 import { useState } from "react";
@@ -32,7 +35,12 @@ const INCLUYE = [
   "Consultas ilimitadas al consultorio",
 ];
 
-export function RegistroPersona() {
+export function RegistroPersona({
+  /** Viene de publicar una consulta en el consultorio de la home. */
+  desdeConsultorio = false,
+}: {
+  desdeConsultorio?: boolean;
+}) {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [pass, setPass] = useState("");
@@ -57,8 +65,21 @@ export function RegistroPersona() {
 
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-5 py-10">
-      <div className="relative mb-[26px]">
+      <div className="relative mb-[26px] flex flex-col items-center gap-4">
         <LogoJustihn size={34} variante="claro" textoPx={24} />
+        {desdeConsultorio && (
+          <div className="glass-card max-w-[440px] px-4 py-2.5 text-center">
+            <p
+              className="text-[10.5px] font-bold tracking-[1.4px] uppercase"
+              style={{ color: "var(--color-celeste)" }}
+            >
+              Tu consulta ya está publicada
+            </p>
+            <p className="mt-1 text-[12.5px] leading-[1.5]" style={{ color: "var(--muted)" }}>
+              Crea tu cuenta para que te avisemos cuando un abogado responda.
+            </p>
+          </div>
+        )}
       </div>
 
       <div
@@ -66,7 +87,7 @@ export function RegistroPersona() {
         style={{ borderColor: "var(--line)", boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
         <h1 className="font-display text-[23px] font-bold tracking-[-.3px]">
-          Crea tu cuenta gratis
+          {desdeConsultorio ? "Sigue tu consulta" : "Crea tu cuenta gratis"}
         </h1>
         <p className="mt-[5px] text-[13.5px] leading-[1.55]" style={{ color: "#5a6b82" }}>
           Sin tarjeta y sin caducidad. Es lo único que te vamos a pedir.
@@ -184,7 +205,7 @@ export function RegistroPersona() {
         </form>
       </div>
 
-      {entrando && <SplashJustihn destino="/personas" />}
+      {entrando && <SplashJustihn destino={desdeConsultorio ? "/personas/consultas" : "/personas"} />}
 
       <p className="relative mt-4 text-[11.5px]" style={{ color: "var(--muted)" }}>
         Demo de validación — todavía no se crean cuentas ni se guardan tus datos.

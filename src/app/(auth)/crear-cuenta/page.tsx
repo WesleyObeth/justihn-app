@@ -22,8 +22,12 @@ export const metadata: Metadata = {
 export default async function PaginaCrearCuenta({
   searchParams,
 }: {
-  searchParams: Promise<{ tipo?: string }>;
+  searchParams: Promise<{ tipo?: string; desde?: string }>;
 }) {
-  const { tipo } = await searchParams;
-  return tipo === "persona" ? <RegistroPersona /> : <PantallaOnboarding />;
+  const { tipo, desde } = await searchParams;
+  return tipo === "persona" ? (
+    <RegistroPersona desdeConsultorio={desde === "consultorio"} />
+  ) : (
+    <PantallaOnboarding />
+  );
 }

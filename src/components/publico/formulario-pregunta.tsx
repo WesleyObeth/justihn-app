@@ -2,8 +2,13 @@
 
 /**
  * Formulario del consultorio — compartido por la sección de la landing y el
- * portal ciudadano. `desdeLanding` aplica el patrón Jusbrasil: preguntar crea
- * la cuenta (demo) y te lleva a seguir tu consulta adentro.
+ * portal ciudadano.
+ *
+ * `desdeLanding` aplica el patrón Jusbrasil y hace pareja con el composer de
+ * la vía A: la consulta se PUBLICA primero (queda en el store) y luego se
+ * pasa por la puerta de cuenta; el alta la reconoce por `?desde=consultorio`,
+ * lo dice, y al terminar deja al visitante en sus consultas. Antes saltaba
+ * directo al portal y se saltaba el alta entera.
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -43,8 +48,8 @@ export function FormularioPregunta({
     setPregunta("");
     setCiudad("");
     if (desdeLanding) {
-      mostrarToast("Tu cuenta gratis está lista (demo) — sigue tu consulta en tu portal");
-      router.push("/personas/consultas");
+      mostrarToast("Consulta publicada — crea tu cuenta gratis para seguir la respuesta");
+      router.push("/crear-cuenta?tipo=persona&desde=consultorio");
       return;
     }
     mostrarToast("Pregunta publicada — los abogados de la materia ya pueden verla");

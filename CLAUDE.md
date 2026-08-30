@@ -206,6 +206,15 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     que es lo único genuinamente tras la cuenta y no vivía en ningún otro
     sitio de la home. Responde la pregunta que provoca la card del plan: si
     todo es gratis, ¿para qué me registro?
+  - **Publicar pasa por la puerta de cuenta** (2026-08-30): la consulta se
+    guarda primero y el visitante va a `/crear-cuenta?tipo=persona&desde=consultorio`,
+    que lo reconoce ("Tu consulta ya está publicada"), cambia el titular a
+    "Sigue tu consulta" y al terminar lo deja en `/personas/consultas` con la
+    pregunta ahí. Antes saltaba directo al portal y se saltaba el alta entera.
+    Hace pareja con el composer de la vía A. ⚠️ La consulta se publica ANTES
+    del alta: al cablear Supabase hay que asignarle dueño en cuanto exista la
+    cuenta, y decidir qué pasa si el visitante la abandona (hoy queda
+    publicada y anónima, que es lo que la sección promete).
   - También se quitaron dos salidas que competían con el paso siguiente: "Ver
     todas las consultas del consultorio" y el enlace al directorio bajo las
     guías de procesos (cada guía ya cierra recomendando abogado de su materia).
