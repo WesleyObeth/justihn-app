@@ -25,10 +25,13 @@ export function NavAurora({
   enlaces = ENLACES_CIUDADANO,
   secundario = { href: "/para-abogados", label: "Para abogados" },
   cta = { href: "/personas", label: "Crear cuenta gratis" },
+  logoVariante = "claro",
 }: {
   enlaces?: EnlaceNav[];
   secundario?: EnlaceNav;
   cta?: EnlaceNav;
+  /** "oscuro" para shells sobre fondo marino (landing black). */
+  logoVariante?: "claro" | "oscuro";
 }) {
   const nav = useRef<HTMLElement>(null);
 
@@ -44,7 +47,7 @@ export function NavAurora({
   return (
     <nav ref={nav} className="nav">
       <Link className="brand" href="/" aria-label="Justihn — inicio">
-        <SimboloJustihn size={30} />
+        <SimboloJustihn size={30} variante={logoVariante} />
         <span className="wm">Justihn</span>
       </Link>
       <div className="nav-mid">

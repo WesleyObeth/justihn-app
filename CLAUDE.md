@@ -175,6 +175,23 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **🌑 LANDING BLACK — `/para-abogados-black` (2026-08-30):** la MISMA landing
+  de la vía A en tema oscuro, para comparar con Wesley cuál versión queda.
+  Cero duplicación: la página reutiliza `LandingProfesional` tal cual y el
+  tema lo hace `.landing-aurora--black` (landing.css) remapeando los tokens
+  (`--ink/--muted/--card/--line/--mint` + `--color-texto-4`) sobre el aurora
+  noche del login; shell propio en `(profesional-black)/layout.tsx` con
+  `NavAurora logoVariante="oscuro"` (prop nuevo) y enlace "Versión clara" de
+  vuelta a `/para-abogados`. **Patrón `superficie-dia`** (composer del hero +
+  ventanas de demo): en la landing clara son cards blancas con los tokens
+  claros re-anclados; en black van en **glass oscuro** (decisión Wesley
+  2026-08-30) — la regla `.landing-aurora--black .superficie-dia` les gana a
+  las utilidades Tailwind del componente y remapea TODOS los tokens interiores
+  (`--color-marino/texto-2/chip/exito…`), con los fondos internos de las
+  ventanas como clases (`ventana-cabecera`, `caja-panel`) y un fix
+  `polygon[fill="#0d2144"]` para aclarar el símbolo de Jus IA. Cuando se elija
+  una versión, borrar la otra ruta (o convertirla en redirect).
+
 - **🔐 AUTH CONSTRUIDO — `/iniciar-sesion` + `/crear-cuenta` (2026-08-30):**
   las dos pantallas del handoff **`../design_handoff_auth/`** (Claude Design,
   copiado del Desktop de Wesley — es la fuente de verdad visual de auth),

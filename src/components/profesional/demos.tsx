@@ -34,15 +34,16 @@ function Ventana({
   return (
     <div
       ref={ref}
-      className={`overflow-hidden rounded-[16px] border border-borde bg-white shadow-[0_18px_50px_rgba(13,33,68,.13)] ${enVista ? "demo-anim" : ""}`}
+      className={`superficie-dia overflow-hidden rounded-[16px] border border-borde bg-white shadow-[0_18px_50px_rgba(13,33,68,.13)] ${enVista ? "demo-anim" : ""}`}
     >
-      <div
-        className="flex items-center gap-2 border-b px-4 py-2.5"
-        style={{ borderColor: "var(--line)", background: "rgba(248,250,252,.9)" }}
-      >
+      <div className="ventana-cabecera flex items-center gap-2 border-b px-4 py-2.5">
         <span className="flex gap-1.5" aria-hidden>
-          {["#e5e9ef", "#e5e9ef", "#e5e9ef"].map((c, i) => (
-            <span key={i} className="h-2 w-2 rounded-full" style={{ background: c }} />
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-2 w-2 rounded-full"
+              style={{ background: "var(--line)" }}
+            />
           ))}
         </span>
         <span
@@ -90,10 +91,7 @@ export function DemoJusIA() {
             865 es de un mes.
           </p>
 
-          <div
-            className="demo-paso demo-paso-3 mt-3 rounded-[10px] border px-3 py-2.5"
-            style={{ borderColor: "var(--line)", background: "rgba(248,250,252,.75)" }}
-          >
+          <div className="caja-panel demo-paso demo-paso-3 mt-3 rounded-[10px] border px-3 py-2.5">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10.5px] font-bold tracking-[1px] text-celeste uppercase">
                 Fuente citada

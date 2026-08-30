@@ -48,7 +48,9 @@ export function ComposerJusIA() {
 
   return (
     <>
-      <div className="relative mx-auto mt-8 max-w-[660px] rounded-[20px] border border-borde bg-white p-4 text-left shadow-[0_16px_48px_rgba(13,33,68,.14)]">
+      {/* `superficie-dia`: la card es blanca también en la landing black — es
+          superficie del producto, no tema de la página. */}
+      <div className="superficie-dia relative mx-auto mt-8 max-w-[660px] rounded-[20px] border border-borde bg-white p-4 text-left shadow-[0_16px_48px_rgba(13,33,68,.14)]">
         {/* Anillo de bienvenida: se enciende, gira unos segundos y se apaga
             solo. Señala la caja al entrar sin dejar animación perpetua — y al
             recargar la página vuelve a reproducirse. */}

@@ -213,6 +213,99 @@
   background: radial-gradient(50% 50% at 50% 50%, rgba(21, 132, 199, 0.28), transparent 70%);
 }
 
+/* ── Variante BLACK de la landing de abogados (/para-abogados-black) ──
+   La MISMA página que /para-abogados con los tokens remapeados a oscuro,
+   sobre el aurora noche del login. La estructura no se duplica: todo lo que
+   lee var(--ink)/var(--muted)/var(--card)/var(--line) se adapta solo.
+   Regla heredada: NO definir `a { color }` aquí — los botones de la landing
+   pasan su color inline y una regla de link se los pisaría (trampa del CTA). */
+.landing-aurora--black {
+  --bg: #0a1830;
+  --card: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.14);
+  --ink: #e8eef6;
+  --muted: rgba(226, 238, 248, 0.66);
+  --mint: #5fb0e0;
+  /* La etiqueta "GRATIS" de los planes usa este token del tema claro y se
+     perdía sobre la card oscura; `.superficie-dia` lo devuelve a su valor. */
+  --color-texto-4: #93a9c4;
+  background: linear-gradient(160deg, #0d2144 0%, #0a1830 55%, #0e2a52 100%);
+  color: var(--ink);
+}
+.landing-aurora--black .nav.solid {
+  background: rgba(10, 24, 48, 0.72);
+}
+.landing-aurora--black .nav-mid {
+  background: rgba(255, 255, 255, 0.06);
+}
+.landing-aurora--black .glass-card {
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Superficie de producto (composer del hero, ventanas de demo). En la landing
+   clara son cards blancas; re-anclar los tokens claros aquí las mantiene
+   legibles venga el tema que venga del shell. */
+.superficie-dia {
+  --card: rgba(255, 255, 255, 0.72);
+  --line: rgba(13, 33, 68, 0.1);
+  --ink: #0d2144;
+  --muted: rgba(13, 33, 68, 0.62);
+  --mint: #1584c7;
+  --color-texto-4: #8095ad;
+}
+/* Piezas internas de las ventanas que en el tema claro llevan fondos casi
+   blancos fijos — como clase (no inline) para poder oscurecerlas en black. */
+.ventana-cabecera {
+  border-color: var(--line);
+  background: rgba(248, 250, 252, 0.9);
+}
+.caja-panel {
+  border-color: var(--line);
+  background: rgba(248, 250, 252, 0.75);
+}
+
+/* En la landing BLACK las superficies de producto van en glass oscuro
+   (decisión Wesley 2026-08-30), como el card del login. La regla de dos
+   clases le gana a las utilidades Tailwind del componente (bg-white,
+   border-borde, shadow-*) sin tocar el markup; los tokens remapeados cubren
+   todo el interior (text-marino, bg-chip, badges de estado, etc.). */
+.landing-aurora--black .superficie-dia {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 24px 64px rgba(5, 12, 26, 0.5);
+  --card: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.14);
+  --ink: #e8eef6;
+  --muted: rgba(226, 238, 248, 0.62);
+  --mint: #5fb0e0;
+  --color-marino: #eef4fb;
+  --color-texto-2: #c9d7e8;
+  --color-texto-3: #a9bcd4;
+  --color-texto-4: #8ba3c0;
+  --color-borde: rgba(255, 255, 255, 0.16);
+  --color-chip: rgba(95, 176, 224, 0.18);
+  --color-celeste: #5fb0e0;
+  --color-exito: #6fd096;
+  --color-exito-bg: rgba(46, 125, 67, 0.22);
+  --color-aviso: rgba(201, 154, 58, 0.2);
+  --color-aviso-texto: #e5c37a;
+}
+.landing-aurora--black .superficie-dia textarea::placeholder {
+  color: rgba(232, 238, 246, 0.4);
+}
+.landing-aurora--black .superficie-dia .ventana-cabecera,
+.landing-aurora--black .superficie-dia .caja-panel {
+  background: rgba(255, 255, 255, 0.05);
+}
+/* El símbolo de Jus IA en la demo va en variante clara (barra marino #0d2144,
+   fijada como atributo fill); la propiedad CSS le gana al atributo y la
+   aclara sobre el glass oscuro. */
+.landing-aurora--black .superficie-dia polygon[fill="#0d2144"] {
+  fill: #eef4fb;
+}
+
 /* ── Utilidades de la landing (contenido z-2, cards glass) ── */
 .landing-contenido {
   position: relative;
