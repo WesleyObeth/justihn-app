@@ -58,12 +58,12 @@ export function RegistroPersona() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-5 py-10">
       <div className="relative mb-[26px]">
-        <LogoJustihn size={34} variante="oscuro" textoPx={24} />
+        <LogoJustihn size={34} variante="claro" textoPx={24} />
       </div>
 
       <div
         className="auth-fadeup-card card-dia relative w-full max-w-[440px] rounded-[18px] bg-white px-9 pt-[34px] pb-[30px] text-marino max-sm:px-6"
-        style={{ boxShadow: "0 24px 64px rgba(5,12,26,.45)" }}
+        style={{ boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
         <h1 className="font-display text-[23px] font-bold tracking-[-.3px]">
           Crea tu cuenta gratis
@@ -186,10 +186,10 @@ export function RegistroPersona() {
 
       {entrando && <SplashJustihn destino="/personas" />}
 
-      <p className="relative mt-4 text-[11.5px]" style={{ color: "#5f7ba0" }}>
+      <p className="relative mt-4 text-[11.5px]" style={{ color: "var(--muted)" }}>
         Demo de validación — todavía no se crean cuentas ni se guardan tus datos.
       </p>
-      <p className="relative mt-2 text-[12px]" style={{ color: "#5f7ba0" }}>
+      <p className="relative mt-2 text-[12px]" style={{ color: "var(--muted)" }}>
         ¿Eres abogado?{" "}
         <Link href="/crear-cuenta" className="font-semibold">
           Crea tu cuenta profesional

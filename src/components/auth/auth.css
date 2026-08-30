@@ -21,7 +21,10 @@
 }
 
 /* ── Inputs ──
-   noche = card glass del login · dia = card blanco del onboarding.
+   dia = card blanco (lo que usan hoy TODAS las pantallas de auth).
+   noche = card glass sobre marino, del handoff original. Está sin uso desde
+   la prueba de fondo claro del 2026-08-30 y se conserva a propósito: es el
+   camino de vuelta si Wesley prefiere la variante noche. No es código muerto.
    Focus con anillo del handoff; el color base del texto lo pone el componente. */
 .input-noche {
   background: rgba(255, 255, 255, 0.06);

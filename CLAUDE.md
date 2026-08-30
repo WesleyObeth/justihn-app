@@ -284,10 +284,14 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
 - **🔐 AUTH CONSTRUIDO — `/iniciar-sesion` + `/crear-cuenta` (2026-08-30):**
   las dos pantallas del handoff **`../design_handoff_auth/`** (Claude Design,
   copiado del Desktop de Wesley — es la fuente de verdad visual de auth),
-  recreadas pixel-perfect en el grupo **`(auth)`** con shell propio: el aurora
-  en variante **noche** (nuevo prop `variante` en `FondoAurora` — shader con
-  `uLight=0` sobre gradiente navy, sin scrim ni capas claras; clases
-  `.landing-aurora--noche` en `landing.css`) y sin navegación.
+  recreadas pixel-perfect en el grupo **`(auth)`** con shell propio y sin
+  navegación.
+  ⚗️ **Prueba en curso (2026-08-30):** el shell usa la **aurora CLARA** de las
+  landings, no la variante noche del handoff — Wesley quiere comparar. Las
+  tarjetas se adaptaron a fondo claro (blanca en vez de glass oscuro, inputs
+  `input-dia`, logo `claro`, sombras recalibradas). **Camino de vuelta:**
+  revertir ese único commit — `landing-aurora--noche` + `FondoAurora
+  variante="noche"` y `.input-noche` siguen en el CSS a propósito.
   - **`/iniciar-sesion`** (`components/auth/iniciar-sesion.tsx`): card glass
     oscuro con login, recuperar contraseña y "enlace enviado".
   - **`/crear-cuenta`** (`components/auth/onboarding.tsx`): **reemplaza la

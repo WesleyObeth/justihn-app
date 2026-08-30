@@ -131,23 +131,23 @@ export function PantallaOnboarding() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-5 py-10">
       <div className="relative mb-[26px] flex flex-col items-center gap-4">
-        <LogoJustihn size={34} variante="oscuro" textoPx={24} />
+        <LogoJustihn size={34} variante="claro" textoPx={24} />
         {consultaPendiente && step < 4 && (
           <div
             className="max-w-[480px] rounded-[12px] border px-4 py-2.5 text-center"
             style={{
-              background: "rgba(255,255,255,.07)",
-              borderColor: "rgba(255,255,255,.16)",
+              background: "rgba(255,255,255,.72)",
+              borderColor: "var(--line)",
               backdropFilter: "blur(12px)",
             }}
           >
             <p
               className="text-[10.5px] font-bold tracking-[1.4px] uppercase"
-              style={{ color: "#5fb0e0" }}
+              style={{ color: "var(--color-celeste)" }}
             >
               Tu pregunta te espera
             </p>
-            <p className="mt-1 text-[12.5px] leading-[1.5]" style={{ color: "#c6d6e8" }}>
+            <p className="mt-1 text-[12.5px] leading-[1.5]" style={{ color: "var(--muted)" }}>
               “{consultaPendiente}”
             </p>
           </div>
@@ -156,7 +156,7 @@ export function PantallaOnboarding() {
 
       <div
         className="auth-fadeup-card card-dia relative w-full max-w-[520px] rounded-[18px] bg-white px-9 pt-[34px] pb-[30px] text-marino max-sm:px-6"
-        style={{ boxShadow: "0 24px 64px rgba(5,12,26,.45)" }}
+        style={{ boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
         {step < 4 && <Stepper step={step} />}
 
@@ -663,10 +663,10 @@ export function PantallaOnboarding() {
 
       {step === 5 && <SplashJustihn />}
 
-      <p className="relative mt-4 text-[11.5px]" style={{ color: "#5f7ba0" }}>
+      <p className="relative mt-4 text-[11.5px]" style={{ color: "var(--muted)" }}>
         Demo de validación — todavía no se crean cuentas ni se guardan tus datos.
       </p>
-      <p className="relative mt-2 text-[12px]" style={{ color: "#5f7ba0" }}>
+      <p className="relative mt-2 text-[12px]" style={{ color: "var(--muted)" }}>
         © 2026 Justihn · Honduras
       </p>
     </section>

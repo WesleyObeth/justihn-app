@@ -77,23 +77,17 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-5 py-10">
       <div
-        className="auth-fadeup-card w-full max-w-[420px] rounded-[20px] border px-9 pt-[38px] pb-[30px] max-sm:px-6"
-        style={{
-          background: "rgba(255,255,255,.07)",
-          borderColor: "rgba(255,255,255,.16)",
-          backdropFilter: "blur(18px)",
-          WebkitBackdropFilter: "blur(18px)",
-          boxShadow: "0 30px 80px rgba(5,12,26,.55)",
-        }}
+        className="auth-fadeup-card card-dia w-full max-w-[420px] rounded-[20px] bg-white px-9 pt-[38px] pb-[30px] text-marino max-sm:px-6"
+        style={{ boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
-        <LogoJustihn size={36} variante="oscuro" textoPx={22} />
+        <LogoJustihn size={36} variante="claro" textoPx={22} />
 
         {vista === "login" && (
           <div className="auth-fadeup">
             <h1 className="font-display mt-6 text-[24px] font-bold tracking-[-.3px]">
               Inicia sesión
             </h1>
-            <p className="mt-[5px] text-[13.5px]" style={{ color: "#9fb6d0" }}>
+            <p className="mt-[5px] text-[13.5px]" style={{ color: "#5a6b82" }}>
               {esPersona
                 ? "Tus trámites y tus consultas te esperan."
                 : "Tu jurisprudencia y Jus IA te esperan."}
@@ -105,7 +99,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                 entrar();
               }}
             >
-              <CampoNoche
+              <CampoAuth
                 etiqueta="Correo electrónico"
                 tipo="email"
                 nombre="correo"
@@ -121,15 +115,15 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                   <label
                     htmlFor="auth-pass"
                     className="text-[12.5px] font-semibold"
-                    style={{ color: "#c6d6e8" }}
+                    style={{ color: "#33475e" }}
                   >
                     Contraseña
                   </label>
                   <button
                     type="button"
                     onClick={() => ir("recuperar")}
-                    className="cursor-pointer text-[12px] font-semibold transition-colors hover:text-white"
-                    style={{ color: "#5fb0e0" }}
+                    className="cursor-pointer text-[12px] font-semibold transition-colors hover:text-celeste"
+                    style={{ color: "var(--color-celeste)" }}
                   >
                     ¿La olvidaste?
                   </button>
@@ -146,13 +140,13 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                       setPass(e.target.value);
                       setError("");
                     }}
-                    className="input-noche flex-1 rounded-[10px] border py-3 pr-11 pl-3.5 text-[14px] text-white outline-none"
+                    className="input-dia flex-1 rounded-[10px] border py-3 pr-11 pl-3.5 text-[14px] text-marino outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setVerPass(!verPass)}
-                    className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-[12px] font-semibold transition-colors select-none hover:text-white"
-                    style={{ color: "#7f9ec0" }}
+                    className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-[12px] font-semibold transition-colors select-none hover:text-celeste"
+                    style={{ color: "#8095ad" }}
                   >
                     {verPass ? "Ocultar" : "Ver"}
                   </button>
@@ -163,19 +157,19 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                 onClick={() => setRecordar(!recordar)}
                 className="flex cursor-pointer items-center gap-2.5 select-none"
               >
-                <CheckCuadro marcado={recordar} bordeApagado="rgba(255,255,255,.3)" />
-                <span className="text-[13px]" style={{ color: "#9fb6d0" }}>
+                <CheckCuadro marcado={recordar} bordeApagado="#b9c8da" fondoApagado="#fff" />
+                <span className="text-[13px]" style={{ color: "#5a6b82" }}>
                   Mantener la sesión iniciada
                 </span>
               </button>
-              {error && <ErrorNoche mensaje={error} />}
+              {error && <ErrorAuth mensaje={error} />}
               <button
                 type="submit"
                 className="btn-celeste mt-0.5 cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold"
               >
                 Iniciar sesión
               </button>
-              <p className="text-center text-[13px]" style={{ color: "#9fb6d0" }}>
+              <p className="text-center text-[13px]" style={{ color: "#5a6b82" }}>
                 ¿Aún no tienes cuenta?{" "}
                 <Link href={altaHref} className="font-semibold">
                   Crear cuenta
@@ -190,7 +184,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
             <h1 className="font-display mt-6 text-[24px] font-bold tracking-[-.3px]">
               Recupera tu contraseña
             </h1>
-            <p className="mt-[5px] text-[13.5px] leading-[1.55]" style={{ color: "#9fb6d0" }}>
+            <p className="mt-[5px] text-[13.5px] leading-[1.55]" style={{ color: "#5a6b82" }}>
               Te enviaremos un enlace para crear una nueva.
             </p>
             <form
@@ -200,7 +194,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                 enviarEnlace();
               }}
             >
-              <CampoNoche
+              <CampoAuth
                 etiqueta="Correo electrónico"
                 tipo="email"
                 nombre="correo"
@@ -211,7 +205,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                   setError("");
                 }}
               />
-              {error && <ErrorNoche mensaje={error} />}
+              {error && <ErrorAuth mensaje={error} />}
               <button
                 type="submit"
                 className="btn-celeste cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold"
@@ -221,8 +215,8 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
               <button
                 type="button"
                 onClick={() => ir("login")}
-                className="cursor-pointer text-center text-[13px] transition-colors select-none hover:text-white"
-                style={{ color: "#7f9ec0" }}
+                className="cursor-pointer text-center text-[13px] transition-colors select-none hover:text-celeste"
+                style={{ color: "#8095ad" }}
               >
                 ← Volver a iniciar sesión
               </button>
@@ -259,9 +253,9 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
             </h1>
             <p
               className="mt-1.5 max-w-[300px] text-[13.5px] leading-[1.6]"
-              style={{ color: "#9fb6d0" }}
+              style={{ color: "#5a6b82" }}
             >
-              Enviamos un enlace de recuperación a <b className="text-white">{correo}</b>.
+              Enviamos un enlace de recuperación a <b className="text-marino">{correo}</b>.
               Expira en 30 minutos.
             </p>
             <button
@@ -274,8 +268,8 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
             <button
               type="button"
               onClick={enviarEnlace}
-              className="mt-3 cursor-pointer text-[12.5px] transition-colors select-none hover:text-white"
-              style={{ color: "#7f9ec0" }}
+              className="mt-3 cursor-pointer text-[12.5px] transition-colors select-none hover:text-celeste"
+              style={{ color: "#8095ad" }}
             >
               ¿No llegó? Reenviar
             </button>
@@ -285,18 +279,18 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
 
       {vista === "splash" && <SplashJustihn destino={destino} />}
 
-      <p className="relative mt-4 text-[11.5px]" style={{ color: "#5f7ba0" }}>
+      <p className="relative mt-4 text-[11.5px]" style={{ color: "var(--muted)" }}>
         Demo de validación — todavía no se crean cuentas ni sesiones reales.
       </p>
-      <p className="relative mt-2 text-[12px]" style={{ color: "#5f7ba0" }}>
+      <p className="relative mt-2 text-[12px]" style={{ color: "var(--muted)" }}>
         © 2026 Justihn · Honduras
       </p>
     </section>
   );
 }
 
-/** Campo de texto sobre el card glass oscuro. */
-function CampoNoche({
+/** Campo de texto de las pantallas de auth. */
+function CampoAuth({
   etiqueta,
   tipo,
   nombre,
@@ -313,7 +307,7 @@ function CampoNoche({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[12.5px] font-semibold" style={{ color: "#c6d6e8" }}>
+      <span className="text-[12.5px] font-semibold" style={{ color: "#33475e" }}>
         {etiqueta}
       </span>
       <input
@@ -323,21 +317,17 @@ function CampoNoche({
         placeholder={placeholder}
         value={valor}
         onChange={(e) => onCambio(e.target.value)}
-        className="input-noche rounded-[10px] border px-3.5 py-3 text-[14px] text-white outline-none"
+        className="input-dia rounded-[10px] border px-3.5 py-3 text-[14px] text-marino outline-none"
       />
     </label>
   );
 }
 
-function ErrorNoche({ mensaje }: { mensaje: string }) {
+function ErrorAuth({ mensaje }: { mensaje: string }) {
   return (
     <div
       className="rounded-[10px] border px-3.5 py-2.5 text-[12.5px]"
-      style={{
-        background: "rgba(192,57,43,.18)",
-        borderColor: "rgba(240,133,122,.4)",
-        color: "#f5a79e",
-      }}
+      style={{ background: "#fdf1ef", borderColor: "#f2c8c2", color: "#a33b2e" }}
       role="alert"
     >
       {mensaje}
