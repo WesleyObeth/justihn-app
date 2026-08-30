@@ -11,10 +11,16 @@ import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
 import { usePreguntarAJusIA } from "@/hooks/use-preguntar-jus-ia";
 
-/** Preguntas de arranque: las que un litigante hondureño haría de verdad. */
+/**
+ * Tres preguntas de arranque, deliberadamente de MATERIAS DISTINTAS y con
+ * fuentes distintas: Código del Trabajo · Código Procesal Civil más
+ * jurisprudencia real · Instituto de la Propiedad. Su trabajo no es cubrir
+ * las dudas más frecuentes sino enseñar el alcance en un vistazo — por eso se
+ * descartó una segunda pregunta laboral (el tope del auxilio de cesantía),
+ * que habría gastado un espacio repitiendo materia.
+ */
 const SUGERENCIAS = [
   "Prescripción del despido injustificado",
-  "Tope del auxilio de cesantía",
   "Requisitos del proceso monitorio",
   "Inscribir una compraventa en el IP",
 ];

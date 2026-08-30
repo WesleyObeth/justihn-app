@@ -77,14 +77,6 @@ export function LandingProfesional() {
         {/* La caja ES la demostración: pregunta algo real y mira con qué
             fuentes responde. Gemela del buscador de la home ciudadana. */}
         <ComposerJusIA />
-
-        <p className="mt-6 text-[12.5px]" style={{ color: "var(--muted)" }}>
-          Primer mes a {OFERTA.anclaPrimerMes} · anual {OFERTA.descuentoAnual} · sin tarjeta
-          para probar ·{" "}
-          <a href="#planes" className="font-semibold" style={{ color: "var(--mint)" }}>
-            Ver planes
-          </a>
-        </p>
       </section>
 
       {/* ── Cómo cita: el diferencial ── */}
