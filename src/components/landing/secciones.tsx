@@ -396,9 +396,6 @@ export function SeccionConsultorio() {
                 </div>
               );
             })}
-            <Link href="/personas/consultas" className="text-[13px]" style={{ color: "var(--mint)" }}>
-              Ver todas las consultas del consultorio →
-            </Link>
           </div>
         </div>
       </div>

@@ -164,6 +164,8 @@ export const LEADS: Lead[] = [
     respuestas: 1,
     pregunta:
       "Me despidieron después de 4 años sin darme ninguna explicación ni pagarme prestaciones. ¿Qué puedo reclamar y cuánto tiempo tengo?",
+    respuestaDemo:
+      "Te corresponden cesantía, preaviso, vacaciones y aguinaldo proporcionales. Ojo con el plazo: el reclamo por despido injustificado prescribe a los dos meses desde que terminó el contrato (artículo 864 del Código del Trabajo). La Procuraduría del Trabajo asesora gratis, y conviene ir con el cálculo hecho.",
   },
   {
     id: "lead-2407",
@@ -174,6 +176,8 @@ export const LEADS: Lead[] = [
     respuestas: 0,
     pregunta:
       "Mi expareja no cumple con la pensión alimenticia acordada. ¿Cómo puedo exigir el pago?",
+    respuestaDemo:
+      "Puedes pedir la ejecución ante el mismo juzgado que fijó la pensión. Lleva el acta o la sentencia y el detalle de los meses no pagados: el juez puede ordenar la retención directa del salario.",
   },
   {
     id: "lead-2404",
@@ -184,6 +188,8 @@ export const LEADS: Lead[] = [
     respuestas: 3,
     pregunta:
       "Quiero comprar un terreno pero el vendedor solo tiene un documento privado. ¿Es seguro? ¿Qué debo verificar antes?",
+    respuestaDemo:
+      "Un documento privado no te hace dueño. Antes de pagar, pide en el Instituto de la Propiedad la certificación del inmueble para ver quién figura como titular y si tiene gravámenes; la compraventa se formaliza en escritura pública ante notario y se inscribe.",
   },
   {
     id: "lead-2402",
@@ -193,6 +199,8 @@ export const LEADS: Lead[] = [
     nuevo: false,
     respuestas: 2,
     pregunta: "¿Es legal que mi empleador me descuente del salario los faltantes de caja?",
+    respuestaDemo:
+      "No de forma automática. El patrono no puede descontarte del salario a discreción: los descuentos por faltantes exigen que se te haya comprobado responsabilidad y, en general, tu autorización. Guarda tus boletas de pago — son la prueba.",
   },
 ];
 

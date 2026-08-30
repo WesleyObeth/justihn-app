@@ -127,6 +127,14 @@ export interface Lead {
   nuevo: boolean;
   respuestas: number;
   pregunta: string;
+  /**
+   * Respuesta de demostración, para que el consultorio público pueda ENSEÑAR
+   * lo que promete. Sin esto la sección mostraba preguntas sin contestar —
+   * decía "te responde un abogado colegiado" y probaba lo contrario.
+   * ⚙️ Pendiente del socio: revisar estas orientaciones antes de lanzar. Son
+   * generales a propósito y no citan artículos sin verificar.
+   */
+  respuestaDemo?: string;
 }
 
 /** Tabla `notificaciones`. */
