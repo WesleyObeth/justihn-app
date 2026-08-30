@@ -194,13 +194,13 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   operación. Ese orden es lo que no se encuentra googleando (hay que
   reconstruirlo leyendo tres portales del Estado) y es la promesa del producto
   hecha visible: asesoría, no directorio de links.
-  - **Van APILADAS y los chips filtran OCULTANDO, no montando.** Las tres
-    rutas se renderizan siempre y el chip activo esconde las otras con el
-    atributo `hidden`; el estado inicial es "Todas", que es lo que sirve el
-    servidor. Si el filtro montara solo la ruta activa, 4 de las 9 guías no
-    llegarían al HTML — y en esta página eso ya costó un incidente (130 →
-    7.452 caracteres). Verificado: las 3 rutas, las 9 guías y sus costos salen
-    en el SSR, y cero `hidden` en el HTML inicial de la sección.
+  - **Se ve una ruta a la vez** (arranca en "Abrir un negocio") y los chips
+    cambian de categoría. ⚠️ **Filtran OCULTANDO, no montando**: las tres se
+    renderizan siempre y el chip activo esconde las otras con `hidden`. Si se
+    montara solo la activa, 4 de las 9 guías dejarían de existir para el
+    crawler — y en esta página eso ya costó un incidente (130 → 7.452
+    caracteres). Verificado: las 3 rutas y las 9 guías, con sus costos, salen
+    en el HTML del servidor aunque solo se vea una.
   - **Buscar rompe el orden a propósito:** con término, resultados planos —
     quien escribe "RTN" quiere su guía, no la ruta entera. Sin término, rutas.
   - **Fuera el filtro por institución.** Pensaba como burócrata: nadie busca

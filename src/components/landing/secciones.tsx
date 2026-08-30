@@ -87,10 +87,10 @@ export function SeccionTramites({
   termino: string;
   onTermino: (v: string) => void;
 }) {
-  // `null` = todas. Arranca así a propósito: es lo que renderiza el servidor,
-  // así que el crawler y quien no tenga JS ven las 9 guías. El filtro es una
-  // comodidad del cliente, no la manera de llegar al contenido.
-  const [rutaActiva, setRutaActiva] = useState<string | null>(null);
+  // Arranca en la primera ruta (decisión Wesley 2026-08-30): el visitante
+  // entra viendo un recorrido concreto, no un muro de nueve, y va cambiando
+  // de categoría con los chips.
+  const [rutaActiva, setRutaActiva] = useState(RUTAS_TRAMITE[0]!.id);
 
   const administrativos = TRAMITES.filter((t) => t.tipo === "tramite");
   const termino = normalizar(q.trim());
@@ -133,9 +133,6 @@ export function SeccionTramites({
 
       {!buscando && (
         <div className="mt-4 flex flex-wrap justify-center gap-2">
-          <Chip activo={rutaActiva === null} onClick={() => setRutaActiva(null)}>
-            Todas ({administrativos.length})
-          </Chip>
           {RUTAS_TRAMITE.map((r) => (
             <Chip
               key={r.id}
@@ -170,15 +167,12 @@ export function SeccionTramites({
         </div>
       ) : (
         <div className="mx-auto mt-9 flex max-w-[760px] flex-col gap-11">
-          {/* Se renderizan las tres siempre y el filtro las OCULTA, en vez de
-              montar solo la activa: así el HTML del servidor lleva las 9 guías
-              — que es la razón por la que esta sección va apilada. */}
+          {/* Las tres se MONTAN siempre y el chip solo oculta las otras. Aunque
+              se vea una a la vez, el HTML del servidor lleva las nueve guías
+              con su texto — si se montara solo la activa, cuatro de nueve
+              dejarían de existir para el crawler. */}
           {RUTAS_TRAMITE.map((ruta) => (
-            <Ruta
-              key={ruta.id}
-              ruta={ruta}
-              oculta={rutaActiva !== null && rutaActiva !== ruta.id}
-            />
+            <Ruta key={ruta.id} ruta={ruta} oculta={rutaActiva !== ruta.id} />
           ))}
         </div>
       )}
