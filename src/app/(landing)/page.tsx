@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: { absolute: "Justihn — Trámites, procesos y abogados en Honduras" },
   description:
     "Guías de trámites paso a paso, consultorio legal gratuito y abogados por materia. Orientación con fuentes oficiales.",
+  openGraph: { url: "/" },
 };
 
 export default function PaginaHome() {

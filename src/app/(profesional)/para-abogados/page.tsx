@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: { absolute: "Justihn para abogados — jurisprudencia y leyes de Honduras" },
   description:
     "Jurisprudencia del CSJ, códigos, alertas de La Gaceta, modelos de escritos y calculadoras. Cada respuesta con el enlace al documento oficial.",
+  // El enlace que más se comparte por WhatsApp: su `og:url` tiene que ser
+  // esta página, no la home. La imagen la pone `opengraph-image.tsx`.
+  openGraph: { url: "/para-abogados" },
 };
 
 export default function PaginaParaAbogados() {

@@ -175,6 +175,32 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **📲 VISTA PREVIA EN WHATSAPP — tarjetas Open Graph (2026-08-30):** el sitio
+  **no tenía NINGUNA etiqueta Open Graph** (cero `og:*`), así que cada enlace
+  compartido salía como burbuja de texto pelado, sin miniatura — justo el
+  enlace que Wesley y el socio pasan a abogados. Resuelto con:
+  - **`metadataBase`** en el layout raíz (constante `SITIO`, con
+    `NEXT_PUBLIC_SITIO_URL` como override). Sin esto Next emite el `og:image`
+    relativo y WhatsApp no pinta nada. **Al comprar el dominio se cambia AHÍ
+    y en ningún otro lado.**
+  - **Tres tarjetas 1200×630** generadas con `next/og` en el BUILD (rutas
+    estáticas, ~150 KB c/u — WhatsApp descarta las imágenes pesadas): la
+    general (`app/opengraph-image.tsx`, la heredan portal/auth/trámites), la
+    ciudadana (`(landing)/`) y la de abogados (`(profesional)/para-abogados/`).
+    Componente único en **`lib/og/tarjeta.tsx`** — fondo marino del login,
+    lockup oficial, titular, bajada y tres sellos de prueba.
+  - **Fuentes en `app/_og-fuentes/` (TTF, OFL).** satori **no lee woff2**, que
+    es lo único que deja `next/font` en el build: por eso van versionadas.
+  - **`og:url` por página, no global** — un `og:url` fijo en el layout haría
+    que toda página compartida se canonizara como la home. Lo declaran las dos
+    landings; el resto no emite ninguno y vale el enlace que se pegó.
+  - `noindex` **no** afecta esto: el rastreador de WhatsApp lee las Open Graph
+    igual. Son cosas distintas.
+  - **`app/og.test.ts`** (6 tests) fija lo que no se ve leyendo el código: que
+    exista `metadataBase` https, que haya una tarjeta por audiencia con
+    medidas/alt, y que titulares (≤48), sellos (≤24) y los títulos y
+    descripciones compartibles (≤70/≤170) no se corten en la burbuja.
+
 - **🌑 LANDING BLACK — `/para-abogados-black` (2026-08-30):** la MISMA landing
   de la vía A en tema oscuro, para comparar con Wesley cuál versión queda.
   Cero duplicación: la página reutiliza `LandingProfesional` tal cual y el
