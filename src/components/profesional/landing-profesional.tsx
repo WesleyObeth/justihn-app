@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { OFERTA, PLANES } from "@/data/catalogo";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
+import { PieAurora } from "@/components/landing/pie-aurora";
 import { ComposerJusIA } from "@/components/profesional/composer-jus-ia";
 import { DemoGaceta, DemoJusIA, DemoLeads, SeccionDemo } from "@/components/profesional/demos";
 
@@ -445,43 +446,31 @@ export function LandingProfesional() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="mt-6 border-t" style={{ borderColor: "var(--line)" }}>
-        <div className="mx-auto flex max-w-[1080px] flex-wrap items-start justify-between gap-6 px-5 py-10">
-          <div className="max-w-[420px]">
-            <p className="font-display text-[15px] font-bold">Justihn</p>
-            <p className="mt-2 text-[12.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
-              Orientación legal con fuentes oficiales para Honduras. Justihn no sustituye
-              el criterio del profesional: es la herramienta con la que trabaja.
-            </p>
-          </div>
-          <div className="flex gap-10 text-[12.5px]" style={{ color: "var(--muted)" }}>
-            <div className="flex flex-col gap-1.5">
-              <span className="font-semibold" style={{ color: "var(--ink)" }}>
-                Abogados
-              </span>
-              <Link href="/abogados">Portal</Link>
-              <a href="#planes">Planes</a>
-              <a href="#capacidades">Qué incluye</a>
-              <a href="#faq">Preguntas frecuentes</a>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <span className="font-semibold" style={{ color: "var(--ink)" }}>
-                Para personas
-              </span>
-              <Link href="/">Guías y trámites</Link>
-              <Link href="/#consultorio">Consultorio</Link>
-              <Link href="/#directorio">Encuentra abogado</Link>
-            </div>
-          </div>
-        </div>
-        <div
-          className="mx-auto max-w-[1080px] border-t px-5 py-5 text-[11.5px]"
-          style={{ borderColor: "var(--line)", color: "var(--muted)" }}
-        >
-          © 2026 Justihn · Cada cita enlaza a su fuente oficial
-        </div>
-      </footer>
+      <PieAurora
+        descripcion="Orientación legal con fuentes oficiales para Honduras. Justihn no sustituye el criterio del profesional: es la herramienta con la que trabaja."
+        columnas={[
+          {
+            titulo: "Abogados",
+            enlaces: [
+              { href: "#capacidades", label: "Qué incluye" },
+              { href: "#fuentes", label: "Cómo cita" },
+              { href: "#planes", label: "Planes" },
+              { href: "#faq", label: "Preguntas frecuentes" },
+              { href: "/iniciar-sesion", label: "Iniciar sesión" },
+              { href: "/abogados", label: "Portal" },
+            ],
+          },
+          {
+            titulo: "Para personas",
+            enlaces: [
+              { href: "/", label: "Guías y trámites" },
+              { href: "/#consultorio", label: "Consultorio" },
+              { href: "/#directorio", label: "Encuentra abogado" },
+            ],
+          },
+        ]}
+        nota="© 2026 Justihn · Cada cita enlaza a su fuente oficial"
+      />
     </div>
   );
 }

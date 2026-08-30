@@ -306,6 +306,39 @@
   fill: #eef4fb;
 }
 
+/* ── Pie de las landings ──
+   Bloque marino a sangre completa (decisión Wesley 2026-08-30): transparente,
+   la página se deshilachaba sobre el aurora en vez de cerrar. Va por CLASE y
+   no por estilos inline en cada footer, para que las dos audiencias —y la
+   variante black, que usa el mismo componente— no puedan divergir. */
+.pie-aurora {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, #0d2144 0%, #0a1830 100%);
+  border-top: 1px solid rgba(125, 211, 252, 0.16);
+  color: #e2eef8;
+}
+.pie-aurora .pie-desc {
+  color: rgba(226, 238, 248, 0.62);
+  max-width: 42ch;
+}
+.pie-aurora .pie-titulo {
+  color: #ffffff;
+}
+.pie-aurora .pie-enlace {
+  color: rgba(226, 238, 248, 0.72);
+  transition: color 0.2s;
+}
+.pie-aurora .pie-enlace:hover {
+  color: #7dd3fc;
+}
+.pie-aurora .pie-linea {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.pie-aurora .pie-linea p {
+  color: rgba(226, 238, 248, 0.5);
+}
+
 /* ── Utilidades de la landing (contenido z-2, cards glass) ── */
 .landing-contenido {
   position: relative;

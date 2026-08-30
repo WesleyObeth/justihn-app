@@ -23,6 +23,7 @@ import {
 } from "@/components/publico/demos-personas";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
 import { OFERTA, PLANES } from "@/data/catalogo";
+import { PieAurora } from "@/components/landing/pie-aurora";
 
 const POPULARES = ["abrir-rtn", "traspaso-vehiculo", "permiso-operacion", "constituir-sociedad"];
 
@@ -521,40 +522,32 @@ export function LandingContenido() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="mt-10 border-t" style={{ borderColor: "var(--line)" }}>
-        <div className="mx-auto flex max-w-[1080px] flex-wrap items-start justify-between gap-6 px-5 py-10">
-          <div className="max-w-[400px]">
-            <span className="font-display text-[16px] font-bold">Justihn</span>
-            <p className="mt-2 text-[12.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
-              Orientación legal con fuentes oficiales para Honduras. Justihn no es un bufete:
-              las guías son orientación general y no sustituyen la asesoría profesional sobre
-              tu caso concreto.
-            </p>
-          </div>
-          <div className="flex flex-col gap-1.5 text-[12.5px]" style={{ color: "var(--muted)" }}>
-            <span className="text-[11px] font-semibold tracking-[1px] uppercase">Para ti</span>
-            <Link href="#tramites">Guías de trámites</Link>
-            <Link href="#procesos">Procesos legales</Link>
-            <Link href="#consultorio">Consultorio gratuito</Link>
-            <Link href="#directorio">Encuentra abogado</Link>
-            <Link href="#plan">Cuánto cuesta</Link>
-            <Link href="#faq">Preguntas frecuentes</Link>
-            <Link href="/personas">Mi cuenta</Link>
-          </div>
-          <div className="flex flex-col gap-1.5 text-[12.5px]" style={{ color: "var(--muted)" }}>
-            <span className="text-[11px] font-semibold tracking-[1px] uppercase">Abogados</span>
-            <Link href="/abogados">Portal de abogados</Link>
-            <Link href="/abogados/planes">Planes</Link>
-          </div>
-        </div>
-        <div className="border-t" style={{ borderColor: "var(--line)" }}>
-          <p className="mx-auto max-w-[1080px] px-5 py-4 text-[11.5px]" style={{ color: "var(--muted)" }}>
-            Habeas data (art. 182 de la Constitución): revisa o pide la supresión de tus datos —
-            respondemos en 72 horas hábiles. · Justihn (demo de validación)
-          </p>
-        </div>
-      </footer>
+      <PieAurora
+        descripcion="Orientación legal con fuentes oficiales para Honduras. Justihn no es un bufete: las guías son orientación general y no sustituyen la asesoría profesional sobre tu caso concreto."
+        columnas={[
+          {
+            titulo: "Para ti",
+            enlaces: [
+              { href: "#tramites", label: "Guías de trámites" },
+              { href: "#procesos", label: "Procesos legales" },
+              { href: "#consultorio", label: "Consultorio gratuito" },
+              { href: "#directorio", label: "Encuentra abogado" },
+              { href: "#plan", label: "Cuánto cuesta" },
+              { href: "#faq", label: "Preguntas frecuentes" },
+              { href: "/personas", label: "Mi cuenta" },
+            ],
+          },
+          {
+            titulo: "Abogados",
+            enlaces: [
+              { href: "/para-abogados", label: "Justihn para abogados" },
+              { href: "/abogados", label: "Portal de abogados" },
+              { href: "/iniciar-sesion", label: "Iniciar sesión" },
+            ],
+          },
+        ]}
+        nota="Habeas data (art. 182 de la Constitución): revisa o pide la supresión de tus datos — respondemos en 72 horas hábiles. · © 2026 Justihn (demo de validación)"
+      />
     </div>
   );
 }

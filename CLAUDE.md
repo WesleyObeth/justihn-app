@@ -175,6 +175,12 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   - **Footer:** enlaces de sección a anclas de esta página (un visitante sin
     cuenta no cae dentro del portal por accidente; "Portal" sí queda como
     entrada deliberada) + fila de cierre con copyright.
+    **Unificado 2026-08-30 en `components/landing/pie-aurora.tsx`**, que usan
+    las DOS landings (y la black): mismo pie, distinto contenido por props.
+    Es un **bloque marino a sangre** (decisión Wesley) — transparente, la
+    página se deshilachaba sobre el aurora en vez de cerrar. Los tonos viven
+    en `.pie-aurora` (landing.css) y NO se ponen inline: un color inline le
+    ganaría a la clase y dejaría texto marino sobre marino.
   ⚠️ **Trampa de esta landing:** `.landing-aurora a { color: inherit }` le gana
   por especificidad a `text-white` de Tailwind. Cualquier utilidad de color
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
