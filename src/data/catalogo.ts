@@ -52,7 +52,12 @@ export const PLANES: Plan[] = [
       "Soporte por WhatsApp",
     ],
     cuotaIa: 60,
-    destacado: false,
+    // El recomendado (decisión Wesley 2026-08-30): es el que cubre el
+    // ejercicio diario y el escalón de entrada al pago. `destacado` es la
+    // ÚNICA fuente de esa recomendación — de aquí salen la insignia y el
+    // realce en la landing de abogados, en su versión black, en la card
+    // puente de la home ciudadana y en la pantalla de planes del portal.
+    destacado: true,
   },
   {
     id: "premium",
@@ -73,7 +78,7 @@ export const PLANES: Plan[] = [
       "Prioridad en leads del directorio",
     ],
     cuotaIa: null,
-    destacado: true,
+    destacado: false,
   },
 ];
 

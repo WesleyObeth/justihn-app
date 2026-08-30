@@ -155,9 +155,14 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     precio (pago = anual −33% · Gratis = "para siempre — sin tarjeta") para
     que las features arranquen a la misma altura; (b) tagline `resumen` por
     plan, nuevo campo en `Plan`/`data/catalogo.ts` (fuente única); (c) features
-    acumulativas ("Todo lo del plan X, y además:"); (d) Premium destacado con
+    acumulativas ("Todo lo del plan X, y además:"); (d) el plan **recomendado** destacado con
     anillo por box-shadow — NO border-2, que encogería el contenido 1px y
-    desalinearía las cards; (e) los CTAs van a `/crear-cuenta` (antes
+    desalinearía las cards. **Desde 2026-08-30 el recomendado es Profesional**
+    (decisión Wesley; antes Premium): es el escalón de entrada al pago y queda
+    en la card del medio, el patrón clásico de pricing. `destacado` en
+    `data/catalogo.ts` es la ÚNICA fuente — de ahí salen la insignia, el
+    realce y el imán en la landing, en la black, en la card puente de la home
+    ciudadana y en la pantalla de planes del portal; (e) los CTAs van a `/crear-cuenta` (antes
     `/abogados/planes`, que saltaba la puerta de cuenta); (f) nota del ancla
     L25 + anual bajo el grid. El subtítulo ya no dice "todo el contenido está
     en todos los planes" — la card Gratis dice "búsqueda limitada" y se

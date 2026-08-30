@@ -22,20 +22,17 @@ import {
   DemoGuiaTramite,
 } from "@/components/publico/demos-personas";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
-import { getPlan, OFERTA } from "@/data/catalogo";
+import { OFERTA, PLANES } from "@/data/catalogo";
 
 const POPULARES = ["abrir-rtn", "traspaso-vehiculo", "permiso-operacion", "constituir-sociedad"];
 
 /**
- * El plan que enseña el puente hacia la vía A. Es el **Profesional**: el de
- * entrada al pago, no el tope de la escalera.
- * ⚠️ Ojo: en `/para-abogados` la insignia "Recomendado" la lleva Premium
- * (`destacado: true` en el catálogo). Aquí no se pone insignia para no
- * contradecir esa página — si algún día el recomendado pasa a ser Profesional,
- * se cambia `destacado` en `data/catalogo.ts` y las dos páginas se mueven
- * juntas.
+ * El plan que enseña el puente hacia la vía A: se toma **del catálogo**, no
+ * por id, para que sea siempre EL MISMO que `/para-abogados` marca como
+ * recomendado. Si mañana la recomendación cambia, se toca `destacado` en
+ * `data/catalogo.ts` y esta card se mueve sola — nunca al revés.
  */
-const PLAN_PUENTE = getPlan("profesional")!;
+const PLAN_PUENTE = PLANES.find((p) => p.destacado) ?? PLANES[1]!;
 
 /**
  * FAQ de la landing ciudadana: responde a quien AÚN no tiene cuenta. No
@@ -475,12 +472,20 @@ export function LandingContenido() {
                 cuanto cambiara el precio. */}
             <div className="flex flex-col items-start gap-3">
               <div>
-                <span
-                  className="text-[11px] font-bold tracking-[1.2px] uppercase"
-                  style={{ color: "var(--mint)" }}
-                >
-                  Plan {PLAN_PUENTE.nombre}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className="text-[11px] font-bold tracking-[1.2px] uppercase"
+                    style={{ color: "var(--mint)" }}
+                  >
+                    Plan {PLAN_PUENTE.nombre}
+                  </span>
+                  <span
+                    className="rounded-full px-2.5 py-[3px] text-[10.5px] font-bold"
+                    style={{ background: "rgba(21,132,199,.12)", color: "var(--mint)" }}
+                  >
+                    Recomendado
+                  </span>
+                </div>
                 <div className="mt-1 flex items-end gap-1">
                   <span className="font-display text-[30px] leading-none font-bold">
                     {PLAN_PUENTE.precioEtiqueta}
