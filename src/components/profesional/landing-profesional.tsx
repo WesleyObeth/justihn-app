@@ -330,14 +330,18 @@ export function LandingProfesional() {
           {FAQ_LANDING.map((f) => (
             <details
               key={f.pregunta}
-              className="group rounded-[14px] border px-5 py-4"
+              /* El relleno va en el `summary`, no aquí: puesto en el
+                 contenedor, la zona que abre la pregunta medía 20px de alto
+                 —el de la línea de texto— y en el teléfono había que apuntarle.
+                 Con el relleno dentro, se toca la fila entera. */
+              className="group rounded-[14px] border"
               style={{
                 borderColor: "var(--line)",
                 background: "var(--card)",
                 backdropFilter: "blur(6px)",
               }}
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[14.5px] leading-[1.4] font-semibold [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-[14.5px] leading-[1.4] font-semibold [&::-webkit-details-marker]:hidden">
                 {f.pregunta}
                 <span
                   aria-hidden
@@ -348,7 +352,7 @@ export function LandingProfesional() {
                 </span>
               </summary>
               <p
-                className="mt-2.5 text-[13.5px] leading-[1.65]"
+                className="-mt-1 px-5 pb-4 text-[13.5px] leading-[1.65]"
                 style={{ color: "var(--muted)" }}
               >
                 {f.respuesta}
@@ -503,7 +507,13 @@ function Encabezado({
       >
         {eyebrow}
       </p>
-      <h2 className="font-display mt-2 text-center text-[26px] leading-[1.2] font-bold text-balance">
+      {/* El tamaño escala con el ancho en vez de quedarse en 26px fijos: a
+          360px, "La diferencia con preguntarle a una IA cualquiera" caía en
+          TRES líneas y el bloque se desarmaba. El piso de 22px es el umbral
+          medido para que entre en dos —y es el mismo mínimo de los titulares
+          de las secciones de demo, así que en móvil las dos familias de
+          encabezado quedan a la misma altura tipográfica. */}
+      <h2 className="font-display mt-2 text-center text-[clamp(22px,5.8vw,26px)] leading-[1.2] font-bold text-balance">
         {titulo}
       </h2>
       <p
