@@ -33,12 +33,9 @@ export function LandingContenido() {
     <div className="landing-contenido">
       {/* ── Hero ── */}
       <section className="mx-auto max-w-[880px] px-5 pt-[150px] pb-16 text-center md:pt-[176px]">
-        <p className="text-[12px] font-semibold tracking-[2.5px] uppercase" style={{ color: "var(--mint)" }}>
-          Justicia e información legal de Honduras
-        </p>
         {/* Dos líneas fijas en escritorio: el quiebre es de composición, no
             del ancho disponible. En móvil fluye natural. */}
-        <h1 className="font-display mx-auto mt-3 max-w-[860px] text-[clamp(30px,5.5vw,52px)] leading-[1.12] font-bold text-balance">
+        <h1 className="font-display mx-auto max-w-[860px] text-[clamp(30px,5.5vw,52px)] leading-[1.12] font-bold text-balance">
           Tus derechos, tus trámites
           <br className="hidden md:block" />{" "}
           <span>y un abogado cuando lo necesitas</span>
