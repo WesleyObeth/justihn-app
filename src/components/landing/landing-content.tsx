@@ -312,7 +312,7 @@ export function LandingContenido() {
             </ul>
 
             <Link
-              href="/personas"
+              href="/crear-cuenta?tipo=persona"
               className="magnetic mt-5 rounded-[10px] py-2.5 text-center text-[13.5px] font-semibold"
               style={{ background: "var(--turq)", color: "#fff" }}
             >
@@ -412,7 +412,7 @@ export function LandingContenido() {
                   `.landing-aurora a { color: inherit }`, que por especificidad
                   le gana a `text-white` de Tailwind. */}
               <Link
-                href="/personas"
+                href="/crear-cuenta?tipo=persona"
                 className="magnetic inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold transition-opacity hover:opacity-90"
                 style={{ background: "var(--turq)", color: "#fff" }}
               >
@@ -542,7 +542,8 @@ export function LandingContenido() {
             enlaces: [
               { href: "/para-abogados", label: "Justihn para abogados" },
               { href: "/abogados", label: "Portal de abogados" },
-              { href: "/iniciar-sesion", label: "Iniciar sesión" },
+              { href: "/iniciar-sesion", label: "Entrar como abogado" },
+              { href: "/iniciar-sesion?tipo=persona", label: "Iniciar sesión" },
             ],
           },
         ]}

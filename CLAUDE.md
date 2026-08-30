@@ -304,6 +304,25 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     muestra el logo terminado). La geometría del handoff resultó idéntica a la
     oficial de `brand/logos.tsx`, y sus fuentes (Space Grotesk títulos +
     Instrument Sans UI) son las que el proyecto ya tenía — cero tokens nuevos.
+  - **🔗 LOGIN COMPARTIDO POR LAS DOS VÍAS (2026-08-30, decisión Wesley):**
+    `/iniciar-sesion` sirve a abogados y a personas. Es UNA base de cuentas:
+    dos logins duplicarían recuperación, enlaces mágicos, rate limit y errores,
+    y sobre todo obligarían a acertar por qué puerta se registró uno — quien
+    elige mal ve "no existe esa cuenta" y se va creyendo que perdió su
+    registro. **El alta sí es distinta** y por eso `?tipo=persona` solo cambia
+    el copy, el placeholder del correo, a qué alta manda y a qué portal entra;
+    nunca lo que se pide para entrar. En **Fase 2 el parámetro sobra**: el
+    destino lo resuelve la cuenta (¿tiene ficha de abogado? → `/abogados`).
+  - **Alta ciudadana corta** (`components/auth/registro-persona.tsx`, en
+    `/crear-cuenta?tipo=persona`): nombre, correo y contraseña. El abogado pasa
+    por tres pasos porque el producto necesita colegiación, materias y
+    solvencia; a un ciudadano eso lo espantaría y su portal no usa ninguno de
+    esos datos. `components/auth/alta.tsx` es la puerta única que elige
+    formulario — una sola URL, haciendo pareja con el login.
+  - **`hooks/use-busqueda-url.ts`**: `?tipo=` se lee con `useSyncExternalStore`
+    sobre `window.location.search`, NO con `useSearchParams` (ese hook bajo
+    Suspense vació el HTML de la home — ver el incidente de SSR). El helper
+    que ya estaba duplicado en `secciones.tsx` se movió aquí.
   - **Honestidad Fase 1:** ambas pantallas validan formato y entran con la
     sesión demo; nota visible bajo el card ("todavía no se crean cuentas
     reales") y `TODO(auth)` con el cableado Supabase exacto en cada archivo.

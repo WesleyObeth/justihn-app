@@ -25,7 +25,7 @@ const ENLACES_CIUDADANO: EnlaceNav[] = [
 export function NavAurora({
   enlaces = ENLACES_CIUDADANO,
   secundario = { href: "/para-abogados", label: "Para abogados" },
-  cta = { href: "/personas", label: "Crear cuenta gratis" },
+  cta = { href: "/crear-cuenta?tipo=persona", label: "Crear cuenta gratis" },
   logoVariante = "claro",
 }: {
   enlaces?: EnlaceNav[];

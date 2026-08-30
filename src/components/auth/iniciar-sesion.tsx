@@ -5,24 +5,45 @@
  * card glass sobre el aurora oscuro, con recuperación de contraseña y el
  * splash del logo al entrar.
  *
+ * **Una sola pantalla para las DOS vías** (decisión Wesley 2026-08-30). Es una
+ * sola base de cuentas: dos logins significarían duplicar recuperación,
+ * enlaces mágicos, rate limit y errores, y sobre todo obligarían a la persona
+ * a acertar por qué puerta se registró — quien elige mal ve "no existe esa
+ * cuenta" y se va creyendo que perdió su registro. **El registro sí es
+ * distinto** (el abogado aporta colegiación, materias y solvencia; la persona,
+ * nombre y correo), y por eso `?tipo=` solo decide el copy, a qué alta manda y
+ * a qué portal entra — nunca lo que se le pide para entrar.
+ *
  * ⚠️ FASE 1 — sin autenticación real: valida formato y entra con la sesión de
- * demostración (splash → /abogados). La nota bajo el card lo dice.
+ * demostración. Como no hay cuenta que consultar, el destino sale del origen
+ * (`?tipo=persona`); en Fase 2 lo decide la cuenta y el parámetro sobra.
  *
  * TODO(auth): Supabase Auth (blueprint §4, plataforma/CLAUDE.md §7.2) —
  * `signInWithPassword` + `resetPasswordForEmail` para "¿La olvidaste?", sesión
  * en cookie y RLS por `abogado_id`. Al cablearlo, `entrar()` deja de ser
- * simulado; el splash y la navegación quedan igual.
+ * simulado y el destino se resuelve consultando el perfil: si la cuenta tiene
+ * ficha de abogado va a `/abogados`, si no a `/personas`. El splash y la
+ * navegación quedan igual.
  */
 import Link from "next/link";
 import { useState } from "react";
 import { LogoJustihn } from "@/components/brand/logos";
 import { SplashJustihn } from "@/components/auth/splash";
+import { useParametroUrl } from "@/hooks/use-busqueda-url";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Vista = "login" | "recuperar" | "enviado" | "splash";
 
 export function PantallaIniciarSesion() {
+  // De dónde viene. Solo personaliza; nunca cambia lo que se pide para entrar.
+  const esPersona = useParametroUrl("tipo") === "persona";
+  const destino = esPersona ? "/personas" : "/abogados";
+  const altaHref = esPersona ? "/crear-cuenta?tipo=persona" : "/crear-cuenta";
+  // Hasta el placeholder delata la audiencia: "nombre@bufete.hn" le dice a un
+  // ciudadano que se equivocó de sitio.
+  const ejemploCorreo = esPersona ? "tucorreo@ejemplo.com" : "nombre@bufete.hn";
+
   const [vista, setVista] = useState<Vista>("login");
   const [correo, setCorreo] = useState("");
   const [pass, setPass] = useState("");
@@ -73,7 +94,9 @@ export function PantallaIniciarSesion() {
               Inicia sesión
             </h1>
             <p className="mt-[5px] text-[13.5px]" style={{ color: "#9fb6d0" }}>
-              Tu jurisprudencia y Jus IA te esperan.
+              {esPersona
+                ? "Tus trámites y tus consultas te esperan."
+                : "Tu jurisprudencia y Jus IA te esperan."}
             </p>
             <form
               className="mt-6 flex flex-col gap-3.5"
@@ -86,7 +109,7 @@ export function PantallaIniciarSesion() {
                 etiqueta="Correo electrónico"
                 tipo="email"
                 nombre="correo"
-                placeholder="nombre@bufete.hn"
+                placeholder={ejemploCorreo}
                 valor={correo}
                 onCambio={(v) => {
                   setCorreo(v);
@@ -154,7 +177,7 @@ export function PantallaIniciarSesion() {
               </button>
               <p className="text-center text-[13px]" style={{ color: "#9fb6d0" }}>
                 ¿Aún no tienes cuenta?{" "}
-                <Link href="/crear-cuenta" className="font-semibold">
+                <Link href={altaHref} className="font-semibold">
                   Crear cuenta
                 </Link>
               </p>
@@ -181,7 +204,7 @@ export function PantallaIniciarSesion() {
                 etiqueta="Correo electrónico"
                 tipo="email"
                 nombre="correo"
-                placeholder="nombre@bufete.hn"
+                placeholder={ejemploCorreo}
                 valor={correo}
                 onCambio={(v) => {
                   setCorreo(v);
@@ -260,7 +283,7 @@ export function PantallaIniciarSesion() {
         )}
       </div>
 
-      {vista === "splash" && <SplashJustihn />}
+      {vista === "splash" && <SplashJustihn destino={destino} />}
 
       <p className="relative mt-4 text-[11.5px]" style={{ color: "#5f7ba0" }}>
         Demo de validación — todavía no se crean cuentas ni sesiones reales.

@@ -7,7 +7,8 @@
  * consultorio — sobre el tema aurora claro.
  */
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useState } from "react";
+import { useBusquedaUrl } from "@/hooks/use-busqueda-url";
 import { Icono } from "@/components/brand/iconos";
 import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
 import { getInstitucion, INSTITUCIONES, TRAMITES } from "@/data/tramites";
@@ -317,21 +318,9 @@ type FiltroDirectorio =
 
 const MATERIAS_DIRECTORIO = [...new Set(DIRECTORIO.flatMap((a) => a.materias))];
 
-/**
- * `window.location.search` leído con `useSyncExternalStore`, no con
- * `useSearchParams`. Motivo: ese hook, bajo un Suspense, hace que Next
- * abandone el prerenderizado del subárbol — la home salía VACÍA en el HTML,
- * justo el contenido que es el motor de captación del producto. Aquí el
- * servidor devuelve "" (sin filtro) y el cliente el valor real, que es
- * exactamente el contrato de este hook.
- */
-const sinSuscripcion = () => () => {};
-const leerBusqueda = () => window.location.search;
-const busquedaEnServidor = () => "";
-
 export function SeccionDirectorio() {
   const mostrarToast = usePortal((s) => s.mostrarToast);
-  const busqueda = useSyncExternalStore(sinSuscripcion, leerBusqueda, busquedaEnServidor);
+  const busqueda = useBusquedaUrl();
   // Cuando el usuario toca un chip, su elección manda sobre la URL.
   const [filtroUsuario, setFiltroUsuario] = useState<FiltroDirectorio | null>(null);
 

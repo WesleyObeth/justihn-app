@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { PantallaOnboarding } from "@/components/auth/onboarding";
+import { PantallaAlta } from "@/components/auth/alta";
 
 export const metadata: Metadata = {
   title: "Crear cuenta",
   description:
-    "Crea tu cuenta de Justihn en tres pasos: cuenta, validación profesional con el CAH y tus materias de práctica.",
+    "Crea tu cuenta de Justihn. El alta profesional pide colegiación y materias; la de personas, solo tu nombre y correo.",
 };
 
 export default function PaginaCrearCuenta() {
-  return <PantallaOnboarding />;
+  return <PantallaAlta />;
 }

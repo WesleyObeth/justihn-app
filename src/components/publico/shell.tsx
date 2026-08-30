@@ -52,7 +52,7 @@ export function HeaderPublico() {
           Soy abogado
         </Link>
         <Link
-          href="/personas"
+          href="/crear-cuenta?tipo=persona"
           className="rounded-lg bg-celeste px-3.5 py-2 text-[12.5px] font-semibold whitespace-nowrap text-white hover:bg-cruce"
         >
           Crear cuenta gratis
