@@ -137,32 +137,6 @@ export function LandingContenido() {
         </div>
       </section>
 
-      {/* ── Por qué confiar: el mismo papel que "Cómo cita" en la vía A ── */}
-      <section id="fuentes" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-14">
-        <TituloSeccion
-          eyebrow="Por qué confiar"
-          titulo="Orientación con la fuente a la vista"
-          desc="En temas legales el problema no es la falta de información, es no saber cuál es cierta. Aquí cada dato dice de dónde salió."
-        />
-        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Pilar
-            icono="check"
-            titulo="Cada dato con su fuente"
-            desc={`Requisitos, costos y plazos salidos del portal de cada una de las ${INSTITUCIONES.length} instituciones que cubrimos. Cada guía enlaza al documento oficial para que lo verifiques.`}
-          />
-          <Pilar
-            icono="leads"
-            titulo="Preguntar no cuesta"
-            desc="El consultorio es gratis y la respuesta es pública: te contesta un abogado colegiado, no un formulario automático."
-          />
-          <Pilar
-            icono="ubicacion"
-            titulo="Hecho para Honduras"
-            desc="SAR, Instituto de la Propiedad, ARSA, ONCAE, alcaldías y juzgados de aquí — no consejos generales de otro país."
-          />
-        </div>
-      </section>
-
       {/* ── Puertas de entrada ── */}
       <section className="mx-auto max-w-[1080px] px-5 py-14">
         <TituloSeccion
@@ -172,25 +146,21 @@ export function LandingContenido() {
         />
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Puerta
-            href="#tramites"
             icono="pasos"
             titulo="Hacer un trámite"
             desc="RTN, traspasos, permisos y licencias — paso a paso, con requisitos y costos."
           />
           <Puerta
-            href="#procesos"
             icono="juris"
             titulo="Enfrentar un proceso"
             desc="Me despidieron, pensión alimenticia, divorcio o herencia — el paso a paso y tu abogado."
           />
           <Puerta
-            href="#consultorio"
             icono="leads"
             titulo="Resolver una duda"
             desc="Pregunta gratis en el consultorio y un abogado colegiado te orienta en público."
           />
           <Puerta
-            href="#directorio"
             icono="perfil"
             titulo="Encontrar abogado"
             desc="Por materia y ciudad, con perfiles validados: laboral, familia, mercantil y más."
@@ -553,19 +523,24 @@ export function LandingContenido() {
   );
 }
 
+/**
+ * Card de orientación, NO navegable (decisión Wesley 2026-08-30): resume lo
+ * que el sitio resuelve. Antes era un enlace con "Empezar →" y competía con
+ * las secciones reales que vienen justo debajo — el visitante decidía dos
+ * veces lo mismo. Por eso también lleva `glass-card--estatica`: sin el hover
+ * que levanta la card, que en algo no clicable es una promesa falsa.
+ */
 function Puerta({
-  href,
   icono,
   titulo,
   desc,
 }: {
-  href: string;
   icono: "pasos" | "juris" | "leads" | "perfil";
   titulo: string;
   desc: string;
 }) {
   return (
-    <Link href={href} className="glass-card block p-6">
+    <div className="glass-card glass-card--estatica block p-6">
       <span
         className="grid h-11 w-11 place-items-center rounded-xl"
         style={{ background: "rgba(21,132,199,0.1)", color: "var(--mint)" }}
@@ -574,35 +549,6 @@ function Puerta({
       </span>
       <div className="font-display mt-3.5 text-[17px] font-bold">{titulo}</div>
       <p className="mt-1.5 text-[13px] leading-[1.6]" style={{ color: "var(--muted)" }}>
-        {desc}
-      </p>
-      <div className="mt-3 text-[13px] font-medium" style={{ color: "var(--mint)" }}>
-        Empezar →
-      </div>
-    </Link>
-  );
-}
-
-/** Pilar de confianza — gemelo del de la landing de abogados. */
-function Pilar({
-  icono,
-  titulo,
-  desc,
-}: {
-  icono: "check" | "leads" | "ubicacion";
-  titulo: string;
-  desc: string;
-}) {
-  return (
-    <div className="glass-card p-6">
-      <span
-        className="grid h-10 w-10 place-items-center rounded-full"
-        style={{ background: "rgba(21,132,199,.1)", color: "var(--mint)" }}
-      >
-        <Icono nombre={icono} size={18} strokeWidth={2.2} />
-      </span>
-      <h3 className="mt-3.5 text-[15px] font-bold">{titulo}</h3>
-      <p className="mt-1.5 text-[13px] leading-[1.65]" style={{ color: "var(--muted)" }}>
         {desc}
       </p>
     </div>

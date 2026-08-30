@@ -358,3 +358,10 @@
   border-color: rgba(21, 132, 199, 0.45);
   transform: translateY(-2px);
 }
+/* Card informativa: mantiene la superficie glass pero NO reacciona al ratón.
+   Levantarse al pasar por encima es una promesa de clic — en algo que no
+   navega, el usuario la intenta y no pasa nada. */
+.glass-card--estatica:hover {
+  border-color: var(--line);
+  transform: none;
+}
