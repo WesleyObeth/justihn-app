@@ -17,9 +17,10 @@ function hasWebGL(): boolean {
   }
 }
 
-export function FondoAurora() {
+export function FondoAurora({ variante = "clara" }: { variante?: "clara" | "noche" }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [fallback, setFallback] = useState(false);
+  const noche = variante === "noche";
 
   useEffect(() => {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -30,14 +31,37 @@ export function FondoAurora() {
     let api: { dispose: () => void } | null = null;
     if (canvas.current && hasWebGL() && !reduced) {
       try {
-        api = initAurora(canvas.current, { lowPerf, light: true });
+        api = initAurora(canvas.current, { lowPerf, light: !noche });
       } catch {
         api = null;
       }
     }
     if (!api) setFallback(true);
     return () => api?.dispose();
-  }, []);
+  }, [noche]);
+
+  if (noche) {
+    // Variante de las pantallas de auth (handoff design_handoff_auth): el
+    // shader dibuja su propio navy opaco, así que no lleva capas claras ni
+    // scrim — solo el canvas sobre el gradiente del shell, y un resplandor
+    // estático si no hay WebGL.
+    return (
+      <>
+        <canvas
+          ref={canvas}
+          className="funnel-bg funnel-bg--noche"
+          style={fallback ? { display: "none" } : undefined}
+          aria-hidden
+        />
+        <div
+          className="funnel-fallback funnel-fallback--noche"
+          style={fallback ? { display: "block" } : undefined}
+        >
+          <i />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

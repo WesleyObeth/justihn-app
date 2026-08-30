@@ -192,6 +192,27 @@
   }
 }
 
+/* ── Variante noche (pantallas de auth: login + onboarding) ──
+   Mismo canvas aurora pero con el shader en modo oscuro (uLight=0), sobre el
+   gradiente navy del handoff. El canvas va a opacidad plena: el shader pinta
+   su propio fondo. */
+.landing-aurora--noche {
+  background: linear-gradient(160deg, #0d2144 0%, #0a1830 55%, #0e2a52 100%);
+  color: #e8eef6;
+}
+.landing-aurora--noche a {
+  color: #5fb0e0;
+}
+.landing-aurora--noche a:hover {
+  color: #fff;
+}
+.funnel-bg--noche {
+  opacity: 1;
+}
+.funnel-fallback--noche i {
+  background: radial-gradient(50% 50% at 50% 50%, rgba(21, 132, 199, 0.28), transparent 70%);
+}
+
 /* ── Utilidades de la landing (contenido z-2, cards glass) ── */
 .landing-contenido {
   position: relative;

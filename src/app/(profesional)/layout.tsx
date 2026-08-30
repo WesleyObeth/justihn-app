@@ -23,7 +23,7 @@ export default function LayoutProfesional({ children }: { children: React.ReactN
           { href: "#faq", label: "Preguntas" },
         ]}
         secundario={{ href: "/", label: "Para personas" }}
-        cta={{ href: "/abogados", label: "Entrar al portal" }}
+        cta={{ href: "/iniciar-sesion", label: "Iniciar sesión" }}
       />
       {children}
       <Toast />

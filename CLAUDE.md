@@ -2,8 +2,8 @@
 
 > Cerebro técnico del portal. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-30** (end-to-end de
-> `/para-abogados`: simetría, planes rediseñados y sección FAQ).
+> Creado: **2026-08-25** · Última actualización: **2026-08-30** (auth:
+> iniciar sesión + onboarding de abogado desde `design_handoff_auth`).
 
 ---
 
@@ -174,6 +174,40 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   por especificidad a `text-white` de Tailwind. Cualquier utilidad de color
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
+
+- **🔐 AUTH CONSTRUIDO — `/iniciar-sesion` + `/crear-cuenta` (2026-08-30):**
+  las dos pantallas del handoff **`../design_handoff_auth/`** (Claude Design,
+  copiado del Desktop de Wesley — es la fuente de verdad visual de auth),
+  recreadas pixel-perfect en el grupo **`(auth)`** con shell propio: el aurora
+  en variante **noche** (nuevo prop `variante` en `FondoAurora` — shader con
+  `uLight=0` sobre gradiente navy, sin scrim ni capas claras; clases
+  `.landing-aurora--noche` en `landing.css`) y sin navegación.
+  - **`/iniciar-sesion`** (`components/auth/iniciar-sesion.tsx`): card glass
+    oscuro con login, recuperar contraseña y "enlace enviado".
+  - **`/crear-cuenta`** (`components/auth/onboarding.tsx`): **reemplaza la
+    maqueta anterior** (misma URL, se borró `profesional/crear-cuenta.tsx`).
+    Onboarding en 3 pasos (Cuenta con medidor de fuerza · Validación CAH
+    opcional con dropzone · Materias en chips, 14 áreas de práctica — más
+    amplias que las 6 del corpus) + bienvenida con resumen y checklist. La
+    **`consultaPendiente` del composer se conserva**: se muestra sobre el card
+    ("Tu pregunta te espera") y se dispara al llegar al chat, igual que antes.
+  - **Splash compartido** (`components/auth/splash.tsx`): el logo se arma en
+    secuencia (pop → páginas 0°→±26° → cruce → wordmark) y a los 5 s navega a
+    `/abogados`. La capa final es `SimboloJustihn` — un solo dibujo del logo,
+    sin drift; keyframes en `components/auth/auth.css` (con reduced-motion
+    muestra el logo terminado). La geometría del handoff resultó idéntica a la
+    oficial de `brand/logos.tsx`, y sus fuentes (Space Grotesk títulos +
+    Instrument Sans UI) son las que el proyecto ya tenía — cero tokens nuevos.
+  - **Honestidad Fase 1:** ambas pantallas validan formato y entran con la
+    sesión demo; nota visible bajo el card ("todavía no se crean cuentas
+    reales") y `TODO(auth)` con el cableado Supabase exacto en cada archivo.
+  - El CTA de la nav de `/para-abogados` pasó de "Entrar al portal"
+    (→ `/abogados` directo) a **"Iniciar sesión"** (→ `/iniciar-sesion`); la
+    entrada directa al portal sigue en el CTA final ("Ver el portal por
+    dentro") para las demos con el socio.
+  - Trampa de contraste: `.landing-aurora--noche a` pinta los links
+    celeste-claro — dentro del card BLANCO del onboarding serían ilegibles;
+    `.card-dia` los devuelve al celeste de marca.
 
 - **🎨 MARCA — favicon y lockup corregidos (2026-08-29):** el favicon no era
   el símbolo oficial sino una versión aparte, con **otra geometría** (barras más
@@ -393,7 +427,9 @@ que se coló en tres páginas a la vez).
   como tales).
 - Los `art. ___` de los procesos son marcadores deliberados hasta cargar los
   códigos (backlog #5 del proyecto).
-- No hay pantalla de login: el portal asume sesión demo.
+- Login y onboarding EXISTEN desde 2026-08-30 (`/iniciar-sesion`,
+  `/crear-cuenta`) pero son maqueta: validan formato y entran con la sesión
+  demo — el portal sigue sin auth real hasta cablear Supabase (§7.2).
 - Responsive móvil **base** hecho (2026-08-25): header con hamburguesa + drawer
   (`HeaderMovil`/`CapaMenuMovil` en `sidebar.tsx`, corte en `lg`) y grids
   apilados en todas las vistas. Falta pulido fino (tablas del chat, editor de

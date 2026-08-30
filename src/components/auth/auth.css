@@ -1,0 +1,182 @@
+/* Pantallas de autenticación (login + onboarding) — handoff design_handoff_auth.
+   Solo lo que Tailwind no expresa: los keyframes del splash del logo y el
+   fadeUp de transición entre pasos/vistas. Los valores (duraciones, easings,
+   delays) son los del handoff, verbatim. */
+
+@keyframes authFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.auth-fadeup {
+  animation: authFadeUp 0.3s ease;
+}
+.auth-fadeup-card {
+  animation: authFadeUp 0.35s ease;
+}
+
+/* ── Inputs ──
+   noche = card glass del login · dia = card blanco del onboarding.
+   Focus con anillo del handoff; el color base del texto lo pone el componente. */
+.input-noche {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.input-noche::placeholder {
+  color: rgba(232, 238, 246, 0.4);
+}
+.input-noche:focus {
+  border-color: #5fb0e0;
+  box-shadow: 0 0 0 3px rgba(21, 132, 199, 0.25);
+}
+.input-dia {
+  border-color: #d5dde8;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.input-dia::placeholder {
+  color: #9aabc0;
+}
+.input-dia:focus {
+  border-color: #1584c7;
+  box-shadow: 0 0 0 3px rgba(21, 132, 199, 0.14);
+}
+
+/* El shell noche pinta los <a> celeste-claro (#5fb0e0) — ilegible dentro del
+   card BLANCO del onboarding. Ahí los links vuelven al celeste de marca. */
+.card-dia a {
+  color: #1584c7;
+}
+.card-dia a:hover {
+  color: #5fb0e0;
+}
+
+/* ── Botones primarios del handoff ── */
+.btn-celeste {
+  background: #1584c7;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(21, 132, 199, 0.35);
+  transition: all 0.2s ease;
+}
+.btn-celeste:hover {
+  background: #2f97d6;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(21, 132, 199, 0.55);
+}
+.btn-celeste:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 18px rgba(21, 132, 199, 0.4);
+}
+.btn-marino {
+  background: #0d2144;
+  color: #fff;
+  transition: background 0.2s ease;
+}
+.btn-marino:hover {
+  background: #1584c7;
+}
+
+/* ── Splash del logo: pop → páginas se abren → cruce → wordmark → texto ── */
+@keyframes obPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes obPageL {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-26deg);
+  }
+}
+@keyframes obPageR {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(26deg);
+  }
+}
+@keyframes obCross {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes obWord {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes obFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.splash-pop {
+  animation: obPop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) both;
+}
+.splash-pagina-izq {
+  transform-origin: 17px 21px;
+  animation: obPageL 1.5s cubic-bezier(0.3, 0, 0.2, 1) 0.6s both;
+}
+.splash-pagina-der {
+  transform-origin: 31px 21px;
+  animation: obPageR 1.5s cubic-bezier(0.3, 0, 0.2, 1) 0.6s both;
+}
+.splash-cruce {
+  animation: obCross 0.45s ease 2s both;
+}
+.splash-wordmark {
+  animation: obWord 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) 2.4s both;
+}
+.splash-texto {
+  animation: obFadeIn 0.6s ease 3.2s both;
+}
+
+/* Con reduced-motion el splash no anima: muestra el logo terminado y el texto,
+   y el redirect de 5 s sigue su curso. */
+@media (prefers-reduced-motion: reduce) {
+  .splash-pop,
+  .splash-pagina-izq,
+  .splash-pagina-der,
+  .splash-cruce,
+  .splash-wordmark,
+  .splash-texto,
+  .auth-fadeup,
+  .auth-fadeup-card {
+    animation: none;
+  }
+  .splash-pagina-izq {
+    transform: rotate(-26deg);
+  }
+  .splash-pagina-der {
+    transform: rotate(26deg);
+  }
+}
