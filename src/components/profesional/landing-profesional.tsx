@@ -249,25 +249,85 @@ export function LandingProfesional() {
         </div>
       </section>
 
-      {/* ── CTA final ── */}
-      <section className="mx-auto max-w-[1080px] px-5 py-14">
-        <div className="glass-card flex flex-wrap items-center justify-between gap-6 p-8">
-          <div className="min-w-[280px] flex-1">
-            <h2 className="font-display text-[22px] leading-[1.3] font-bold">
-              Entra y pruébalo antes de decidir
+      {/* ── CTA final ──────────────────────────────────────────────────────
+          Único bloque oscuro de la página, a propósito: después de recorrer
+          todo en claro, el momento de decidir tiene su propio peso visual.
+          El marino es el mismo del sidebar del portal — al que lleva. */}
+      <section className="mx-auto max-w-[1080px] px-5 py-16">
+        <div
+          className="relative overflow-hidden rounded-[24px] px-6 py-14 text-center md:px-14"
+          style={{
+            background: "linear-gradient(160deg,#0d2144 0%,#0a1830 55%,#08142a 100%)",
+            border: "1px solid rgba(125,211,252,.16)",
+          }}
+        >
+          {/* Resplandor celeste: eco del fondo aurora, ahora sobre marino. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(60% 55% at 50% 0%, rgba(21,132,199,.35) 0%, transparent 70%)",
+            }}
+          />
+          <div className="relative">
+            <p
+              className="text-[11.5px] font-bold tracking-[2.5px] uppercase"
+              style={{ color: "#7dd3fc" }}
+            >
+              Tu próximo caso
+            </p>
+            <h2 className="font-display mx-auto mt-4 max-w-[720px] text-[clamp(26px,4vw,42px)] leading-[1.14] font-bold text-balance text-white">
+              Tu próxima búsqueda ya no empieza en Google.
             </h2>
-            <p className="mt-2 text-[13.5px]" style={{ color: "var(--muted)" }}>
-              El portal está abierto para que lo recorras. Justihn está en validación con
-              abogados del gremio: si algo te falta, queremos oírlo antes de construirlo.
+            <p
+              className="mx-auto mt-4 max-w-[540px] text-[15px] leading-[1.65]"
+              style={{ color: "rgba(226,238,248,.72)" }}
+            >
+              Crea tu cuenta gratis y pregúntale a Jus IA una duda real del caso que
+              tienes encima. Si no encuentra la fuente te lo va a decir — eso también es
+              información.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              {/* ⚠️ El color va INLINE, no con `text-white`: la landing define
+                  `.landing-aurora a { color: inherit }`, que por especificidad
+                  le gana a las utilidades de Tailwind y dejaba el texto marino
+                  sobre el botón azul. */}
+              <Link
+                href="/crear-cuenta"
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold transition-opacity hover:opacity-90"
+                style={{ background: "var(--turq)", color: "#fff" }}
+              >
+                Crear cuenta gratis
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </Link>
+              <Link
+                href="/abogados"
+                className="rounded-full border px-7 py-3.5 text-[14.5px] font-semibold transition-colors"
+                style={{ borderColor: "rgba(226,238,248,.32)", color: "#e2eef8" }}
+              >
+                Ver el portal por dentro
+              </Link>
+            </div>
+
+            <p className="mt-6 text-[12.5px]" style={{ color: "rgba(226,238,248,.55)" }}>
+              Plan Gratis sin caducidad · primer mes a {OFERTA.anclaPrimerMes} · anual{" "}
+              {OFERTA.descuentoAnual}
             </p>
           </div>
-          <Link
-            href="/abogados"
-            className="rounded-[12px] px-6 py-3.5 text-[14.5px] font-semibold text-white"
-            style={{ background: "var(--turq)" }}
-          >
-            Entrar al portal
-          </Link>
         </div>
       </section>
 
