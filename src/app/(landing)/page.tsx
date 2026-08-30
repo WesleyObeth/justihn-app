@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { LandingContenido } from "@/components/landing/landing-content";
 
 export const metadata: Metadata = {
@@ -9,10 +8,8 @@ export const metadata: Metadata = {
 };
 
 export default function PaginaHome() {
-  return (
-    // Suspense: el directorio lee `?materia=` para llegar filtrado.
-    <Suspense fallback={null}>
-      <LandingContenido />
-    </Suspense>
-  );
+  // Sin Suspense a propósito: envolver la landing entera hacía que Next
+  // emitiera el fallback (null) en el HTML estático. El contenido de la home
+  // tiene que llegar al crawler — es el motor de captación del producto.
+  return <LandingContenido />;
 }

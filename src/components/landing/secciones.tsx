@@ -7,8 +7,7 @@
  * consultorio — sobre el tema aurora claro.
  */
 import Link from "next/link";
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { Icono } from "@/components/brand/iconos";
 import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
 import { getInstitucion, INSTITUCIONES, TRAMITES } from "@/data/tramites";
@@ -310,21 +309,51 @@ export function SeccionConsultorio() {
 
 // ── Sección Directorio ─────────────────────────────────────────────────────
 
+/** Filtro del directorio: puede venir de la URL o de un clic del usuario. */
+type FiltroDirectorio =
+  | { tipo: "todas" }
+  | { tipo: "materia"; materia: Materia }
+  | { tipo: "notarios" };
+
+const MATERIAS_DIRECTORIO = [...new Set(DIRECTORIO.flatMap((a) => a.materias))];
+
+/**
+ * `window.location.search` leído con `useSyncExternalStore`, no con
+ * `useSearchParams`. Motivo: ese hook, bajo un Suspense, hace que Next
+ * abandone el prerenderizado del subárbol — la home salía VACÍA en el HTML,
+ * justo el contenido que es el motor de captación del producto. Aquí el
+ * servidor devuelve "" (sin filtro) y el cliente el valor real, que es
+ * exactamente el contrato de este hook.
+ */
+const sinSuscripcion = () => () => {};
+const leerBusqueda = () => window.location.search;
+const busquedaEnServidor = () => "";
+
 export function SeccionDirectorio() {
   const mostrarToast = usePortal((s) => s.mostrarToast);
-  // `?materia=` y `?notarios=1` permiten llegar filtrado desde un paso de guía.
-  const params = useSearchParams();
-  const materiaUrl = params.get("materia") as Materia | null;
-  const [materia, setMateria] = useState<Materia | "todas">(materiaUrl ?? "todas");
-  const [soloNotarios, setSoloNotarios] = useState(params.get("notarios") === "1");
+  const busqueda = useSyncExternalStore(sinSuscripcion, leerBusqueda, busquedaEnServidor);
+  // Cuando el usuario toca un chip, su elección manda sobre la URL.
+  const [filtroUsuario, setFiltroUsuario] = useState<FiltroDirectorio | null>(null);
 
-  const materias = [...new Set(DIRECTORIO.flatMap((a) => a.materias))];
+  const filtroUrl = useMemo<FiltroDirectorio>(() => {
+    const p = new URLSearchParams(busqueda);
+    if (p.get("notarios") === "1") return { tipo: "notarios" };
+    const m = p.get("materia");
+    // La URL es entrada del usuario: se valida contra las materias reales.
+    return m && (MATERIAS_DIRECTORIO as string[]).includes(m)
+      ? { tipo: "materia", materia: m as Materia }
+      : { tipo: "todas" };
+  }, [busqueda]);
+
+  const filtro = filtroUsuario ?? filtroUrl;
+  const soloNotarios = filtro.tipo === "notarios";
+  const materia: Materia | "todas" = filtro.tipo === "materia" ? filtro.materia : "todas";
+
+  const materias = MATERIAS_DIRECTORIO;
   const abogados = (soloNotarios ? buscarNotarios() : buscarAbogados(materia)).slice(0, 3);
 
-  const elegirMateria = (m: Materia | "todas") => {
-    setSoloNotarios(false);
-    setMateria(m);
-  };
+  const elegirMateria = (m: Materia | "todas") =>
+    setFiltroUsuario(m === "todas" ? { tipo: "todas" } : { tipo: "materia", materia: m });
 
   return (
     <section id="directorio" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-16">
@@ -338,7 +367,7 @@ export function SeccionDirectorio() {
         <Chip activo={!soloNotarios && materia === "todas"} onClick={() => elegirMateria("todas")}>
           Todas
         </Chip>
-        <Chip activo={soloNotarios} onClick={() => setSoloNotarios(true)}>
+        <Chip activo={soloNotarios} onClick={() => setFiltroUsuario({ tipo: "notarios" })}>
           Notarios
         </Chip>
         {materias.map((m) => (
