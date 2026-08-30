@@ -99,6 +99,25 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   pantalla del ciudadano. El label de la UI sigue siendo "Encuentra abogado".
   Redirects 308 en `next.config.ts` para las cuatro formas viejas.
   `data/persona.ts` se queda en singular: es UNA persona demo, no la audiencia.
+- **💼 LANDING DE LA VÍA A — `/para-abogados` (2026-08-29):** el "Para
+  abogados" del header ya no tira al portal: ahora hay una página que VENDE
+  antes de dejar entrar. Grupo `(profesional)` con shell aurora propio
+  (`components/profesional/landing-profesional.tsx`); `NavAurora` quedó
+  parametrizada (`enlaces`/`secundario`/`cta`) porque la misma superficie
+  sirve a las dos audiencias. Secciones: hero · **cómo cita** (el diferencial
+  contra un chatbot: sin fuente no hay respuesta · solo fuentes del Estado ·
+  derecho hondureño) · 8 capacidades mapeadas a pantallas que EXISTEN ·
+  **leads** (el funnel vía B → vía A, con las materias reales del seed) ·
+  planes desde `data/catalogo.ts` con el ancla L25 y el anual −33% · CTA.
+  **Ruta:** `/para-abogados`, no `/profesional` — el plan intermedio se llama
+  "Profesional" (`PlanId`), así que esa URL habría chocado con el nombre del
+  tier. Entradas: nav de la landing, "Soy abogado" del shell público y la
+  sección de abogados de la home.
+  ⚠️ **Regla de esta página: no promete lo que el portal no hace hoy.** No
+  anuncia cifras de sentencias mientras el corpus no esté indexado. En la
+  misma pasada se corrigió la home, que afirmaba "Jus IA responde citando las
+  20,202 sentencias del corpus oficial" con 12 en el seed y el motor apagado.
+
 - **✨ LANDING AURORA (2026-08-29):** la home se movió al grupo `(landing)` con
   shell propio estilo Jusbrasil: fondo aurora WebGL (three.js, shader FBM
   replicado verbatim de otro proyecto de Wesley — solo se adaptaron los vec3 a

@@ -161,7 +161,7 @@ export function LandingContenido() {
               </h2>
               <ul className="mt-4 flex flex-col gap-2 text-[13.5px]" style={{ color: "var(--muted)" }}>
                 {[
-                  "Jus IA responde citando las 20,202 sentencias del corpus oficial — nunca inventa",
+                  "Jus IA responde citando la sentencia o el artículo — y si no encuentra fuente, lo dice",
                   "Alertas de La Gaceta por materia y monitoreo de nombres",
                   "Modelos de escritos, calculadoras y los leads de este consultorio",
                 ].map((f) => (
@@ -180,11 +180,11 @@ export function LandingContenido() {
                 </span>
               </div>
               <Link
-                href="/abogados"
+                href="/para-abogados"
                 className="rounded-[12px] px-6 py-3.5 text-[14px] font-semibold text-white"
                 style={{ background: "var(--turq)" }}
               >
-                Conocer el portal de abogados
+                Conocer Justihn para abogados
               </Link>
               <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
                 Primer mes a L25 en tu primera suscripción

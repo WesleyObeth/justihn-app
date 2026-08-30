@@ -46,7 +46,7 @@ export function HeaderPublico() {
         <span className="flex-1" />
 
         <Link
-          href="/abogados"
+          href="/para-abogados"
           className="rounded-lg px-3 py-2 text-[12.5px] font-medium whitespace-nowrap text-texto-2 hover:bg-lienzo hover:text-marino"
         >
           Soy abogado

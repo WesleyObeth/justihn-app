@@ -1,11 +1,35 @@
 "use client";
 
-/** Nav fijo glassy de la landing (estado sólido al hacer scroll). */
+/**
+ * Nav fijo glassy de la landing (estado sólido al hacer scroll).
+ * Parametrizada porque el shell aurora sirve a las DOS audiencias: la home
+ * ciudadana y `/para-abogados`. Cambian los enlaces, no la superficie.
+ */
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { SimboloJustihn } from "@/components/brand/logos";
 
-export function NavAurora() {
+export interface EnlaceNav {
+  href: string;
+  label: string;
+}
+
+const ENLACES_CIUDADANO: EnlaceNav[] = [
+  { href: "#tramites", label: "Trámites" },
+  { href: "#procesos", label: "Procesos" },
+  { href: "#consultorio", label: "Consultorio" },
+  { href: "#directorio", label: "Encuentra abogado" },
+];
+
+export function NavAurora({
+  enlaces = ENLACES_CIUDADANO,
+  secundario = { href: "/para-abogados", label: "Para abogados" },
+  cta = { href: "/personas", label: "Crear cuenta gratis" },
+}: {
+  enlaces?: EnlaceNav[];
+  secundario?: EnlaceNav;
+  cta?: EnlaceNav;
+}) {
   const nav = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -24,17 +48,18 @@ export function NavAurora() {
         <span className="wm">Justihn</span>
       </Link>
       <div className="nav-mid">
-        <a href="#tramites">Trámites</a>
-        <a href="#procesos">Procesos</a>
-        <a href="#consultorio">Consultorio</a>
-        <a href="#directorio">Encuentra abogado</a>
+        {enlaces.map((e) => (
+          <a key={e.href} href={e.href}>
+            {e.label}
+          </a>
+        ))}
       </div>
       <div className="nav-right" style={{ display: "flex", alignItems: "center", gap: 18 }}>
-        <Link className="nav-login" href="/abogados">
-          Para abogados
+        <Link className="nav-login" href={secundario.href}>
+          {secundario.label}
         </Link>
-        <Link className="nav-cta" href="/personas">
-          Crear cuenta gratis
+        <Link className="nav-cta" href={cta.href}>
+          {cta.label}
           <svg
             viewBox="0 0 24 24"
             fill="none"
