@@ -162,12 +162,44 @@
   padding: 2px;
 }
 
+/* Variante de bienvenida: el anillo se enciende, gira unos segundos y se
+   apaga solo. Sirve para señalar la caja de Jus IA al entrar sin dejar una
+   animación perpetua en la landing. Como es una animación CSS, vuelve a
+   reproducirse en cada carga de la página, que es justo lo que se busca.
+   `forwards` deja el opacity final en 0: el anillo desaparece, no parpadea. */
+@keyframes auroraBienvenida {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  65% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.borde-aurora--intro {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .borde-aurora {
     animation: auroraGira 7s linear infinite;
   }
   .borde-aurora--pensando {
     animation-duration: 1.6s;
+  }
+  /* Dos animaciones a la vez: el gradiente sigue girando mientras el anillo
+     entra y se va. Con `prefers-reduced-motion` no se anima nada y el anillo
+     queda invisible (opacity 0), que es la degradación honesta. */
+  .borde-aurora--intro {
+    animation:
+      auroraGira 7s linear infinite,
+      auroraBienvenida 6s ease forwards;
   }
 }
 

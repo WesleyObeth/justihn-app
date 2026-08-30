@@ -3,13 +3,18 @@
 /**
  * Composer de Jus IA en el hero de `/para-abogados`. Es el gemelo del buscador
  * de la home ciudadana —misma superficie, mismo borde aurora— pero aquí la
- * caja no busca: pregunta. Al enviar, `usePreguntarAJusIA` deja la consulta
- * disparándose al llegar al chat (`/abogados`), que es la demostración del
- * producto: preguntas algo real y ves con qué fuentes responde.
+ * caja no busca: pregunta. Escribir es libre; al ENVIAR se pide cuenta: la
+ * consulta queda guardada en el store y el visitante pasa por `/crear-cuenta`,
+ * que se la muestra y la dispara al entrar al chat. Así el lead se captura sin
+ * que la pregunta se pierda por el camino.
+ *
+ * No usa `usePreguntarAJusIA` a propósito: ese hook es para quien YA está
+ * dentro del portal y va directo al chat.
  */
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
-import { usePreguntarAJusIA } from "@/hooks/use-preguntar-jus-ia";
+import { usePortal } from "@/store/portal";
 
 /**
  * Tres preguntas de arranque, deliberadamente de MATERIAS DISTINTAS y con
@@ -27,21 +32,27 @@ const SUGERENCIAS = [
 
 export function ComposerJusIA() {
   const [q, setQ] = useState("");
-  const preguntar = usePreguntarAJusIA();
+  const router = useRouter();
+  const nuevaConsulta = usePortal((s) => s.nuevaConsulta);
+  const setConsultaPendiente = usePortal((s) => s.setConsultaPendiente);
 
   const enviar = (texto: string) => {
     const limpio = texto.trim();
     if (!limpio) return;
-    preguntar(limpio, { enviarDirecto: true });
+    // La pregunta se guarda ANTES de mandar a la puerta de cuenta: si el
+    // visitante se registra, la consulta lo está esperando del otro lado.
+    nuevaConsulta();
+    setConsultaPendiente(limpio);
+    router.push("/crear-cuenta");
   };
 
   return (
     <>
-      {/* TEST 2026-08-29: sin `borde-aurora`. Se retiró para comparar contra la
-          versión con el anillo animado — es también donde apareció el fallo
-          transitorio de composición. Para revolverlo, basta reponer:
-          <span aria-hidden className="borde-aurora" /> como primer hijo. */}
       <div className="relative mx-auto mt-8 max-w-[660px] rounded-[20px] border border-borde bg-white p-4 text-left shadow-[0_16px_48px_rgba(13,33,68,.14)]">
+        {/* Anillo de bienvenida: se enciende, gira unos segundos y se apaga
+            solo. Señala la caja al entrar sin dejar animación perpetua — y al
+            recargar la página vuelve a reproducirse. */}
+        <span aria-hidden className="borde-aurora borde-aurora--intro" />
         <textarea
           value={q}
           onChange={(e) => setQ(e.target.value)}
