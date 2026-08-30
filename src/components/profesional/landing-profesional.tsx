@@ -63,24 +63,15 @@ export function LandingProfesional() {
     <div className="landing-contenido">
       {/* ── Hero ── */}
       <section className="mx-auto max-w-[880px] px-5 pt-[150px] pb-8 text-center md:pt-[176px]">
-        <p
-          className="text-[12px] font-semibold tracking-[2.5px] uppercase"
-          style={{ color: "var(--mint)" }}
-        >
-          Para profesionales del derecho
-        </p>
-        <h1 className="font-display mx-auto mt-3 max-w-[820px] text-[clamp(29px,5vw,48px)] leading-[1.14] font-bold text-balance">
-          Un asistente jurídico que cita sus fuentes
-          <br className="hidden md:block" />{" "}
-          <span>— o admite que no las tiene</span>
+        <h1 className="font-display mx-auto max-w-[820px] text-[clamp(32px,5.5vw,52px)] leading-[1.12] font-bold text-balance">
+          Cita con la sentencia en la mano
         </h1>
         <p
-          className="mx-auto mt-5 max-w-[600px] text-[15.5px] leading-[1.65]"
+          className="mx-auto mt-5 max-w-[580px] text-[15.5px] leading-[1.65]"
           style={{ color: "var(--muted)" }}
         >
-          Jurisprudencia, legislación, alertas de La Gaceta, modelos y calculadoras. Cada
-          dato llega con el enlace al documento oficial, para que el respaldo lo
-          compruebes tú y no tengas que confiar en nuestra palabra.
+          Cada respuesta trae enlazado el documento que la respalda. Y cuando no lo hay,
+          Jus IA lo dice — antes que inventarlo.
         </p>
 
         {/* La caja ES la demostración: pregunta algo real y mira con qué
