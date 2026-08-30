@@ -61,7 +61,9 @@ export function NavAurora({
         <Link className="nav-login" href={secundario.href}>
           {secundario.label}
         </Link>
-        <Link className="nav-cta" href={cta.href}>
+        {/* `magnetic`: su hover solo cambia fondo y sombra, así que el
+            transform que escribe GSAP no pisa nada (ver `magnetico.tsx`). */}
+        <Link className="nav-cta magnetic" href={cta.href}>
           {cta.label}
           <svg
             viewBox="0 0 24 24"

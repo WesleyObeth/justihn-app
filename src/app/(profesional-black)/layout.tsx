@@ -1,6 +1,7 @@
 import "@/components/landing/landing.css";
 import { FondoAurora } from "@/components/landing/fondo-aurora";
 import { NavAurora } from "@/components/landing/nav-aurora";
+import { BotonesMagneticos } from "@/components/landing/magnetico";
 import { Toast } from "@/components/portal/capas-globales";
 import { HidratarStore } from "@/components/portal/marco";
 
@@ -33,6 +34,7 @@ export default function LayoutProfesionalBlack({
         cta={{ href: "/iniciar-sesion", label: "Iniciar sesión" }}
       />
       {children}
+      <BotonesMagneticos />
       <Toast />
     </div>
   );

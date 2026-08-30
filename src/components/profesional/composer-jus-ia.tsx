@@ -83,7 +83,7 @@ export function ComposerJusIA() {
             onClick={() => enviar(q)}
             disabled={!q.trim()}
             aria-label="Preguntar a Jus IA"
-            className="grid h-10 w-10 min-w-10 place-items-center rounded-full text-white transition-opacity disabled:opacity-35"
+            className="magnetic grid h-10 w-10 min-w-10 place-items-center rounded-full text-white transition-opacity disabled:opacity-35"
             style={{ background: "var(--turq)" }}
           >
             <Icono nombre="enviar" size={17} strokeWidth={2.2} />

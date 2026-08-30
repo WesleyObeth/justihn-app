@@ -175,6 +175,22 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **🧲 BOTÓN MAGNÉTICO (GSAP) — `components/landing/magnetico.tsx` (2026-08-30):**
+  los elementos con clase **`.magnetic`** se van hacia el cursor (factor
+  **0.35**) con `gsap.quickTo` y ease **`elastic.out(1,0.4)`**, y vuelven a
+  0,0 en `pointerleave`. `BotonesMagneticos` se monta una vez por shell de
+  landing (clara, black y ciudadana) y trabaja sobre el DOM con delegación +
+  `MutationObserver`: un botón se vuelve magnético con solo añadirle la clase,
+  sin envolverlo ni pasarle props. GSAP entra por **import dinámico** (es
+  decoración; no debe pesar en el primer render de una landing que se mide por
+  SEO) y el efecto **se apaga** con `prefers-reduced-motion` y sin
+  `(hover:hover) and (pointer:fine)` — en táctil el botón se escaparía justo
+  al tocarlo. Aplicado al CTA del nav, al botón de enviar del composer, a los
+  CTAs de planes y a los dos del cierre.
+  ⚠️ **Trampa:** GSAP escribe `transform`; si el elemento ya tiene un `:hover`
+  con transform (la `.glass-card` sube 2px, `.btn-celeste` −1px) una de las dos
+  animaciones se pierde en silencio. `magnetico.test.ts` lo topa.
+
 - **📲 VISTA PREVIA EN WHATSAPP — tarjetas Open Graph (2026-08-30):** el sitio
   **no tenía NINGUNA etiqueta Open Graph** (cero `og:*`), así que cada enlace
   compartido salía como burbuja de texto pelado, sin miniatura — justo el

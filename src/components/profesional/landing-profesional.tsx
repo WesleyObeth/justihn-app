@@ -296,7 +296,7 @@ export function LandingProfesional() {
               </div>
               <Link
                 href="/crear-cuenta"
-                className="mt-5 rounded-[10px] py-2.5 text-center text-[13.5px] font-semibold"
+                className="magnetic mt-5 rounded-[10px] py-2.5 text-center text-[13.5px] font-semibold"
                 style={
                   p.destacado
                     ? { background: "var(--turq)", color: "#fff" }
@@ -409,7 +409,7 @@ export function LandingProfesional() {
                   sobre el botón azul. */}
               <Link
                 href="/crear-cuenta"
-                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold transition-opacity hover:opacity-90"
+                className="magnetic inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold transition-opacity hover:opacity-90"
                 style={{ background: "var(--turq)", color: "#fff" }}
               >
                 Crear cuenta gratis
@@ -429,7 +429,7 @@ export function LandingProfesional() {
               </Link>
               <Link
                 href="/abogados"
-                className="rounded-full border px-7 py-3.5 text-[14.5px] font-semibold transition-colors"
+                className="magnetic rounded-full border px-7 py-3.5 text-[14.5px] font-semibold transition-colors"
                 style={{ borderColor: "rgba(226,238,248,.32)", color: "#e2eef8" }}
               >
                 Ver el portal por dentro
