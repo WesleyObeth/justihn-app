@@ -29,15 +29,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { LogoJustihn } from "@/components/brand/logos";
 import { SplashJustihn } from "@/components/auth/splash";
-import { useParametroUrl } from "@/hooks/use-busqueda-url";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Vista = "login" | "recuperar" | "enviado" | "splash";
 
-export function PantallaIniciarSesion() {
-  // De dónde viene. Solo personaliza; nunca cambia lo que se pide para entrar.
-  const esPersona = useParametroUrl("tipo") === "persona";
+/** `esPersona` lo resuelve la página en el SERVIDOR (ver `page.tsx`): así el
+ *  HTML ya llega con el copy correcto y no se ve el del abogado un instante. */
+export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boolean }) {
+  // Solo personaliza; nunca cambia lo que se pide para entrar.
   const destino = esPersona ? "/personas" : "/abogados";
   const altaHref = esPersona ? "/crear-cuenta?tipo=persona" : "/crear-cuenta";
   // Hasta el placeholder delata la audiencia: "nombre@bufete.hn" le dice a un

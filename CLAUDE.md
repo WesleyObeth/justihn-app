@@ -319,10 +319,15 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     solvencia; a un ciudadano eso lo espantaría y su portal no usa ninguno de
     esos datos. `components/auth/alta.tsx` es la puerta única que elige
     formulario — una sola URL, haciendo pareja con el login.
-  - **`hooks/use-busqueda-url.ts`**: `?tipo=` se lee con `useSyncExternalStore`
-    sobre `window.location.search`, NO con `useSearchParams` (ese hook bajo
-    Suspense vació el HTML de la home — ver el incidente de SSR). El helper
-    que ya estaba duplicado en `secciones.tsx` se movió aquí.
+  - **El `?tipo=` se lee en el SERVIDOR** (`searchParams` de la page), no con
+    un hook de cliente: leerlo en cliente hacía que el HTML llegara siempre
+    con la variante del abogado y se viera un parpadeo del stepper antes de
+    cambiar al formulario corto. A cambio las dos rutas se sirven dinámicas
+    (`ƒ`), que en pantallas de auth sin SEO no cuesta nada. Tampoco se usa
+    `useSearchParams`: ese hook bajo Suspense vació el HTML de la home (ver el
+    incidente de SSR). **`hooks/use-busqueda-url.ts`** queda para el cliente
+    —lo usa el filtro del directorio— unificando el helper que estaba
+    duplicado en `secciones.tsx`.
   - **Honestidad Fase 1:** ambas pantallas validan formato y entran con la
     sesión demo; nota visible bajo el card ("todavía no se crean cuentas
     reales") y `TODO(auth)` con el cableado Supabase exacto en cada archivo.
