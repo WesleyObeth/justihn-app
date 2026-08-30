@@ -128,8 +128,7 @@ export function LandingContenido() {
             <Link
               key={t.id}
               href={`/tramites/${t.id}`}
-              className="rounded-full border px-3.5 py-1.5 transition-colors hover:border-celeste hover:text-celeste"
-              style={{ borderColor: "var(--line)", color: "var(--muted)" }}
+              className="chip-tramite rounded-full px-3.5 py-1.5"
             >
               {t.nombre}
             </Link>

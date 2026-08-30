@@ -339,6 +339,47 @@
   color: rgba(226, 238, 248, 0.5);
 }
 
+/* ── Chip de trámite: los atajos bajo el buscador del hero ──
+   SÍ navegan (al detalle de la guía), así que necesitan gesto de tocable —
+   solo cambiar de color se sentía muerto. Sube, se aclara y proyecta sombra
+   celeste. Es lo contrario de `.glass-card--estatica`: allá se quitó el
+   levantamiento porque la card no navega; aquí se pone porque sí. */
+.landing-aurora .chip-tramite {
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.55);
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+.landing-aurora .chip-tramite:hover {
+  color: var(--mint);
+  border-color: rgba(21, 132, 199, 0.45);
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(21, 132, 199, 0.18);
+}
+.landing-aurora .chip-tramite:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(21, 132, 199, 0.16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-aurora .chip-tramite:hover,
+  .landing-aurora .chip-tramite:active {
+    transform: none;
+  }
+}
+/* En la landing black el blanco pleno reventaría: se aclara sobre el glass. */
+.landing-aurora--black .chip-tramite {
+  background: rgba(255, 255, 255, 0.05);
+}
+.landing-aurora--black .chip-tramite:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 /* ── Utilidades de la landing (contenido z-2, cards glass) ── */
 .landing-contenido {
   position: relative;

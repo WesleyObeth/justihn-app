@@ -97,8 +97,7 @@ export function ComposerJusIA() {
             key={s}
             type="button"
             onClick={() => enviar(s)}
-            className="cursor-pointer rounded-full border px-3.5 py-1.5 transition-colors hover:border-celeste hover:text-celeste"
-            style={{ borderColor: "var(--line)", color: "var(--muted)" }}
+            className="chip-tramite cursor-pointer rounded-full px-3.5 py-1.5"
           >
             {s}
           </button>
