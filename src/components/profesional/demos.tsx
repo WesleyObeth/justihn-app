@@ -121,9 +121,13 @@ export function DemoJusIA() {
   );
 }
 
-/** Alertas de Gaceta: lo que se publicó y por qué te toca. */
+/**
+ * Alertas de Gaceta: lo que se publicó y por qué te toca. Tres para que la
+ * ventana quede a la altura de las otras dos demos y para que se vea que la
+ * bandeja llega filtrada por materia, no con una alerta suelta.
+ */
 export function DemoGaceta() {
-  const publicaciones = PUBLICACIONES.slice(0, 2);
+  const publicaciones = PUBLICACIONES.slice(0, 3);
 
   return (
     <Ventana etiqueta="Alertas de La Gaceta">
@@ -162,43 +166,59 @@ export function DemoGaceta() {
   );
 }
 
-/** Leads: la consulta ciudadana que llega a la bandeja del abogado. */
+/**
+ * Leads: las consultas ciudadanas que llegan a la bandeja del abogado.
+ *
+ * Van DOS y no una por dos razones: la ventana queda a la altura de las otras
+ * dos demos (con una sola se veía media sección vacía al lado del copy), y
+ * son el argumento de la sección — la segunda no tiene ninguna respuesta
+ * todavía, que es literalmente "un cliente esperando".
+ */
 export function DemoLeads() {
-  const lead = LEADS[0]!;
+  const leads = LEADS.slice(0, 2);
 
   return (
     <Ventana etiqueta="Leads del consultorio">
-      <div
-        className="demo-paso demo-paso-1 rounded-[10px] border px-3.5 py-3"
-        style={{ borderColor: "var(--line)" }}
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-chip px-2.5 py-[2px] text-[10.5px] font-semibold text-celeste">
-            {lead.materia}
-          </span>
-          {lead.nuevo && (
-            <span className="rounded-full bg-exito-bg px-2.5 py-[2px] text-[10.5px] font-bold text-exito">
-              Nuevo
-            </span>
-          )}
-          <span className="text-[10.5px]" style={{ color: "var(--muted)" }}>
-            {lead.ciudad} · {lead.cuando}
-          </span>
-        </div>
-        <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-2">“{lead.pregunta}”</p>
-        <div className="demo-paso demo-paso-2 mt-3 flex items-center justify-between gap-2">
-          <span className="text-[11px]" style={{ color: "var(--muted)" }}>
-            {lead.respuestas === 1
-              ? "1 abogado ya respondió"
-              : `${lead.respuestas} abogados ya respondieron`}
-          </span>
-          <span
-            className="rounded-[8px] px-3 py-1.5 text-[11.5px] font-semibold text-white"
-            style={{ background: "var(--turq)" }}
+      <div className="flex flex-col gap-2.5">
+        {leads.map((lead, i) => (
+          <div
+            key={lead.id}
+            className={`demo-paso demo-paso-${i + 1} rounded-[10px] border px-3.5 py-3`}
+            style={{ borderColor: "var(--line)" }}
           >
-            Responder
-          </span>
-        </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-chip px-2.5 py-[2px] text-[10.5px] font-semibold text-celeste">
+                {lead.materia}
+              </span>
+              {lead.nuevo && (
+                <span className="rounded-full bg-exito-bg px-2.5 py-[2px] text-[10.5px] font-bold text-exito">
+                  Nuevo
+                </span>
+              )}
+              <span className="text-[10.5px]" style={{ color: "var(--muted)" }}>
+                {lead.ciudad} · {lead.cuando}
+              </span>
+            </div>
+            <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-2">
+              “{lead.pregunta}”
+            </p>
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <span className="text-[11px]" style={{ color: "var(--muted)" }}>
+                {lead.respuestas === 0
+                  ? "Nadie ha respondido todavía"
+                  : lead.respuestas === 1
+                    ? "1 abogado ya respondió"
+                    : `${lead.respuestas} abogados ya respondieron`}
+              </span>
+              <span
+                className="rounded-[8px] px-3 py-1.5 text-[11.5px] font-semibold text-white"
+                style={{ background: "var(--turq)" }}
+              >
+                Responder
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
       <p
         className="demo-paso demo-paso-3 mt-2.5 text-center text-[11px]"
