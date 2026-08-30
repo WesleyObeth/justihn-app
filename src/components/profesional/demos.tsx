@@ -1,4 +1,7 @@
+"use client";
+
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
+import { useEnVista } from "@/hooks/use-en-vista";
 import { SimboloJusIA } from "@/components/brand/logos";
 import { LEADS } from "@/data/catalogo";
 import { PUBLICACIONES } from "@/data/gaceta";
@@ -12,6 +15,11 @@ import { SENTENCIAS } from "@/data/sentencias";
  * expediente, órgano y magistrada verdaderos; la alerta sale del seed de
  * Gaceta y el lead del consultorio, del mismo que alimenta /abogados/leads.
  * Si el seed cambia, estas vistas cambian con él — no pueden mentir.
+ *
+ * Se reproducen como una grabación: al entrar en pantalla los pasos se revelan
+ * en orden (pregunta → pensando → respuesta → fuente) y se rearman al salir.
+ * Pero NO son video: el HTML trae el estado final completo y la animación solo
+ * lo va destapando, así que el crawler lee todo y sin JS se ve entero.
  */
 
 /** Marco de ventana: enseña que lo de dentro es producto, no ilustración. */
@@ -22,8 +30,12 @@ function Ventana({
   etiqueta: string;
   children: React.ReactNode;
 }) {
+  const { ref, enVista } = useEnVista<HTMLDivElement>();
   return (
-    <div className="overflow-hidden rounded-[16px] border border-borde bg-white shadow-[0_18px_50px_rgba(13,33,68,.13)]">
+    <div
+      ref={ref}
+      className={`overflow-hidden rounded-[16px] border border-borde bg-white shadow-[0_18px_50px_rgba(13,33,68,.13)] ${enVista ? "demo-anim" : ""}`}
+    >
       <div
         className="flex items-center gap-2 border-b px-4 py-2.5"
         style={{ borderColor: "var(--line)", background: "rgba(248,250,252,.9)" }}
@@ -51,13 +63,22 @@ export function DemoJusIA() {
 
   return (
     <Ventana etiqueta="Jus IA">
-      <div className="flex justify-end">
+      <div className="demo-paso demo-paso-1 flex justify-end">
         <p className="max-w-[85%] rounded-[12px] bg-chip px-3.5 py-2 text-[13px] leading-[1.5] text-marino">
           ¿En cuánto tiempo prescribe el reclamo por despido injustificado?
         </p>
       </div>
 
-      <div className="mt-3 flex gap-2.5">
+      {/* Fila de "pensando": aparece tras la pregunta y se va cuando llega la
+          respuesta. Ocupa 0 de alto para no empujar el resto al desaparecer. */}
+      <div className="demo-pensando pointer-events-none mt-2 flex h-0 items-center gap-1.5 text-[11.5px] text-texto-4">
+        Buscando en jurisprudencia y Gaceta
+        <span className="h-1 w-1 rounded-full bg-celeste" />
+        <span className="h-1 w-1 rounded-full bg-celeste" />
+        <span className="h-1 w-1 rounded-full bg-celeste" />
+      </div>
+
+      <div className="demo-paso demo-paso-2 mt-3 flex gap-2.5">
         <span className="mt-0.5 shrink-0">
           <SimboloJusIA size={18} variante="claro" />
         </span>
@@ -70,7 +91,7 @@ export function DemoJusIA() {
           </p>
 
           <div
-            className="mt-3 rounded-[10px] border px-3 py-2.5"
+            className="demo-paso demo-paso-3 mt-3 rounded-[10px] border px-3 py-2.5"
             style={{ borderColor: "var(--line)", background: "rgba(248,250,252,.75)" }}
           >
             <div className="flex items-center justify-between gap-2">
@@ -92,7 +113,10 @@ export function DemoJusIA() {
         </div>
       </div>
 
-      <p className="mt-3 text-center text-[11px]" style={{ color: "var(--muted)" }}>
+      <p
+        className="demo-paso demo-paso-4 mt-3 text-center text-[11px]"
+        style={{ color: "var(--muted)" }}
+      >
         Sin fuente no responde · el criterio jurídico es del profesional
       </p>
     </Ventana>
@@ -109,7 +133,7 @@ export function DemoGaceta() {
         {publicaciones.map((p, i) => (
           <div
             key={p.id}
-            className="rounded-[10px] border px-3.5 py-3"
+            className={`demo-paso demo-paso-${i + 1} rounded-[10px] border px-3.5 py-3`}
             style={{ borderColor: "var(--line)" }}
           >
             <div className="flex flex-wrap items-center gap-2">
@@ -146,7 +170,10 @@ export function DemoLeads() {
 
   return (
     <Ventana etiqueta="Leads del consultorio">
-      <div className="rounded-[10px] border px-3.5 py-3" style={{ borderColor: "var(--line)" }}>
+      <div
+        className="demo-paso demo-paso-1 rounded-[10px] border px-3.5 py-3"
+        style={{ borderColor: "var(--line)" }}
+      >
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-chip px-2.5 py-[2px] text-[10.5px] font-semibold text-celeste">
             {lead.materia}
@@ -161,7 +188,7 @@ export function DemoLeads() {
           </span>
         </div>
         <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-2">“{lead.pregunta}”</p>
-        <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="demo-paso demo-paso-2 mt-3 flex items-center justify-between gap-2">
           <span className="text-[11px]" style={{ color: "var(--muted)" }}>
             {lead.respuestas === 1
               ? "1 abogado ya respondió"
@@ -175,7 +202,10 @@ export function DemoLeads() {
           </span>
         </div>
       </div>
-      <p className="mt-2.5 text-center text-[11px]" style={{ color: "var(--muted)" }}>
+      <p
+        className="demo-paso demo-paso-3 mt-2.5 text-center text-[11px]"
+        style={{ color: "var(--muted)" }}
+      >
         Responder en público es lo que te pone delante de quien busca abogado
       </p>
     </Ventana>

@@ -296,3 +296,74 @@
   font-weight: 700;
   letter-spacing: -0.015em;
 }
+
+/* ── Demostraciones animadas de la landing de abogados ────────────────────
+   El contenido está SIEMPRE en el HTML: la clase `demo-anim` la añade el
+   cliente al entrar en vista, y solo entonces los pasos arrancan ocultos y se
+   revelan. Sin JS —o con `prefers-reduced-motion`— se ve el estado final
+   completo, que es la degradación honesta y además lo que lee el crawler. */
+@keyframes demoEntra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes demoPensando {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  12%,
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes demoPunto {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .demo-anim .demo-paso {
+    animation: demoEntra 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .demo-anim .demo-paso-1 {
+    animation-delay: 0.15s;
+  }
+  .demo-anim .demo-paso-2 {
+    animation-delay: 1.5s;
+  }
+  .demo-anim .demo-paso-3 {
+    animation-delay: 2.3s;
+  }
+  .demo-anim .demo-paso-4 {
+    animation-delay: 3s;
+  }
+  /* La fila de "pensando" aparece entre la pregunta y la respuesta y se va. */
+  .demo-anim .demo-pensando {
+    animation: demoPensando 2.4s ease 0.5s both;
+  }
+  .demo-anim .demo-pensando span {
+    animation: demoPunto 1.1s ease-in-out infinite;
+  }
+  .demo-anim .demo-pensando span:nth-child(2) {
+    animation-delay: 0.16s;
+  }
+  .demo-anim .demo-pensando span:nth-child(3) {
+    animation-delay: 0.32s;
+  }
+}
