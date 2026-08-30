@@ -2,7 +2,8 @@
 
 > Cerebro técnico del portal. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-29**.
+> Creado: **2026-08-25** · Última actualización: **2026-08-29** (refinado de
+> landings: hero, marca, SSR, demos animados y puerta de cuenta).
 
 ---
 
@@ -117,6 +118,53 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   anuncia cifras de sentencias mientras el corpus no esté indexado. En la
   misma pasada se corrigió la home, que afirmaba "Jus IA responde citando las
   20,202 sentencias del corpus oficial" con 12 en el seed y el motor apagado.
+  **Refinado 2026-08-29 (sesión con Wesley), en este orden:**
+  - **Hero = composer de Jus IA** (`composer-jus-ia.tsx`), gemelo del buscador
+    ciudadano: la caja no busca, pregunta. Enter envía · Shift+Enter salta
+    línea · 3 chips de arranque de **materias y fuentes distintas** (Código del
+    Trabajo · CPC + jurisprudencia · IP), elegidos para enseñar alcance, no
+    frecuencia. Titular al patrón Jusbrasil ("Tu investigación jurídica empieza
+    en Justihn") y subtítulo que dice **qué se puede preguntar** — ahí el
+    lenguaje de inventario SÍ trabaja, porque está encima de la caja.
+  - **Puerta de cuenta:** escribir es libre; al ENVIAR se pasa por
+    **`/crear-cuenta`** (`crear-cuenta.tsx`). La pregunta se guarda en el store
+    ANTES de navegar, la pantalla la muestra ("Tu pregunta te espera") y se
+    dispara sola al llegar al chat. Se gatea en enviar y no en la primera
+    tecla: cortar a media escritura se siente roto.
+  - **Anillo de bienvenida** (`.borde-aurora--intro`): el borde aurora se
+    enciende, dura ~4 s y se apaga solo; al recargar vuelve. Es animación CSS,
+    así que reinicia con el montaje sin estado ni temporizadores.
+  - **Tres secciones con demostración** (`demos.tsx`) — Jus IA · Gaceta ·
+    Leads — con **datos reales de los seeds**, no maquetas: la sentencia citada
+    es CL-528-24 del piloto, con su órgano y magistrada verdaderos. Se
+    **reproducen** al entrar en vista (pregunta → pensando → respuesta →
+    fuente) y se rearman al salir. No son video a propósito: el HTML conserva
+    el texto para el crawler y las vistas siguen atadas al seed.
+  - **CTA final oscuro**, único bloque marino de la página. Su titular ("Tu
+    próxima búsqueda ya no empieza en Google") evita el paralelo tentador con
+    la referencia —"tu próximo cliente ya está preguntando"— porque los leads
+    del consultorio son seed: sería la misma sobreventa del corpus.
+
+  ⚠️ **Trampa de esta landing:** `.landing-aurora a { color: inherit }` le gana
+  por especificidad a `text-white` de Tailwind. Cualquier utilidad de color
+  sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
+  Pasó con los botones del CTA (texto marino sobre azul, ilegible).
+
+- **🎨 MARCA — favicon y lockup corregidos (2026-08-29):** el favicon no era
+  el símbolo oficial sino una versión aparte, con **otra geometría** (barras más
+  gordas y encimadas), **sin el cruce** `#0e5f92` y con un
+  `prefers-color-scheme: dark` que le volvía la barra izquierda casi blanca.
+  Ahora `src/app/icon.svg` ES `logo/justihn-icon.svg`, con el viewBox recortado
+  a la tinta (`4.1 1.1 39.9 39.9`) para llenar la pestaña; sin adaptación a modo
+  oscuro — el logo no cambia de color, a costa de que la barra marina quede
+  tenue en pestaña oscura. `favicon.ico` se genera del mismo SVG (16/32/48/64/128,
+  alfa 0) y `logo/justihn-favicon.svg` se mantiene igual para que no drifteen.
+  ⚠️ **Rompe la ficha de marca**, que pedía la variante favicon "sin cruce" a
+  ≤20px: se prioriza que la pestaña se vea como el logo.
+  **Lockup:** el gap del nav de la landing (11px) no coincidía con el de
+  `LogoJustihn` (7px). Ambos a **5px**, medido sobre el render a 4× contando
+  columnas con tinta: 9.2px de hueco visual en los dos. El símbolo aporta ~2.4px
+  de aire propio dentro de su viewBox — descontarlo es lo que faltaba.
 
 - **✨ LANDING AURORA (2026-08-29):** la home se movió al grupo `(landing)` con
   shell propio estilo Jusbrasil: fondo aurora WebGL (three.js, shader FBM
@@ -134,6 +182,17 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   del hero y el de la sección comparten estado (buscar arriba filtra abajo y
   hace scroll). Las rutas viejas redirigen a su ancla; sobreviven como página
   el detalle `/tramites/[id]` (SEO + gate de cuenta) y la calculadora.
+  ⚡ **SSR arreglado (2026-08-29):** la home salía casi VACÍA en el HTML —
+  13.627 bytes de los que el único texto era el `<title>` y el menú; cero
+  apariciones de "RTN", "despido", "divorcio". La causa no era "es client
+  component" (el nav también lo es y sí salía): toda la landing iba dentro de un
+  `<Suspense fallback={null}>` y `SeccionDirectorio` llamaba `useSearchParams()`
+  para leer `?materia=`/`?notarios=1`; ese hook bajo un Suspense hace que Next
+  abandone el prerenderizado del subárbol y emita el fallback. Se cambió a
+  `useSyncExternalStore` sobre `window.location.search` (servidor "" · cliente el
+  valor real) y se quitó el Suspense. **Resultado: 130 → 7.452 caracteres de
+  texto.** Regla para la próxima pantalla pública: `useSearchParams` bajo
+  Suspense = contenido invisible para Google.
   **Procesos legales ciudadanos (2026-08-29, pedido del socio):** `tramites.ts`
   gana `tipo: "tramite" | "proceso"` y 4 guías judiciales — me despidieron
   (Laboral, el ejemplo que pidió), pensión alimenticia, divorcio y herencia —
@@ -191,7 +250,7 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (36 tests de invariantes)
+pnpm test         # Vitest (51 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -199,7 +258,13 @@ pnpm build        # gate antes de cualquier entrega
 `build` verdes en cada incremento, más verificación visual con Playwright. Los
 tests cubren lo crítico: el harness de seguridad (inyección, enmascarado, hosts
 oficiales), el determinismo y honestidad del router (expedientes reales /
-inexistentes / casos propios), prestaciones, plazos y vía procesal.
+inexistentes / casos propios), prestaciones, plazos y vía procesal. Se sumaron
+2026-08-29: **`data/tramites.test.ts`** (las 13 guías con fuente en la
+whitelist, cero marcadores pendientes, y que un paso de notario resuelva a un
+notario habilitado y no a un abogado de materia "Notarial") y
+**`app/titulos.test.ts`** (ninguna página nombra la marca sin `absolute`, para
+que la pestaña no diga "Justihn" dos veces — error invisible leyendo el código,
+que se coló en tres páginas a la vez).
 
 ## 6. Pendientes — próxima sesión (en orden)
 
@@ -248,6 +313,26 @@ inexistentes / casos propios), prestaciones, plazos y vía procesal.
    contradice a la guía dentro del mismo producto.** No se corrigió porque
    el cálculo laboral está gated a la validación del socio (§7.6); el texto
    oficial ya está localizado, así que es un cambio corto.
+
+5b. **🎨 SEGUIR REFINANDO LAS LANDINGS** (en curso con Wesley, 2026-08-29).
+   Lo hecho hoy queda arriba, en el bloque de `/para-abogados`. Lo que sigue
+   sobre la mesa, sin orden fijo:
+   - **Más demos con seed real**: los candidatos naturales son *Calculadoras*
+     (prestaciones, con el resultado que da `lib/prestaciones`) y *Modelos de
+     escritos*. El patrón ya está: `SeccionDemo` + una vista en `demos.tsx`.
+   - **La home ciudadana no tiene demos todavía** — el patrón es reutilizable.
+   - **SEO de la vía B**: no hay `sitemap.xml` ni datos estructurados
+     (`HowTo`/`FAQPage` en las guías de trámites, que es lo que gana los rich
+     snippets). Y `robots` sigue en `noindex` en el layout raíz: **acordarse de
+     quitarlo al lanzar**, o nada de esto rankea.
+   - **Video real del portal**: hoy los demos son animación HTML a propósito
+     (siguen al seed, pesan bytes, el crawler lee el texto). Cuando la UI se
+     estabilice tras Supabase, grabar footage real con Playwright sí aporta.
+   - **CTA de WhatsApp**: la referencia de Wesley lo lleva; Justihn no tiene
+     número configurado y no se inventó un enlace muerto.
+   - **`prestaciones.ts` sigue contradiciendo a la guía de despido** (ver el
+     punto 5 de esta lista): si se toca la landing laboral, cuidado con
+     publicar dos cifras distintas del mismo cálculo.
 
 6. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
    ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende
