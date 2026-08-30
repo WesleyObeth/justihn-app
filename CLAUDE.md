@@ -185,8 +185,12 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   decoración; no debe pesar en el primer render de una landing que se mide por
   SEO) y el efecto **se apaga** con `prefers-reduced-motion` y sin
   `(hover:hover) and (pointer:fine)` — en táctil el botón se escaparía justo
-  al tocarlo. Aplicado al CTA del nav, al botón de enviar del composer, a los
-  CTAs de planes y a los dos del cierre.
+  al tocarlo. **Va SOLO en los botones azules sólidos** (decisión Wesley
+  2026-08-30): CTA del nav · enviar del composer · plan destacado · CTA del
+  cierre. En un botón de solo borde el imán no se lee como intención sino como
+  que el botón tiembla, y si todo se mueve el efecto deja de señalar la acción
+  principal porque ya no distingue a nadie. Hay auditoría hecha: los 4 con
+  imán son `rgb(21,132,199)` y ningún botón azul quedó sin él.
   ⚠️ **Trampa:** GSAP escribe `transform`; si el elemento ya tiene un `:hover`
   con transform (la `.glass-card` sube 2px, `.btn-celeste` −1px) una de las dos
   animaciones se pierde en silencio. `magnetico.test.ts` lo topa.
@@ -261,9 +265,11 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     sesión demo; nota visible bajo el card ("todavía no se crean cuentas
     reales") y `TODO(auth)` con el cableado Supabase exacto en cada archivo.
   - El CTA de la nav de `/para-abogados` pasó de "Entrar al portal"
-    (→ `/abogados` directo) a **"Iniciar sesión"** (→ `/iniciar-sesion`); la
-    entrada directa al portal sigue en el CTA final ("Ver el portal por
-    dentro") para las demos con el socio.
+    (→ `/abogados` directo) a **"Iniciar sesión"** (→ `/iniciar-sesion`). La
+    entrada directa al portal —la de enseñárselo al socio— vive en el pie
+    ("Abogados → Portal"); el botón "Ver el portal por dentro" que estaba en
+    el CTA final **se quitó** (decisión Wesley 2026-08-30): competía con el
+    botón azul y ofrecía entrar sin cuenta justo donde se pide crearla.
   - Trampa de contraste: `.landing-aurora--noche a` pinta los links
     celeste-claro — dentro del card BLANCO del onboarding serían ilegibles;
     `.card-dia` los devuelve al celeste de marca.

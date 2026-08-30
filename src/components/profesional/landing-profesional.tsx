@@ -296,7 +296,9 @@ export function LandingProfesional() {
               </div>
               <Link
                 href="/crear-cuenta"
-                className="magnetic mt-5 rounded-[10px] py-2.5 text-center text-[13.5px] font-semibold"
+                /* Solo el plan destacado lleva imán: es el único con relleno
+                   azul. Los otros dos son de borde (ver el CTA secundario). */
+                className={`${p.destacado ? "magnetic " : ""}mt-5 rounded-[10px] py-2.5 text-center text-[13.5px] font-semibold`}
                 style={
                   p.destacado
                     ? { background: "var(--turq)", color: "#fff" }
@@ -402,7 +404,13 @@ export function LandingProfesional() {
               información.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            {/* Un solo CTA a propósito (decisión Wesley 2026-08-30): el
+                cierre pide UNA decisión. El "Ver el portal por dentro" que
+                acompañaba aquí competía con el botón azul y ofrecía entrar sin
+                cuenta justo donde se pide crearla. La entrada directa al
+                portal —la que sirve para enseñárselo al socio— sigue viva en
+                el pie ("Abogados → Portal"). */}
+            <div className="mt-8 flex justify-center">
               {/* ⚠️ El color va INLINE, no con `text-white`: la landing define
                   `.landing-aurora a { color: inherit }`, que por especificidad
                   le gana a las utilidades de Tailwind y dejaba el texto marino
@@ -426,13 +434,6 @@ export function LandingProfesional() {
                 >
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
-              </Link>
-              <Link
-                href="/abogados"
-                className="magnetic rounded-full border px-7 py-3.5 text-[14.5px] font-semibold transition-colors"
-                style={{ borderColor: "rgba(226,238,248,.32)", color: "#e2eef8" }}
-              >
-                Ver el portal por dentro
               </Link>
             </div>
 

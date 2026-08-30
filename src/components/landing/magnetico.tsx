@@ -18,6 +18,13 @@
  * - **GSAP entra por import dinámico**: es decoración, no tiene por qué pesar
  *   en el primer render de una landing que además se mide por SEO.
  *
+ * **Dónde va (decisión Wesley 2026-08-30): solo en los botones azules
+ * sólidos** — el CTA del nav, el de enviar del composer, el del plan
+ * destacado y el principal del cierre. En un botón de solo borde el imán no
+ * se lee como intención sino como que el botón tiembla, y si TODO se mueve la
+ * jerarquía de la página se pierde: el efecto deja de señalar la acción
+ * principal porque ya no distingue a nadie.
+ *
  * ⚠️ No poner `.magnetic` en algo cuyo `:hover` ya use `transform` — la card
  * glass de la landing sube 2px, por ejemplo. GSAP escribe el mismo transform
  * y una de las dos animaciones se pierde. Es para botones y enlaces.
