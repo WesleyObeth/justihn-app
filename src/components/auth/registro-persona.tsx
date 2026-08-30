@@ -62,8 +62,8 @@ export function RegistroPersona() {
       </div>
 
       <div
-        className="auth-fadeup-card card-dia relative w-full max-w-[440px] rounded-[18px] bg-white px-9 pt-[34px] pb-[30px] text-marino max-sm:px-6"
-        style={{ boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
+        className="auth-fadeup-card card-dia relative w-full max-w-[440px] rounded-[18px] border bg-white px-9 pt-[34px] pb-[30px] text-marino max-sm:px-6"
+        style={{ borderColor: "var(--line)", boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
         <h1 className="font-display text-[23px] font-bold tracking-[-.3px]">
           Crea tu cuenta gratis

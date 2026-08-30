@@ -77,8 +77,8 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-5 py-10">
       <div
-        className="auth-fadeup-card card-dia w-full max-w-[420px] rounded-[20px] bg-white px-9 pt-[38px] pb-[30px] text-marino max-sm:px-6"
-        style={{ boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
+        className="auth-fadeup-card card-dia w-full max-w-[420px] rounded-[20px] border bg-white px-9 pt-[38px] pb-[30px] text-marino max-sm:px-6"
+        style={{ borderColor: "var(--line)", boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
         <LogoJustihn size={36} variante="claro" textoPx={22} />
 
