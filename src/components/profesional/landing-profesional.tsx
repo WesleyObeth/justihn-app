@@ -3,6 +3,7 @@ import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { OFERTA, PLANES } from "@/data/catalogo";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
 import { ComposerJusIA } from "@/components/profesional/composer-jus-ia";
+import { DemoGaceta, DemoJusIA, DemoLeads, SeccionDemo } from "@/components/profesional/demos";
 
 /**
  * Landing de la vía A: el abogado que todavía no es suscriptor.
@@ -57,8 +58,6 @@ const CAPACIDADES: { icono: NombreIcono; titulo: string; desc: string }[] = [
 ];
 
 export function LandingProfesional() {
-  const materias = [...new Set(TRAMITES.map((t) => t.materia))];
-
   return (
     <div className="landing-contenido">
       {/* ── Hero ── */}
@@ -136,52 +135,45 @@ export function LandingProfesional() {
         </div>
       </section>
 
-      {/* ── Leads: el funnel de la vía B hacia la A ── */}
-      <section id="leads" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-14">
-        <div className="glass-card p-7 md:p-9">
-          <div className="flex flex-wrap items-center gap-8">
-            <div className="min-w-[300px] flex-1">
-              <p
-                className="text-[11px] font-bold tracking-[2px] uppercase"
-                style={{ color: "var(--mint)" }}
-              >
-                Clientes, no solo herramientas
-              </p>
-              <h2 className="font-display mt-2 text-[24px] leading-[1.28] font-bold">
-                El mismo sitio donde la gente busca ayuda es donde te encuentra
-              </h2>
-              <p
-                className="mt-3 text-[13.5px] leading-[1.65]"
-                style={{ color: "var(--muted)" }}
-              >
-                Del lado público hay {TRAMITES.length} guías de trámites y procesos ante{" "}
-                {INSTITUCIONES.length} instituciones del Estado, y un consultorio gratuito.
-                Cada guía termina recomendando un abogado de esa materia, y cada consulta
-                sin responder es un cliente esperando. Tu perfil aparece en el directorio
-                por materia y ciudad — con prioridad si eres Premium.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {materias.map((m) => (
-                  <span
-                    key={m}
-                    className="rounded-full px-2.5 py-[3px] text-[11.5px] font-medium"
-                    style={{ background: "rgba(21,132,199,.1)", color: "var(--mint)" }}
-                  >
-                    {m}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="rounded-[12px] border px-5 py-3 text-[13.5px] font-semibold"
-              style={{ borderColor: "var(--line)", color: "var(--muted)" }}
-            >
-              Ver el lado público →
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ── Demostraciones: el producto a la vista, con datos reales ── */}
+      <SeccionDemo
+        id="jus-ia"
+        eyebrow="Jus IA"
+        titulo="Pregunta en lenguaje normal, recibe la cita"
+        descripcion="No hace falta acertar con el término del buscador. Preguntas como se lo explicarías a un colega y la respuesta llega con la sentencia o el artículo que la sostiene, enlazado al documento del Estado."
+        puntos={[
+          { icono: "check", texto: "La cita se abre: expediente, órgano, magistrado y fallo" },
+          { icono: "candado", texto: "Si no encuentra fuente lo dice, en vez de rellenar el hueco" },
+          { icono: "reloj", texto: "El historial guarda cada consulta con sus fuentes" },
+        ]}
+        demo={<DemoJusIA />}
+      />
+
+      <SeccionDemo
+        eyebrow="Alertas de La Gaceta"
+        titulo="Entérate de la reforma antes que tu contraparte"
+        descripcion="Eliges tus materias y Justihn te avisa de lo que se publica. Cada alerta explica en una línea a qué de tu trabajo afecta — no te deja el PDF y que te las arregles."
+        puntos={[
+          { icono: "gaceta", texto: "Filtradas por las materias que litigas" },
+          { icono: "juris", texto: "Con el efecto práctico, no solo el titular del acuerdo" },
+          { icono: "bell", texto: "Monitoreo de nombres: te avisa cuando aparece uno que vigilas" },
+        ]}
+        demo={<DemoGaceta />}
+        invertida
+      />
+
+      <SeccionDemo
+        id="leads"
+        eyebrow="Clientes, no solo herramientas"
+        titulo="El mismo sitio donde la gente busca ayuda es donde te encuentra"
+        descripcion={`Del lado público hay ${TRAMITES.length} guías de trámites y procesos ante ${INSTITUCIONES.length} instituciones del Estado, y un consultorio gratuito. Cada guía termina recomendando un abogado de esa materia, y cada consulta sin responder es un cliente esperando.`}
+        puntos={[
+          { icono: "leads", texto: "Las consultas llegan con su materia y su ciudad" },
+          { icono: "perfil", texto: "Tu perfil aparece en el directorio, con prioridad si eres Premium" },
+          { icono: "documento", texto: "Las guías de trámites derivan a un abogado de esa materia" },
+        ]}
+        demo={<DemoLeads />}
+      />
 
       {/* ── Planes ── */}
       <section id="planes" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-14">
