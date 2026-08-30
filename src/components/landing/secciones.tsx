@@ -87,6 +87,11 @@ export function SeccionTramites({
   termino: string;
   onTermino: (v: string) => void;
 }) {
+  // `null` = todas. Arranca así a propósito: es lo que renderiza el servidor,
+  // así que el crawler y quien no tenga JS ven las 9 guías. El filtro es una
+  // comodidad del cliente, no la manera de llegar al contenido.
+  const [rutaActiva, setRutaActiva] = useState<string | null>(null);
+
   const administrativos = TRAMITES.filter((t) => t.tipo === "tramite");
   const termino = normalizar(q.trim());
   const buscando = termino.length > 0;
@@ -127,16 +132,20 @@ export function SeccionTramites({
       </div>
 
       {!buscando && (
-        <nav
-          aria-label="Categorías de trámites"
-          className="mt-4 flex flex-wrap justify-center gap-2 text-[12.5px]"
-        >
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <Chip activo={rutaActiva === null} onClick={() => setRutaActiva(null)}>
+            Todas ({administrativos.length})
+          </Chip>
           {RUTAS_TRAMITE.map((r) => (
-            <a key={r.id} href={`#ruta-${r.id}`} className="chip-tramite rounded-full px-3.5 py-1.5">
+            <Chip
+              key={r.id}
+              activo={rutaActiva === r.id}
+              onClick={() => setRutaActiva(r.id)}
+            >
               {r.etiqueta} ({r.pasos.length})
-            </a>
+            </Chip>
           ))}
-        </nav>
+        </div>
       )}
 
       {/* Buscando se rompe el orden a propósito: quien escribe "RTN" quiere su
@@ -161,8 +170,15 @@ export function SeccionTramites({
         </div>
       ) : (
         <div className="mx-auto mt-9 flex max-w-[760px] flex-col gap-11">
+          {/* Se renderizan las tres siempre y el filtro las OCULTA, en vez de
+              montar solo la activa: así el HTML del servidor lleva las 9 guías
+              — que es la razón por la que esta sección va apilada. */}
           {RUTAS_TRAMITE.map((ruta) => (
-            <Ruta key={ruta.id} ruta={ruta} />
+            <Ruta
+              key={ruta.id}
+              ruta={ruta}
+              oculta={rutaActiva !== null && rutaActiva !== ruta.id}
+            />
           ))}
         </div>
       )}
@@ -171,9 +187,9 @@ export function SeccionTramites({
 }
 
 /** Una ruta: su encabezado y los trámites encadenados por el riel numerado. */
-function Ruta({ ruta }: { ruta: RutaTramite }) {
+function Ruta({ ruta, oculta }: { ruta: RutaTramite; oculta: boolean }) {
   return (
-    <div id={`ruta-${ruta.id}`} className="scroll-mt-28">
+    <div id={`ruta-${ruta.id}`} className="scroll-mt-28" hidden={oculta}>
       <p
         className="text-[11px] font-bold tracking-[2px] uppercase"
         style={{ color: "var(--mint)" }}
