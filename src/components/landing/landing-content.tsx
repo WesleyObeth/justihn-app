@@ -14,7 +14,7 @@ import {
   SeccionProcesos,
   SeccionTramites,
 } from "@/components/landing/secciones";
-import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
+import { TRAMITES } from "@/data/tramites";
 
 const POPULARES = ["abrir-rtn", "traspaso-vehiculo", "permiso-operacion", "constituir-sociedad"];
 
@@ -32,7 +32,7 @@ export function LandingContenido() {
   return (
     <div className="landing-contenido">
       {/* ── Hero ── */}
-      <section className="mx-auto max-w-[880px] px-5 pt-[150px] pb-16 text-center md:pt-[176px]">
+      <section className="mx-auto max-w-[880px] px-5 pt-[150px] pb-8 text-center md:pt-[176px]">
         {/* Dos líneas fijas en escritorio: el quiebre es de composición, no
             del ancho disponible. En móvil fluye natural. */}
         <h1 className="font-display mx-auto max-w-[860px] text-[clamp(30px,5.5vw,52px)] leading-[1.12] font-bold text-balance">
@@ -79,14 +79,6 @@ export function LandingContenido() {
               {t.nombre}
             </Link>
           ))}
-        </div>
-
-        {/* Prueba con números reales */}
-        <div className="mx-auto mt-12 grid max-w-[720px] grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat cifra="20,202" etiqueta="sentencias del PJ" />
-          <Stat cifra={String(TRAMITES.length)} etiqueta="guías de trámites" />
-          <Stat cifra={String(INSTITUCIONES.length)} etiqueta="instituciones del Estado" />
-          <Stat cifra="Gratis" etiqueta="consultorio legal" />
         </div>
       </section>
 
@@ -234,19 +226,6 @@ export function LandingContenido() {
           </p>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function Stat({ cifra, etiqueta }: { cifra: string; etiqueta: string }) {
-  return (
-    <div className="glass-card px-4 py-3.5 text-center">
-      <div className="font-display text-[20px] font-bold" style={{ color: "var(--mint)" }}>
-        {cifra}
-      </div>
-      <div className="mt-0.5 text-[11.5px] leading-[1.35]" style={{ color: "var(--muted)" }}>
-        {etiqueta}
-      </div>
     </div>
   );
 }
