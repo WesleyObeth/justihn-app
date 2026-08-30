@@ -338,13 +338,6 @@ export function SeccionProcesos() {
             </Link>
           ))}
         </div>
-
-        <p className="mt-5 text-center text-[12.5px]" style={{ color: "var(--muted)" }}>
-          ¿Ya sabes que necesitas abogado?{" "}
-          <a href="#directorio" style={{ color: "var(--mint)" }}>
-            Búscalo por materia en el directorio →
-          </a>
-        </p>
       </div>
     </section>
   );
