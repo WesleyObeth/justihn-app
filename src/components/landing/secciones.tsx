@@ -312,30 +312,13 @@ export function SeccionProcesos() {
           ))}
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+        {/* Misma fila que los trámites, pero SIN el riel numerado: despido,
+            pensión, divorcio y herencia no se encadenan entre sí, y numerarlos
+            inventaría un orden. Lo que se unifica es el lenguaje visual, no el
+            significado. */}
+        <div className="mx-auto mt-7 flex max-w-[760px] flex-col gap-2.5">
           {filtrados.map((t) => (
-            <Link key={t.id} href={`/tramites/${t.id}`} className="glass-card flex flex-col p-5.5">
-              <div className="flex items-center gap-2">
-                <span
-                  className="rounded-full px-2.5 py-[3px] text-[11px] font-bold"
-                  style={{ background: "rgba(21,132,199,.1)", color: "var(--mint)" }}
-                >
-                  {t.materia}
-                </span>
-                <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
-                  {t.pasos.length} pasos
-                </span>
-              </div>
-              <div className="font-display mt-2 text-[16.5px] leading-[1.3] font-bold">
-                {t.nombre}
-              </div>
-              <p className="mt-1.5 flex-1 text-[13px] leading-[1.6]" style={{ color: "var(--muted)" }}>
-                {t.resumen}
-              </p>
-              <div className="mt-3 flex items-center gap-2 text-[12.5px]" style={{ color: "var(--mint)" }}>
-                Ver el paso a paso →
-              </div>
-            </Link>
+            <FilaTramite key={t.id} tramite={t} nota={t.paraQuien} />
           ))}
         </div>
       </div>
@@ -387,17 +370,23 @@ export function SeccionConsultorio() {
             ejemplo && <Intercambio lead={ejemplo} respuesta={ejemplo.respuestaDemo} />
           )}
 
-          <div className="glass-card mt-5 p-6">
-            <h3 className="font-display text-[17px] font-bold">
+          {/* El formulario va DENTRO de la misma card, bajo un divisor: en dos
+              cards separadas la sección era la más alta de la página sin
+              ganar nada. */}
+          <div className="mt-6 border-t pt-6" style={{ borderColor: "var(--line)" }}>
+            <h3 className="font-display text-center text-[17px] font-bold">
               {propia ? "¿Otra duda?" : "Ahora la tuya"}
             </h3>
-            <p className="mt-1 text-[13px]" style={{ color: "var(--muted)" }}>
+            <p
+              className="mt-1 text-center text-[13px]"
+              style={{ color: "var(--muted)" }}
+            >
               {/* No dice "sin cuenta": publicar lleva a `/personas/consultas`,
                   que es donde se sigue la respuesta. */}
               Publicarla es gratis. Te llevamos a tus consultas para que sigas la respuesta.
             </p>
-            <div className="mt-4">
-              <FormularioPregunta desdeLanding claro />
+            <div className="mt-5">
+              <FormularioPregunta desdeLanding claro sinMarco />
             </div>
           </div>
         </div>
@@ -501,7 +490,10 @@ export function SeccionDirectorio() {
   const materia: Materia | "todas" = filtro.tipo === "materia" ? filtro.materia : "todas";
 
   const materias = MATERIAS_DIRECTORIO;
-  const abogados = (soloNotarios ? buscarNotarios() : buscarAbogados(materia)).slice(0, 3);
+  // Sin recorte: con cinco perfiles, esconder dos tras una cuenta fingiría
+  // que hay más de lo que hay. Cuando el directorio crezca, aquí entra la
+  // paginación (o el gate, si tiene sentido entonces).
+  const abogados = soloNotarios ? buscarNotarios() : buscarAbogados(materia);
 
   const elegirMateria = (m: Materia | "todas") =>
     setFiltroUsuario(m === "todas" ? { tipo: "todas" } : { tipo: "materia", materia: m });
@@ -511,7 +503,7 @@ export function SeccionDirectorio() {
       <TituloSeccion
         eyebrow="Encuentra abogado"
         titulo="Profesionales del derecho por materia y ciudad"
-        desc="Perfiles con insignia de validado: colegiación comprobada con documentos ante el CAH."
+        desc="La insignia de validado significa que ese profesional comprobó su colegiación con documentos ante el CAH."
       />
 
       <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -583,11 +575,6 @@ export function SeccionDirectorio() {
         ))}
       </div>
 
-      <div className="mt-5 text-center">
-        <Link href="/personas/directorio" className="text-[13px]" style={{ color: "var(--mint)" }}>
-          Ver todo el directorio →
-        </Link>
-      </div>
     </section>
   );
 }

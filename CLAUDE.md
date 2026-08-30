@@ -186,6 +186,27 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **🔍 REFINADO DE LA HOME CIUDADANA (2026-08-30, auditoría + ajustes):**
+  - **Procesos habla el mismo idioma que Trámites**: pasa de 4 cards en grid a
+    la misma `FilaTramite`, pero **sin el riel numerado** — despido, pensión,
+    divorcio y herencia no se encadenan entre sí y numerarlos inventaría un
+    orden. Se unifica el lenguaje visual, no el significado (861 → 656px).
+  - **La página ya no termina dos veces:** la cross-sell "Para profesionales
+    del derecho" iba DESPUÉS del CTA oscuro, así que el cierre se deshinchaba
+    y la última impresión de un ciudadano era una oferta que no es para él.
+    Ahora va antes.
+  - **El eyebrow "Guías de trámites" se repetía** en el demo y en la sección;
+    el del demo pasa a "Dentro de una guía".
+  - **Directorio:** el subtítulo afirmaba "Perfiles con insignia de validado"
+    y una de las tres cards no la lleva (`verificado: false` en el seed) —
+    ahora **describe qué significa** la insignia. Y se enseñan **los cinco**
+    perfiles en vez de tres: esconder dos tras una cuenta fingía que hay más
+    de lo que hay, así que se quitó "Ver todo el directorio", que además metía
+    al visitante dentro del portal sin pasar por el alta.
+  - **Consultorio compactado:** el formulario era una card DENTRO de la card.
+    `FormularioPregunta` gana `sinMarco` para vivir dentro de un contenedor
+    que ya pone marco y titular (984 → 889px).
+
 - **💬 CONSULTORIO: la conversación primero (2026-08-30, elegido de un
   prototipo de tres):** la sección `#consultorio` abre con un **intercambio
   real** —consulta ciudadana + respuesta firmada por la colegiada, con su

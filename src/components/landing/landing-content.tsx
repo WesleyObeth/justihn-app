@@ -169,7 +169,7 @@ export function LandingContenido() {
 
       {/* ── Demostraciones: lo que hay detrás de la cuenta gratis ── */}
       <SeccionDemo
-        eyebrow="Guías de trámites"
+        eyebrow="Dentro de una guía"
         titulo="Deja de averiguar en la fila qué papel te falta"
         descripcion="Cada guía trae los requisitos, la tasa exacta y el orden de los pasos, con el enlace al portal de la institución para que lo verifiques. Con tu cuenta gratis vas marcando lo que ya hiciste."
         puntos={[
@@ -398,74 +398,6 @@ export function LandingContenido() {
         </div>
       </section>
 
-      {/* ── CTA final ── */}
-      <section className="mx-auto max-w-[1080px] px-5 py-16">
-        <div
-          className="relative overflow-hidden rounded-[24px] px-6 py-14 text-center md:px-14"
-          style={{
-            background: "linear-gradient(160deg,#0d2144 0%,#0a1830 55%,#08142a 100%)",
-            border: "1px solid rgba(125,211,252,.16)",
-          }}
-        >
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(60% 55% at 50% 0%, rgba(21,132,199,.35) 0%, transparent 70%)",
-            }}
-          />
-          <div className="relative">
-            <p
-              className="text-[11.5px] font-bold tracking-[2.5px] uppercase"
-              style={{ color: "#7dd3fc" }}
-            >
-              Tu trámite pendiente
-            </p>
-            <h2 className="font-display mx-auto mt-4 max-w-[720px] text-[clamp(26px,4vw,42px)] leading-[1.14] font-bold text-balance text-white">
-              Nadie debería perder un día por no saber qué papel llevar.
-            </h2>
-            <p
-              className="mx-auto mt-4 max-w-[540px] text-[15px] leading-[1.65]"
-              style={{ color: "rgba(226,238,248,.72)" }}
-            >
-              Crea tu cuenta gratis, abre la guía de lo que necesitas y ve marcando. Y si
-              se complica, pregunta — te responde un abogado colegiado.
-            </p>
-
-            <div className="mt-8 flex justify-center">
-              {/* ⚠️ El color va INLINE: la landing define
-                  `.landing-aurora a { color: inherit }`, que por especificidad
-                  le gana a `text-white` de Tailwind. */}
-              <Link
-                href="/crear-cuenta?tipo=persona"
-                className="magnetic inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold transition-opacity hover:opacity-90"
-                style={{ background: "var(--turq)", color: "#fff" }}
-              >
-                Crear cuenta gratis
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </Link>
-            </div>
-
-            <p className="mt-6 text-[12.5px]" style={{ color: "rgba(226,238,248,.55)" }}>
-              Gratis, sin tarjeta · tus guías y consultas quedan guardadas
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* ── Para abogados ── */}
       <section className="mx-auto max-w-[1080px] px-5 py-10">
         <div className="glass-card p-7 md:p-9">
@@ -544,6 +476,74 @@ export function LandingContenido() {
                 Primer mes a {OFERTA.anclaPrimerMes} en tu primera suscripción
               </span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA final ── */}
+      <section className="mx-auto max-w-[1080px] px-5 py-16">
+        <div
+          className="relative overflow-hidden rounded-[24px] px-6 py-14 text-center md:px-14"
+          style={{
+            background: "linear-gradient(160deg,#0d2144 0%,#0a1830 55%,#08142a 100%)",
+            border: "1px solid rgba(125,211,252,.16)",
+          }}
+        >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(60% 55% at 50% 0%, rgba(21,132,199,.35) 0%, transparent 70%)",
+            }}
+          />
+          <div className="relative">
+            <p
+              className="text-[11.5px] font-bold tracking-[2.5px] uppercase"
+              style={{ color: "#7dd3fc" }}
+            >
+              Tu trámite pendiente
+            </p>
+            <h2 className="font-display mx-auto mt-4 max-w-[720px] text-[clamp(26px,4vw,42px)] leading-[1.14] font-bold text-balance text-white">
+              Nadie debería perder un día por no saber qué papel llevar.
+            </h2>
+            <p
+              className="mx-auto mt-4 max-w-[540px] text-[15px] leading-[1.65]"
+              style={{ color: "rgba(226,238,248,.72)" }}
+            >
+              Crea tu cuenta gratis, abre la guía de lo que necesitas y ve marcando. Y si
+              se complica, pregunta — te responde un abogado colegiado.
+            </p>
+
+            <div className="mt-8 flex justify-center">
+              {/* ⚠️ El color va INLINE: la landing define
+                  `.landing-aurora a { color: inherit }`, que por especificidad
+                  le gana a `text-white` de Tailwind. */}
+              <Link
+                href="/crear-cuenta?tipo=persona"
+                className="magnetic inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14.5px] font-semibold transition-opacity hover:opacity-90"
+                style={{ background: "var(--turq)", color: "#fff" }}
+              >
+                Crear cuenta gratis
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </Link>
+            </div>
+
+            <p className="mt-6 text-[12.5px]" style={{ color: "rgba(226,238,248,.55)" }}>
+              Gratis, sin tarjeta · tus guías y consultas quedan guardadas
+            </p>
           </div>
         </div>
       </section>

@@ -27,9 +27,13 @@ export const MATERIAS_CONSULTA: Materia[] = [
 export function FormularioPregunta({
   desdeLanding = false,
   claro = false,
+  sinMarco = false,
 }: {
   desdeLanding?: boolean;
   claro?: boolean;
+  /** Sin card propia ni titular: cuando ya vive DENTRO de una card que los
+   *  pone (el consultorio de la home). Evita la card dentro de la card. */
+  sinMarco?: boolean;
 }) {
   const router = useRouter();
   const preguntarConsultorio = usePortal((s) => s.preguntarConsultorio);
@@ -63,13 +67,15 @@ export function FormularioPregunta({
   return (
     <div
       className={
-        claro
-          ? "glass-card p-5"
-          : "rounded-2xl border border-borde bg-white p-5"
+        sinMarco
+          ? ""
+          : claro
+            ? "glass-card p-5"
+            : "rounded-2xl border border-borde bg-white p-5"
       }
     >
-      <h3 className="font-display text-[16px] font-bold">Haz tu pregunta</h3>
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {!sinMarco && <h3 className="font-display text-[16px] font-bold">Haz tu pregunta</h3>}
+      <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 ${sinMarco ? "" : "mt-3"}`}>
         <label className="flex flex-col gap-1.5 text-[12.5px] text-texto-3">
           Materia
           <select
