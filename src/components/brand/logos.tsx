@@ -79,7 +79,9 @@ export function LogoJustihn({
   textoPx = 17,
 }: SimboloProps & { textoPx?: number }) {
   return (
-    <span className="flex items-center gap-[7px]">
+    // 5px de caja ≈ 7px ópticos: el símbolo ya aporta ~2px de aire propio
+    // a su derecha (tinta de 3.85 a 44.15 dentro del viewBox de 48).
+    <span className="flex items-center gap-[5px]">
       <SimboloJustihn size={size} variante={variante} className="shrink-0" />
       <span
         className="wordmark leading-none"

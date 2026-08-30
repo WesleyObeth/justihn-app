@@ -122,7 +122,11 @@
 .landing-aurora .brand {
   display: flex;
   align-items: center;
-  gap: 11px;
+  /* 5px de caja = ~7px ópticos: el símbolo lleva 3.85u de aire propio a cada
+     lado dentro de su viewBox de 48 (≈2.4px a size 30). Mismo valor óptico
+     que el lockup de `LogoJustihn`, para que la marca no cambie de aire
+     entre la landing y los portales. */
+  gap: 5px;
 }
 .landing-aurora .brand .wm {
   font: 600 18px/1 var(--font);
