@@ -220,6 +220,14 @@ export function LandingContenido() {
           El plan de pago que el socio pidió está EN DEFINICIÓN — se nombra al
           pie, con las mismas palabras que usa el portal ciudadano, para que
           las dos pantallas no se contradigan. */}
+      {/* ── Plan: uno solo, y es gratis ──────────────────────────────────
+          Estructura adaptada de la referencia que pasó Wesley (la card de
+          plan de Sonriprev): promesa y precio a la izquierda, lo que incluye
+          a la derecha, separadas por una línea. Funciona porque el ojo lee
+          primero "cuánto" y después "qué", que es el orden de la duda.
+          ⚠️ La referencia usa escasez ("los primeros 200 aseguran estas
+          condiciones"). Aquí NO se copia: sería inventarse un cupo que no
+          existe. El gancho es la gratuidad, que sí es verdad. */}
       <section id="plan" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-14">
         <TituloSeccion
           eyebrow="Cuánto cuesta"
@@ -227,76 +235,125 @@ export function LandingContenido() {
           desc="No hay prueba de 15 días ni tarjeta al final del formulario. Lo que ves es lo que hay."
         />
 
-        <div className="mx-auto mt-8 max-w-[440px]">
-          <div
-            className="glass-card flex flex-col p-7"
-            style={{
-              borderColor: "rgba(21,132,199,.55)",
-              boxShadow: "0 0 0 1px rgba(21,132,199,.45), 0 14px 40px rgba(21,132,199,.14)",
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <span
-                className="text-[12px] font-bold tracking-[1.2px] uppercase"
-                style={{ color: "var(--mint)" }}
-              >
-                Gratis
-              </span>
-              <span
-                className="rounded-full px-2.5 py-[3px] text-[10.5px] font-bold"
-                style={{ background: "rgba(21,132,199,.12)", color: "var(--mint)" }}
-              >
-                Sin tarjeta
-              </span>
-            </div>
-            <p className="mt-1 text-[12.5px]" style={{ color: "var(--muted)" }}>
-              Para cualquier persona en Honduras
-            </p>
-            <div className="mt-3 flex items-end gap-1">
-              <span className="font-display text-[32px] leading-none font-bold">L0</span>
-              <span className="text-[13px]" style={{ color: "var(--muted)" }}>
-                /mes
+        <div
+          className="glass-card mx-auto mt-9 grid max-w-[900px] grid-cols-1 overflow-hidden md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+          style={{
+            borderColor: "rgba(21,132,199,.4)",
+            boxShadow: "0 18px 50px rgba(13,33,68,.10)",
+          }}
+        >
+          {/* ── Promesa y precio ── */}
+          <div className="p-8 md:p-10">
+            <span
+              className="inline-block rounded-full border px-3.5 py-1.5 text-[11.5px] font-bold tracking-[1.4px] uppercase"
+              style={{
+                borderColor: "rgba(21,132,199,.35)",
+                background: "var(--color-chip)",
+                color: "var(--mint)",
+              }}
+            >
+              Plan único · sin tarjeta
+            </span>
+
+            <h3 className="font-display mt-6 text-[30px] leading-none font-bold">Plan Gratis</h3>
+
+            <div className="mt-4 flex items-end gap-2">
+              <span className="font-display text-[64px] leading-[0.9] font-bold">L0</span>
+              <span className="pb-1.5 text-[19px]" style={{ color: "var(--muted)" }}>
+                / para siempre
               </span>
             </div>
-            <p className="mt-1 text-[12px]" style={{ color: "var(--muted)" }}>
-              para siempre — sin caducidad
+
+            <p className="mt-5 text-[14.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
+              Todo lo que necesitas para resolver tu trámite o tu duda. Sin costo y sin
+              sorpresas:{" "}
+              <b style={{ color: "var(--ink)" }}>
+                no pedimos tarjeta, ni ahora ni después.
+              </b>
             </p>
 
-            <ul
-              className="mt-4 flex flex-col gap-2 border-t pt-4 text-[13px]"
-              style={{ borderColor: "var(--line)" }}
+            <Link
+              href="/crear-cuenta?tipo=persona"
+              className="magnetic mt-7 flex items-center justify-center gap-2 rounded-full py-4 text-[15.5px] font-semibold"
+              style={{
+                background: "var(--turq)",
+                color: "#fff",
+                boxShadow: "0 10px 28px rgba(21,132,199,.32)",
+              }}
             >
+              Crear cuenta gratis
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </Link>
+
+            <p className="mt-3.5 text-center text-[12.5px]" style={{ color: "var(--muted)" }}>
+              Listo en un minuto · solo tu nombre y tu correo
+            </p>
+          </div>
+
+          {/* ── Lo que incluye ── */}
+          <div
+            className="border-t p-8 md:border-t-0 md:border-l md:p-10"
+            style={{ borderColor: "var(--line)" }}
+          >
+            <p
+              className="text-[11.5px] font-bold tracking-[1.6px] uppercase"
+              style={{ color: "var(--muted)" }}
+            >
+              Incluido
+            </p>
+
+            <ul className="mt-4 flex flex-col">
               {[
                 `Las ${TRAMITES.length} guías completas, con su fuente oficial`,
                 "Checklist de tus trámites, guardado",
                 "Consultas ilimitadas al consultorio",
                 "Calculadora de prestaciones y de plazos",
                 "Directorio de abogados por materia y ciudad",
-              ].map((f) => (
-                <li key={f} className="flex gap-2.5" style={{ color: "var(--muted)" }}>
-                  <span style={{ color: "var(--mint)" }}>✓</span>
+              ].map((f, i) => (
+                <li
+                  key={f}
+                  className={`flex items-start gap-3 py-3.5 text-[14px] leading-[1.5] ${i > 0 ? "border-t" : ""}`}
+                  style={i > 0 ? { borderColor: "var(--line)" } : undefined}
+                >
+                  <span className="mt-0.5 shrink-0" style={{ color: "var(--color-exito)" }}>
+                    <Icono nombre="check" size={16} strokeWidth={2.6} />
+                  </span>
                   {f}
                 </li>
               ))}
             </ul>
 
-            <Link
-              href="/crear-cuenta?tipo=persona"
-              className="magnetic mt-5 rounded-[10px] py-2.5 text-center text-[13.5px] font-semibold"
-              style={{ background: "var(--turq)", color: "#fff" }}
+            {/* El plan de pago del socio, con LAS MISMAS palabras que el
+                portal ciudadano — si cambia una, cambian las dos. */}
+            <div
+              className="mt-6 flex gap-3 rounded-[14px] border px-4 py-3.5"
+              style={{ borderColor: "var(--line)", background: "var(--color-chip)" }}
             >
-              Crear cuenta gratis
-            </Link>
+              <span className="mt-0.5 shrink-0" style={{ color: "var(--mint)" }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z" />
+                </svg>
+              </span>
+              <p className="text-[12.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
+                ¿Verificaciones y alertas sobre tu nombre? El{" "}
+                <b style={{ color: "var(--ink)" }}>plan de pago está en definición</b> — lo que
+                hoy es gratis seguirá siendo gratis.
+              </p>
+            </div>
           </div>
         </div>
-
-        <p
-          className="mx-auto mt-6 max-w-[520px] text-center text-[12.5px] leading-[1.6]"
-          style={{ color: "var(--muted)" }}
-        >
-          Más adelante habrá un plan de pago con herramientas de verificación y
-          protección — está en definición. Lo que hoy es gratis seguirá siendo gratis.
-        </p>
       </section>
 
       {/* ── FAQ ── */}

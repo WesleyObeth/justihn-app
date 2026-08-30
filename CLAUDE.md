@@ -277,6 +277,13 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     una decisión que la persona no tiene. El plan de pago que pidió el socio
     se nombra al pie con **las mismas palabras que usa el portal ciudadano**
     ("en definición"), para que las dos pantallas no se contradigan.
+    **Rediseñada 2026-08-30** siguiendo una referencia que pasó Wesley (la
+    card de plan de Sonriprev): dos columnas separadas por una línea —promesa,
+    precio grande y CTA a la izquierda; "Incluido" con divisores y la nota del
+    plan de pago a la derecha—. Se lee "cuánto" y luego "qué", que es el orden
+    de la duda. ⚠️ **La referencia usa escasez** ("los primeros 200 aseguran
+    estas condiciones") y eso NO se copió: sería inventarse un cupo que no
+    existe. El gancho es la gratuidad, que sí es verdad.
   - ⚠️ **Honestidad:** el copy de la demo de calculadora NO dice "usa el
     Código del Trabajo" ni "el mismo número que vería tu abogado" — sería
     sobreventa mientras `lib/prestaciones` siga sin validar con el socio y
