@@ -41,8 +41,8 @@ export function LandingContenido() {
           <span>y un abogado cuando lo necesitas</span>
         </h1>
         <p className="mx-auto mt-4 max-w-[560px] text-[15.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
-          Guías paso a paso con fuentes oficiales, un consultorio gratuito con abogados
-          colegiados y la jurisprudencia del país en un solo lugar.
+          Qué necesitas, dónde se hace y cuánto cuesta — cada dato con su fuente oficial.
+          Y un abogado colegiado que responde gratis si se complica.
         </p>
 
         {/* Buscador con el borde aurora canónico de Jus IA: la puerta de
