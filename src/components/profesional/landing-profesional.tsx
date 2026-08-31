@@ -3,6 +3,7 @@ import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { OFERTA, PLANES } from "@/data/catalogo";
 import { INSTITUCIONES, TRAMITES } from "@/data/tramites";
 import { PieAurora } from "@/components/landing/pie-aurora";
+import { Capacidades } from "@/components/profesional/capacidades";
 import { ComposerJusIA } from "@/components/profesional/composer-jus-ia";
 import { DemoGaceta, DemoJusIA, DemoLeads, SeccionDemo } from "@/components/profesional/demos";
 
@@ -15,48 +16,6 @@ import { DemoGaceta, DemoJusIA, DemoLeads, SeccionDemo } from "@/components/prof
  * su fuente, y que cuando no la hay el sistema lo dice en vez de inventarla.
  */
 
-const CAPACIDADES: { icono: NombreIcono; titulo: string; desc: string }[] = [
-  {
-    icono: "juris",
-    titulo: "Jurisprudencia del CSJ",
-    desc: "Sentencias con el resumen del CEDIJ, órgano, magistrado y fallo. Filtras por materia y abres el texto íntegro.",
-  },
-  {
-    icono: "libro",
-    titulo: "Legislación",
-    desc: "Códigos y artículos con su síntesis. Lo que está cargado se muestra con su fuente; lo que no, aparece en preparación.",
-  },
-  {
-    icono: "gaceta",
-    titulo: "Alertas de La Gaceta",
-    desc: "Publicaciones por materia, para enterarte de la reforma antes que tu contraparte.",
-  },
-  {
-    icono: "pasos",
-    titulo: "Procesos paso a paso",
-    desc: "El camino procesal con sus plazos y su checklist, para no perder un término por descuido.",
-  },
-  {
-    icono: "plantillas",
-    titulo: "Modelos de escritos",
-    desc: "Demandas y escritos editables como punto de partida, no como plantilla ciega.",
-  },
-  {
-    icono: "calc",
-    titulo: "Calculadoras del litigante",
-    desc: "Prestaciones laborales, cómputo de plazos y vía procesal según la cuantía.",
-  },
-  {
-    icono: "perfil",
-    titulo: "Monitoreo de nombres",
-    desc: "Te avisa cuando un nombre que vigilas aparece en lo que el Estado publica.",
-  },
-  {
-    icono: "leads",
-    titulo: "Leads del consultorio",
-    desc: "Las consultas que la gente hace en el lado público llegan aquí, con su materia y ciudad.",
-  },
-];
 
 /**
  * FAQ de la landing — responde objeciones de quien AÚN no tiene cuenta, no las
@@ -148,27 +107,9 @@ export function LandingProfesional() {
         <Encabezado
           eyebrow="Qué incluye"
           titulo="Lo que encuentras dentro"
-          sub="Ocho herramientas que ya son pantallas del portal — no promesas de un roadmap."
+          sub="Nueve herramientas que ya son pantallas del portal — no promesas de un roadmap. Elige una categoría y mírala por dentro."
         />
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CAPACIDADES.map((c) => (
-            <div key={c.titulo} className="glass-card flex flex-col p-5">
-              <span
-                className="grid h-9 w-9 place-items-center rounded-[10px]"
-                style={{ background: "rgba(21,132,199,.1)", color: "var(--mint)" }}
-              >
-                <Icono nombre={c.icono} size={17} />
-              </span>
-              <h3 className="mt-3 text-[14.5px] font-bold">{c.titulo}</h3>
-              <p
-                className="mt-1.5 text-[12.5px] leading-[1.6]"
-                style={{ color: "var(--muted)" }}
-              >
-                {c.desc}
-              </p>
-            </div>
-          ))}
-        </div>
+        <Capacidades />
       </section>
 
       {/* ── Demostraciones: el producto a la vista, con datos reales ── */}

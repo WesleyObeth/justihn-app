@@ -426,6 +426,28 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     medidas/alt, y que titulares (≤48), sellos (≤24) y los títulos y
     descripciones compartibles (≤70/≤170) no se corten en la burbuja.
 
+- **🗂️ "LO QUE ENCUENTRAS DENTRO" — tres categorías con vista previa
+  (`components/profesional/capacidades.tsx`, 2026-08-30):** sustituye al muro
+  de 8 cards iguales sobre una referencia que pasó Wesley — lista seleccionable
+  a la izquierda, panel de producto a la derecha. Categorías: **Investigar con
+  fuente · No perder nada de vista · Producir y conseguir clientes**.
+  - Arregla tres cosas del muro anterior: **no incluía Jus IA** (el corazón del
+    producto), llamaba a cada función por el nombre de su pantalla en vez de
+    por el trabajo que resuelve, y no daba ninguna jerarquía.
+  - **Cada card lleva sus funciones como chips aunque no esté activa.** La
+    referencia son tres servicios; aquí son nueve funciones, y si solo se
+    vieran las de la categoría abierta el inventario desaparecería.
+  - ⚠️ **Los tres paneles se MONTAN siempre**, el inactivo va con `hidden`.
+    Montar solo el activo dejaría 6 de 9 funciones fuera del HTML del servidor.
+    Verificado que las nueve salen en el SSR.
+  - **Los tres miden lo mismo** (`min-h`, 513×404 medido): con alturas
+    distintas la página saltaba al cambiar de categoría.
+  - El contenido de los paneles sale de los **seeds reales** (sentencia
+    CL-528-24 del piloto, alerta de Gaceta, modelo y lead), no de maquetas.
+    ⚙️ **Capturas del portal: diferidas a propósito** — una captura driftea en
+    cuanto cambia una pantalla, no le da texto al crawler, y la UI se moverá
+    mucho al entrar Supabase. Se reevalúa entonces (ver §6.5b).
+
 - **🌑 LANDING BLACK — `/para-abogados-black` (2026-08-30):** la MISMA landing
   de la vía A en tema oscuro, para comparar con Wesley cuál versión queda.
   Cero duplicación: la página reutiliza `LandingProfesional` tal cual y el
