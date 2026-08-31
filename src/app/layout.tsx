@@ -19,13 +19,15 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 /**
- * Origen público del sitio. Es lo que vuelve absolutas las URLs de las
- * tarjetas sociales: WhatsApp y LinkedIn descartan un `og:image` relativo, así
- * que sin esto no hay miniatura.
- * TODO(dominio): al comprar el dominio definitivo, se cambia AQUÍ y nada más.
+ * Origen público del sitio (dominio propio desde 2026-08-30). Es lo que vuelve
+ * absolutas las URLs de las tarjetas sociales: WhatsApp y LinkedIn descartan un
+ * `og:image` relativo, así que sin esto no hay miniatura.
+ *
+ * Es el ÚNICO sitio donde vive el dominio. `NEXT_PUBLIC_SITIO_URL` lo sobrescribe
+ * para previsualizaciones, donde conviene que las tarjetas apunten al deploy que
+ * se está mirando y no a producción.
  */
-const SITIO =
-  process.env.NEXT_PUBLIC_SITIO_URL?.trim() || "https://justihn-app.vercel.app";
+const SITIO = process.env.NEXT_PUBLIC_SITIO_URL?.trim() || "https://justihn.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITIO),
