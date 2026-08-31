@@ -37,20 +37,32 @@ export function InicioPersona() {
       <BuscadorProblema />
       <Metricas />
 
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
+      {/* Dos rejillas, no una.
+          Con una sola, cada columna apila lo suyo y la última card de cada lado
+          empieza donde termina la anterior — que depende del contenido: medido,
+          "Lo que viene" arrancaba 121px por debajo de "Lo que otros preguntan"
+          con la cuenta vacía y 157px con datos. Ninguna altura fija arregla las
+          dos a la vez. Sacándolas a su PROPIA fila quedan alineadas por
+          construcción, en cualquier estado. El `flex-1` de la última card de
+          cada columna de arriba cierra las dos a la misma altura, así que la
+          costura entre las dos rejillas es una línea recta. */}
+      <div className="mt-4 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.6fr_1fr]">
         <div className="flex flex-col gap-4">
           <TusPendientes />
           <MisConsultas />
           <MisTramites />
-          <LoQueOtrosPreguntan />
         </div>
 
         <div className="flex flex-col gap-4">
           <PlazoDestacado />
           <AntesDeFirmar />
           <AccesosRapidos />
-          <LoQueViene />
         </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.6fr_1fr]">
+        <LoQueOtrosPreguntan />
+        <LoQueViene />
       </div>
     </div>
   );
@@ -383,6 +395,9 @@ function MisTramites() {
   const pasosTramite = usePortal((s) => s.pasosTramite);
   const enProgreso = TRAMITES.filter((t) => (pasosTramite[t.id] ?? []).length > 0);
 
+  // Sin `flex-1` a propósito: la fila de abajo ya alinea por su cuenta, así que
+  // estirar esta card solo metería el hueco DENTRO de ella — un rectángulo
+  // blanco vacío. Suelto, el aire queda entre cards, que se lee como aire.
   return (
     <div className="rounded-2xl border border-borde bg-white p-5">
       <div className="flex items-center justify-between">
@@ -455,7 +470,7 @@ function LoQueOtrosPreguntan() {
   if (ejemplos.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-borde bg-white p-5">
+    <div className="flex flex-col rounded-2xl border border-borde bg-white p-5">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-[17px] font-bold">Lo que otros preguntan</h2>
         <Link href="/personas/consultas" className="text-[12.5px]">
@@ -544,23 +559,26 @@ function AntesDeFirmar() {
   );
 }
 
-/** Las seis pantallas a un clic, con el catálogo en cifras al pie. */
+/**
+ * Cuatro, no seis (decisión Wesley: achicarla para alinear la fila de abajo).
+ * Se van las dos que ya tienen otra puerta en esta misma pantalla: "Mis
+ * consultas" es una card entera más arriba, y a Calculadoras lleva el botón del
+ * destacado oscuro. Quedan las que NO se alcanzan de otro modo desde Inicio.
+ */
 function AccesosRapidos() {
   const accesos: { href: string; icono: NombreIcono; label: string }[] = [
     { href: "/personas/tramites", icono: "pasos", label: "Guías de trámites" },
     { href: "/personas/instituciones", icono: "gaceta", label: "Instituciones" },
     { href: "/personas/directorio", icono: "perfil", label: "Encuentra abogado" },
-    { href: "/personas/calculadora", icono: "calc", label: "Calculadoras" },
-    { href: "/personas/consultas", icono: "leads", label: "Mis consultas" },
     { href: "/personas/monitoreo", icono: "bell", label: "Mi nombre" },
   ];
 
   return (
-    <div className="rounded-2xl border border-borde bg-white p-5">
+    <div className="flex flex-1 flex-col rounded-2xl border border-borde bg-white p-5">
       <h2 className="text-[11px] font-semibold tracking-[1.2px] text-texto-4 uppercase">
         Accesos rápidos
       </h2>
-      <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      <div className="mt-3 grid flex-1 grid-cols-1 content-start gap-2.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         {accesos.map((a) => (
           <Link
             key={a.href}
@@ -618,7 +636,7 @@ function LoQueViene() {
   ];
 
   return (
-    <div className="flex flex-1 flex-col rounded-2xl border-2 border-dashed border-borde bg-white/70 p-5">
+    <div className="flex flex-col rounded-2xl border-2 border-dashed border-borde bg-white/70 p-5">
       <div className="flex items-baseline gap-2">
         <h2 className="text-[11px] font-semibold tracking-[1.2px] text-dorado uppercase">
           Lo que viene

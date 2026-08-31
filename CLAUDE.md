@@ -102,8 +102,20 @@ promesas que ya estaban hechas y no existían:
   - **El destacado oscuro es un PLAZO, no un digest** (`data/plazos.ts`, art. 864):
     es lo que le hace perder el caso sin enterarse, y ya está verificado.
   - **Accesos rápidos** resuelve que Instituciones, Verifica y Mi nombre no se
-    descubrían desde Inicio. **La card "Tu plan" se quitó** (decisión Wesley):
-    duplicaba el menú del avatar, que es donde vive el plan.
+    descubrían desde Inicio; son **4, no 6** (decisión Wesley) — se fueron las
+    dos que ya tienen otra puerta en la misma pantalla: "Mis consultas" es una
+    card entera arriba y a Calculadoras lleva el botón del destacado oscuro.
+    **La card "Tu plan" se quitó** (decisión Wesley): duplicaba el menú del
+    avatar, que es donde vive el plan.
+  - **La pantalla son DOS rejillas, no una** (decisión Wesley: alinear "Lo que
+    otros preguntan" con "Lo que viene"). Con una sola, cada columna apila lo
+    suyo y la última card de cada lado empieza donde acabe la anterior — que
+    depende del contenido: medido, había **121px de desfase con la cuenta vacía
+    y 157px con datos**, así que ninguna altura fija los arregla a la vez. En su
+    propia fila quedan alineadas por construcción. `items-stretch` iguala las
+    columnas de arriba, y **"Mis trámites" NO lleva `flex-1`** a propósito:
+    estirarla metía el hueco dentro de la card (un rectángulo blanco vacío) en
+    vez de dejarlo entre cards, donde se lee como aire.
   - **"Lo que viene"** (decisión Wesley: partir Accesos rápidos en dos) NO es un
     anuncio de marketing: sus tres puntos son ítems del backlog con su bloqueo
     real detrás — Informe Verifica completo (depende de cuentas SURE/CCIT), más
