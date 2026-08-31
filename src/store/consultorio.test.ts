@@ -120,3 +120,86 @@ describe("escribirAAbogado", () => {
     expect(estado["carlos-mejia"]![0]!.texto).toBe("Para Carlos");
   });
 });
+
+/**
+ * Habeas data funcional (§5 del CLAUDE.md del producto): el canal de supresión
+ * tiene que BORRAR, no enseñar un aviso. Y por categoría, porque no todo pesa
+ * igual — el historial del Informe Verifica (a quién consultó) puede querer
+ * borrarse sin perder el avance de los trámites.
+ */
+describe("borrarDatosPersona", () => {
+  const sembrar = () =>
+    usePortal.setState({
+      preguntasPublico: [
+        {
+          id: "pub-1",
+          materia: "Consumidor",
+          ciudad: "Tegucigalpa",
+          cuando: "reciente",
+          nuevo: true,
+          respuestas: 0,
+          pregunta: "Producto vencido",
+        },
+      ],
+      leadsRespondidos: { "pub-1": [{ abogadoId: ABOGADA_DEMO.id, texto: "x", cuando: "hoy" }] },
+      pasosTramite: { "abrir-rtn": [0, 1] },
+      nombresVigiladosPersona: [{ id: "v1", nombre: "Carlos Zelaya", tipo: "propio" }],
+      mensajesAbogado: {
+        "gabriela-nunez": [
+          { abogadoId: "gabriela-nunez", materia: "Consumidor", texto: "hola", cuando: "hoy" },
+        ],
+      },
+      consultasVerifica: ["Estado de Honduras"],
+    });
+
+  beforeEach(sembrar);
+
+  it("borra SOLO la categoría pedida", () => {
+    usePortal.getState().borrarDatosPersona("verifica");
+    const s = usePortal.getState();
+    expect(s.consultasVerifica).toEqual([]);
+    // Lo demás sigue intacto.
+    expect(s.preguntasPublico).toHaveLength(1);
+    expect(s.pasosTramite["abrir-rtn"]).toEqual([0, 1]);
+    expect(s.nombresVigiladosPersona).toHaveLength(1);
+  });
+
+  it("borrar consultas se lleva también sus respuestas", () => {
+    usePortal.getState().borrarDatosPersona("consultas");
+    const s = usePortal.getState();
+    expect(s.preguntasPublico).toEqual([]);
+    expect(s.leadsRespondidos).toEqual({});
+  });
+
+  it("cada categoría se puede borrar por su cuenta", () => {
+    for (const categoria of ["tramites", "vigilados", "mensajes"] as const) {
+      sembrar();
+      usePortal.getState().borrarDatosPersona(categoria);
+      const s = usePortal.getState();
+      if (categoria === "tramites") expect(s.pasosTramite).toEqual({});
+      if (categoria === "vigilados") expect(s.nombresVigiladosPersona).toEqual([]);
+      if (categoria === "mensajes") expect(s.mensajesAbogado).toEqual({});
+      // Y nunca se lleva por delante lo que no se pidió.
+      expect(s.consultasVerifica, categoria).toEqual(["Estado de Honduras"]);
+    }
+  });
+
+  it('"todo" no deja nada de la persona', () => {
+    usePortal.getState().borrarDatosPersona("todo");
+    const s = usePortal.getState();
+    expect(s.preguntasPublico).toEqual([]);
+    expect(s.leadsRespondidos).toEqual({});
+    expect(s.pasosTramite).toEqual({});
+    expect(s.nombresVigiladosPersona).toEqual([]);
+    expect(s.mensajesAbogado).toEqual({});
+    expect(s.consultasVerifica).toEqual([]);
+  });
+
+  it("no toca los datos del abogado: son otra audiencia", () => {
+    usePortal.setState({
+      nombresVigilados: [{ id: "vig-x", nombre: "Cliente del abogado", tipo: "cliente" }],
+    });
+    usePortal.getState().borrarDatosPersona("todo");
+    expect(usePortal.getState().nombresVigilados).toHaveLength(1);
+  });
+});

@@ -115,6 +115,8 @@ interface PortalState {
   escribirAAbogado: (abogadoId: string, materia: Materia, texto: string) => void;
   registrarConsultaVerifica: (nombre: string) => void;
   olvidarConsultasVerifica: () => void;
+  /** Habeas data de verdad (§5): borra una categoría, o todo. */
+  borrarDatosPersona: (que: CategoriaDatos | "todo") => void;
   dejarDeVigilarPersona: (id: string) => void;
   dejarDeVigilar: (id: string) => void;
   preguntarConsultorio: (materia: Materia, ciudad: string, pregunta: string) => void;
@@ -274,6 +276,18 @@ export const usePortal = create<PortalState>()(
           return { consultasVerifica: [limpio, ...resto].slice(0, 8) };
         }),
       olvidarConsultasVerifica: () => set({ consultasVerifica: [] }),
+      borrarDatosPersona: (que) =>
+        set(() => {
+          const vacio = {
+            consultas: { preguntasPublico: [], leadsRespondidos: {} },
+            tramites: { pasosTramite: {} },
+            vigilados: { nombresVigiladosPersona: [] },
+            mensajes: { mensajesAbogado: {} },
+            verifica: { consultasVerifica: [] },
+          } as const;
+          if (que === "todo") return Object.assign({}, ...Object.values(vacio));
+          return vacio[que];
+        }),
       dejarDeVigilarPersona: (id) =>
         set((s) => ({
           nombresVigiladosPersona: s.nombresVigiladosPersona.filter((v) => v.id !== id),
@@ -383,6 +397,9 @@ export const usePortal = create<PortalState>()(
  * `onFinishHydration` es el mecanismo previsto (el mismo patrón de
  * `hooks/use-saludo.ts`), y devuelve `false` en SSR.
  */
+/** Las categorías de datos propios que la persona puede revisar y borrar. */
+export type CategoriaDatos = "consultas" | "tramites" | "vigilados" | "mensajes" | "verifica";
+
 export function useStoreHidratado(): boolean {
   return useSyncExternalStore(
     (alCambiar) => usePortal.persist.onFinishHydration(alCambiar),

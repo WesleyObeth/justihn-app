@@ -187,6 +187,19 @@ promesas que ya estaban hechas y no existían:
   importa entonces es seguirlas) y **se cierra solo al publicar**: guarda
   cuántas consultas había al abrirse, no un booleano, así que publicar lo cierra
   sin un efecto — que además no pasaría el lint (§4.7.18).
+- **Configuración: el habeas data pasa a ser FUNCIONAL** (2026-08-31). §5 del
+  CLAUDE.md del producto lo exige desde el día 1 —"canal de supresión/revisión
+  funcional desde la plataforma"— y la pantalla lo prometía con dos botones que
+  solo enseñaban un toast. Ahora lista **lo que Justihn guarda de verdad**, con
+  su cuenta derivada del store (consultas · avance de trámites · nombres
+  vigilados · mensajes a abogados · a quién consultó en Verifica), **borra por
+  categoría** —el historial de Verifica es lo más sensible y puede querer irse
+  sin perder el avance de los trámites— y **descarga un JSON de verdad**.
+  "Borrar todo" pide confirmación; una categoría no: no hay deshacer y el peso
+  del error es muy distinto. `borrarDatosPersona` no toca los datos del abogado,
+  que son otra audiencia en el mismo store (hay test). Y las notificaciones
+  **dicen por dónde llegan** — correo y WhatsApp de la cuenta —, que era el dato
+  que faltaba teniendo los dos campos justo arriba.
 - **Plan y Mi perfil** (refinadas 2026-08-31). En Plan, lo incluido **se deriva
   de los seeds** (`TRAMITES.length`, `INSTITUCIONES`, `DIRECTORIO`): escrito a
   mano se había quedado viejo — decía "calculadora de prestaciones" en singular
@@ -693,7 +706,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (140 tests de invariantes)
+pnpm test         # Vitest (145 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
