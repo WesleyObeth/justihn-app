@@ -88,98 +88,161 @@
   background: #1584c7;
 }
 
-/* ── Splash del logo: pop → páginas se abren → cruce → wordmark → texto ── */
-@keyframes obPop {
-  from {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+/* ── Escena del logo — 4 actos en 6,8 s ────────────────────────────────────
+   Especificación de `justihn-logo-scene.jsx`, portada a keyframes CSS. Los
+   tiempos van en PORCENTAJE del ciclo para que el bucle sea una sola
+   animación por elemento y las cuatro escenas no puedan desincronizarse:
+
+     Cerrado   0 → 1,4 s   (  0 %  → 20,6 %)  libro cerrado, centrado
+     Apertura  1,4 → 3,0 s ( 20,6 % → 44,1 %)  páginas a ±26° + cruce
+     Nombre    3,0 → 5,2 s ( 44,1 % → 76,5 %)  se revela el wordmark
+     Final     5,2 → 6,8 s ( 76,5 % → 100 %)   respiración y fade
+
+   El símbolo "se desliza a la izquierda" como CONSECUENCIA de que el wordmark
+   ocupe sitio: el grupo está centrado y el ancho del nombre crece de 0. Así
+   no hay que codificar a mano cuántos píxeles mide "Justihn" — si cambia la
+   fuente o el tamaño, el encuadre sigue centrado solo. */
+.escena-logo {
+  --ciclo: 6.8s;
 }
-@keyframes obPageL {
-  from {
+
+@keyframes escPaginaIzq {
+  0%,
+  20.6% {
     transform: rotate(0deg);
   }
-  to {
+  44.1%,
+  100% {
     transform: rotate(-26deg);
   }
 }
-@keyframes obPageR {
-  from {
+@keyframes escPaginaDer {
+  0%,
+  20.6% {
     transform: rotate(0deg);
   }
-  to {
+  44.1%,
+  100% {
     transform: rotate(26deg);
   }
 }
-@keyframes obCross {
-  from {
+/* El cruce nace cuando las páginas ya se solapan, no antes. */
+@keyframes escCruce {
+  0%,
+  32% {
     opacity: 0;
   }
-  to {
+  44.1%,
+  100% {
     opacity: 1;
   }
 }
-@keyframes obWord {
-  from {
+@keyframes escNombre {
+  0%,
+  44.1% {
+    max-width: 0;
     opacity: 0;
-    transform: translateX(-14px);
   }
-  to {
+  60% {
     opacity: 1;
-    transform: none;
+  }
+  76.5%,
+  100% {
+    max-width: 440px;
+    opacity: 1;
   }
 }
-@keyframes obFadeIn {
-  from {
+/* Escena 4: respira y se desvanece para volver a empezar. */
+@keyframes escRespira {
+  0%,
+  76.5% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  88% {
+    transform: scale(1.035);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
     opacity: 0;
   }
-  to {
+}
+@keyframes escPie {
+  0%,
+  50% {
+    opacity: 0;
+  }
+  64%,
+  90% {
     opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
-.splash-pop {
-  animation: obPop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) both;
+.escena-logo .esc-grupo {
+  animation: escRespira var(--ciclo) cubic-bezier(0.4, 0, 0.2, 1) both;
 }
-.splash-pagina-izq {
+/* ⚠️ El pivote va en (17,21)/(31,21) — el centro de cada rect— y NO en su
+   base, aunque la spec dijera "base". Motivo: el logo oficial se define como
+   `rotate(-26 17 21)` (`logo/justihn-icon.svg`, geometría FIJA). Girando
+   desde la base, ese mismo ángulo deja las páginas desplazadas y el
+   fotograma final NO sería el logo de la marca. El gesto de libro abriéndose
+   se conserva igual; lo que se garantiza es dónde termina. */
+.escena-logo .esc-pagina-izq {
   transform-origin: 17px 21px;
-  animation: obPageL 1.5s cubic-bezier(0.3, 0, 0.2, 1) 0.6s both;
+  animation: escPaginaIzq var(--ciclo) cubic-bezier(0.3, 0, 0.2, 1) both;
 }
-.splash-pagina-der {
+.escena-logo .esc-pagina-der {
   transform-origin: 31px 21px;
-  animation: obPageR 1.5s cubic-bezier(0.3, 0, 0.2, 1) 0.6s both;
+  animation: escPaginaDer var(--ciclo) cubic-bezier(0.3, 0, 0.2, 1) both;
 }
-.splash-cruce {
-  animation: obCross 0.45s ease 2s both;
+.escena-logo .esc-cruce {
+  animation: escCruce var(--ciclo) ease both;
 }
-.splash-wordmark {
-  animation: obWord 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) 2.4s both;
+.escena-logo .esc-nombre {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: escNombre var(--ciclo) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.splash-texto {
-  animation: obFadeIn 0.6s ease 3.2s both;
+.escena-logo .esc-pie {
+  animation: escPie var(--ciclo) ease both;
+}
+
+/* En bucle (escaparate). El splash de carga NO lo lleva: una sola pasada. */
+.escena-logo--bucle .esc-grupo,
+.escena-logo--bucle .esc-pagina-izq,
+.escena-logo--bucle .esc-pagina-der,
+.escena-logo--bucle .esc-cruce,
+.escena-logo--bucle .esc-nombre,
+.escena-logo--bucle .esc-pie {
+  animation-iteration-count: infinite;
 }
 
 /* Con reduced-motion el splash no anima: muestra el logo terminado y el texto,
    y el redirect de 5 s sigue su curso. */
 @media (prefers-reduced-motion: reduce) {
-  .splash-pop,
-  .splash-pagina-izq,
-  .splash-pagina-der,
-  .splash-cruce,
-  .splash-wordmark,
-  .splash-texto,
+  .escena-logo .esc-grupo,
+  .escena-logo .esc-cruce,
+  .escena-logo .esc-pie,
   .auth-fadeup,
   .auth-fadeup-card {
     animation: none;
   }
-  .splash-pagina-izq {
+  /* Sin movimiento se enseña el logo YA abierto y el nombre visible. */
+  .escena-logo .esc-pagina-izq {
+    animation: none;
     transform: rotate(-26deg);
   }
-  .splash-pagina-der {
+  .escena-logo .esc-pagina-der {
+    animation: none;
     transform: rotate(26deg);
+  }
+  .escena-logo .esc-nombre {
+    animation: none;
+    max-width: 440px;
+    opacity: 1;
   }
 }

@@ -463,11 +463,26 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     amplias que las 6 del corpus) + bienvenida con resumen y checklist. La
     **`consultaPendiente` del composer se conserva**: se muestra sobre el card
     ("Tu pregunta te espera") y se dispara al llegar al chat, igual que antes.
-  - **Splash compartido** (`components/auth/splash.tsx`): el logo se arma en
-    secuencia (pop → páginas 0°→±26° → cruce → wordmark) y a los 5 s navega a
-    `/abogados`. La capa final es `SimboloJustihn` — un solo dibujo del logo,
-    sin drift; keyframes en `components/auth/auth.css` (con reduced-motion
-    muestra el logo terminado). La geometría del handoff resultó idéntica a la
+  - **Escena del logo — el libro que se abre** (`components/auth/escena-logo.tsx`,
+    reescrita 2026-08-30 según la spec `justihn-logo-scene.jsx` que pasó
+    Wesley). Cuatro actos en **6,8 s**: Cerrado 1,4 s (libro cerrado y
+    centrado) · Apertura 1,6 s (páginas a ±26° y nace el cruce) · Nombre 2,2 s
+    (se revela el wordmark) · Final 1,6 s (respiración y fade). Los tiempos van
+    en **porcentaje de un ciclo único** en `auth.css`, para que el bucle sea
+    una animación por elemento y los actos no puedan desincronizarse.
+    - El símbolo **se corre a la izquierda como consecuencia** de que el
+      wordmark ocupe sitio (el grupo está centrado y el ancho del nombre crece
+      de 0), no con un desplazamiento en píxeles: si cambia la fuente o el
+      tamaño, el encuadre se recentra solo.
+    - ⚠️ **El pivote va en (17,21)/(31,21) —el centro de cada rect— y NO en su
+      base**, aunque la spec dijera "base": el logo oficial se define como
+      `rotate(-26 17 21)` y girando desde la base ese mismo ángulo deja las
+      páginas desplazadas, o sea que **el fotograma final no sería el logo de
+      la marca**. Verificado que termina en −26°/+26° sobre esos orígenes.
+    - `SplashJustihn` hace **una sola pasada** y navega a los 5 s — justo al
+      cerrar el tercer acto, con el nombre ya revelado y antes del fade del
+      cuarto. `bucle` lo repite (escaparate). Con reduced-motion se muestra el
+      logo abierto y el nombre, sin movimiento. La geometría del handoff resultó idéntica a la
     oficial de `brand/logos.tsx`, y sus fuentes (Space Grotesk títulos +
     Instrument Sans UI) son las que el proyecto ya tenía — cero tokens nuevos.
   - **🔗 LOGIN COMPARTIDO POR LAS DOS VÍAS (2026-08-30, decisión Wesley):**
