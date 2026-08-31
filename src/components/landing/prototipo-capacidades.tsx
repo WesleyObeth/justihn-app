@@ -1,287 +1,282 @@
 "use client";
 
 /**
- * ⚗️ PROTOTIPO TEMPORAL — reestructurar "Lo que encuentras dentro" de la
- * landing de abogados (2026-08-30). Se borra con su ruta al elegir una.
+ * ⚗️ PROTOTIPO TEMPORAL — "Lo que encuentras dentro", 2ª ronda (2026-08-30).
+ * Se borra con su ruta al elegir una.
  *
- * Lo que las tres corrigen del muro de 8 cards iguales:
- *   1. **Faltaba Jus IA** — el corazón del producto, con demo propio justo
- *      debajo, no estaba en la lista de lo que encuentras dentro.
- *   2. **Títulos de pantalla, no de trabajo.** Nadie busca "monitoreo de
- *      nombres"; busca enterarse si mencionan a su cliente.
- *   3. **No decía qué plan incluye qué**, que es la duda que decide y estaba
- *      2.000px más abajo.
- *   4. **Cero jerarquía**: Jus IA pesaría lo mismo que la calculadora.
+ * La 1ª ronda (rejilla agrupada / lista / destacada) no convenció, y las
+ * insignias de plan se van: la tabla de precios está 800px más abajo y
+ * adelantarla convertía una sección que vende ALCANCE en una de precios.
  *
- * ⚠️ Hallazgo que hay que resolver con Wesley, no con diseño: **"Procesos
- * paso a paso" no aparece en las features de NINGÚN plan** del catálogo. Aquí
- * se marca como pendiente en vez de inventarle un plan.
+ * Estas tres son paradigmas distintos, no variantes de rejilla:
+ *   D · mosaico con celdas de tamaños distintos (jerarquía visual)
+ *   E · un caso real de principio a fin (jerarquía narrativa)
+ *   F · lista editorial sin cajas (jerarquía tipográfica)
+ *
+ * Las tres incluyen **Jus IA**, que faltaba en la sección real, y llaman a
+ * cada función por el trabajo que resuelve, no por el nombre de su pantalla.
  */
 import Link from "next/link";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { SimboloJusIA } from "@/components/brand/logos";
 
-type Plan = "Gratis" | "Profesional" | "Premium" | "pendiente";
-
 type IconoCapacidad = NombreIcono | "jus-ia";
 
 interface Capacidad {
   icono: IconoCapacidad;
-  /** El trabajo que resuelve, en la voz del abogado. */
   titulo: string;
   desc: string;
-  /** Plan mínimo — sacado de `PLANES[].features` del catálogo. */
-  plan: Plan;
-  nota?: string;
 }
 
-const INVESTIGAR: Capacidad[] = [
+const CAPS: Capacidad[] = [
   {
     icono: "jus-ia",
-    titulo: "Preguntar y recibir la cita",
-    desc: "Jus IA responde con la sentencia o el artículo que lo sostiene — y si no lo encuentra, lo dice.",
-    plan: "Profesional",
-    nota: "60/mes · ilimitada en Premium",
+    titulo: "Pregunta y recibe la cita",
+    desc: "Jus IA responde con la sentencia o el artículo que lo sostiene — y si no lo encuentra, lo dice en vez de inventarlo.",
   },
   {
     icono: "juris",
-    titulo: "Buscar jurisprudencia del CSJ",
+    titulo: "Jurisprudencia del CSJ",
     desc: "Sentencias con el resumen del CEDIJ, órgano, magistrado y fallo, filtradas por materia.",
-    plan: "Gratis",
-    nota: "limitada · ilimitada desde Profesional",
+  },
+  {
+    icono: "gaceta",
+    titulo: "Entérate de la reforma a tiempo",
+    desc: "Alertas de La Gaceta por materia, con el efecto práctico y no solo el titular del acuerdo.",
   },
   {
     icono: "libro",
-    titulo: "Consultar la ley vigente",
-    desc: "Códigos y artículos con su síntesis y el enlace al PDF oficial del Poder Judicial.",
-    plan: "Profesional",
-  },
-];
-
-const NO_PERDER: Capacidad[] = [
-  {
-    icono: "gaceta",
-    titulo: "Enterarte de la reforma a tiempo",
-    desc: "Alertas de La Gaceta por materia, con el efecto práctico y no solo el titular del acuerdo.",
-    plan: "Profesional",
-  },
-  {
-    icono: "perfil",
-    titulo: "Saber si mencionan a tu cliente",
-    desc: "Te avisa cuando un nombre que vigilas aparece en lo que el Estado publica.",
-    plan: "Premium",
-  },
-  {
-    icono: "pasos",
-    titulo: "No dejar vencer un término",
-    desc: "El camino procesal con sus plazos y su checklist, paso por paso.",
-    plan: "pendiente",
-  },
-];
-
-const TRABAJAR: Capacidad[] = [
-  {
-    icono: "plantillas",
-    titulo: "Arrancar un escrito, no la hoja en blanco",
-    desc: "Demandas y escritos editables como punto de partida.",
-    plan: "Premium",
-  },
-  {
-    icono: "calc",
-    titulo: "Calcular sin dudar del número",
-    desc: "Prestaciones laborales, cómputo de plazos y vía procesal según la cuantía.",
-    plan: "Premium",
+    titulo: "La ley vigente, con su fuente",
+    desc: "Códigos y artículos con síntesis y enlace al PDF oficial del Poder Judicial.",
   },
   {
     icono: "leads",
     titulo: "Que te encuentren clientes",
     desc: "Las consultas del consultorio público llegan con su materia y su ciudad.",
-    plan: "Gratis",
-    nota: "con prioridad en Premium",
+  },
+  {
+    icono: "plantillas",
+    titulo: "Arranca el escrito, no la hoja en blanco",
+    desc: "Demandas y escritos editables como punto de partida.",
+  },
+  {
+    icono: "calc",
+    titulo: "Calcula sin dudar del número",
+    desc: "Prestaciones, cómputo de plazos y vía procesal según la cuantía.",
+  },
+  {
+    icono: "perfil",
+    titulo: "Si mencionan a tu cliente, lo sabes",
+    desc: "Te avisa cuando un nombre que vigilas aparece en lo que el Estado publica.",
+  },
+  {
+    icono: "pasos",
+    titulo: "No dejes vencer un término",
+    desc: "El camino procesal con sus plazos y su checklist, paso por paso.",
   },
 ];
 
-const GRUPOS = [
-  { id: "investigar", titulo: "Investigar", sub: "Lo que antes te llevaba una tarde", items: INVESTIGAR },
-  { id: "vigilar", titulo: "No perder nada", sub: "Lo que se pierde por no enterarse a tiempo", items: NO_PERDER },
-  { id: "trabajar", titulo: "Producir y crecer", sub: "Del escrito al cliente siguiente", items: TRABAJAR },
-];
-
-const TODAS = [...INVESTIGAR, ...NO_PERDER, ...TRABAJAR];
-
-function Insignia({ plan, nota }: { plan: Plan; nota?: string }) {
-  if (plan === "pendiente") {
-    return (
-      <span
-        className="rounded-full px-2 py-[2px] text-[10.5px] font-bold"
-        style={{ background: "var(--color-aviso)", color: "var(--color-aviso-texto)" }}
-        title="No aparece en las features de ningún plan del catálogo"
-      >
-        Plan sin definir
-      </span>
-    );
-  }
-  const estilo =
-    plan === "Gratis"
-      ? { background: "var(--color-exito-bg)", color: "var(--color-exito)" }
-      : plan === "Profesional"
-        ? { background: "rgba(21,132,199,.12)", color: "var(--mint)" }
-        : { background: "rgba(197,160,72,.16)", color: "#8a6d2a" };
-  return (
-    <span className="flex flex-wrap items-center gap-1.5">
-      <span
-        className="rounded-full px-2 py-[2px] text-[10.5px] font-bold whitespace-nowrap"
-        style={estilo}
-      >
-        {plan === "Gratis" ? "Desde Gratis" : `Desde ${plan}`}
-      </span>
-      {nota && (
-        <span className="text-[10.5px]" style={{ color: "var(--muted)" }}>
-          {nota}
-        </span>
-      )}
-    </span>
-  );
-}
-
-function IconoCap({ nombre, size = 17 }: { nombre: IconoCapacidad; size?: number }) {
+function IconoCap({ nombre, size = 18 }: { nombre: IconoCapacidad; size?: number }) {
   return nombre === "jus-ia" ? (
-    <SimboloJusIA size={size + 1} variante="claro" />
+    <SimboloJusIA size={size + 2} variante="claro" />
   ) : (
     <Icono nombre={nombre} size={size} />
   );
 }
 
-// ── A · agrupadas por el trabajo que resuelven ─────────────────────────────
+// ── D · mosaico ────────────────────────────────────────────────────────────
 
-function OpcionA() {
+/** Cuánto ocupa cada celda. La primera manda; el resto la rodea. */
+const AREAS = [
+  "lg:col-span-2 lg:row-span-2",
+  "lg:col-span-2",
+  "",
+  "",
+  "lg:col-span-2",
+  "",
+  "",
+  "lg:col-span-2",
+  "lg:col-span-2",
+];
+
+function OpcionD() {
   return (
-    <div className="flex flex-col gap-10">
-      {GRUPOS.map((g) => (
-        <div key={g.id}>
-          <div className="flex flex-wrap items-baseline gap-x-3">
-            <h3 className="font-display text-[18px] font-bold">{g.titulo}</h3>
-            <span className="text-[13px]" style={{ color: "var(--muted)" }}>
-              {g.sub}
-            </span>
-          </div>
-          <div className="mt-4 grid grid-cols-1 gap-3.5 md:grid-cols-3">
-            {g.items.map((c) => (
-              <div key={c.titulo} className="glass-card flex flex-col p-5">
-                <span
-                  className="grid h-9 w-9 place-items-center rounded-[10px]"
-                  style={{ background: "rgba(21,132,199,.1)", color: "var(--mint)" }}
-                >
-                  <IconoCap nombre={c.icono} />
-                </span>
-                <h4 className="mt-3 text-[14.5px] leading-[1.3] font-bold">{c.titulo}</h4>
-                <p
-                  className="mt-1.5 flex-1 text-[12.5px] leading-[1.6]"
-                  style={{ color: "var(--muted)" }}
-                >
-                  {c.desc}
-                </p>
-                <div className="mt-3">
-                  <Insignia plan={c.plan} nota={c.nota} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── B · lista con la columna del plan ──────────────────────────────────────
-
-function OpcionB() {
-  return (
-    <div className="mx-auto max-w-[820px]">
-      {GRUPOS.map((g) => (
-        <div key={g.id} className="mt-7 first:mt-0">
-          <p
-            className="text-[11px] font-bold tracking-[1.6px] uppercase"
-            style={{ color: "var(--mint)" }}
+    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+      {CAPS.map((c, i) => {
+        const grande = i === 0;
+        return (
+          <div
+            key={c.titulo}
+            className={`glass-card flex flex-col p-5 ${AREAS[i]}`}
+            style={
+              grande
+                ? {
+                    borderColor: "rgba(21,132,199,.4)",
+                    background:
+                      "linear-gradient(160deg, rgba(21,132,199,.10), rgba(255,255,255,.72) 55%)",
+                  }
+                : undefined
+            }
           >
-            {g.titulo}
-          </p>
-          <div className="mt-3 flex flex-col gap-2">
-            {g.items.map((c) => (
-              <div
-                key={c.titulo}
-                className="glass-card flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5"
-              >
-                <span className="shrink-0" style={{ color: "var(--mint)" }}>
-                  <IconoCap nombre={c.icono} size={16} />
-                </span>
-                <div className="min-w-[240px] flex-1">
-                  <p className="text-[14px] leading-[1.3] font-semibold">{c.titulo}</p>
-                  <p className="mt-0.5 text-[12px] leading-[1.5]" style={{ color: "var(--muted)" }}>
-                    {c.desc}
-                  </p>
-                </div>
-                <Insignia plan={c.plan} nota={c.nota} />
-              </div>
-            ))}
+            <span
+              className={`grid place-items-center rounded-xl ${grande ? "h-12 w-12" : "h-9 w-9"}`}
+              style={{ background: "rgba(21,132,199,.12)", color: "var(--mint)" }}
+            >
+              <IconoCap nombre={c.icono} size={grande ? 24 : 17} />
+            </span>
+            <h3
+              className={`font-display mt-3.5 leading-[1.25] font-bold ${grande ? "text-[22px]" : "text-[15px]"}`}
+            >
+              {c.titulo}
+            </h3>
+            <p
+              className={`mt-2 flex-1 leading-[1.6] ${grande ? "text-[14px]" : "text-[12.5px]"}`}
+              style={{ color: "var(--muted)" }}
+            >
+              {c.desc}
+              {grande && " Es lo que separa a Justihn de preguntarle a un chatbot."}
+            </p>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
-// ── C · Jus IA destacada + el resto compacto ───────────────────────────────
+// ── E · un caso de principio a fin ─────────────────────────────────────────
 
-function OpcionC() {
-  const [jusIa, ...resto] = TODAS;
+const CASO = [
+  {
+    icono: "jus-ia" as IconoCapacidad,
+    momento: "Llega el caso",
+    titulo: "Preguntas en lenguaje normal",
+    desc: "«Me despidieron tras 4 años sin prestaciones, ¿qué reclamo y en cuánto tiempo?». Jus IA responde con el artículo y la sentencia que lo sostienen.",
+  },
+  {
+    icono: "juris" as IconoCapacidad,
+    momento: "Verificas",
+    titulo: "Abres la sentencia citada",
+    desc: "Expediente, órgano, magistrado y fallo, con el resumen del CEDIJ. La cita se comprueba antes de llevarla a un escrito.",
+  },
+  {
+    icono: "calc" as IconoCapacidad,
+    momento: "Cuantificas",
+    titulo: "Calculas lo que le corresponde",
+    desc: "Cesantía, preaviso y proporcionales desglosados, y la vía procesal según la cuantía.",
+  },
+  {
+    icono: "plantillas" as IconoCapacidad,
+    momento: "Redactas",
+    titulo: "Arrancas del modelo, no de cero",
+    desc: "La demanda laboral editable, con el cálculo anexo.",
+  },
+  {
+    icono: "pasos" as IconoCapacidad,
+    momento: "Presentas",
+    titulo: "Sigues el proceso sin perder un término",
+    desc: "El camino con sus plazos y su checklist hasta la audiencia.",
+  },
+];
+
+const EN_PARALELO = [
+  { icono: "gaceta" as IconoCapacidad, t: "La Gaceta te avisa de lo que cambia en tus materias" },
+  { icono: "perfil" as IconoCapacidad, t: "Y si mencionan a tu cliente en lo que el Estado publica" },
+  { icono: "leads" as IconoCapacidad, t: "Mientras el consultorio te trae el caso siguiente" },
+];
+
+function OpcionE() {
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
-      <div
-        className="glass-card flex flex-col p-6"
-        style={{
-          borderColor: "rgba(21,132,199,.5)",
-          boxShadow: "0 0 0 1px rgba(21,132,199,.4), 0 14px 40px rgba(21,132,199,.12)",
-        }}
-      >
-        <span
-          className="grid h-11 w-11 place-items-center rounded-xl"
-          style={{ background: "rgba(21,132,199,.12)" }}
-        >
-          <SimboloJusIA size={22} variante="claro" />
-        </span>
-        <h3 className="font-display mt-3.5 text-[20px] leading-[1.25] font-bold">
-          {jusIa!.titulo}
-        </h3>
-        <p className="mt-2 flex-1 text-[13.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
-          {jusIa!.desc} Es lo que separa a Justihn de preguntarle a un chatbot: sin fuente,
-          no hay respuesta.
-        </p>
-        <div className="mt-4">
-          <Insignia plan={jusIa!.plan} nota={jusIa!.nota} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {resto.map((c) => (
-          <div key={c.titulo} className="glass-card flex flex-col p-4">
-            <div className="flex items-start gap-2.5">
-              <span className="mt-0.5 shrink-0" style={{ color: "var(--mint)" }}>
-                <IconoCap nombre={c.icono} size={16} />
+    <div className="mx-auto max-w-[760px]">
+      <ol className="flex flex-col">
+        {CASO.map((p, i) => (
+          <li key={p.titulo} className="flex gap-4">
+            <div className="flex flex-col items-center">
+              <span
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full"
+                style={{ background: "var(--turq)", color: "#fff" }}
+              >
+                <IconoCap nombre={p.icono} size={16} />
               </span>
-              <div className="min-w-0">
-                <p className="text-[13.5px] leading-[1.3] font-bold">{c.titulo}</p>
-                <p className="mt-1 text-[12px] leading-[1.5]" style={{ color: "var(--muted)" }}>
-                  {c.desc}
-                </p>
-              </div>
+              {i < CASO.length - 1 && (
+                <span
+                  className="w-px flex-1"
+                  style={{ background: "var(--line)", minHeight: 20 }}
+                />
+              )}
             </div>
-            <div className="mt-2.5 pl-[26px]">
-              <Insignia plan={c.plan} nota={c.nota} />
+            <div className="mb-5 min-w-0 flex-1 pt-1">
+              <p
+                className="text-[10.5px] font-bold tracking-[1.6px] uppercase"
+                style={{ color: "var(--mint)" }}
+              >
+                {p.momento}
+              </p>
+              <h3 className="font-display mt-1 text-[16.5px] leading-[1.3] font-bold">
+                {p.titulo}
+              </h3>
+              <p
+                className="mt-1.5 text-[13.5px] leading-[1.6]"
+                style={{ color: "var(--muted)" }}
+              >
+                {p.desc}
+              </p>
             </div>
+          </li>
+        ))}
+      </ol>
+
+      <div
+        className="glass-card mt-3 flex flex-col gap-2.5 p-5"
+        style={{ background: "rgba(21,132,199,.06)" }}
+      >
+        <p
+          className="text-[10.5px] font-bold tracking-[1.6px] uppercase"
+          style={{ color: "var(--mint)" }}
+        >
+          Y mientras tanto, solo
+        </p>
+        {EN_PARALELO.map((x) => (
+          <div key={x.t} className="flex items-center gap-2.5 text-[13.5px]">
+            <span className="shrink-0" style={{ color: "var(--mint)" }}>
+              <IconoCap nombre={x.icono} size={15} />
+            </span>
+            {x.t}
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ── F · lista editorial, sin cajas ─────────────────────────────────────────
+
+function OpcionF() {
+  return (
+    <div className="mx-auto max-w-[820px]">
+      {CAPS.map((c, i) => (
+        <div
+          key={c.titulo}
+          className={`flex flex-wrap items-baseline gap-x-5 gap-y-1 py-5 ${i > 0 ? "border-t" : ""}`}
+          style={i > 0 ? { borderColor: "var(--line)" } : undefined}
+        >
+          <span
+            className="shrink-0 self-center"
+            style={{ color: "var(--mint)", width: 22 }}
+            aria-hidden
+          >
+            <IconoCap nombre={c.icono} size={19} />
+          </span>
+          <h3 className="font-display min-w-[260px] flex-1 text-[19px] leading-[1.25] font-bold">
+            {c.titulo}
+          </h3>
+          <p
+            className="min-w-[280px] flex-[1.3] text-[13.5px] leading-[1.6]"
+            style={{ color: "var(--muted)" }}
+          >
+            {c.desc}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -306,7 +301,7 @@ function Bloque({
   return (
     <section className="mx-auto max-w-[1080px] px-5 py-12">
       <div
-        className="mb-7 rounded-[14px] border px-5 py-4"
+        className="mb-8 rounded-[14px] border px-5 py-4"
         style={{ borderColor: "var(--line)", background: "rgba(255,255,255,.6)" }}
       >
         <div className="flex items-center gap-2.5">
@@ -339,7 +334,7 @@ export function PrototipoCapacidades() {
           className="text-[11px] font-bold tracking-[2px] uppercase"
           style={{ color: "var(--mint)" }}
         >
-          Prototipo · elegir una
+          Prototipo · 2ª ronda
         </p>
         <h1 className="font-display mt-2 text-[clamp(26px,4vw,38px)] leading-[1.15] font-bold text-balance">
           Tres maneras de contar lo que hay dentro
@@ -348,44 +343,48 @@ export function PrototipoCapacidades() {
           className="mx-auto mt-3 max-w-[660px] text-[14px] leading-[1.65]"
           style={{ color: "var(--muted)" }}
         >
-          Las tres arreglan lo mismo: <b>añaden Jus IA</b> (faltaba), cambian los nombres de
-          pantalla por el trabajo que resuelven, y dicen <b>qué plan incluye cada cosa</b> —
-          la duda que decide y que hoy vive 2.000px más abajo.
+          Sin insignias de plan: la tabla de precios está 800px más abajo y adelantarla
+          convertía una sección que vende alcance en una de precios. Tres paradigmas
+          distintos — jerarquía visual, narrativa y tipográfica.
         </p>
       </section>
 
       <Bloque
-        letra="A"
-        titulo="Agrupadas por el trabajo"
-        idea="Investigar · No perder nada · Producir y crecer."
-        pros="Un abogado se reconoce en los grupos, no en una lista de pantallas. Da jerarquía sin sacrificar nada y hace pareja con las rutas de trámites de la home."
-        contras="Es la más alta de las tres, y hay funciones que caben en dos grupos (las alertas también son investigar)."
+        letra="D"
+        titulo="Mosaico"
+        idea="Celdas de tamaños distintos: Jus IA manda y el resto la rodea."
+        pros="Jerarquía de un vistazo, sin leer. Rompe el muro de cajas iguales y deja aire donde hace falta; es el lenguaje que la gente ya reconoce en producto."
+        contras="El tamaño de cada celda es una decisión estética que hay que sostener, y en móvil el mosaico se aplana a una columna: la jerarquía desaparece."
       >
-        <OpcionA />
+        <OpcionD />
       </Bloque>
 
       <Bloque
-        letra="B"
-        titulo="Lista con la columna del plan"
-        idea="Filas compactas agrupadas, con la insignia del plan a la derecha."
-        pros="La más escaneable y la mitad de alto. El plan queda alineado en columna, así que se compara de un vistazo qué te da cada nivel."
-        contras="Se siente a tabla de precios adelantada; le quita algo de aire a una sección que vende alcance."
+        letra="E"
+        titulo="Un caso, de principio a fin"
+        idea="Un despido injustificado recorrido con las herramientas en el orden real de uso."
+        pros="No enumera funciones: enseña el producto TRABAJANDO. Un abogado ve su miércoles ahí dentro, y de paso queda claro que las piezas se encadenan en vez de ser nueve cosas sueltas."
+        contras="Se casa con una materia (laboral); quien litiga penal tiene que traducir. Y compite en formato con las rutas de trámites de la home."
       >
-        <OpcionB />
+        <OpcionE />
       </Bloque>
 
       <Bloque
-        letra="C"
-        titulo="Jus IA destacada + el resto"
-        idea="La función que diferencia manda; las otras ocho la acompañan."
-        pros="Deja clarísimo cuál es el corazón del producto. El ojo entra por Jus IA y el resto se lee como lo que la rodea."
-        contras="Aplana las ocho restantes: 'que te encuentren clientes' merece más que una línea, y aquí pesa igual que la calculadora."
+        letra="F"
+        titulo="Lista editorial"
+        idea="Sin cajas: tipografía grande a la izquierda, explicación a la derecha, línea fina entre medias."
+        pros="Se lee como un índice, no como un catálogo. Mucho aire, cero ruido visual, y el titular de cada función tiene sitio para decir algo de verdad."
+        contras="Es la más sobria de las tres: no aporta ninguna jerarquía — las nueve pesan igual, que era parte del problema original."
       >
-        <OpcionC />
+        <OpcionF />
       </Bloque>
 
       <section className="mx-auto max-w-[1080px] px-5 pb-20 text-center">
-        <Link href="/para-abogados" className="text-[13.5px] font-semibold" style={{ color: "var(--mint)" }}>
+        <Link
+          href="/para-abogados"
+          className="text-[13.5px] font-semibold"
+          style={{ color: "var(--mint)" }}
+        >
           ← Volver a la landing
         </Link>
       </section>
