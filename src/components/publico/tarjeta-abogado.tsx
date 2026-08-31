@@ -60,7 +60,14 @@ export function TarjetaAbogado({
   const mostrarToast = usePortal((s) => s.mostrarToast);
 
   return (
-    <div className={`glass-card flex flex-col ${compacta ? "p-4.5" : "p-5"}`}>
+    /* ⚠️ `glass-card` está definida en `landing.css`, y ese archivo NO se
+       carga en el portal: allí la card se quedaba sin borde, sin radio, sin
+       fondo y sin sombra — desnuda sobre el lienzo. Las clases del tema van
+       DESPUÉS para darle superficie propia en las tres superficies; en la
+       landing, `.glass-card` sigue ganando y conserva su efecto glass. */
+    <div
+      className={`glass-card flex flex-col rounded-2xl border border-borde bg-white ${compacta ? "p-4.5" : "p-5"}`}
+    >
       <div className="flex flex-wrap gap-1.5">
         {a.materias.map((m) => (
           <span
