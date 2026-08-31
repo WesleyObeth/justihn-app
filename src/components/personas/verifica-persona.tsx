@@ -2,39 +2,50 @@
 
 /**
  * Informe Verifica — verificar a alguien ANTES de firmar (comprar un terreno,
- * alquilar, contratar, asociarse).
+ * alquilar, contratar, asociarte).
  *
- * Tres reglas de §5 del CLAUDE.md del producto están cableadas en la UI, no
- * son copy decorativo:
- *  · disclaimer de homónimos SIEMPRE, junto a cada resultado;
- *  · usos prohibidos a la vista antes de buscar (no acoso, no discriminación);
+ * Tres reglas de §5 del CLAUDE.md del producto están cableadas en la UI, no son
+ * copy decorativo:
+ *  · disclaimer de homónimos SIEMPRE, también cuando NO hay resultados;
+ *  · usos prohibidos a la vista antes de buscar;
  *  · se vende como verificación, no como vigilancia.
+ *
+ * ⚠️ **Sin semáforo de riesgo**, aunque el modelo de negocio lo mencione. Poner
+ * un rojo/verde sobre una persona por aparecer en sentencias es etiquetarla —
+ * y en Honduras nadie pierde derechos por figurar en un expediente. Lo que se
+ * muestra es QUÉ hay y EN QUÉ CALIDAD aparece, que es comprobable; la
+ * conclusión la saca quien lee, con la sentencia delante.
  *
  * Y una regla de §4.5: la parte que HOY funciona es la búsqueda en sentencias
  * publicadas —motor real sobre el corpus—; folio real y Registro Mercantil
  * exigen cuenta institucional (SURE/CCIT) que aún no existe, así que aparecen
- * como lo que son, en preparación, y no como una promesa cobrada por
- * adelantado. TODO(data): al abrir esas cuentas, el informe pasa a completo.
+ * como lo que son, en preparación.
  */
 import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
 import { buscarApariciones, type Aparicion } from "@/data/monitoreo";
+import { usePortal } from "@/store/portal";
+import { cn } from "@/lib/utils";
+import type { Materia } from "@/types/dominio";
 
 export function VerificaPersona() {
+  const registrar = usePortal((s) => s.registrarConsultaVerifica);
   const [nombre, setNombre] = useState("");
   const [consultado, setConsultado] = useState<string | null>(null);
   const [resultados, setResultados] = useState<Aparicion[]>([]);
 
-  const buscar = () => {
-    const limpio = nombre.trim();
+  const buscar = (texto?: string) => {
+    const limpio = (texto ?? nombre).trim();
     if (limpio.length < 4) return;
+    setNombre(limpio);
     setResultados(buscarApariciones(limpio));
     setConsultado(limpio);
+    registrar(limpio);
   };
 
   return (
-    <div className="max-w-[860px]">
+    <div className="max-w-[1080px]">
       <h1 className="font-display text-[24px] font-bold">Informe Verifica</h1>
       <p className="mt-1 max-w-[650px] text-[13px] leading-[1.6] text-texto-3">
         Antes de comprar un terreno, alquilar, contratar o asociarte: mira qué hay publicado
@@ -59,7 +70,7 @@ export function VerificaPersona() {
             />
             <button
               type="button"
-              onClick={buscar}
+              onClick={() => buscar()}
               disabled={nombre.trim().length < 4}
               className="h-[42px] cursor-pointer rounded-lg bg-celeste px-4 text-[13px] font-semibold text-white hover:bg-cruce disabled:cursor-not-allowed disabled:opacity-45"
             >
@@ -71,6 +82,8 @@ export function VerificaPersona() {
           Busca en las sentencias que el Poder Judicial publica. Es gratis y no se le avisa a
           nadie que lo buscaste.
         </p>
+
+        <Historial onElegir={(n) => buscar(n)} />
       </div>
 
       {consultado && <Resultado nombre={consultado} apariciones={resultados} />}
@@ -96,18 +109,64 @@ function UsosProhibidos() {
   );
 }
 
+/** Volver a una consulta sin reescribirla — y poder borrarlas todas. */
+function Historial({ onElegir }: { onElegir: (nombre: string) => void }) {
+  const consultas = usePortal((s) => s.consultasVerifica);
+  const olvidar = usePortal((s) => s.olvidarConsultasVerifica);
+  const mostrarToast = usePortal((s) => s.mostrarToast);
+  if (consultas.length === 0) return null;
+
+  return (
+    <div className="mt-3.5 border-t border-borde pt-3">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <span className="text-[11.5px] text-texto-4">Consultaste antes:</span>
+        <button
+          type="button"
+          onClick={() => {
+            olvidar();
+            mostrarToast("Borramos tus consultas de este navegador");
+          }}
+          className="ml-auto cursor-pointer text-[11.5px] font-medium text-celeste hover:text-cruce"
+        >
+          Borrar historial
+        </button>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {consultas.map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => onElegir(n)}
+            className="cursor-pointer rounded-full border border-borde px-3 py-1.5 text-[12px] font-medium text-texto-2 hover:border-celeste hover:text-celeste"
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+      <p className="mt-2 text-[11px] leading-[1.5] text-texto-4">
+        Se guarda solo en este navegador. A quién consultas no sale de aquí.
+      </p>
+    </div>
+  );
+}
+
 function Resultado({ nombre, apariciones }: { nombre: string; apariciones: Aparicion[] }) {
+  const [materia, setMateria] = useState<Materia | "todas">("todas");
   const hay = apariciones.length > 0;
+  const materias = [...new Set(apariciones.map((a) => a.sentencia.materia))];
+  const visibles =
+    materia === "todas" ? apariciones : apariciones.filter((a) => a.sentencia.materia === materia);
 
   return (
     <div className="mt-4 rounded-2xl border border-borde bg-white p-5">
       <div className="flex flex-wrap items-center gap-2.5">
         <span
-          className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
-            hay ? "bg-[rgba(201,154,58,.16)] text-dorado" : "bg-exito-bg text-exito"
-          }`}
+          className={cn(
+            "grid h-9 w-9 shrink-0 place-items-center rounded-full",
+            hay ? "bg-chip text-celeste" : "bg-exito-bg text-exito",
+          )}
         >
-          <Icono nombre={hay ? "alerta" : "check"} size={16} strokeWidth={2.4} />
+          <Icono nombre={hay ? "documento" : "check"} size={16} strokeWidth={2.4} />
         </span>
         <div className="min-w-0">
           <div className="text-[15px] font-semibold">{nombre}</div>
@@ -137,28 +196,26 @@ function Resultado({ nombre, apariciones }: { nombre: string; apariciones: Apari
       </p>
 
       {hay && (
-        <div className="mt-3 flex flex-col gap-2.5">
-          {apariciones.map(({ sentencia, rol }) => (
-            <div key={sentencia.id} className="rounded-[10px] border border-borde px-4 py-3">
-              <div className="flex flex-wrap items-center gap-2 text-[11.5px] text-texto-4">
-                <span className="rounded-full bg-chip px-2.5 py-[2px] font-medium text-celeste">
-                  {sentencia.materia}
-                </span>
-                {rol && <span className="font-semibold text-texto-3">{rol}</span>}
-                <span>
-                  {sentencia.organo} · {sentencia.fecha}
-                </span>
-                <span className="ml-auto font-mono">{sentencia.expediente}</span>
-              </div>
-              <div className="mt-1.5 text-[13.5px] leading-[1.5] font-medium">
-                {sentencia.titulo}
-              </div>
-              <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-[1.55] text-texto-3">
-                {sentencia.resumen}
-              </p>
+        <>
+          {materias.length > 1 && (
+            <div className="mt-3.5 flex flex-wrap gap-1.5">
+              <Chip activo={materia === "todas"} onClick={() => setMateria("todas")}>
+                Todas ({apariciones.length})
+              </Chip>
+              {materias.map((m) => (
+                <Chip key={m} activo={materia === m} onClick={() => setMateria(m)}>
+                  {m} ({apariciones.filter((a) => a.sentencia.materia === m).length})
+                </Chip>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+
+          <div className="mt-3 flex flex-col gap-2.5">
+            {visibles.map((a) => (
+              <FilaAparicion key={a.sentencia.id} aparicion={a} />
+            ))}
+          </div>
+        </>
       )}
 
       <div className="mt-3.5 border-t border-borde pt-3 text-[12.5px]">
@@ -167,6 +224,124 @@ function Resultado({ nombre, apariciones }: { nombre: string; apariciones: Apari
         </Link>
       </div>
     </div>
+  );
+}
+
+/**
+ * Una aparición, que SE PUEDE ABRIR.
+ *
+ * El disclaimer pide "abre cada sentencia y contrasta" y antes no había forma
+ * de hacerlo: el texto exigía algo que la pantalla no permitía. Al desplegarla
+ * se ve el resumen del CEDIJ, quién la firmó, el fallo y el fragmento del texto
+ * oficial — que es con lo que se contrasta si el homónimo es o no la persona.
+ */
+function FilaAparicion({ aparicion: { sentencia: s, rol } }: { aparicion: Aparicion }) {
+  const [abierta, setAbierta] = useState(false);
+
+  return (
+    <div className="rounded-[10px] border border-borde">
+      <button
+        type="button"
+        onClick={() => setAbierta((v) => !v)}
+        aria-expanded={abierta}
+        className="flex w-full cursor-pointer flex-col gap-1.5 px-4 py-3 text-left hover:bg-lienzo"
+      >
+        <span className="flex flex-wrap items-center gap-2 text-[11.5px] text-texto-4">
+          <span className="rounded-full bg-chip px-2.5 py-[2px] font-medium text-celeste">
+            {s.materia}
+          </span>
+          {rol && <span className="font-semibold text-texto-3">{rol}</span>}
+          <span>
+            {s.organo} · {s.fecha}
+          </span>
+          <span className="ml-auto font-mono">{s.expediente}</span>
+        </span>
+        <span className="flex w-full items-start gap-2">
+          <span className="min-w-0 flex-1 text-[13.5px] leading-[1.5] font-medium">
+            {s.titulo}
+          </span>
+          <span className="mt-0.5 shrink-0 text-[11.5px] font-medium text-celeste">
+            {abierta ? "Cerrar" : "Abrir"}
+          </span>
+        </span>
+      </button>
+
+      {abierta && (
+        <div className="border-t border-borde px-4 py-3.5">
+          <Dato rotulo="Resumen del CEDIJ">{s.resumen}</Dato>
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Dato rotulo="Firma">{s.ponente}</Dato>
+            <Dato rotulo="Fallo">{s.fallo}</Dato>
+          </div>
+          <Dato rotulo="Fragmento del texto oficial" className="mt-3">
+            {s.extracto}
+          </Dato>
+          {s.fuenteUrl ? (
+            <a
+              href={s.fuenteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-medium"
+            >
+              <Icono nombre="check" size={12} strokeWidth={2.6} />
+              Ver la sentencia íntegra en el Poder Judicial
+            </a>
+          ) : (
+            /* El seed del piloto no trae la URL por sentencia (§8). Se dice, en
+               vez de dejar un enlace que no existe. */
+            <p className="mt-3 text-[11.5px] leading-[1.5] text-texto-4">
+              El enlace al documento íntegro del Poder Judicial llega cuando esté indexado el
+              corpus completo. Lo de arriba es el texto oficial que devuelve su API.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Dato({
+  rotulo,
+  children,
+  className,
+}: {
+  rotulo: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <div className="text-[10.5px] font-semibold tracking-[.8px] text-texto-4 uppercase">
+        {rotulo}
+      </div>
+      <p className="mt-1 text-[12.5px] leading-[1.6] text-texto-2">{children}</p>
+    </div>
+  );
+}
+
+function Chip({
+  activo,
+  onClick,
+  children,
+}: {
+  activo: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={activo}
+      onClick={onClick}
+      className={cn(
+        "cursor-pointer rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors",
+        activo
+          ? "border-celeste bg-celeste text-white"
+          : "border-borde bg-white text-texto-3 hover:border-celeste hover:text-marino",
+      )}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -184,7 +359,10 @@ function InformeCompleto() {
       <ul className="mt-3 flex flex-col gap-2 text-[12.5px] leading-[1.55] text-texto-3">
         {[
           ["Folio real de un inmueble", "Instituto de la Propiedad (SURE) — exige cuenta"],
-          ["Situación de una empresa", "Registro Mercantil — la consulta pública es por número de matrícula, no por nombre"],
+          [
+            "Situación de una empresa",
+            "Registro Mercantil — la consulta pública es por número de matrícula, no por nombre",
+          ],
           ["Vigilancia por 30 días", "avisa si sale algo nuevo después de tu consulta"],
         ].map(([que, por]) => (
           <li key={que} className="flex items-start gap-2">

@@ -74,6 +74,12 @@ interface PortalState {
   nombresVigiladosPersona: NombreVigilado[];
   /** Mensajes que la persona ha enviado a abogados, por abogado. */
   mensajesAbogado: Record<string, MensajeAbogado[]>;
+  /**
+   * A quién ha consultado en el Informe Verifica, para volver sin reescribir.
+   * Vive SOLO en su navegador y se puede borrar: un registro de a quién
+   * investiga alguien es de lo más sensible que guarda este producto (§5).
+   */
+  consultasVerifica: string[];
   /** Preguntas hechas desde el consultorio público (Vía B) — aparecen como
    *  leads en el portal de abogados: es el mismo flujo, visto de ambos lados. */
   preguntasPublico: Lead[];
@@ -107,6 +113,8 @@ interface PortalState {
   vigilarNombre: (nombre: string, tipo: NombreVigilado["tipo"]) => void;
   vigilarNombrePersona: (nombre: string) => void;
   escribirAAbogado: (abogadoId: string, materia: Materia, texto: string) => void;
+  registrarConsultaVerifica: (nombre: string) => void;
+  olvidarConsultasVerifica: () => void;
   dejarDeVigilarPersona: (id: string) => void;
   dejarDeVigilar: (id: string) => void;
   preguntarConsultorio: (materia: Materia, ciudad: string, pregunta: string) => void;
@@ -154,6 +162,7 @@ export const usePortal = create<PortalState>()(
       nombresVigilados: VIGILADOS_INICIALES,
       nombresVigiladosPersona: VIGILADOS_INICIALES_PERSONA,
       mensajesAbogado: {},
+      consultasVerifica: [],
       preguntasPublico: [],
       pasosTramite: {},
       prefsPersona: { respuestas: true, tramites: true, novedades: false },
@@ -254,6 +263,17 @@ export const usePortal = create<PortalState>()(
             ],
           },
         })),
+      // Sin duplicados y con la última primero; se guardan 8 como mucho.
+      registrarConsultaVerifica: (nombre) =>
+        set((s) => {
+          const limpio = nombre.trim();
+          if (limpio.length < 4) return s;
+          const resto = s.consultasVerifica.filter(
+            (n) => n.toLowerCase() !== limpio.toLowerCase(),
+          );
+          return { consultasVerifica: [limpio, ...resto].slice(0, 8) };
+        }),
+      olvidarConsultasVerifica: () => set({ consultasVerifica: [] }),
       dejarDeVigilarPersona: (id) =>
         set((s) => ({
           nombresVigiladosPersona: s.nombresVigiladosPersona.filter((v) => v.id !== id),
@@ -342,6 +362,7 @@ export const usePortal = create<PortalState>()(
         nombresVigilados: s.nombresVigilados,
         nombresVigiladosPersona: s.nombresVigiladosPersona,
         mensajesAbogado: s.mensajesAbogado,
+        consultasVerifica: s.consultasVerifica,
         preguntasPublico: s.preguntasPublico,
         pasosTramite: s.pasosTramite,
         prefsPersona: s.prefsPersona,

@@ -245,7 +245,23 @@ promesas que ya estaban hechas y no existían:
   Tres reglas de §5 están cableadas en la UI, no son copy: **homónimos
   siempre** —también cuando NO hay resultados, porque "sin apariciones" se lee
   como certificado y no lo es—, **usos prohibidos a la vista antes de buscar**,
-  y **materias reservadas excluidas**. El informe completo (folio real, Registro
+  y **materias reservadas excluidas**. `verifica.test.ts` las comprueba sobre la
+  fuente: son texto en la UI, no lógica, y un revert descuidado las borraría sin
+  que nada fallara.
+  **Refinado 2026-08-31.** El disclaimer decía "abre cada sentencia y contrasta"
+  y **no había forma de abrirla**: el texto exigía algo que la pantalla no
+  permitía. Ahora cada aparición se despliega con el resumen del CEDIJ, quién
+  firmó, el fallo y el fragmento del texto oficial — que es con lo que se
+  descarta un homónimo. ⚠️ Ninguna sentencia del piloto trae `fuenteUrl` aunque
+  el tipo diga "toda cita debe poder abrirse": **se dice que el enlace llega con
+  el corpus**, en vez de dejar un enlace muerto. Se suman filtro por materia
+  (cuando hay más de una) e **historial de consultas**, que se guarda solo en
+  ese navegador y **se puede borrar** — un registro de a quién investiga alguien
+  es de lo más sensible que guarda este producto.
+  ⚠️ **Sin semáforo de riesgo**, aunque el modelo de negocio lo mencione: un
+  rojo/verde sobre una persona por aparecer en sentencias la etiqueta, y en
+  Honduras nadie pierde derechos por figurar en un expediente. Se muestra QUÉ
+  hay y EN QUÉ CALIDAD aparece; la conclusión la saca quien lee. Hay test. El informe completo (folio real, Registro
   Mercantil, vigilancia 30 días) aparece **en preparación**: depende de cuentas
   SURE/CCIT que no existen, así que no se cobra por adelantado ni se le pone
   precio (§4.5).
@@ -650,7 +666,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (128 tests de invariantes)
+pnpm test         # Vitest (138 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
