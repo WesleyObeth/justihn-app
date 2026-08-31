@@ -11,6 +11,10 @@
  *     nadie: es prueba fabricada, y aquí decide a quién contrata una persona.
  *   21 contactos    — vanidad. Que le escriban no dice que responda bien.
  *
+ * Tampoco se cuentan las respuestas (decisión Wesley): un abogado con 34 no
+ * es mejor que uno con 12, y contarlas premiaría publicar por publicar. Lo
+ * que prueba es la respuesta en sí, no cuántas lleva.
+ *
  * Las tres evoluciones las quitan y las reemplazan por lo único que Justihn
  * puede probar de verdad: **lo que el abogado ha respondido en el consultorio**.
  * Ahí se lee cómo explica antes de contactarlo, y crea el círculo que el
@@ -29,7 +33,6 @@ const ORDENADOS = [...DIRECTORIO].sort((a, b) => Number(b.premium) - Number(a.pr
 
 interface Extra {
   anios: number;
-  respuestas: number;
   responde: string;
   /** Fragmento de una respuesta suya en el consultorio: su voz, no un eslogan. */
   cita: string;
@@ -39,35 +42,30 @@ interface Extra {
 const EXTRA: Record<string, Extra> = {
   "maria-castillo": {
     anios: 12,
-    respuestas: 34,
     responde: "el mismo día",
     cita: "El plazo corre desde que terminó el contrato, no desde que te pagaron. Dos meses.",
     enLinea: true,
   },
   "carlos-mejia": {
     anios: 15,
-    respuestas: 21,
     responde: "en 1 día",
     cita: "Antes de firmar el pacto social decide quién administra: cambiarlo después cuesta otra escritura.",
     enLinea: true,
   },
   "lucia-fernandez": {
     anios: 9,
-    respuestas: 12,
     responde: "en 2 días",
     cita: "La licencia ambiental no se pide al final: si arrancas sin ella, la multa la fija MiAmbiente por día.",
     enLinea: false,
   },
   "roberto-pineda": {
     anios: 18,
-    respuestas: 27,
     responde: "el mismo día",
     cita: "Pídeme el folio real antes de dar un adelanto. La mitad de mi trabajo es evitar ese pleito.",
     enLinea: true,
   },
   "ana-varela": {
     anios: 7,
-    respuestas: 19,
     responde: "en horas",
     cita: "Si te citan a declarar, no vayas solo. Puedes pedir asistencia antes de decir una palabra.",
     enLinea: true,
@@ -158,6 +156,69 @@ function Boton({ a, ancho = true }: { a: AbogadoDirectorio; ancho?: boolean }) {
   );
 }
 
+/**
+ * G · la combinación: la fila ancha de F con la cita de D, y SIN el conteo de
+ * respuestas (decisión Wesley 2026-08-30). El número era la parte floja: la
+ * cita ya prueba que responde en el consultorio, y contarlas volvía a meter
+ * una métrica de vanidad — un abogado con 34 no es mejor que uno con 12.
+ */
+function OpcionG() {
+  return (
+    <div className="mx-auto flex max-w-[860px] flex-col gap-3">
+      {ORDENADOS.map((a) => (
+        <div key={a.id} className="glass-card flex flex-wrap gap-5 p-5">
+          <div className="min-w-[280px] flex-1">
+            <Materias a={a} />
+            <div className="mt-3">
+              <Cabecera a={a} />
+            </div>
+            <div className="mt-2.5">
+              <Credenciales a={a} />
+            </div>
+            <blockquote
+              className="mt-3.5 rounded-[12px] border-l-[3px] py-2.5 pr-3 pl-3.5 text-[13px] leading-[1.6]"
+              style={{
+                borderColor: "var(--color-celeste)",
+                background: "rgba(21,132,199,.06)",
+                color: "var(--ink)",
+              }}
+            >
+              “{ex(a).cita}”
+              <footer className="mt-1.5 text-[11px]" style={{ color: "var(--muted)" }}>
+                De una respuesta suya en el consultorio
+              </footer>
+            </blockquote>
+          </div>
+
+          <div
+            className="flex min-w-[190px] flex-col justify-center gap-2.5 border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-5"
+            style={{ borderColor: "var(--line)" }}
+          >
+            <div className="flex items-center gap-2">
+              <span style={{ color: "var(--mint)" }}>
+                <Icono nombre="reloj" size={15} strokeWidth={2.2} />
+              </span>
+              <span className="text-[12.5px]">Responde {ex(a).responde}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span style={{ color: "var(--mint)" }}>
+                <Icono nombre="ubicacion" size={15} strokeWidth={2.2} />
+              </span>
+              <span className="text-[12.5px]">
+                {ex(a).enLinea ? "En línea y presencial" : "Presencial"}
+              </span>
+            </div>
+            <Boton a={a} />
+            <Link href="#" className="text-center text-[11.5px]" style={{ color: "var(--mint)" }}>
+              Ver su perfil y sus respuestas →
+            </Link>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── D · la card que habla ──────────────────────────────────────────────────
 
 function OpcionD() {
@@ -185,7 +246,7 @@ function OpcionD() {
           >
             “{ex(a).cita}”
             <footer className="mt-1.5 text-[11px]" style={{ color: "var(--muted)" }}>
-              De una de sus {ex(a).respuestas} respuestas en el consultorio
+              De una respuesta suya en el consultorio
             </footer>
           </blockquote>
 
@@ -226,7 +287,7 @@ function OpcionE() {
               {
                 icono: "leads" as const,
                 k: "En el consultorio",
-                v: `${ex(a).respuestas} respuestas públicas`,
+                v: "Responde consultas",
                 ok: true,
               },
               {
@@ -305,9 +366,7 @@ function OpcionF() {
               <span style={{ color: "var(--mint)" }}>
                 <Icono nombre="leads" size={15} strokeWidth={2.2} />
               </span>
-              <span className="text-[12.5px]">
-                <b>{ex(a).respuestas}</b> respuestas públicas
-              </span>
+              <span className="text-[12.5px]">Responde en el consultorio</span>
             </div>
             <div className="flex items-center gap-2">
               <span style={{ color: "var(--mint)" }}>
@@ -386,21 +445,32 @@ export function PrototipoDirectorio() {
           Prototipo · la card oficial del abogado
         </p>
         <h1 className="font-display mt-2 text-[clamp(26px,4vw,38px)] leading-[1.15] font-bold text-balance">
-          Tres cards para elegir abogado
+La card del abogado
         </h1>
         <p
           className="mx-auto mt-3 max-w-[660px] text-[14px] leading-[1.65]"
           style={{ color: "var(--muted)" }}
         >
-          Las tres quitan la valoración “★ 4.9” y el contador de contactos: no hay sistema de
-          reseñas detrás, así que ese número no lo produce nadie. En su lugar usan lo único
-          que Justihn sí puede probar — lo que el abogado respondió en el consultorio.
+          Arriba, la combinación que pediste: la fila ancha de F con la cita de D y sin
+          contar respuestas. Debajo quedan D y F sueltas para comparar. Ninguna usa ya la
+          valoración “★ 4.9” ni el contador de contactos — no hay sistema de reseñas
+          detrás, así que ese número no lo produce nadie.
         </p>
       </section>
 
       <Bloque
+        letra="G"
+        titulo="La combinación · fila ancha + cita"
+        idea="La estructura de F con la cita de D, y sin contar respuestas."
+        pros="Junta lo que te gustó de las dos: la voz del abogado a la izquierda y la columna de decisión a la derecha. Sin el conteo, la cita prueba sola que responde — y deja de premiar al que más publica."
+        contras="La fila es alta; con veinte perfiles habrá que paginar o volver a un grid."
+      >
+        <OpcionG />
+      </Bloque>
+
+      <Bloque
         letra="D"
-        titulo="La card que habla"
+        titulo="La card que habla (referencia)"
         idea="Un fragmento real de una respuesta suya, citado."
         pros="Es lo más persuasivo que puede llevar una card de abogado: dejas juzgar CÓMO explica antes de escribirle. Y crea el círculo del producto — responder en público te trae clientes."
         contras="Ocupa más y exige que cada abogado tenga al menos una respuesta publicada; el que acaba de entrar no tiene qué citar."
@@ -420,7 +490,7 @@ export function PrototipoDirectorio() {
 
       <Bloque
         letra="F"
-        titulo="Fila ancha con columna de decisión"
+        titulo="Fila ancha con columna de decisión (referencia)"
         idea="A la izquierda quién es; a la derecha, separado por una línea, la prueba y la acción."
         pros="Separa 'conocerlo' de 'decidir'. Cabe la bio entera y el ojo va directo a la columna de la derecha cuando ya se decidió. Coherente con las filas de trámites."
         contras="En móvil se apila y pierde la separación; con muchos perfiles es una lista larga sin jerarquía."
