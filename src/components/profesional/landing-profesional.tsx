@@ -156,7 +156,7 @@ export function LandingProfesional() {
       <section id="planes" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 py-14">
         <Encabezado
           eyebrow="Planes"
-          titulo="En lempiras, pensados para el gremio"
+          titulo="Elige tu plan, pensado para el gremio"
           sub="Los planes de pago traen todo el contenido, ilimitado — la diferencia entre ellos es la cuota de Jus IA. El Gratis te deja probar sin tarjeta."
         />
 
