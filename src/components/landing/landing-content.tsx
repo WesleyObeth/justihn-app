@@ -402,7 +402,10 @@ export function LandingContenido() {
       <section className="mx-auto max-w-[1080px] px-5 py-10">
         <div className="glass-card p-7 md:p-9">
           <div className="flex flex-wrap items-center gap-6">
-            <div className="min-w-[280px] flex-1">
+            {/* `min(280px,100%)` y no 280 a secas: el mínimo rígido desbordaba la
+                pantalla por debajo de 360px, donde ya no queda ese ancho después
+                del padding de la sección y de la card. */}
+            <div className="min-w-[min(280px,100%)] flex-1">
               <p className="text-[11px] font-bold tracking-[2px] uppercase" style={{ color: "var(--mint)" }}>
                 Para profesionales del derecho
               </p>

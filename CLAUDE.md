@@ -358,8 +358,29 @@ oscuro, no después.
     sin `(hover:hover) and (pointer:fine)` — en táctil el botón se escaparía al tocarlo.
 16. **El botón lleno de la nav es "Crear cuenta gratis", no "Iniciar sesión"** en
     las dos landings. Dos razones: el botón lleno es para la acción que la página
-    busca, y **por debajo de 980px el nav esconde los enlaces de texto y solo
-    sobrevive ese botón**.
+    busca, y por debajo de 980px el nav esconde los enlaces de texto — lo que
+    queda visible es ese botón más el menú de móvil (siguiente punto).
+17. **El menú de móvil (`<980px`) es lo único que da acceso a las secciones y al
+    cambio de audiencia** en un teléfono. Hasta el 2026-08-30 no existía: el nav
+    era logo + "Crear cuenta gratis" y punto, así que ni se llegaba a una sección
+    ni había puerta a la otra vía. Tres cosas que se rompen fácil al tocarlo:
+    - La regla base `.nav-burger { display: none }` tiene que ir **antes** del
+      `@media (max-width: 980px)` que la pone en `flex`: misma especificidad, gana
+      la última. Con el orden invertido el botón no aparece nunca — y el fallo se
+      ve solo en móvil.
+    - El panel se **oculta con `display:none`, no se desmonta** (misma regla que
+      los filtros de trámites): así el crawler conserva los enlaces y el foco no
+      entra en un menú cerrado.
+    - **No bloquea el scroll del body** a propósito. Con `overflow:hidden`, el
+      clic en un ancla se pisaría a sí mismo: `desplazamiento-suave.tsx` escucha
+      en `document` y corre ANTES de que React aplique el cierre, así que su
+      `scrollTo` no movería nada.
+18. **`min-w-[Npx]` sobre un `flex-1` desborda en pantallas estrechas.** El
+    mínimo es rígido: a 320px la card de cross-sell de la home se salía 9px (19 en
+    WebKit, que reserva más barra de scroll). Se escribe **`min-w-[min(Npx,100%)]`**,
+    que conserva el punto de envoltura en anchos medios sin forzar el estrecho.
+    ⚙️ Quedan varios `min-w-[180..240px] flex-1` en los portales — revisar en el
+    refinado del pendiente #1.
 
 ## 5. Comandos
 

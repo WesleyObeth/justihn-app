@@ -205,11 +205,151 @@
     padding-inline: clamp(16px, 3vw, 40px);
   }
 }
+/* ── Menú de móvil ──
+   El botón vive en el flujo del nav; el panel cuelga de la nav (que es fija),
+   así que no necesita bloquear el scroll del body — ver la nota de
+   `nav-aurora.tsx` sobre por qué eso rompería el desplazamiento suave. */
+.landing-aurora .nav-burger {
+  display: none;
+  position: relative;
+  /* 40×40: por encima del mínimo de 24 de WCAG 2.5.8 y del tamaño cómodo de
+     pulgar, sin que el botón pese más que el CTA que tiene al lado. */
+  width: 40px;
+  height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+.landing-aurora .nav-burger span {
+  position: absolute;
+  left: 11px;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition:
+    transform 0.28s var(--ease),
+    opacity 0.18s;
+}
+.landing-aurora .nav-burger span:nth-child(1) {
+  transform: translateY(-5.5px);
+}
+.landing-aurora .nav-burger span:nth-child(3) {
+  transform: translateY(5.5px);
+}
+.landing-aurora .nav.abierto .nav-burger span:nth-child(1) {
+  transform: rotate(45deg);
+}
+.landing-aurora .nav.abierto .nav-burger span:nth-child(2) {
+  opacity: 0;
+}
+.landing-aurora .nav.abierto .nav-burger span:nth-child(3) {
+  transform: rotate(-45deg);
+}
+
+.landing-aurora .nav-panel {
+  /* Oculto con display:none, no desmontado: el HTML conserva los enlaces para
+     el crawler y el foco no entra en un menú cerrado. */
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 6px 14px 14px;
+}
+.landing-aurora .nav.abierto .nav-panel {
+  display: block;
+}
+@media (min-width: 981px) {
+  /* Aunque el estado quedara abierto, en escritorio no se enseña nunca. */
+  .landing-aurora .nav-panel {
+    display: none !important;
+  }
+}
+.landing-aurora .nav-panel-caja {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 18px 44px rgba(13, 33, 68, 0.16);
+  overflow: hidden;
+  animation: navPanelEntra 0.24s var(--ease);
+}
+@keyframes navPanelEntra {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-aurora .nav-panel-caja {
+    animation: none;
+  }
+}
+/* La especificidad importa: `.landing-aurora a { color: inherit }` le ganaría
+   a una utilidad, así que el color de estos enlaces se declara aquí (§4.7). */
+.landing-aurora .nav-panel-caja a {
+  display: block;
+  padding: 13px 16px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+.landing-aurora .nav-panel-caja a:last-child {
+  border-bottom: 0;
+}
+.landing-aurora .nav-panel-pie {
+  display: flex;
+  flex-direction: column;
+  background: rgba(21, 132, 199, 0.06);
+}
+.landing-aurora .nav-panel-pie a {
+  font-weight: 600;
+  color: var(--mint);
+}
+
+/* Variante black: la caja es glass oscuro como el resto de superficies. */
+
 @media (max-width: 980px) {
   .landing-aurora .nav-mid,
   .landing-aurora .nav-login {
     display: none;
   }
+  /* Lo que sustituye a esos enlaces: el botón de menú. */
+  .landing-aurora .nav-burger {
+    display: flex;
+  }
+  .landing-aurora .nav-right {
+    gap: 10px !important;
+  }
+  /* "Crear cuenta gratis" + el botón de menú no caben juntos en un teléfono
+     estrecho: por debajo de 400px el CTA se aprieta en vez de empujar el menú
+     fuera de pantalla. */
+  @media (max-width: 400px) {
+    .landing-aurora .nav-cta {
+      padding: 10px 13px;
+      font-size: 12.5px;
+    }
+    .landing-aurora .nav {
+      padding-inline: 14px;
+    }
+  }
+}
+
+.landing-aurora--black .nav-burger {
+  background: rgba(255, 255, 255, 0.06);
+}
+.landing-aurora--black .nav-panel-caja {
+  background: rgba(13, 33, 68, 0.96);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+}
+.landing-aurora--black .nav-panel-pie {
+  background: rgba(21, 132, 199, 0.12);
 }
 
 /* ── Variante noche (pantallas de auth: login + onboarding) ──
