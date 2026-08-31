@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ── Tokens de marca Justihn ──────────────────────────────────────────────
-   Fuente de verdad: design_handoff_portal/marca-tipografia-colores.md
+   Fuente de verdad: ../logo/especificacion/marca-tipografia-colores.md
    El cruce (#0e5f92) es color del símbolo + hover de botones celestes; nunca
    se usa como color de interfaz por sí solo. */
 @theme {

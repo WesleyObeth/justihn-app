@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Onboarding de abogado (handoff design_handoff_auth, `05 Justihn Onboarding
+ * Onboarding de abogado (handoff en `logo/especificacion/handoff-auth.md`
  * Abogado`): registro en 3 pasos + bienvenida, card blanco sobre el aurora
  * oscuro, y el splash del logo al entrar al portal.
  *

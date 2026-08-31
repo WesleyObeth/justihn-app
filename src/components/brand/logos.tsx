@@ -1,6 +1,8 @@
 /**
  * Logos oficiales — geometría FIJA.
- * Fuente de verdad: `design_handoff_portal/logos-oficiales.md`.
+ * Fuente de verdad: `../../logo/especificacion/logos-oficiales.md` (la geometría
+ * explicada: barras 11.7×36 en viewBox 48×48, ±26°, rx = mitad del ancho).
+ * Los SVG de `logo/` son el resultado; ese archivo es la receta.
  * No redibujar, rotar, recolorear ni estirar. Bajo 24px el cruce se omite.
  *
  * Los `id` de clipPath llevan sufijo por instancia: dos logos en la misma página

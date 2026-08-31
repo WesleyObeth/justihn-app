@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Iniciar sesión (handoff design_handoff_auth, `06 Justihn Iniciar Sesion`):
+ * Iniciar sesión (handoff en `logo/especificacion/handoff-auth.md`):
  * card glass sobre el aurora oscuro, con recuperación de contraseña y el
  * splash del logo al entrar.
  *

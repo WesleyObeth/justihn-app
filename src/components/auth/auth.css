@@ -1,4 +1,5 @@
-/* Pantallas de autenticación (login + onboarding) — handoff design_handoff_auth.
+/* Pantallas de autenticación (login + onboarding) — handoff en
+   `logo/especificacion/handoff-auth.md`.
    Solo lo que Tailwind no expresa: los keyframes del splash del logo y el
    fadeUp de transición entre pasos/vistas. Los valores (duraciones, easings,
    delays) son los del handoff, verbatim. */

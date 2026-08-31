@@ -41,7 +41,7 @@ export function FondoAurora({ variante = "clara" }: { variante?: "clara" | "noch
   }, [noche]);
 
   if (noche) {
-    // Variante de las pantallas de auth (handoff design_handoff_auth): el
+    // Variante de las pantallas de auth (handoff en `logo/especificacion/`): el
     // shader dibuja su propio navy opaco, así que no lleva capas claras ni
     // scrim — solo el canvas sobre el gradiente del shell, y un resplandor
     // estático si no hay WebGL.

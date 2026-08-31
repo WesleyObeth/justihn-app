@@ -30,8 +30,14 @@ el contrato literal** de las tablas Supabase de Fase 2. Deployado en
 **https://justihn-app.vercel.app** (repo `github.com/WesleyObeth/justihn-app`,
 env `JUSTIHN_DEMO_SESSION=1`, `noindex` hasta lanzar).
 
-**Fuentes de verdad visuales** (no improvisar valores): `../design_handoff_portal/`
-para el portal y `../design_handoff_auth/` para login y onboarding.
+**Fuentes de verdad visuales** (no improvisar valores): **`../logo/especificacion/`**
+— `logos-oficiales.md` (la geometría, que los SVG solo materializan),
+`marca-tipografia-colores.md` (los tokens **y el porqué de cada uno**) y los dos
+handoffs de Claude Design, `handoff-portal.md` y `handoff-auth.md`.
+⚠️ Las carpetas `design_handoff_portal/` y `design_handoff_auth/` **se eliminaron
+el 2026-08-31**: sus prototipos `.dc.html` (260 KB) y su runtime (72 KB) eran la
+maqueta de partida y el producto los superó — solo ese día se refinaron diez
+pantallas. Se conservaron los 40 KB de especificación, que sí es viva.
 
 ### 1.1 Portal de abogados — `/abogados` (15 pantallas)
 
@@ -422,7 +428,8 @@ contenido z-2 · nav z-100.
 
 ### 1.4 Auth — `/iniciar-sesion` + `/crear-cuenta`
 
-Grupo `(auth)`, shell propio sin navegación, del handoff `../design_handoff_auth/`.
+Grupo `(auth)`, shell propio sin navegación, del handoff
+`../logo/especificacion/handoff-auth.md`.
 
 - **Un solo login para las dos vías** (decisión Wesley 2026-08-30). Es UNA base
   de cuentas: dos logins duplicarían recuperación, enlaces mágicos, rate limit y
@@ -442,7 +449,7 @@ Grupo `(auth)`, shell propio sin navegación, del handoff `../design_handoff_aut
   en pantallas sin SEO no cuesta nada.
 - **`next` validado** — ver §4.7.
 - **Escena del logo: el libro que se abre** (`escena-logo.tsx`, portada de
-  `../design_handoff_auth/justihn-logo-scene.jsx`). Cuatro actos en 6,8 s:
+  `../logo/especificacion/justihn-logo-scene.jsx`). Cuatro actos en 6,8 s:
   Cerrado 1,4 s · Apertura 1,6 s (páginas a ±26°, nace el cruce) · Nombre 2,2 s ·
   Final 1,6 s. Los tiempos van en **porcentaje de un ciclo único** en `auth.css`,
   para que el bucle sea una animación por elemento y los actos no se
