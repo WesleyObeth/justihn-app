@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getInstitucion, INSTITUCIONES, TRAMITES } from "./tramites";
+import {
+  buscarInstituciones,
+  getInstitucion,
+  INSTITUCIONES,
+  materiasDeInstitucion,
+  TRAMITES,
+} from "./tramites";
 import { isFuenteOficial } from "@/lib/security/sanitize";
 
 /**
@@ -44,6 +50,57 @@ describe("instituciones", () => {
       expect(i.sigla.trim().length, i.id).toBeGreaterThan(0);
       expect(i.descripcion.trim().length, i.id).toBeGreaterThan(0);
       expect(i.nombre.trim().length, i.id).toBeGreaterThan(0);
+    }
+  });
+});
+
+/**
+ * La sigla se pinta ENTERA. La card la recortaba con `slice(0, 4)` y convertía
+ * «ONCAE» en «ONCA» y «MiAmbiente» en «MiAm» — una sigla a medias no identifica
+ * a nadie, y en un catálogo de oficinas del Estado eso es un error de dato.
+ */
+describe("siglas", () => {
+  it("ninguna sigla necesita recorte para leerse", () => {
+    for (const i of INSTITUCIONES) {
+      expect(i.sigla.length, `${i.id}: "${i.sigla}"`).toBeLessThanOrEqual(12);
+      expect(i.sigla.trim(), i.id).toBe(i.sigla);
+    }
+  });
+
+  it("las siglas no se repiten entre instituciones", () => {
+    const siglas = INSTITUCIONES.map((i) => i.sigla.toLowerCase());
+    expect(new Set(siglas).size).toBe(siglas.length);
+  });
+});
+
+describe("buscarInstituciones", () => {
+  it("encuentra por sigla, por nombre y por lo que hace", () => {
+    expect(buscarInstituciones("SAR").map((i) => i.id)).toContain("sar");
+    expect(buscarInstituciones("propiedad").map((i) => i.id)).toContain("ip");
+    expect(buscarInstituciones("impuestos").map((i) => i.id)).toContain("sar");
+  });
+
+  it("sin término devuelve todas — la pantalla abre con el catálogo completo", () => {
+    expect(buscarInstituciones("")).toHaveLength(INSTITUCIONES.length);
+    expect(buscarInstituciones("   ")).toHaveLength(INSTITUCIONES.length);
+  });
+
+  it("lo inexistente devuelve vacío, no resultados de relleno", () => {
+    expect(buscarInstituciones("zzzz")).toEqual([]);
+  });
+});
+
+describe("materiasDeInstitucion", () => {
+  it("sale de sus trámites y no se repite", () => {
+    for (const i of INSTITUCIONES) {
+      const materias = materiasDeInstitucion(i.id);
+      expect(new Set(materias).size, i.id).toBe(materias.length);
+      for (const m of materias) {
+        expect(
+          TRAMITES.some((t) => t.institucionId === i.id && t.materia === m),
+          `${i.id} → ${m}`,
+        ).toBe(true);
+      }
     }
   });
 });

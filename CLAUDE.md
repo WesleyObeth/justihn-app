@@ -196,6 +196,18 @@ promesas que ya estaban hechas y no existían:
   **opcional a propósito**: solo se rellena si el host pasa la whitelist §3.3
   (6 de 9; MiAmbiente no responde, STSS y Registro Mercantil sin verificar), y
   `instituciones.test.ts` lo exige — antes ningún enlace que uno muerto.
+  **Refinada 2026-08-31.** La card metía la sigla en un cuadro con
+  `slice(0, 4)`: convertía **«ONCAE» en «ONCA»** y «MiAmbiente» en «MiAm» — una
+  sigla a medias no identifica a nadie, y encima repetía un dato que ya estaba
+  dos líneas más abajo. Ahora va **entera y como rótulo**, igual que en la card
+  de guía, con test que impide siglas irrepresentables o repetidas. Se suman
+  buscador (`buscarInstituciones`, por sigla, nombre o por lo que hace — la
+  gente escribe "impuestos", no "SAR"), estado sin resultados que empuja al
+  buscador de trámites, y en el pie de cada card el nº de guías, si tiene portal
+  y **cuántas tiene en curso**. El detalle gana columna lateral: portal oficial,
+  materias que cubre (derivadas de sus trámites), otras instituciones y el
+  consultorio. Cuando NO hay portal **se dice por qué**: el hueco solo se lee
+  como descuido si no se explica.
 - **Verificación son DOS pantallas, y la separación es la regla, no diseño.**
   **Mi nombre** vigila solo nombres propios; **Informe Verifica** mira a un
   tercero. Ofrecer vigilar a terceros en la primera convertiría el monitoreo en
@@ -612,7 +624,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (98 tests de invariantes)
+pnpm test         # Vitest (104 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

@@ -1103,6 +1103,23 @@ export function guiasDeMateria(materia: Materia): Tramite[] {
   return TRAMITES.filter((t) => t.materia === materia);
 }
 
+/** Busca una institución por sigla, nombre o lo que hace — mismo criterio que
+ *  `buscarGuias`: la gente escribe "impuestos", no "SAR". */
+export function buscarInstituciones(termino: string): Institucion[] {
+  const t = normalizar(termino.trim());
+  if (!t) return INSTITUCIONES;
+  return INSTITUCIONES.filter((i) =>
+    normalizar(`${i.sigla} ${i.nombre} ${i.descripcion}`).includes(t),
+  );
+}
+
+/** Las materias que cubre una institución, deducidas de sus trámites. */
+export function materiasDeInstitucion(institucionId: string): Materia[] {
+  return [
+    ...new Set(TRAMITES.filter((t) => t.institucionId === institucionId).map((t) => t.materia)),
+  ];
+}
+
 export function getInstitucion(id: string): Institucion | undefined {
   return INSTITUCIONES.find((i) => i.id === id);
 }
