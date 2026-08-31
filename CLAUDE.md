@@ -325,8 +325,10 @@ oscuro, no después.
 6. **satori (`next/og`) no lee woff2**, que es lo único que deja `next/font` en el
    build — por eso las fuentes van versionadas en TTF (`app/_og-fuentes/`, OFL).
    Y sin **`metadataBase`** Next emite el `og:image` relativo y WhatsApp no pinta
-   nada. **Al comprar el dominio se cambia en la constante `SITIO` y en ningún
-   otro lado.** El `og:url` va **por página**: uno global en el layout haría que
+   nada. El origen vive en la constante **`SITIO`** (`app/layout.tsx`) y en ningún
+   otro lado: es **`https://justihn.com`** desde el 2026-08-30, con
+   `NEXT_PUBLIC_SITIO_URL` como override para previsualizaciones. Mientras estuvo
+   en la URL de Vercel, compartir el dominio nuevo pedía la miniatura al viejo. El `og:url` va **por página**: uno global en el layout haría que
    toda página compartida se canonizara como la home. `noindex` no afecta a esto
    — el rastreador de WhatsApp lee las Open Graph igual.
 7. **Chromium fuerza `line-height: normal !important` en `<select>`.** Dos campos
@@ -452,9 +454,14 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
    2026-08-30): es una comparación visual que no bloquea nada. Ídem con la prueba
    de la aurora clara en auth (§1.4).
 5. **SEO de la vía B:** no hay `sitemap.xml` ni datos estructurados
-   (`HowTo`/`FAQPage` en las guías, que es lo que gana los rich snippets). Y
-   `robots` sigue en **`noindex`** en el layout raíz: **quitarlo al lanzar**, o
-   nada de esto rankea.
+   (`HowTo`/`FAQPage` en las guías, que es lo que gana los rich snippets).
+   🚦 **El `noindex` del layout raíz se mantiene a propósito hasta cablear
+   Supabase** (decisión Wesley 2026-08-30, con el dominio ya comprado): el sitio
+   es accesible y compartible por enlace, pero fuera de Google — hoy el login
+   entra con cualquier correo y Jus IA está apagado sin corpus, así que un
+   visitante que llegara de una búsqueda se registraría en algo que no existe, y
+   sin sitemap el primer rastreo se desaprovecha. **Quitarlo es una línea**, y el
+   momento de hacerlo es el mismo en que el alta empiece a crear cuentas de verdad.
 6. **Decidir en qué plan entra "Procesos"** (`data/catalogo.ts`): la pantalla
    existe y la landing la vende, pero la tabla de planes no dice desde cuál se
    tiene. Antes de cobrar.
