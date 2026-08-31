@@ -1,4 +1,8 @@
-import { HeaderMovilPersona, SidebarPersona } from "@/components/personas/shell-persona";
+import {
+  CapaMenuMovilPersona,
+  HeaderMovilPersona,
+  SidebarPersona,
+} from "@/components/personas/shell-persona";
 import { Toast } from "@/components/portal/capas-globales";
 import { HidratarStore } from "@/components/portal/marco";
 
@@ -11,13 +15,14 @@ export default function LayoutPersona({ children }: { children: React.ReactNode 
   return (
     <>
       <HidratarStore />
-      <div className="flex h-screen flex-col overflow-hidden bg-lienzo text-marino lg:flex-row">
+      <div className="flex h-screen overflow-hidden bg-lienzo text-marino">
         <SidebarPersona />
         <div className="flex min-w-0 flex-1 flex-col">
           <HeaderMovilPersona />
           <main className="flex-1 overflow-y-auto px-4 py-5 md:px-8 md:py-7">{children}</main>
         </div>
       </div>
+      <CapaMenuMovilPersona />
       <Toast />
     </>
   );

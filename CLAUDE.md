@@ -2,8 +2,8 @@
 
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-30** (reorganización:
-> §1 comprimida, trampas a §4.7; refinado final de los portales como pendiente #1).
+> Creado: **2026-08-25** · Última actualización: **2026-08-31** (el shell del
+> portal ciudadano pasa a ser gemelo real del de abogados — §1.2).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -61,10 +61,27 @@ Perfil · Planes · Configuración · Ayuda.
 ### 1.2 Portal ciudadano — `/personas` (9 rutas)
 
 El patrón Jusbrasil completo: la landing da la probadita y "crear cuenta gratis"
-abre un portal con shell propio (sidebar marino gemelo del de abogados; persona
-demo Carlos Zelaya en `data/persona.ts`). Inicio · Trámites (con **checklist
-persistido**, `pasosTramite` en el store) · Consultas · Directorio · Calculadora ·
-Plan · Perfil · Configuración · Ayuda.
+abre un portal con shell propio (persona demo Carlos Zelaya en `data/persona.ts`).
+Inicio · Trámites (con **checklist persistido**, `pasosTramite` en el store) ·
+Consultas · Directorio · Calculadora · Plan · Perfil · Configuración · Ayuda.
+
+**El shell es gemelo del de abogados, no parecido** (2026-08-31): misma columna
+marina **colapsable** (236px ↔ 68px), navegación **agrupada por categorías** y
+**drawer** en móvil. Tres decisiones detrás:
+- **Comparte `sidebarColapsado` del store** con el portal de abogados, así que la
+  preferencia se persiste una sola vez. No es un descuido: nadie es las dos
+  audiencias a la vez, y duplicar la clave daría dos memorias del mismo gesto.
+- **Colapsada, las categorías se leen como separadores** (una línea de 24px), no
+  como rótulos: a 68px no hay ancho para el texto, y sin nada los seis iconos
+  quedaban en una lista plana.
+- **"Mi plan" salió de la nav al menú del avatar**, donde lo tiene el abogado.
+  Ahí ya se anunciaba "Plan Gratis" sin ser un enlace — un texto muerto que
+  ahora lleva a `/personas/plan`. La nav queda en 5 enlaces y 2 categorías.
+
+Móvil dejó de ser chips deslizables en cabecera marina: es la misma cabecera
+blanca con hamburguesa del portal de abogados. La mecánica del drawer (Escape,
+clic al fondo, cierre al navegar) vive UNA vez en `DrawerMenuMovil`
+(`portal/sidebar.tsx`) y los dos portales le pasan su propio sidebar.
 
 **Nombres cerrados (2026-08-29):** `/personas` en plural, para leer como pareja
 de `/abogados`; y su buscador es `/personas/directorio`, no `/personas/abogados`

@@ -398,10 +398,12 @@ export function HeaderMovil() {
 }
 
 /**
- * Drawer de navegación: reutiliza el Sidebar completo en variante móvil.
- * Se cierra al navegar (cambio de pathname), con Escape o tocando el fondo.
+ * Mecánica del drawer, compartida por los dos portales: se cierra al navegar
+ * (cambio de pathname), con Escape o tocando el fondo. El contenido lo pone
+ * cada portal — aquí solo vive el comportamiento, que es lo que no conviene
+ * duplicar.
  */
-export function CapaMenuMovil() {
+export function DrawerMenuMovil({ children }: { children: React.ReactNode }) {
   const abierto = usePortal((s) => s.menuMovil);
   const setMenuMovil = usePortal((s) => s.setMenuMovil);
   const pathname = usePathname();
@@ -430,13 +432,22 @@ export function CapaMenuMovil() {
         className="absolute inset-0 cursor-default bg-[rgba(10,24,48,.5)]"
       />
       <div className="absolute inset-y-0 left-0" style={{ animation: "fadeUp .2s ease" }}>
-        <Sidebar variante="movil" />
+        {children}
       </div>
     </div>
   );
 }
 
-function IconoColapsar({ direccion }: { direccion: "izquierda" | "derecha" }) {
+/** Drawer del portal de abogados: el Sidebar completo en variante móvil. */
+export function CapaMenuMovil() {
+  return (
+    <DrawerMenuMovil>
+      <Sidebar variante="movil" />
+    </DrawerMenuMovil>
+  );
+}
+
+export function IconoColapsar({ direccion }: { direccion: "izquierda" | "derecha" }) {
   return (
     <svg
       width={18}

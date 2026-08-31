@@ -1,26 +1,43 @@
 "use client";
 
 /**
- * Shell del portal ciudadano (`/personas`) — gemelo visual del portal de
- * abogados: sidebar marino en escritorio, barra superior con navegación
- * horizontal en móvil. La "cuenta" es la sesión demo de la persona.
+ * Shell del portal ciudadano (`/personas`) — gemelo del portal de abogados:
+ * sidebar marino colapsable en escritorio (mismo estado del store, así que la
+ * preferencia viaja con la persona), navegación agrupada por categorías y
+ * drawer en móvil. La "cuenta" es la sesión demo de la persona.
  */
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { LogoJustihn, SimboloJustihn } from "@/components/brand/logos";
+import { DrawerMenuMovil, IconoColapsar } from "@/components/portal/sidebar";
 import { PERSONA_DEMO } from "@/data/persona";
 import { usePortal } from "@/store/portal";
 import { cn } from "@/lib/utils";
 
-const NAV_PERSONA: { href: string; label: string; icono: NombreIcono }[] = [
+interface ItemNav {
+  href: string;
+  label: string;
+  icono: NombreIcono;
+}
+
+type EntradaNav = ItemNav | { seccion: string };
+
+/**
+ * Dos categorías con la misma lógica que las del abogado (Investigación /
+ * Consultorio), vista desde el ciudadano: lo que ya empezó y guarda avance,
+ * y lo que consulta cuando lo necesita. "Mi plan" no está aquí sino en el menú
+ * del avatar — donde lo tiene el abogado, y donde ya se anuncia su plan.
+ */
+const NAV_PERSONA: EntradaNav[] = [
   { href: "/personas", label: "Inicio", icono: "dash" },
+  { seccion: "Mis gestiones" },
   { href: "/personas/tramites", label: "Trámites", icono: "pasos" },
   { href: "/personas/consultas", label: "Mis consultas", icono: "leads" },
+  { seccion: "Herramientas" },
   { href: "/personas/directorio", label: "Encuentra abogado", icono: "perfil" },
   { href: "/personas/calculadora", label: "Calculadora", icono: "calc" },
-  { href: "/personas/plan", label: "Mi plan", icono: "planes" },
 ];
 
 function esActiva(pathname: string, href: string): boolean {
@@ -28,28 +45,95 @@ function esActiva(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SidebarPersona() {
+/**
+ * `variante="escritorio"`: columna fija con colapso, oculta bajo `lg`.
+ * `variante="movil"`: mismo contenido siempre expandido, para el drawer.
+ */
+export function SidebarPersona({
+  variante = "escritorio",
+}: {
+  variante?: "escritorio" | "movil";
+}) {
   const pathname = usePathname();
+  const esMovil = variante === "movil";
+  const colapsado = usePortal((s) => s.sidebarColapsado) && !esMovil;
+  const toggleSidebar = usePortal((s) => s.toggleSidebar);
+  const expandido = !colapsado;
 
   return (
     <nav
       aria-label="Navegación del portal"
-      className="relative z-20 hidden w-[236px] min-w-[236px] flex-col text-[#e8eef6] lg:flex"
-      style={{ background: "linear-gradient(180deg,#0d2144 0%,#0a1830 100%)" }}
+      className={cn(
+        "relative z-20 flex shrink-0 flex-col text-[#e8eef6] transition-[width,min-width] duration-[250ms]",
+        esMovil ? "h-full" : "max-lg:hidden",
+      )}
+      style={{
+        width: colapsado ? 68 : 236,
+        minWidth: colapsado ? 68 : 236,
+        background: "linear-gradient(180deg,#0d2144 0%,#0a1830 100%)",
+      }}
     >
-      <div className="px-4 pt-4 pb-3">
-        <Link href="/" aria-label="Justihn — inicio" className="ml-[3px] inline-block">
-          <LogoJustihn size={28} variante="oscuro" textoPx={17} />
-        </Link>
+      <div className="flex items-center gap-[7px] px-3.5 pt-4 pb-2.5">
+        {expandido ? (
+          <>
+            <Link href="/" className="ml-[3px] inline-block" aria-label="Justihn — inicio">
+              <LogoJustihn size={28} variante="oscuro" textoPx={17} />
+            </Link>
+            {!esMovil && (
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                title="Contraer menú"
+                aria-label="Contraer menú"
+                className="ml-auto grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-lg text-sobre-marino hover:bg-white/10 hover:text-[#e8eef6]"
+              >
+                <IconoColapsar direccion="izquierda" />
+              </button>
+            )}
+          </>
+        ) : (
+          <Link href="/" className="ml-[3px]" aria-label="Justihn — inicio">
+            <SimboloJustihn size={28} variante="oscuro" />
+          </Link>
+        )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2.5 py-1.5">
-        {NAV_PERSONA.map((item) => {
-          const activo = esActiva(pathname, item.href);
+      {colapsado && (
+        <div className="flex justify-center pb-1.5">
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            title="Expandir menú"
+            aria-label="Expandir menú"
+            className="grid h-8 w-8 cursor-pointer place-items-center rounded-lg text-sobre-marino hover:bg-white/10 hover:text-[#e8eef6]"
+          >
+            <IconoColapsar direccion="derecha" />
+          </button>
+        </div>
+      )}
+
+      <div className="flex flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto px-2.5 py-1.5">
+        {NAV_PERSONA.map((entrada) => {
+          if ("seccion" in entrada) {
+            // Colapsada la barra no hay ancho para el rótulo; el grupo se lee
+            // por la separación entre iconos.
+            return expandido ? (
+              <div
+                key={entrada.seccion}
+                className="px-3 pt-3.5 pb-1 text-[10px] font-semibold tracking-[1.6px] whitespace-nowrap text-[#5f7ba0] uppercase"
+              >
+                {entrada.seccion}
+              </div>
+            ) : (
+              <div key={entrada.seccion} className="mx-auto my-1.5 h-px w-6 bg-white/[0.12]" />
+            );
+          }
+          const activo = esActiva(pathname, entrada.href);
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={entrada.href}
+              href={entrada.href}
+              title={entrada.label}
               aria-current={activo ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-[9px] transition-colors",
@@ -57,22 +141,24 @@ export function SidebarPersona() {
               )}
             >
               <span className="grid w-[22px] min-w-[22px] place-items-center">
-                <Icono nombre={item.icono} size={17} />
+                <Icono nombre={entrada.icono} size={17} />
               </span>
-              <span className="text-[13.5px] font-medium whitespace-nowrap">{item.label}</span>
+              {expandido && (
+                <span className="text-[13.5px] font-medium whitespace-nowrap">{entrada.label}</span>
+              )}
             </Link>
           );
         })}
       </div>
 
-      <MenuUsuarioPersona />
+      <MenuUsuarioPersona expandido={expandido} />
     </nav>
   );
 }
 
-/** Menú del avatar (patrón del portal de abogados): perfil, configuración,
- *  ayuda y cerrar sesión. */
-function MenuUsuarioPersona() {
+/** Menú del avatar (patrón del portal de abogados): plan, perfil,
+ *  configuración, ayuda y cerrar sesión. */
+function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
   const router = useRouter();
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const [abierto, setAbierto] = useState(false);
@@ -102,36 +188,69 @@ function MenuUsuarioPersona() {
             onClick={() => setAbierto(false)}
           />
           <div
-            className="absolute bottom-[64px] left-2.5 z-[60] w-[218px] rounded-[14px] border border-white/[0.14] bg-[#12294f] p-2"
+            className="absolute bottom-[66px] left-2.5 z-[60] w-[224px] rounded-[14px] border border-white/[0.14] bg-[#12294f] p-2"
             style={{ boxShadow: "0 18px 48px rgba(5,12,26,.6)", animation: "fadeUp .2s ease" }}
             role="menu"
           >
-            <div className="px-3 pt-1.5 pb-2">
-              <div className="text-sm font-semibold">{PERSONA_DEMO.nombre}</div>
-              <div className="text-[11px] text-sobre-marino">
-                Plan Gratis · miembro desde {PERSONA_DEMO.miembroDesde}
+            {/* Identidad + plan de un vistazo */}
+            <div className="border-b border-white/10 px-3 pt-2.5 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold">{PERSONA_DEMO.nombre}</span>
+                <span className="rounded-full border border-white/20 bg-white/10 px-1.5 py-px text-[10px] font-bold text-[#9fb6d0]">
+                  GRATIS
+                </span>
+              </div>
+              <div className="mt-0.5 text-[11.5px] text-sobre-marino">
+                Miembro desde {PERSONA_DEMO.miembroDesde}
               </div>
             </div>
-            <div className="my-1 h-px bg-white/[0.1]" />
-            <ItemMenu icono="perfil" onClick={() => ir("/personas/perfil")}>
-              Mi perfil
-            </ItemMenu>
-            <ItemMenu icono="config" onClick={() => ir("/personas/configuracion")}>
-              Configuración
-            </ItemMenu>
-            <ItemMenu icono="help" onClick={() => ir("/personas/ayuda")}>
-              Ayuda
-            </ItemMenu>
-            <div className="my-1 h-px bg-white/[0.1]" />
-            <ItemMenu
-              icono="logout"
-              onClick={() => {
-                setAbierto(false);
-                mostrarToast("Sesión de demostración — el login llega con la Fase 2");
-              }}
+
+            {/* El plan: contexto antes que las acciones, como en el del abogado */}
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => ir("/personas/plan")}
+              className="w-full cursor-pointer rounded-lg px-3 py-2.5 text-left hover:bg-white/[0.08]"
             >
-              Cerrar sesión
-            </ItemMenu>
+              <div className="flex items-center gap-2.5 text-[12.5px] text-[#9fb6d0]">
+                <span className="grid w-[18px] place-items-center text-[#e8eef6]">
+                  <Icono nombre="planes" size={15} />
+                </span>
+                <span className="flex-1">Mi plan</span>
+                <b className="text-[#e8eef6]">Gratis</b>
+              </div>
+              <div className="mt-1.5 ml-[28px] text-[11px] text-celeste">Ver qué incluye →</div>
+            </button>
+
+            {/* Cuenta */}
+            <div className="my-1 border-t border-white/10 pt-1">
+              <ItemMenu icono="perfil" onClick={() => ir("/personas/perfil")}>
+                Mi perfil
+              </ItemMenu>
+              <ItemMenu icono="config" onClick={() => ir("/personas/configuracion")}>
+                Configuración
+              </ItemMenu>
+            </div>
+
+            {/* Soporte */}
+            <div className="my-1 border-t border-white/10 pt-1">
+              <ItemMenu icono="help" onClick={() => ir("/personas/ayuda")}>
+                Ayuda
+              </ItemMenu>
+            </div>
+
+            <div className="mt-1 border-t border-white/10 pt-1">
+              <ItemMenu
+                icono="logout"
+                destructivo
+                onClick={() => {
+                  setAbierto(false);
+                  mostrarToast("Sesión de demostración — el login llega con la Fase 2");
+                }}
+              >
+                Cerrar sesión
+              </ItemMenu>
+            </div>
           </div>
         </>
       )}
@@ -141,16 +260,25 @@ function MenuUsuarioPersona() {
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
         aria-haspopup="menu"
-        className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl p-1 text-left hover:bg-white/[0.07]"
+        title={PERSONA_DEMO.nombre}
+        className="flex w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-2 py-[7px] text-left hover:bg-white/[0.08]"
       >
-        <span className="font-display grid h-9 w-9 shrink-0 place-items-center rounded-full bg-celeste text-[13px] font-semibold text-white">
+        <span className="font-display grid h-[34px] w-[34px] min-w-[34px] place-items-center rounded-full bg-celeste text-[12.5px] font-semibold text-white">
           {PERSONA_DEMO.iniciales}
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-[13px] font-semibold">{PERSONA_DEMO.nombre}</span>
-          <span className="block text-[11px] text-sobre-marino">Plan Gratis</span>
-        </span>
-        <Icono nombre="chevrons" size={16} className="shrink-0 text-sobre-marino" />
+        {expandido && (
+          <>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[13px] font-semibold">
+                {PERSONA_DEMO.nombre}
+              </span>
+              <span className="block text-[11px] text-sobre-marino">Plan Gratis</span>
+            </span>
+            <span className="grid place-items-center text-sobre-marino">
+              <Icono nombre="chevrons" size={18} />
+            </span>
+          </>
+        )}
       </button>
     </div>
   );
@@ -160,64 +288,70 @@ function ItemMenu({
   icono,
   onClick,
   children,
+  destructivo,
 }: {
   icono: NombreIcono;
   onClick: () => void;
   children: React.ReactNode;
+  destructivo?: boolean;
 }) {
   return (
     <button
       type="button"
       role="menuitem"
       onClick={onClick}
-      className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] text-nav hover:bg-white/[0.08] hover:text-white"
+      className={cn(
+        "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-[13.5px]",
+        destructivo ? "text-[#f0857a] hover:bg-[rgba(240,133,122,.1)]" : "hover:bg-white/[0.08]",
+      )}
     >
-      <Icono nombre={icono} size={15} />
-      {children}
+      <span className="grid w-[18px] place-items-center">
+        <Icono nombre={icono} size={15} />
+      </span>
+      <span className="flex-1">{children}</span>
     </button>
   );
 }
 
-/** Barra superior móvil: logo + navegación horizontal deslizable. */
+// ── Navegación móvil (bajo `lg`) ───────────────────────────────────────────
+
+/** Barra superior con hamburguesa — gemela de la del portal de abogados. */
 export function HeaderMovilPersona() {
-  const pathname = usePathname();
+  const setMenuMovil = usePortal((s) => s.setMenuMovil);
 
   return (
-    <div
-      className="text-[#e8eef6] lg:hidden"
-      style={{ background: "linear-gradient(180deg,#0d2144,#0a1830)" }}
-    >
-      <div className="flex items-center justify-between px-4 pt-3">
-        <Link href="/" aria-label="Justihn — inicio">
-          <SimboloJustihn size={26} variante="oscuro" />
-        </Link>
-        <Link
-          href="/personas/perfil"
-          className="flex items-center gap-2 text-[12px] text-sobre-marino hover:text-white"
+    <header className="flex items-center gap-2.5 border-b border-borde bg-white px-4 py-2.5 lg:hidden">
+      <button
+        type="button"
+        onClick={() => setMenuMovil(true)}
+        aria-label="Abrir menú"
+        className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-marino hover:bg-lienzo"
+      >
+        <svg
+          width={20}
+          height={20}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          aria-hidden="true"
         >
-          <span className="font-display grid h-7 w-7 place-items-center rounded-full bg-celeste text-[11px] font-semibold text-white">
-            {PERSONA_DEMO.iniciales}
-          </span>
-          {PERSONA_DEMO.nombre}
-        </Link>
-      </div>
-      <div className="flex gap-1 overflow-x-auto px-3 py-2.5">
-        {NAV_PERSONA.map((item) => {
-          const activo = esActiva(pathname, item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "rounded-full px-3.5 py-1.5 text-[12.5px] font-medium whitespace-nowrap",
-                activo ? "bg-celeste text-white" : "text-nav hover:bg-white/10",
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </div>
-    </div>
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+      <Link href="/personas" aria-label="Justihn">
+        <LogoJustihn size={24} textoPx={15} />
+      </Link>
+    </header>
+  );
+}
+
+/** Drawer del portal ciudadano: el sidebar completo en variante móvil. */
+export function CapaMenuMovilPersona() {
+  return (
+    <DrawerMenuMovil>
+      <SidebarPersona variante="movil" />
+    </DrawerMenuMovil>
   );
 }
