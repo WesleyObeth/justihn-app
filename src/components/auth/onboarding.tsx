@@ -306,7 +306,10 @@ export function PantallaOnboarding() {
                   <select
                     value={depto}
                     onChange={(e) => setDepto(e.target.value)}
-                    className="input-dia rounded-[10px] border bg-white px-2.5 py-[11px] text-[14px] text-marino outline-none"
+                    /* Alto fijo: Chromium impone `line-height: normal !important` a los
+                       <select>, así que con el mismo padding queda 1px más bajo que
+                       el input de al lado. */
+                    className="input-dia h-[45px] rounded-[10px] border bg-white px-3 text-[14px] text-marino outline-none"
                   >
                     <option value="">Selecciona…</option>
                     {DEPARTAMENTOS.map((d) => (
@@ -757,7 +760,7 @@ function CampoDia({
         placeholder={placeholder}
         value={valor}
         onChange={(e) => onCambio(e.target.value)}
-        className="input-dia rounded-[10px] border px-3.5 py-[11px] text-[14px] text-marino outline-none"
+        className="input-dia h-[45px] rounded-[10px] border px-3.5 text-[14px] text-marino outline-none"
       />
     </label>
   );

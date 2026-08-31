@@ -81,7 +81,13 @@ export function FormularioPregunta({
           <select
             value={materia}
             onChange={(e) => setMateria(e.target.value as Materia)}
-            className="rounded-lg border border-borde bg-white p-2.5 text-[13.5px] text-marino outline-none focus:border-celeste"
+            /* Alto FIJO, igual que el input de al lado. No basta con el mismo
+               padding: Chromium impone `line-height: normal !important` a los
+               <select>, así que el alto no se puede igualar por line-height —
+               salía 40px contra los 42.3 del input. El padding lateral también
+               era distinto (`p-2.5` = 10px frente a los 12 del input), con lo
+               que el texto de los dos campos ni siquiera empezaba en la misma x. */
+            className="h-[42px] rounded-lg border border-borde bg-white px-3 text-[13.5px] text-marino outline-none focus:border-celeste"
           >
             {MATERIAS_CONSULTA.map((m) => (
               <option key={m} value={m}>
@@ -96,7 +102,7 @@ export function FormularioPregunta({
             value={ciudad}
             onChange={(e) => setCiudad(e.target.value)}
             placeholder="Ej. Tegucigalpa"
-            className="rounded-lg border border-borde bg-white px-3 py-2.5 text-[13.5px] text-marino outline-none focus:border-celeste"
+            className="h-[42px] rounded-lg border border-borde bg-white px-3 text-[13.5px] text-marino outline-none focus:border-celeste"
           />
         </label>
       </div>
