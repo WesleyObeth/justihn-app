@@ -426,10 +426,13 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     medidas/alt, y que titulares (≤48), sellos (≤24) y los títulos y
     descripciones compartibles (≤70/≤170) no se corten en la burbuja.
 
-- **🗂️ "LO QUE ENCUENTRAS DENTRO" — mosaico en tres categorías
+- **🗂️ "LO QUE ENCUENTRAS DENTRO" — mosaico de nueve piezas
   (`components/profesional/capacidades.tsx`, 2026-08-30, tres rondas):**
-  **Investigar con fuente · No perder nada de vista · Producir y conseguir
-  clientes**, con una celda ancha por fila que alterna de lado.
+  con una celda ancha por fila que alterna de lado. **Sin encabezados de
+  categoría** (decisión Wesley): el orden sigue agrupando por trabajo
+  —investigar → vigilar → producir— pero sin rotularlo; tres titulares dentro
+  de una sección que ya tiene el suyo hacían cuatro niveles de jerarquía en el
+  mismo bloque y partían el mosaico en tres rejillas sueltas.
   - Arregla tres cosas del muro de 8 cards iguales que había antes: **no
     incluía Jus IA** (el corazón del producto), llamaba a cada función por el
     nombre de su pantalla en vez de por el trabajo que resuelve, y no daba
@@ -441,7 +444,8 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     tres demos de después. No era parecido: era lo mismo dos veces. **Reparto
     definitivo: esta sección es el INVENTARIO, los demos son la DEMOSTRACIÓN.**
   - La celda ancha alterna de posición por fila (izq · der · izq): con la ancha
-    siempre al principio, las tres filas se leerían idénticas.
+    siempre al principio, las tres filas se leerían idénticas. Con 4 columnas
+    cada fila suma 2+1+1, así que teja sin huecos (verificado 3+3+3).
   - **Sin estado ni interacción** — componente de servidor, así que las nueve
     funciones llegan íntegras al HTML sin depender de hidratación.
   - ⚙️ **Capturas del portal: diferidas a propósito** — una captura driftea en
