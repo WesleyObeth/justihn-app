@@ -134,6 +134,26 @@ promesas que ya estaban hechas y no existían:
   portal); lo que se comparte es la fuente y el criterio. Y **"Lo que otros
   preguntan"** es el eco de "Leads en tu especialidad" visto desde el ciudadano:
   enseña que el consultorio se usa sin inventar un contador de actividad.
+- **Trámites separa trámites de procesos** (refinado 2026-08-31): eran 14 cards
+  en una parrilla plana donde un divorcio y un RTN se veían igual, y la única
+  señal de que son cosas distintas era un chip que había que pulsar. Ahora van
+  en dos secciones con su conteo — y solo se parte cuando el filtro de tipo está
+  en "Todos": con "Procesos" activo, un encabezado "Procesos legales" sobre la
+  única lista sería ruido. `tramites.test.ts` exige que los dos tipos cubran el
+  catálogo entero: un tercer tipo desaparecería de la pantalla en silencio
+  (mismo fallo que §4.7.12 describe para `RUTAS_TRAMITE`).
+  - **El filtro estaba invertido**: el buscador medía 230px y el select de
+    institución 480 — lo secundario era el doble que lo principal. Ahora el
+    buscador se lleva el espacio sobrante y el select baja a 220px.
+  - **Los tres controles iban a 42/41/40px.** Un `<select>` no se iguala por
+    interlineado (§4.7.7): los tres llevan **altura explícita** (`h-10`).
+  - **Cada institución muestra su conteo y se deshabilita en 0**, calculado
+    sobre lo ya filtrado por tipo. Antes "Procesos" + "SAR" dejaba la parrilla
+    en blanco sin avisar.
+  - **Sin resultados hay pantalla, no vacío**: mensaje, "Ver todas las guías" y
+    el consultorio — porque puede que la guía no exista todavía.
+  - **La card muestra pasos y `tasaCorta`**, que estaba en el seed sin usarse:
+    "cuánto me cuesta" obligaba a abrir la guía para saberlo.
 - **Instituciones** (2026-08-31) es el pedido literal del socio: "ver todas las
   instituciones del Estado y los trámites de cada una — ej. el IP". El seed ya
   lo tenía (`INSTITUCIONES`, 9, todas con trámite). ⚠️ No contradice §1.3: allí
@@ -546,7 +566,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (84 tests de invariantes)
+pnpm test         # Vitest (87 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

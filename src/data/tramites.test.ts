@@ -172,3 +172,27 @@ describe("buscarGuias — la entrada por problema", () => {
     }
   });
 });
+
+/**
+ * La pantalla Trámites parte las guías en dos secciones por `tipo`. Si naciera
+ * un tercer tipo, sus guías desaparecerían de la lista sin que nada fallara —
+ * el mismo fallo silencioso que §4.7.12 describe para `RUTAS_TRAMITE`.
+ */
+describe("tipos de guía — las dos secciones cubren todo", () => {
+  it("solo existen «tramite» y «proceso»", () => {
+    const otros = TRAMITES.filter((t) => t.tipo !== "tramite" && t.tipo !== "proceso");
+    expect(otros.map((t) => `${t.id}: ${t.tipo}`)).toEqual([]);
+  });
+
+  it("ninguna sección queda vacía", () => {
+    for (const tipo of ["tramite", "proceso"] as const) {
+      expect(TRAMITES.filter((t) => t.tipo === tipo).length, tipo).toBeGreaterThan(0);
+    }
+  });
+
+  it("la suma de las dos secciones es el catálogo entero", () => {
+    const tramites = TRAMITES.filter((t) => t.tipo === "tramite").length;
+    const procesos = TRAMITES.filter((t) => t.tipo === "proceso").length;
+    expect(tramites + procesos).toBe(TRAMITES.length);
+  });
+});

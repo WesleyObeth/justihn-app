@@ -15,7 +15,14 @@ import { AvisoProfesional } from "@/components/publico/paso-profesional";
 import { usePortal } from "@/store/portal";
 import { cn } from "@/lib/utils";
 
-/** Lista de trámites del portal: con el avance del checklist de la persona. */
+/**
+ * Lista de guías del portal.
+ *
+ * Estructura: los trámites del Estado y los procesos legales van en secciones
+ * SEPARADAS cuando no hay filtro activo. Antes compartían una parrilla plana de
+ * 14 cards donde un divorcio y un RTN se veían igual, y la única señal de que
+ * son cosas distintas era un chip de filtro que había que pulsar para notarlo.
+ */
 export function TramitesPersona() {
   const pasosTramite = usePortal((s) => s.pasosTramite);
   const [q, setQ] = useState("");
@@ -25,19 +32,34 @@ export function TramitesPersona() {
   // Sin término, la lista completa; con término, lo que devuelve el buscador
   // canónico (el mismo de Inicio).
   const base = q.trim() ? buscarGuias(q) : TRAMITES;
-  const filtrados = base.filter((t) => {
-    const porTipo = tipo === "todos" || t.tipo === tipo;
-    const porInst = institucion === "todas" || t.institucionId === institucion;
-    return porTipo && porInst;
-  });
+  const porTipo = base.filter((t) => tipo === "todos" || t.tipo === tipo);
+  const filtrados = porTipo.filter(
+    (t) => institucion === "todas" || t.institucionId === institucion,
+  );
 
   const enProgreso = TRAMITES.filter((t) => (pasosTramite[t.id] ?? []).length > 0);
+  const hayFiltro = q.trim() !== "" || tipo !== "todos" || institucion !== "todas";
+  const limpiar = () => {
+    setQ("");
+    setTipo("todos");
+    setInstitucion("todas");
+  };
+
+  // Solo se parte en dos cuando no hay filtro de tipo: con "Procesos" activo,
+  // un encabezado "Procesos legales" sobre la única lista sería ruido.
+  const secciones =
+    tipo === "todos"
+      ? ([
+          { clave: "tramite", titulo: "Trámites del Estado", desc: "Gestiones ante una institución" },
+          { clave: "proceso", titulo: "Procesos legales", desc: "Cuando el asunto va a un juzgado o a una autoridad" },
+        ] as const)
+      : ([{ clave: tipo, titulo: "", desc: "" }] as const);
 
   return (
-    <div className="max-w-[1080px]">
-      <h1 className="font-display text-[24px] font-bold">Trámites</h1>
+    <div className="max-w-[1180px]">
+      <h1 className="font-display text-[24px] font-bold">Trámites y procesos</h1>
       <p className="mt-1 text-[13px] text-texto-3">
-        Trámites del Estado y procesos legales, paso a paso — marca tu avance y retómalo
+        Paso a paso, con requisitos, costos y su fuente oficial — marca tu avance y retómalo
         cuando quieras.
       </p>
 
@@ -63,96 +85,247 @@ export function TramitesPersona() {
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap items-center gap-2.5">
-        <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-lg border border-borde bg-white px-3.5 py-2.5 focus-within:border-celeste sm:max-w-[320px]">
-          <Icono nombre="buscar" size={15} className="shrink-0 text-texto-4" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar trámite…"
-            aria-label="Buscar trámite"
-            className="min-w-0 flex-1 border-none bg-transparent text-sm text-marino outline-none"
-          />
-        </div>
-        <div className="flex gap-1.5 rounded-full border border-borde bg-white p-1">
-          {(
-            [
-              ["todos", "Todos"],
-              ["tramite", "Trámites"],
-              ["proceso", "Procesos"],
-            ] as const
-          ).map(([valor, etiqueta]) => (
-            <button
-              key={valor}
-              type="button"
-              aria-pressed={tipo === valor}
-              onClick={() => {
-                setTipo(valor);
-                setInstitucion("todas");
-              }}
-              className={cn(
-                "cursor-pointer rounded-full px-3.5 py-1.5 text-[12.5px] font-medium transition-colors",
-                tipo === valor ? "bg-celeste text-white" : "text-texto-3 hover:text-marino",
-              )}
-            >
-              {etiqueta}
-            </button>
-          ))}
-        </div>
-        <select
-          value={institucion}
-          onChange={(e) => setInstitucion(e.target.value)}
-          aria-label="Institución"
-          className="rounded-lg border border-borde bg-white p-2.5 text-[13px] text-marino outline-none focus:border-celeste"
-        >
-          <option value="todas">Todas las instituciones</option>
-          {INSTITUCIONES.map((i) => (
-            <option key={i.id} value={i.id}>
-              {i.sigla} — {i.nombre}
-            </option>
-          ))}
-        </select>
+      <Filtros
+        q={q}
+        setQ={setQ}
+        tipo={tipo}
+        setTipo={setTipo}
+        institucion={institucion}
+        setInstitucion={setInstitucion}
+        porTipo={porTipo}
+      />
+
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <p className="text-[12.5px] text-texto-3">
+          {filtrados.length === TRAMITES.length
+            ? `${TRAMITES.length} guías, todas con su fuente oficial`
+            : `${filtrados.length} ${filtrados.length === 1 ? "resultado" : "resultados"}`}
+        </p>
+        {hayFiltro && (
+          <button
+            type="button"
+            onClick={limpiar}
+            className="cursor-pointer text-[12.5px] font-medium text-celeste hover:text-cruce"
+          >
+            Limpiar filtros
+          </button>
+        )}
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-        {filtrados.map((t) => {
-          const inst = getInstitucion(t.institucionId)!;
-          const hechos = (pasosTramite[t.id] ?? []).length;
+      {filtrados.length === 0 ? (
+        <SinResultados onLimpiar={limpiar} />
+      ) : (
+        secciones.map(({ clave, titulo, desc }) => {
+          const suyos = filtrados.filter((t) => t.tipo === clave);
+          if (suyos.length === 0) return null;
           return (
-            <Link
-              key={t.id}
-              href={`/personas/tramites/${t.id}`}
-              className="flex flex-col rounded-xl border border-borde bg-white p-4.5 text-marino hover:border-celeste"
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[11px] font-bold tracking-[.8px] text-celeste uppercase">
-                  {inst.sigla}
-                </span>
-                {hechos > 0 && (
-                  <span className="text-[11px] font-semibold text-celeste">
-                    {hechos}/{t.pasos.length}
+            <section key={clave} className="mt-5">
+              {titulo && (
+                <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                  <h2 className="font-display text-[15px] font-bold">{titulo}</h2>
+                  <span className="text-[12px] text-texto-4">
+                    {suyos.length} · {desc}
                   </span>
-                )}
-              </div>
-              <div className="font-display mt-1 text-[15px] leading-[1.35] font-semibold">
-                {t.nombre}
-              </div>
-              <p className="mt-1.5 flex-1 text-[12.5px] leading-[1.55] text-texto-3">
-                {t.paraQuien}
-              </p>
-              {hechos > 0 && (
-                <div className="mt-2.5 h-1 overflow-hidden rounded bg-sutil">
-                  <div
-                    className="h-full rounded bg-celeste transition-[width]"
-                    style={{ width: `${(hechos / t.pasos.length) * 100}%` }}
-                  />
                 </div>
               )}
-            </Link>
+              <div className="mt-2.5 grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
+                {suyos.map((t) => (
+                  <TarjetaGuia key={t.id} tramite={t} hechos={(pasosTramite[t.id] ?? []).length} />
+                ))}
+              </div>
+            </section>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+/**
+ * Los tres controles.
+ *
+ * El buscador manda y por eso ocupa el espacio sobrante: antes medía 230px
+ * mientras el select de institución se llevaba 480 — lo secundario era el doble
+ * de grande que lo principal. Y los tres iban a 42/41/40px: un `<select>` no se
+ * iguala por interlineado, hay que darle ALTURA explícita (§4.7.7), así que los
+ * tres llevan `h-10`.
+ */
+function Filtros({
+  q,
+  setQ,
+  tipo,
+  setTipo,
+  institucion,
+  setInstitucion,
+  porTipo,
+}: {
+  q: string;
+  setQ: (v: string) => void;
+  tipo: "todos" | "tramite" | "proceso";
+  setTipo: (v: "todos" | "tramite" | "proceso") => void;
+  institucion: string;
+  setInstitucion: (v: string) => void;
+  porTipo: Tramite[];
+}) {
+  // El conteo por institución se calcula sobre lo YA filtrado por tipo: así una
+  // opción en 0 avisa antes de elegirla, en vez de dejar la parrilla en blanco
+  // (pasaba con "Procesos" + "SAR").
+  const cuenta = (id: string) => porTipo.filter((t) => t.institucionId === id).length;
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-2.5">
+      <div className="flex h-10 min-w-[min(260px,100%)] flex-1 items-center gap-2 rounded-lg border border-borde bg-white px-3.5 focus-within:border-celeste">
+        <Icono nombre="buscar" size={15} className="shrink-0 text-texto-4" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          maxLength={120}
+          placeholder="Buscar por lo que necesitas: despido, RTN, vencido…"
+          aria-label="Buscar trámite"
+          className="min-w-0 flex-1 border-none bg-transparent text-sm text-marino outline-none"
+        />
+        {q && (
+          <button
+            type="button"
+            onClick={() => setQ("")}
+            aria-label="Limpiar búsqueda"
+            className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded text-texto-4 hover:text-marino"
+          >
+            <Icono nombre="cerrar" size={13} />
+          </button>
+        )}
+      </div>
+
+      <div className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-borde bg-white px-1">
+        {(
+          [
+            ["todos", "Todos"],
+            ["tramite", "Trámites"],
+            ["proceso", "Procesos"],
+          ] as const
+        ).map(([valor, etiqueta]) => (
+          <button
+            key={valor}
+            type="button"
+            aria-pressed={tipo === valor}
+            onClick={() => {
+              setTipo(valor);
+              setInstitucion("todas");
+            }}
+            className={cn(
+              "cursor-pointer rounded-full px-3.5 py-1.5 text-[12.5px] font-medium transition-colors",
+              tipo === valor ? "bg-celeste text-white" : "text-texto-3 hover:text-marino",
+            )}
+          >
+            {etiqueta}
+          </button>
+        ))}
+      </div>
+
+      <select
+        value={institucion}
+        onChange={(e) => setInstitucion(e.target.value)}
+        aria-label="Filtrar por institución"
+        className="h-10 w-[min(220px,100%)] shrink-0 rounded-lg border border-borde bg-white px-3 text-[13px] text-marino outline-none focus:border-celeste"
+      >
+        <option value="todas">Todas las instituciones</option>
+        {INSTITUCIONES.map((i) => {
+          const n = cuenta(i.id);
+          return (
+            <option key={i.id} value={i.id} disabled={n === 0}>
+              {i.sigla} ({n})
+            </option>
           );
         })}
+      </select>
+    </div>
+  );
+}
+
+/** Antes la parrilla se quedaba en blanco, sin decir nada ni ofrecer salida. */
+function SinResultados({ onLimpiar }: { onLimpiar: () => void }) {
+  return (
+    <div className="mt-5 rounded-2xl border border-borde bg-white px-6 py-10 text-center">
+      <p className="text-[14px] font-semibold">No hay ninguna guía con esos filtros</p>
+      <p className="mx-auto mt-1.5 max-w-[420px] text-[13px] leading-[1.6] text-texto-3">
+        Puede que todavía no la hayamos escrito. Pregúntalo en el consultorio: es gratis y te
+        responde un abogado colegiado.
+      </p>
+      <div className="mt-4 flex flex-wrap justify-center gap-2.5">
+        <button
+          type="button"
+          onClick={onLimpiar}
+          className="cursor-pointer rounded-lg border border-borde bg-lienzo px-4 py-2.5 text-[13px] font-medium text-marino hover:border-celeste"
+        >
+          Ver todas las guías
+        </button>
+        <Link
+          href="/personas/consultas"
+          className="rounded-lg bg-celeste px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-cruce"
+        >
+          Preguntar en el consultorio
+        </Link>
       </div>
     </div>
+  );
+}
+
+/**
+ * La card gana el pie con pasos y costo. `tasaCorta` ya existía en el seed y no
+ * se mostraba: "cuánto me va a costar" es de las dos primeras preguntas de
+ * cualquiera, y obligaba a abrir la guía para saberlo.
+ */
+function TarjetaGuia({ tramite, hechos }: { tramite: Tramite; hechos: number }) {
+  const inst = getInstitucion(tramite.institucionId)!;
+  const total = tramite.pasos.length;
+  const completo = hechos === total;
+
+  return (
+    <Link
+      href={`/personas/tramites/${tramite.id}`}
+      className="flex flex-col rounded-xl border border-borde bg-white p-4.5 text-marino hover:border-celeste"
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-[11px] font-bold tracking-[.8px] text-celeste uppercase">
+          {inst.sigla}
+        </span>
+        {hechos > 0 &&
+          (completo ? (
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-exito">
+              <Icono nombre="check" size={10} strokeWidth={2.6} />
+              Completo
+            </span>
+          ) : (
+            <span className="text-[11px] font-semibold text-celeste">
+              {hechos}/{total}
+            </span>
+          ))}
+      </div>
+
+      <div className="font-display mt-1 text-[15px] leading-[1.35] font-semibold">
+        {tramite.nombre}
+      </div>
+      <p className="mt-1.5 flex-1 text-[12.5px] leading-[1.55] text-texto-3">
+        {tramite.paraQuien}
+      </p>
+
+      {hechos > 0 && (
+        <div className="mt-2.5 h-1 overflow-hidden rounded bg-sutil">
+          <div
+            className="h-full rounded bg-celeste transition-[width]"
+            style={{ width: `${(hechos / total) * 100}%` }}
+          />
+        </div>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-borde pt-2.5 text-[11.5px] text-texto-4">
+        <span>{total} pasos</span>
+        <span aria-hidden>·</span>
+        <span className={tramite.tasaCorta.toLowerCase().startsWith("gratu") ? "font-semibold text-exito" : ""}>
+          {tramite.tasaCorta}
+        </span>
+      </div>
+    </Link>
   );
 }
 
