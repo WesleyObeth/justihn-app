@@ -185,6 +185,26 @@
   width: 14px;
   height: 14px;
 }
+/* Con seis enlaces (la landing de abogados) la fila se pasa de ancho antes de
+   llegar al corte: a 1000px el CTA se salía de pantalla. Se aprieta el
+   interlineado del grupo en vez de esconder enlaces o renunciar a uno. */
+@media (max-width: 1200px) {
+  .landing-aurora .nav-mid a {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+  .landing-aurora .nav-right {
+    gap: 14px !important;
+  }
+}
+@media (max-width: 1060px) {
+  .landing-aurora .nav-mid a {
+    padding: 9px 9px;
+  }
+  .landing-aurora .nav {
+    padding-inline: clamp(16px, 3vw, 40px);
+  }
+}
 @media (max-width: 980px) {
   .landing-aurora .nav-mid,
   .landing-aurora .nav-login {

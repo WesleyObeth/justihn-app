@@ -452,8 +452,9 @@ export function LandingProfesional() {
           {
             titulo: "Abogados",
             enlaces: [
-              { href: "#capacidades", label: "Qué incluye" },
               { href: "#fuentes", label: "Cómo cita" },
+              { href: "#capacidades", label: "Qué incluye" },
+              { href: "#leads", label: "Clientes" },
               { href: "#planes", label: "Planes" },
               { href: "#faq", label: "Preguntas frecuentes" },
               { href: "/iniciar-sesion", label: "Iniciar sesión" },

@@ -17,9 +17,13 @@ export default function LayoutProfesional({ children }: { children: React.ReactN
       <HidratarStore />
       <FondoAurora />
       <NavAurora
+        /* En el MISMO orden en que aparecen las secciones al bajar: la nav
+           es el mapa de la página, y tenerla desordenada hace que el lector
+           no sepa dónde está. Lo topa `app/orden-nav.test.ts`. */
         enlaces={[
-          { href: "#capacidades", label: "Qué incluye" },
           { href: "#fuentes", label: "Cómo cita" },
+          { href: "#capacidades", label: "Qué incluye" },
+          { href: "#jus-ia", label: "Jus IA" },
           { href: "#leads", label: "Clientes" },
           { href: "#planes", label: "Planes" },
           { href: "#faq", label: "Preguntas" },
