@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
-import { RUTAS_TRAMITE, TRAMITES } from "@/data/tramites";
+import { buscarGuias, RUTAS_TRAMITE, TRAMITES } from "@/data/tramites";
 import { isFuenteOficial } from "@/lib/security/sanitize";
 
 /**
@@ -127,5 +127,48 @@ describe("rutas de trámites de la home", () => {
   it("toda guía lleva su costo resumido para la fila", () => {
     const sinCorta = TRAMITES.filter((t) => !t.tasaCorta?.trim());
     expect(sinCorta.map((t) => t.id)).toEqual([]);
+  });
+});
+
+/**
+ * El buscador es la puerta de entrada de Inicio y el filtro de Trámites — un
+ * solo motor para los dos. Lo que se protege aquí es que encuentre lo que la
+ * gente escribe de verdad: en minúscula, sin tildes y con sus palabras, no
+ * con el nombre exacto de la guía.
+ */
+describe("buscarGuias — la entrada por problema", () => {
+  it("encuentra por las palabras del ciudadano, no por el título", () => {
+    // Ninguno de estos términos es el nombre de su guía.
+    const casos: [string, string][] = [
+      ["despidieron", "despido-injustificado"],
+      ["vencido", "reclamo-consumidor"],
+      ["pensión", "pension-alimenticia"],
+      ["herencia", "herencia-sucesion"],
+    ];
+    for (const [termino, esperado] of casos) {
+      const ids = buscarGuias(termino).map((t) => t.id);
+      expect(ids, `"${termino}"`).toContain(esperado);
+    }
+  });
+
+  it("ignora tildes y mayúsculas — nadie las escribe en un buscador", () => {
+    expect(buscarGuias("PENSION").map((t) => t.id)).toContain("pension-alimenticia");
+    expect(buscarGuias("pension").map((t) => t.id)).toContain("pension-alimenticia");
+    expect(buscarGuias("Pensión").map((t) => t.id)).toContain("pension-alimenticia");
+  });
+
+  it("sin término no devuelve todo: el desplegable no se abre solo", () => {
+    expect(buscarGuias("")).toEqual([]);
+    expect(buscarGuias("   ")).toEqual([]);
+  });
+
+  it("lo que no existe devuelve vacío en vez de resultados de relleno", () => {
+    expect(buscarGuias("zzzz")).toEqual([]);
+  });
+
+  it("toda guía es alcanzable escribiendo su nombre", () => {
+    for (const t of TRAMITES) {
+      expect(buscarGuias(t.nombre).map((g) => g.id), t.id).toContain(t.id);
+    }
   });
 });

@@ -1034,6 +1034,32 @@ export function getTramite(id: string): Tramite | undefined {
   return TRAMITES.find((t) => t.id === id);
 }
 
+/** Sin tildes ni mayúsculas: la gente escribe "tramite" y "rtn" en minúscula. */
+function normalizar(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "");
+}
+
+/**
+ * Busca una guía por lo que la persona escribiría. Mira `nombre`, `paraQuien`
+ * y `resumen` —no los pasos— porque el buscador de Inicio muestra el resumen
+ * como respuesta: si acertara por una palabra enterrada en el paso 4, el
+ * resultado se vería sin relación con lo buscado.
+ *
+ * Vive aquí y no en la pantalla porque la usan dos (Inicio y Trámites): con
+ * una copia en cada una, arreglar un fallo de búsqueda solo lo arreglaría en
+ * la mitad de los sitios (§4.4).
+ */
+export function buscarGuias(termino: string): Tramite[] {
+  const t = normalizar(termino.trim());
+  if (!t) return [];
+  return TRAMITES.filter((g) =>
+    normalizar(`${g.nombre} ${g.paraQuien} ${g.resumen}`).includes(t),
+  );
+}
+
 export function getInstitucion(id: string): Institucion | undefined {
   return INSTITUCIONES.find((i) => i.id === id);
 }

@@ -81,6 +81,24 @@ promesas que ya estaban hechas y no existían:
   retorno de la vía B: la persona pregunta y se va. Va en el **menú del avatar**
   (decisión Wesley), con un punto sobre el avatar — sin él la insignia solo se
   vería abriendo el menú, y con la barra colapsada no se vería nunca.
+- **Inicio NO es el dashboard del abogado con otros datos** (refinado
+  2026-08-31). El abogado entra a trabajar y tiene qué controlar —casos, leads,
+  cuota—; el ciudadano llega con UN problema ("me despidieron", "compré algo
+  vencido") y se va. Por eso el protagonista es un **buscador por problema**, no
+  un panel: el saludo baja a línea de contexto y el h1 pregunta. Dos decisiones:
+  los resultados salen **en la propia pantalla** (mandarlo a una lista con
+  filtros es pedirle que decida otra vez), y **sin coincidencia ofrece el
+  consultorio** con lo escrito — 14 guías no cubren todo, y ese es el camino
+  honesto. El motor es `buscarGuias` en `data/tramites.ts`, **compartido con la
+  pantalla Trámites**: estaba duplicado en el filtro de esa pantalla, y con dos
+  copias un fallo de búsqueda solo se arreglaría en la mitad de los sitios.
+- **El estado vacío del consultorio enseña en vez de esperar.** Decía "Aún no
+  has preguntado nada"; ahora muestra un intercambio REAL ya respondido y
+  firmado con su colegiación (`respuestaDemo` del seed). El obstáculo del
+  ciudadano no es no saber dónde escribir: es no creer que alguien le responda —
+  mismo criterio que la sección consultorio de la home (§1.3). El componente no
+  se comparte con aquella porque pintan sobre temas distintos (shell aurora vs
+  portal); lo que se comparte es la fuente y el criterio.
 - **Instituciones** (2026-08-31) es el pedido literal del socio: "ver todas las
   instituciones del Estado y los trámites de cada una — ej. el IP". El seed ya
   lo tenía (`INSTITUCIONES`, 9, todas con trámite). ⚠️ No contradice §1.3: allí
@@ -493,7 +511,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (79 tests de invariantes)
+pnpm test         # Vitest (84 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -508,7 +526,9 @@ Los tests cubren lo que no se ve leyendo el código: el harness de seguridad
 procesal, las 14 guías con fuente en la whitelist, los plazos legales (que su artículo
 siga en el texto de su guía, y el cálculo por meses/años en bisiestos y meses
 cortos), las instituciones (ninguna card vacía, ningún `institucionId` huérfano,
-ningún portal fuera de la whitelist), los títulos de página, las
+ningún portal fuera de la whitelist), el buscador de guías (que encuentre por
+las palabras del ciudadano, sin tildes, y que toda guía sea alcanzable), los
+títulos de página, las
 rutas de trámites y las colisiones de transform del imán.
 
 **Recorridos E2E** (2026-08-30): los scripts de los tres caminos de un visitante

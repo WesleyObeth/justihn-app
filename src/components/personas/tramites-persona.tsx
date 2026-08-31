@@ -3,18 +3,17 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
-import { getInstitucion, INSTITUCIONES, TRAMITES, type Tramite } from "@/data/tramites";
+import {
+  buscarGuias,
+  getInstitucion,
+  INSTITUCIONES,
+  TRAMITES,
+  type Tramite,
+} from "@/data/tramites";
 import { buscarAbogados } from "@/data/directorio";
 import { AvisoProfesional } from "@/components/publico/paso-profesional";
 import { usePortal } from "@/store/portal";
 import { cn } from "@/lib/utils";
-
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "");
-}
 
 /** Lista de trámites del portal: con el avance del checklist de la persona. */
 export function TramitesPersona() {
@@ -23,13 +22,13 @@ export function TramitesPersona() {
   const [institucion, setInstitucion] = useState("todas");
   const [tipo, setTipo] = useState<"todos" | "tramite" | "proceso">("todos");
 
-  const termino = normalizar(q.trim());
-  const filtrados = TRAMITES.filter((t) => {
+  // Sin término, la lista completa; con término, lo que devuelve el buscador
+  // canónico (el mismo de Inicio).
+  const base = q.trim() ? buscarGuias(q) : TRAMITES;
+  const filtrados = base.filter((t) => {
     const porTipo = tipo === "todos" || t.tipo === tipo;
     const porInst = institucion === "todas" || t.institucionId === institucion;
-    const porTermino =
-      !termino || normalizar(`${t.nombre} ${t.paraQuien} ${t.resumen}`).includes(termino);
-    return porTipo && porInst && porTermino;
+    return porTipo && porInst;
   });
 
   const enProgreso = TRAMITES.filter((t) => (pasosTramite[t.id] ?? []).length > 0);
