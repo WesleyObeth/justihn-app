@@ -3,7 +3,8 @@
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
 > Creado: **2026-08-25** · Última actualización: **2026-08-31** (portal
-> ciudadano: shell gemelo del de abogados, Notificaciones y plazos — §1.2).
+> ciudadano: shell gemelo, Notificaciones, plazos, Instituciones y
+> Verificación — §1.2).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -58,13 +59,14 @@ Perfil · Planes · Configuración · Ayuda.
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
   disclaimer de homónimos y exclusión de materias reservadas.
 
-### 1.2 Portal ciudadano — `/personas` (11 rutas)
+### 1.2 Portal ciudadano — `/personas` (15 rutas)
 
 El patrón Jusbrasil completo: la landing da la probadita y "crear cuenta gratis"
 abre un portal con shell propio (persona demo Carlos Zelaya en `data/persona.ts`).
 Inicio · Trámites (con **checklist persistido**, `pasosTramite` en el store) ·
-Consultas · Directorio · Calculadoras · Notificaciones · Plan · Perfil ·
-Configuración · Ayuda.
+Consultas · Instituciones (+ detalle) · Directorio · Calculadoras · Informe
+Verifica · Mi nombre · Notificaciones · Plan · Perfil · Configuración · Ayuda.
+El sidebar los agrupa en **Mis gestiones · Herramientas · Verificación**.
 
 **Notificaciones y la calculadora de plazos nacen el 2026-08-31** cerrando dos
 promesas que ya estaban hechas y no existían:
@@ -79,6 +81,30 @@ promesas que ya estaban hechas y no existían:
   retorno de la vía B: la persona pregunta y se va. Va en el **menú del avatar**
   (decisión Wesley), con un punto sobre el avatar — sin él la insignia solo se
   vería abriendo el menú, y con la barra colapsada no se vería nunca.
+- **Instituciones** (2026-08-31) es el pedido literal del socio: "ver todas las
+  instituciones del Estado y los trámites de cada una — ej. el IP". El seed ya
+  lo tenía (`INSTITUCIONES`, 9, todas con trámite). ⚠️ No contradice §1.3: allí
+  se decidió no dar filtro por institución **en la home**, porque quien llega de
+  Google busca "voy a abrir un negocio", no "un trámite de ONCAE". Dentro del
+  portal sí hay quien ya sabe que su asunto es del IP. El campo `sitio` es
+  **opcional a propósito**: solo se rellena si el host pasa la whitelist §3.3
+  (6 de 9; MiAmbiente no responde, STSS y Registro Mercantil sin verificar), y
+  `instituciones.test.ts` lo exige — antes ningún enlace que uno muerto.
+- **Verificación son DOS pantallas, y la separación es la regla, no diseño.**
+  **Mi nombre** vigila solo nombres propios; **Informe Verifica** mira a un
+  tercero. Ofrecer vigilar a terceros en la primera convertiría el monitoreo en
+  acoso, que es justo lo que prohíbe §5 del CLAUDE.md del producto. Las dos
+  corren el MISMO motor real (`buscarApariciones` sobre el texto de las
+  sentencias del piloto) y **el ciudadano tiene su propia lista**
+  (`nombresVigiladosPersona`): compartir la del abogado le enseñaría sus
+  clientes y contrapartes.
+  Tres reglas de §5 están cableadas en la UI, no son copy: **homónimos
+  siempre** —también cuando NO hay resultados, porque "sin apariciones" se lee
+  como certificado y no lo es—, **usos prohibidos a la vista antes de buscar**,
+  y **materias reservadas excluidas**. El informe completo (folio real, Registro
+  Mercantil, vigilancia 30 días) aparece **en preparación**: depende de cuentas
+  SURE/CCIT que no existen, así que no se cobra por adelantado ni se le pone
+  precio (§4.5).
 - **La calculadora de plazos NO es la del abogado con otro nombre.** La suya pide
   "días de plazo", que un ciudadano no sabe: aquí elige el **hecho** que le pasó
   y el plazo lo pone la ley. Los tres salen de guías ya verificadas
@@ -450,7 +476,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (74 tests de invariantes)
+pnpm test         # Vitest (79 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -464,7 +490,8 @@ Los tests cubren lo que no se ve leyendo el código: el harness de seguridad
 (expedientes reales / inexistentes / casos propios), prestaciones, plazos, vía
 procesal, las 13 guías con fuente en la whitelist, los plazos legales (que su artículo
 siga en el texto de su guía, y el cálculo por meses/años en bisiestos y meses
-cortos), los títulos de página, las
+cortos), las instituciones (ninguna card vacía, ningún `institucionId` huérfano,
+ningún portal fuera de la whitelist), los títulos de página, las
 rutas de trámites y las colisiones de transform del imán.
 
 **Recorridos E2E** (2026-08-30): los scripts de los tres caminos de un visitante

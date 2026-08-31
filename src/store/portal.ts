@@ -13,7 +13,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { CUOTA_BASE, NOTIFICACIONES } from "@/data/catalogo";
-import { VIGILADOS_INICIALES } from "@/data/monitoreo";
+import { VIGILADOS_INICIALES, VIGILADOS_INICIALES_PERSONA } from "@/data/monitoreo";
 import type { Lead, Materia, MensajeChat, NombreVigilado, PlanId } from "@/types/dominio";
 
 export interface PreferenciasNotificacion {
@@ -56,6 +56,12 @@ interface PortalState {
   leadsRespondidos: Record<string, string>;
   /** Nombres bajo monitoreo (feature Pro). Persistido. */
   nombresVigilados: NombreVigilado[];
+  /**
+   * Los del ciudadano van APARTE de los del abogado: comparten store pero no
+   * lista. Mezclarlos le enseñaría a la persona los clientes y contrapartes
+   * de la abogada demo — misma lección que las notificaciones.
+   */
+  nombresVigiladosPersona: NombreVigilado[];
   /** Preguntas hechas desde el consultorio público (Vía B) — aparecen como
    *  leads en el portal de abogados: es el mismo flujo, visto de ambos lados. */
   preguntasPublico: Lead[];
@@ -87,6 +93,8 @@ interface PortalState {
   reiniciarProceso: (procesoId: string) => void;
   responderLead: (leadId: string, respuesta: string) => void;
   vigilarNombre: (nombre: string, tipo: NombreVigilado["tipo"]) => void;
+  vigilarNombrePersona: (nombre: string) => void;
+  dejarDeVigilarPersona: (id: string) => void;
   dejarDeVigilar: (id: string) => void;
   preguntarConsultorio: (materia: Materia, ciudad: string, pregunta: string) => void;
   togglePasoTramite: (tramiteId: string, indice: number) => void;
@@ -131,6 +139,7 @@ export const usePortal = create<PortalState>()(
       pasosHechos: {},
       leadsRespondidos: {},
       nombresVigilados: VIGILADOS_INICIALES,
+      nombresVigiladosPersona: VIGILADOS_INICIALES_PERSONA,
       preguntasPublico: [],
       pasosTramite: {},
       prefsPersona: { respuestas: true, tramites: true, novedades: false },
@@ -189,6 +198,28 @@ export const usePortal = create<PortalState>()(
         }),
       dejarDeVigilar: (id) =>
         set((s) => ({ nombresVigilados: s.nombresVigilados.filter((v) => v.id !== id) })),
+      // La persona solo vigila nombres "propios": los suyos y los de su familia.
+      // No hay clientes ni contrapartes en la vía B.
+      vigilarNombrePersona: (nombre) =>
+        set((s) => {
+          const id = `vigp-${nombre
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/\p{M}/gu, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "")}`;
+          if (s.nombresVigiladosPersona.some((v) => v.id === id)) return s;
+          return {
+            nombresVigiladosPersona: [
+              ...s.nombresVigiladosPersona,
+              { id, nombre, tipo: "propio" as const },
+            ],
+          };
+        }),
+      dejarDeVigilarPersona: (id) =>
+        set((s) => ({
+          nombresVigiladosPersona: s.nombresVigiladosPersona.filter((v) => v.id !== id),
+        })),
       preguntarConsultorio: (materia, ciudad, pregunta) =>
         set((s) => ({
           preguntasPublico: [
@@ -246,6 +277,7 @@ export const usePortal = create<PortalState>()(
         pasosHechos: s.pasosHechos,
         leadsRespondidos: s.leadsRespondidos,
         nombresVigilados: s.nombresVigilados,
+        nombresVigiladosPersona: s.nombresVigiladosPersona,
         preguntasPublico: s.preguntasPublico,
         pasosTramite: s.pasosTramite,
         prefsPersona: s.prefsPersona,

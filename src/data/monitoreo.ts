@@ -15,6 +15,18 @@ import type { NombreVigilado, Sentencia } from "@/types/dominio";
  * ejecuta al ingerir cada tanda nueva del scraper (sentencias + Gaceta) y
  * dispara la notificación WhatsApp/correo.
  */
+/**
+ * Lo que vigila el CIUDADANO: su propio nombre y nada más — en la vía B no hay
+ * clientes ni contrapartes. Arranca con el de la persona demo, que no aparece
+ * en el corpus: el estado normal de este producto es "sin apariciones", y
+ * sembrarlo con un match falso vendería miedo (§4.5).
+ *
+ * TODO(data): misma tabla `nombres_vigilados`, con RLS por `persona_id`.
+ */
+export const VIGILADOS_INICIALES_PERSONA: NombreVigilado[] = [
+  { id: "vigp-carlos-zelaya", nombre: "Carlos Zelaya", tipo: "propio" },
+];
+
 export const VIGILADOS_INICIALES: NombreVigilado[] = [
   { id: "vig-propio", nombre: "María Castillo", tipo: "propio" },
   { id: "vig-henriquez", nombre: "Wilson Pablo Henríquez Martínez", tipo: "cliente" },

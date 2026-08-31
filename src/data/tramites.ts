@@ -22,6 +22,13 @@ export interface Institucion {
   nombre: string;
   sigla: string;
   descripcion: string;
+  /**
+   * Portal oficial. Opcional a propósito: solo se pone si el host está en la
+   * whitelist §3.3 (`isFuenteOficial`), y hay instituciones cuyo sitio no
+   * responde —MiAmbiente— o no se ha verificado. Antes un enlace muerto o a un
+   * dominio sin comprobar, ninguno. `instituciones.test.ts` lo exige.
+   */
+  sitio?: string;
 }
 
 /**
@@ -75,24 +82,28 @@ export const INSTITUCIONES: Institucion[] = [
     nombre: "Servicio de Administración de Rentas",
     sigla: "SAR",
     descripcion: "Impuestos, RTN y facturación autorizada (CAI).",
+    sitio: "https://www.sar.gob.hn",
   },
   {
     id: "ip",
     nombre: "Instituto de la Propiedad",
     sigla: "IP",
     descripcion: "Propiedad inmueble, tradición de dominio y registro vehicular.",
+    sitio: "https://www.ip.gob.hn",
   },
   {
     id: "municipalidad",
     nombre: "Municipalidad (AMDC y demás alcaldías)",
     sigla: "Alcaldía",
     descripcion: "Permisos de operación de negocios y tasas municipales.",
+    sitio: "https://gac.amdc.hn",
   },
   {
     id: "arsa",
     nombre: "Agencia de Regulación Sanitaria",
     sigla: "ARSA",
     descripcion: "Licencias y permisos sanitarios de establecimientos y productos.",
+    sitio: "https://arsa.gob.hn",
   },
   {
     id: "miambiente",
@@ -105,12 +116,14 @@ export const INSTITUCIONES: Institucion[] = [
     nombre: "Oficina Normativa de Contratación y Adquisiciones del Estado",
     sigla: "ONCAE",
     descripcion: "Registro de proveedores para venderle al Estado.",
+    sitio: "https://oncae.gob.hn",
   },
   {
     id: "poder-judicial",
     nombre: "Poder Judicial (juzgados)",
     sigla: "Juzgados",
     descripcion: "Demandas y procesos ante los juzgados de letras y de paz.",
+    sitio: "https://www.poderjudicial.gob.hn",
   },
   {
     id: "trabajo",
