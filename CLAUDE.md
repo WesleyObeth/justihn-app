@@ -2,8 +2,8 @@
 
 > Cerebro técnico del portal. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-30** (auth:
-> iniciar sesión + onboarding de abogado desde `design_handoff_auth`).
+> Creado: **2026-08-25** · Última actualización: **2026-08-30** (E2E de las
+> cinco pantallas públicas: gate de cuenta y áreas táctiles).
 
 ---
 
@@ -576,6 +576,39 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     celeste-claro — dentro del card BLANCO del onboarding serían ilegibles;
     `.card-dia` los devuelve al celeste de marca.
 
+- **✅ E2E DE LAS CINCO PANTALLAS PÚBLICAS (2026-08-30):** recorrido completo
+  de los tres caminos que un visitante puede tomar —ciudadano, abogado, volver
+  a entrar— más los cruces de móvil, enlaces, SSR y accesibilidad en **Chromium
+  y WebKit**. Scripts en el scratchpad de la sesión (no commiteados: dependen
+  del servidor de desarrollo). Encontró **dos defectos que solo se ven
+  recorriendo, no leyendo**:
+
+  1. **El gate de cuenta se saltaba el alta.** En el detalle de un trámite y en
+     la calculadora, "Crear mi cuenta gratis" enlazaba **directo a
+     `/personas/…`**: el visitante entraba al portal ciudadano sin crear nada,
+     así que la puerta era decorativa. Ahora pasan por
+     `/crear-cuenta?tipo=persona&next=…` y aterrizan en la guía que estaban
+     leyendo (`tramites.tsx`, `calculadora.tsx`, `registro-persona.tsx`).
+     ⚠️ **Ese `next` lo valida `destinoSeguro()`** en
+     `app/(auth)/crear-cuenta/page.tsx`: debe empezar por `/personas` y no por
+     `//`. **No quitarlo** — sin él el parámetro es un redirect abierto colgando
+     de un formulario que pide correo y contraseña, que es justo donde sirve
+     para mandar a alguien a una página falsa después de escribir sus datos.
+  2. **Áreas táctiles bajo el mínimo.** El toggle "Ver" de la contraseña medía
+     **18×19,5 px** en las tres pantallas con clave, y los enlaces del pie
+     18,8 px apilados. Se agrandó el área **sin mover el texto**: el toggle está
+     en posición absoluta, así que `right-3 → right-1 + px-2` compensa los 8px
+     exactos. Criterio: **24×24 de WCAG 2.5.8**, que **exime a los enlaces
+     dentro de una frase** ("Términos de servicio", "Inicia sesión") — ahí el
+     tamaño lo manda el texto, no el diseño. El listón de 32px que usé al
+     principio era más estricto que el estándar y daba falsos positivos.
+
+  Lo verde: 33 comprobaciones de recorrido (la pregunta del composer llega al
+  chat de Jus IA; la consulta pública aparece como lead en el portal), 0
+  desbordes horizontales y 0 errores de JS en móvil y escritorio en los dos
+  motores, 21 enlaces internos vivos, un solo `h1` por página, todo control con
+  nombre accesible, y la home sirviendo **11.462 caracteres de texto sin JS**.
+
 - **🎨 MARCA — favicon y lockup corregidos (2026-08-29):** el favicon no era
   el símbolo oficial sino una versión aparte, con **otra geometría** (barras más
   gordas y encimadas), **sin el cruce** `#0e5f92` y con un
@@ -676,7 +709,7 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (51 tests de invariantes)
+pnpm test         # Vitest (64 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -746,7 +779,8 @@ que se coló en tres páginas a la vez).
    - **Más demos con seed real**: los candidatos naturales son *Calculadoras*
      (prestaciones, con el resultado que da `lib/prestaciones`) y *Modelos de
      escritos*. El patrón ya está: `SeccionDemo` + una vista en `demos.tsx`.
-   - **La home ciudadana no tiene demos todavía** — el patrón es reutilizable.
+   - ~~La home ciudadana no tiene demos~~ — hecho 2026-08-30: tres
+     `SeccionDemo` en `landing-content.tsx`, con el mismo patrón de la vía A.
    - **SEO de la vía B**: no hay `sitemap.xml` ni datos estructurados
      (`HowTo`/`FAQPage` en las guías de trámites, que es lo que gana los rich
      snippets). Y `robots` sigue en `noindex` en el layout raíz: **acordarse de
@@ -759,6 +793,9 @@ que se coló en tres páginas a la vez).
    - **`prestaciones.ts` sigue contradiciendo a la guía de despido** (ver el
      punto 5 de esta lista): si se toca la landing laboral, cuidado con
      publicar dos cifras distintas del mismo cálculo.
+   - **"Procesos" no está en las features de ningún plan** (`data/catalogo.ts`):
+     la pantalla existe y la landing la vende, pero la tabla de planes no dice
+     a partir de cuál se tiene. Decidirlo con Wesley antes de cobrar.
 
 6. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
    ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende
@@ -795,8 +832,10 @@ que se coló en tres páginas a la vez).
 - Los `art. ___` de los procesos son marcadores deliberados hasta cargar los
   códigos (backlog #5 del proyecto).
 - Login y onboarding EXISTEN desde 2026-08-30 (`/iniciar-sesion`,
-  `/crear-cuenta`) pero son maqueta: validan formato y entran con la sesión
-  demo — el portal sigue sin auth real hasta cablear Supabase (§7.2).
+  `/crear-cuenta`) pero son maqueta: validan formato y **entran con cualquier
+  correo y contraseña** usando la sesión demo — hay nota visible bajo el card y
+  `TODO(auth)` con el cableado Supabase exacto en cada archivo (§7.2). El E2E
+  del 2026-08-30 lo confirma como comportamiento esperado, no como fallo.
 - Responsive móvil **base** hecho (2026-08-25): header con hamburguesa + drawer
   (`HeaderMovil`/`CapaMenuMovil` en `sidebar.tsx`, corte en `lg`) y grids
   apilados en todas las vistas. Falta pulido fino (tablas del chat, editor de
