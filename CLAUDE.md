@@ -187,6 +187,22 @@ promesas que ya estaban hechas y no existían:
   importa entonces es seguirlas) y **se cierra solo al publicar**: guarda
   cuántas consultas había al abrirse, no un booleano, así que publicar lo cierra
   sin un efecto — que además no pasaría el lint (§4.7.18).
+- **Plan y Mi perfil** (refinadas 2026-08-31). En Plan, lo incluido **se deriva
+  de los seeds** (`TRAMITES.length`, `INSTITUCIONES`, `DIRECTORIO`): escrito a
+  mano se había quedado viejo — decía "calculadora de prestaciones" en singular
+  con dos ya hechas, y no nombraba Instituciones, Verifica ni Mi nombre. Se suma
+  **"Lo que llevas usado"**, porque un plan sin uso al lado es una lista de
+  promesas. **Card de Jus IA** (decisión Wesley): se anuncia **sin fecha y sin
+  precio**, y diciendo POR QUÉ no está — el motor existe pero se niega a
+  responder sin corpus, y anunciarlo como si funcionara rompería en la pantalla
+  que lo vende justo la promesa que lo distingue.
+  **Mi perfil** toma la estructura del perfil del abogado con una diferencia que
+  manda: **el del abogado es PÚBLICO y el del ciudadano no.** El abogado gestiona
+  una vitrina (sube su carné, elige materias visibles, mide vistas del
+  directorio); la persona no aparece en ninguna parte, y saberlo la tranquiliza —
+  por eso "Tu perfil no es público" es una card con el mismo peso que las demás,
+  no letra pequeña al pie. Y **sus métricas enlazan**: en el abogado son
+  indicadores de negocio, aquí son la puerta a lo que dejó a medias.
 - **Cada abogado tiene perfil, y desde ahí se le escribe**
   (`/personas/directorio/[id]`, 2026-08-31). El mensaje se envía **dentro de
   Justihn**, no a WhatsApp: §4.5 ya decía que sacar el contacto en el primer
