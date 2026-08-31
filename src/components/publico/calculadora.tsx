@@ -57,9 +57,13 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
 
   return (
     <div className={enPortal ? "max-w-[860px]" : "mx-auto max-w-[860px] px-4 py-8 md:px-6"}>
-      <h1 className="font-display text-[26px] leading-[1.25] font-bold">
+      {/* En la ruta pública este es EL título de la página; dentro del portal
+          convive con la calculadora de plazos bajo un h1 propio, así que baja
+          a h2 para no dejar dos h1 ni titular la pantalla con una sola de las
+          dos herramientas. */}
+      <Titular enPortal={enPortal} className="font-display text-[26px] leading-[1.25] font-bold">
         ¿Te despidieron? Esto es lo que te corresponde por ley
-      </h1>
+      </Titular>
       <p className="mt-2 max-w-[640px] text-[13.5px] leading-[1.6] text-texto-3">
         Si te despidieron <b>sin causa justificada</b>, el Código del Trabajo te reconoce
         cesantía, preaviso y las partes proporcionales de vacaciones y aguinaldos. Calcula tu
@@ -198,6 +202,22 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
         </div>
       )}
     </div>
+  );
+}
+
+function Titular({
+  enPortal,
+  className,
+  children,
+}: {
+  enPortal: boolean;
+  className: string;
+  children: React.ReactNode;
+}) {
+  return enPortal ? (
+    <h2 className={className}>{children}</h2>
+  ) : (
+    <h1 className={className}>{children}</h1>
   );
 }
 

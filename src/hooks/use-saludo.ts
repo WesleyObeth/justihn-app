@@ -82,3 +82,24 @@ function snapshotSemana(): string {
 export function useSemanaActual(): string {
   return useSyncExternalStore(SIN_SUSCRIPCION, snapshotSemana, () => "");
 }
+
+/**
+ * La fecha de HOY a medianoche — para contar cuántos días faltan para que
+ * venza un plazo. El servidor no conoce la zona horaria del visitante, así que
+ * sirve `null` y el cliente la completa tras el mount; misma memoización que
+ * la franja, para que el snapshot sea estable entre renders.
+ */
+let hoyMemo: Date | null = null;
+
+function snapshotHoy(): Date {
+  if (hoyMemo === null) {
+    const ahora = new Date();
+    hoyMemo = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  }
+  return hoyMemo;
+}
+
+/** `null` durante SSR e hidratación; la fecha local después del mount. */
+export function useHoy(): Date | null {
+  return useSyncExternalStore<Date | null>(SIN_SUSCRIPCION, snapshotHoy, () => null);
+}

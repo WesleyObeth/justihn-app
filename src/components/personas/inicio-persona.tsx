@@ -141,7 +141,7 @@ export function InicioPersona() {
             href="/personas/calculadora"
             icono="calc"
             titulo="¿Te despidieron?"
-            desc="Calcula tus prestaciones según el Código del Trabajo"
+            desc="Cuánto te toca y hasta cuándo puedes reclamar, según el Código del Trabajo"
           />
           <Acceso
             href="/personas/directorio"

@@ -2,8 +2,8 @@
 
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-31** (el shell del
-> portal ciudadano pasa a ser gemelo real del de abogados — §1.2).
+> Creado: **2026-08-25** · Última actualización: **2026-08-31** (portal
+> ciudadano: shell gemelo del de abogados, Notificaciones y plazos — §1.2).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -58,12 +58,35 @@ Perfil · Planes · Configuración · Ayuda.
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
   disclaimer de homónimos y exclusión de materias reservadas.
 
-### 1.2 Portal ciudadano — `/personas` (9 rutas)
+### 1.2 Portal ciudadano — `/personas` (11 rutas)
 
 El patrón Jusbrasil completo: la landing da la probadita y "crear cuenta gratis"
 abre un portal con shell propio (persona demo Carlos Zelaya en `data/persona.ts`).
 Inicio · Trámites (con **checklist persistido**, `pasosTramite` en el store) ·
-Consultas · Directorio · Calculadora · Plan · Perfil · Configuración · Ayuda.
+Consultas · Directorio · Calculadoras · Notificaciones · Plan · Perfil ·
+Configuración · Ayuda.
+
+**Notificaciones y la calculadora de plazos nacen el 2026-08-31** cerrando dos
+promesas que ya estaban hechas y no existían:
+
+- **Notificaciones se DERIVA del store**, no es un seed como la del abogado: las
+  consultas ya respondidas, las publicadas a la espera y los trámites empezados
+  y sin terminar. Una notificación semilla diciendo "un abogado respondió tu
+  consulta" a quien nunca preguntó sería justo la evidencia fabricada que
+  prohíbe §4.5; solo la bienvenida es estática, y es cierta. Agrupa por **origen
+  y no por fecha** porque lo derivado no tiene sello de tiempo real. Configuración
+  llevaba desde el principio tres interruptores sin destino, y es el mecanismo de
+  retorno de la vía B: la persona pregunta y se va. Va en el **menú del avatar**
+  (decisión Wesley), con un punto sobre el avatar — sin él la insignia solo se
+  vería abriendo el menú, y con la barra colapsada no se vería nunca.
+- **La calculadora de plazos NO es la del abogado con otro nombre.** La suya pide
+  "días de plazo", que un ciudadano no sabe: aquí elige el **hecho** que le pasó
+  y el plazo lo pone la ley. Los tres salen de guías ya verificadas
+  (`data/plazos.ts` → `art. 864` y `865` del Código del Trabajo, `art. 240` del
+  Código de Familia, contrastados contra los PDF del CEDIJ el 2026-08-31).
+  El número vive en la prosa de la guía **y** como dato aquí, así que
+  `plazos.test.ts` exige que el artículo citado aparezca en el texto de esa guía
+  — es lo que impide que diverjan (misma lógica que §4.7.13).
 
 **El shell es gemelo del de abogados, no parecido** (2026-08-31): misma columna
 marina **colapsable** (236px ↔ 68px), navegación **agrupada por categorías** y
@@ -402,7 +425,20 @@ oscuro, no después.
       clic en un ancla se pisaría a sí mismo: `desplazamiento-suave.tsx` escucha
       en `document` y corre ANTES de que React aplique el cierre, así que su
       `scrollTo` no movería nada.
-18. **`min-w-[Npx]` sobre un `flex-1` desborda en pantallas estrechas.** El
+18. **Un `setState` dentro de un `useEffect` no pasa el lint** (`react-hooks/
+    set-state-in-effect`), y es el reflejo natural para resolver "hoy" o la hora
+    local tras el mount. El mecanismo del proyecto es **`useSyncExternalStore`
+    con el valor memoizado** (`hooks/use-saludo.ts`: `useSaludoPorHora`,
+    `useTitularJusIA`, `useSemanaActual`, `useHoy`) — sirve el valor neutro en
+    SSR y el real después, sin render en cascada. Al necesitar un dato que solo
+    el navegador conoce, añadir un snapshot ahí en vez de un efecto.
+19. **Un componente reutilizado en dos superficies no puede traer su `<h1>`
+    fijo.** `CalculadoraPublica` es el título de `/calculadora-prestaciones`,
+    pero dentro de `/personas/calculadora` convive con la de plazos: dejaba dos
+    h1 y titulaba la pantalla "Calculadoras" con "¿Te despidieron?". Baja a `h2`
+    con `enPortal`. Al montar un componente público dentro de un portal,
+    revisar su encabezado.
+20. **`min-w-[Npx]` sobre un `flex-1` desborda en pantallas estrechas.** El
     mínimo es rígido: a 320px la card de cross-sell de la home se salía 9px (19 en
     WebKit, que reserva más barra de scroll). Se escribe **`min-w-[min(Npx,100%)]`**,
     que conserva el punto de envoltura en anchos medios sin forzar el estrecho.
@@ -414,7 +450,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (64 tests de invariantes)
+pnpm test         # Vitest (74 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -426,7 +462,9 @@ diferencias de motor de §4.7).
 Los tests cubren lo que no se ve leyendo el código: el harness de seguridad
 (inyección, enmascarado, hosts oficiales), el determinismo y honestidad del router
 (expedientes reales / inexistentes / casos propios), prestaciones, plazos, vía
-procesal, las 13 guías con fuente en la whitelist, los títulos de página, las
+procesal, las 13 guías con fuente en la whitelist, los plazos legales (que su artículo
+siga en el texto de su guía, y el cálculo por meses/años en bisiestos y meses
+cortos), los títulos de página, las
 rutas de trámites y las colisiones de transform del imán.
 
 **Recorridos E2E** (2026-08-30): los scripts de los tres caminos de un visitante

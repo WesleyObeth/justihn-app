@@ -26,3 +26,43 @@ export function calcularVencimiento(
   }
   return fecha;
 }
+
+/**
+ * Vencimiento de un plazo legal expresado en meses o años (los del ciudadano:
+ * "dos meses desde que terminó el contrato"). Vive aquí, junto al de días, para
+ * que no haya dos módulos calculando fechas (§4.4).
+ *
+ * Convención de plazos por meses/años: se cuenta de fecha a fecha. Si el mes de
+ * destino no tiene ese día —del 31 de enero, dos meses— se toma el último día
+ * de ese mes, que es lo que evita saltar al mes siguiente y REGALAR días que la
+ * ley no da.
+ */
+export function calcularVencimientoPorUnidad(
+  fechaIso: string,
+  cantidad: number,
+  unidad: "dias-habiles" | "dias-calendario" | "meses" | "anios",
+): Date | null {
+  if (unidad === "dias-habiles" || unidad === "dias-calendario") {
+    return calcularVencimiento(fechaIso, cantidad, unidad === "dias-habiles");
+  }
+
+  const inicio = new Date(`${fechaIso}T00:00:00`);
+  if (Number.isNaN(inicio.getTime())) return null;
+  if (!Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 120) return null;
+
+  const meses = unidad === "anios" ? Math.floor(cantidad) * 12 : Math.floor(cantidad);
+  const dia = inicio.getDate();
+  const fecha = new Date(inicio);
+  fecha.setDate(1); // primero el mes, o el 31 desbordaría al mes siguiente
+  fecha.setMonth(fecha.getMonth() + meses);
+  const ultimoDelMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
+  fecha.setDate(Math.min(dia, ultimoDelMes));
+  return fecha;
+}
+
+/** Días que faltan (negativo = ya venció). Se compara a medianoche. */
+export function diasHasta(vencimiento: Date, hoy: Date): number {
+  const a = new Date(vencimiento.getFullYear(), vencimiento.getMonth(), vencimiento.getDate());
+  const b = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+  return Math.round((a.getTime() - b.getTime()) / 86_400_000);
+}

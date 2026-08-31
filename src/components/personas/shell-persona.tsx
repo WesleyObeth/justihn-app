@@ -38,7 +38,7 @@ const NAV_PERSONA: EntradaNav[] = [
   { href: "/personas/consultas", label: "Mis consultas", icono: "leads" },
   { seccion: "Herramientas" },
   { href: "/personas/directorio", label: "Encuentra abogado", icono: "perfil" },
-  { href: "/personas/calculadora", label: "Calculadora", icono: "calc" },
+  { href: "/personas/calculadora", label: "Calculadoras", icono: "calc" },
 ];
 
 function esActiva(pathname: string, href: string): boolean {
