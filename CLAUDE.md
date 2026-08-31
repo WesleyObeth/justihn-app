@@ -59,12 +59,12 @@ Perfil · Planes · Configuración · Ayuda.
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
   disclaimer de homónimos y exclusión de materias reservadas.
 
-### 1.2 Portal ciudadano — `/personas` (15 rutas)
+### 1.2 Portal ciudadano — `/personas` (16 rutas)
 
 El patrón Jusbrasil completo: la landing da la probadita y "crear cuenta gratis"
 abre un portal con shell propio (persona demo Carlos Zelaya en `data/persona.ts`).
 Inicio · Trámites (con **checklist persistido**, `pasosTramite` en el store) ·
-Consultas · Instituciones (+ detalle) · Directorio · Calculadoras · Informe
+Consultas (+ detalle) · Instituciones (+ detalle) · Directorio · Calculadoras · Informe
 Verifica · Mi nombre · Notificaciones · Plan · Perfil · Configuración · Ayuda.
 El sidebar los agrupa en **Mis gestiones · Herramientas · Verificación**.
 
@@ -172,6 +172,21 @@ promesas que ya estaban hechas y no existían:
     el siguiente**. Los procesos judiciales no pertenecen a ninguna ruta y la
     pantalla no se la inventa; hay test.
   - La institución del encabezado **enlaza a su pantalla**, que ahora existe.
+- **Cada consulta tiene su ruta** (`/personas/consultas/[id]`, 2026-08-31).
+  No existe para "verla más grande": la lista dejaba «Esperando a los
+  abogados…» como callejón sin salida, justo en el momento de más ansiedad.
+  El detalle le da contenido a esa espera — **las guías verificadas de su
+  materia** y **otras consultas de la misma materia ya respondidas** (filtro por
+  materia sobre el seed, no un "relacionadas" inventado por parecido de texto),
+  así que la persona sale con algo aunque nadie haya contestado.
+  ⚠️ **`useStoreHidratado()`** nace aquí y es obligatorio en cualquier pantalla
+  que busque un registro POR ID: con `skipHydration`, el primer render ve el
+  store vacío y `notFound()` dispararía un **404 falso** a quien recargue.
+  Mismo patrón `useSyncExternalStore` de `use-saludo.ts`.
+  En la lista, el formulario **se pliega cuando ya hay consultas** (lo que
+  importa entonces es seguirlas) y **se cierra solo al publicar**: guarda
+  cuántas consultas había al abrirse, no un booleano, así que publicar lo cierra
+  sin un efecto — que además no pasaría el lint (§4.7.18).
 - **Instituciones** (2026-08-31) es el pedido literal del socio: "ver todas las
   instituciones del Estado y los trámites de cada una — ej. el IP". El seed ya
   lo tenía (`INSTITUCIONES`, 9, todas con trámite). ⚠️ No contradice §1.3: allí

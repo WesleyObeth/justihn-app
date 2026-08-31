@@ -10,6 +10,7 @@
  * SSR-safety (§0.6): `skipHydration` + hidratación explícita tras el mount, de
  * modo que el primer render del servidor y el del cliente coincidan.
  */
+import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { CUOTA_BASE, NOTIFICACIONES } from "@/data/catalogo";
@@ -287,6 +288,24 @@ export const usePortal = create<PortalState>()(
     },
   ),
 );
+
+/**
+ * Si el store ya se rehidrató desde `localStorage`.
+ *
+ * Con `skipHydration` el primer render del cliente ve el estado inicial, así
+ * que una pantalla que busca un registro POR ID no puede distinguir "todavía no
+ * cargó" de "no existe" — y enseñaría un 404 falso durante un instante a quien
+ * recargue en el detalle de su consulta. `useSyncExternalStore` sobre
+ * `onFinishHydration` es el mecanismo previsto (el mismo patrón de
+ * `hooks/use-saludo.ts`), y devuelve `false` en SSR.
+ */
+export function useStoreHidratado(): boolean {
+  return useSyncExternalStore(
+    (alCambiar) => usePortal.persist.onFinishHydration(alCambiar),
+    () => usePortal.persist.hasHydrated(),
+    () => false,
+  );
+}
 
 /**
  * Notificaciones sin leer — un único lugar para la insignia del menú y la

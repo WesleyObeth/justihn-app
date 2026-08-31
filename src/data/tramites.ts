@@ -1097,6 +1097,12 @@ export function getContextoRuta(tramiteId: string):
   return undefined;
 }
 
+/** Guías de una materia — conecta una consulta del consultorio con el contenido
+ *  verificado que habla de su tema. */
+export function guiasDeMateria(materia: Materia): Tramite[] {
+  return TRAMITES.filter((t) => t.materia === materia);
+}
+
 export function getInstitucion(id: string): Institucion | undefined {
   return INSTITUCIONES.find((i) => i.id === id);
 }
