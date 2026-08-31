@@ -25,7 +25,7 @@
  * hueco 28, wordmark 560 → lockup de 788) y se reduce con `scale`, para que
  * el desplazamiento de 294px siga siendo exactamente medio lockup.
  */
-import { useId } from "react";
+import { useEffect, useId, useState } from "react";
 
 /** Medidas intrínsecas del archivo original. */
 const SIMBOLO = 200;
@@ -37,18 +37,44 @@ const ANCHO = SIMBOLO + HUECO + CAJA_NOMBRE;
 const W = 13 * 0.9;
 const X_CERRADO = 24 - W / 2;
 
+/** Aire a cada lado en pantallas estrechas, para que el lockup no toque el borde. */
+const MARGEN = 20;
+
 export function EscenaLogo({
   ancho = 480,
   bucle = false,
   pie,
 }: {
-  /** Ancho final del lockup abierto; el resto se escala en proporción. */
+  /**
+   * Ancho final del lockup abierto; el resto se escala en proporción. Es un
+   * MÁXIMO: si no cabe en la pantalla, manda el viewport (ver `anchoReal`).
+   */
   ancho?: number;
   bucle?: boolean;
   pie?: string;
 }) {
   const clip = useId();
-  const escala = ancho / ANCHO;
+
+  /**
+   * El ancho pedido se recorta al del viewport. Sin esto, en un teléfono el
+   * lockup se salía por los dos lados **y generaba scroll horizontal**, que es
+   * lo que además lo descuadraba: la vista podía quedar desplazada y el símbolo
+   * aparecía fuera de sitio.
+   *
+   * Se mide tras el mount (no en carga de módulo, §4.5): el servidor entrega el
+   * ancho pedido y el cliente lo ajusta antes de la primera pintura útil. Es un
+   * overlay que aparece después de una acción del usuario, así que no hay SSR
+   * que preservar.
+   */
+  const [anchoReal, setAnchoReal] = useState(ancho);
+  useEffect(() => {
+    const medir = () => setAnchoReal(Math.min(ancho, window.innerWidth - MARGEN * 2));
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, [ancho]);
+
+  const escala = anchoReal / ANCHO;
 
   const pagina = {
     y: 3,
@@ -61,7 +87,7 @@ export function EscenaLogo({
   return (
     <div
       className={`escena-logo relative ${bucle ? "escena-logo--bucle" : ""}`}
-      style={{ width: ancho, height: SIMBOLO * escala + (pie ? 64 : 0) }}
+      style={{ width: anchoReal, height: SIMBOLO * escala + (pie ? 64 : 0) }}
     >
       {/* El LIENZO centra y reduce; el GRUPO solo hace la animación. Antes el
           grupo llevaba `zoom`, que no es estándar y en algunos motores escala

@@ -176,6 +176,14 @@ Grupo `(auth)`, shell propio sin navegación, del handoff `../design_handoff_aut
   cerrado de verdad, una sola forma visible. `SplashJustihn` hace una pasada y
   navega a los 5 s, justo al cerrar el tercer acto. Con reduced-motion se muestra
   el logo abierto, sin movimiento.
+  ⚠️ **`ancho` es un MÁXIMO, no una medida.** El lockup se dibuja a la escala
+  intrínseca del archivo (788) y se reduce con `scale`, así que un ancho fijo no
+  sabe nada del teléfono: a 520px en una pantalla de 390 se cortaba por los dos
+  lados **y daba scroll horizontal a la página**, que además lo descuadraba —
+  la vista podía quedar desplazada y el símbolo aparecía fuera de sitio. Ahora
+  se recorta a `innerWidth − 40` midiendo tras el mount (no en carga de módulo,
+  §4.5), y el overlay del splash lleva `overflow-hidden` para no ser nunca el
+  origen de ese scroll. Verificado a 320/390/430/768/1280 en Chromium y WebKit.
 - ⚗️ **Prueba en curso:** el shell usa la **aurora CLARA** de las landings, no la
   variante noche del handoff — Wesley quiere comparar. **Camino de vuelta:**
   revertir ese único commit; `landing-aurora--noche`, `FondoAurora variante="noche"`

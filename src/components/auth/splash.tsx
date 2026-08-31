@@ -23,7 +23,9 @@ export function SplashJustihn({ destino = "/abogados" }: { destino?: string }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center"
+      // `overflow-hidden`: aunque la escena ya se recorta al viewport, este
+      // overlay no puede ser nunca el que le dé scroll horizontal a la página.
+      className="fixed inset-0 z-[100] grid place-items-center overflow-hidden"
       style={{ background: "linear-gradient(180deg,#0d2144 0%,#0a1830 100%)" }}
       role="status"
       aria-label="Preparando tu portal"
