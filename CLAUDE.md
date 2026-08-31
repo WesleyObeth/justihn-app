@@ -104,6 +104,15 @@ promesas que ya estaban hechas y no existían:
   - **Accesos rápidos** resuelve que Instituciones, Verifica y Mi nombre no se
     descubrían desde Inicio. **La card "Tu plan" se quitó** (decisión Wesley):
     duplicaba el menú del avatar, que es donde vive el plan.
+  - **"Lo que viene"** (decisión Wesley: partir Accesos rápidos en dos) NO es un
+    anuncio de marketing: sus tres puntos son ítems del backlog con su bloqueo
+    real detrás — Informe Verifica completo (depende de cuentas SURE/CCIT), más
+    guías (alquiler y depósito, bloqueada porque el texto de la Ley de
+    Inquilinato no está en fuente estatal legible) y el plan de pago que define
+    el socio. **Sin fechas a propósito**: prometer una es lo que prohíbe §4.5, y
+    lo dice en la propia card. El único compromiso que repite es el que sí está
+    tomado: lo gratis sigue gratis. Lleva el `flex-1` que cierra la columna
+    derecha a la altura de la izquierda.
 - **El estado vacío del consultorio enseña en vez de esperar.** Decía "Aún no
   has preguntado nada"; ahora muestra un intercambio REAL ya respondido y
   firmado con su colegiación (`respuestaDemo` del seed). El obstáculo del

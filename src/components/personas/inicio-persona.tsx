@@ -49,6 +49,7 @@ export function InicioPersona() {
           <PlazoDestacado />
           <AntesDeFirmar />
           <AccesosRapidos />
+          <LoQueViene />
         </div>
       </div>
     </div>
@@ -543,10 +544,7 @@ function AntesDeFirmar() {
   );
 }
 
-/**
- * `flex-1` para que la columna derecha cierre a la altura de la izquierda —
- * el mismo recurso que usa el dashboard del abogado en su última card.
- */
+/** Las seis pantallas a un clic, con el catálogo en cifras al pie. */
 function AccesosRapidos() {
   const accesos: { href: string; icono: NombreIcono; label: string }[] = [
     { href: "/personas/tramites", icono: "pasos", label: "Guías de trámites" },
@@ -558,11 +556,11 @@ function AccesosRapidos() {
   ];
 
   return (
-    <div className="flex flex-1 flex-col rounded-2xl border border-borde bg-white p-5">
+    <div className="rounded-2xl border border-borde bg-white p-5">
       <h2 className="text-[11px] font-semibold tracking-[1.2px] text-texto-4 uppercase">
         Accesos rápidos
       </h2>
-      <div className="mt-3 grid flex-1 grid-cols-1 content-start gap-2.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         {accesos.map((a) => (
           <Link
             key={a.href}
@@ -578,6 +576,83 @@ function AccesosRapidos() {
       </div>
       <p className="mt-3 border-t border-borde pt-3 text-[11.5px] leading-[1.5] text-texto-4">
         {INSTITUCIONES.length} instituciones del Estado · {DIRECTORIO.length} abogados por materia
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Lo que viene.
+ *
+ * Los tres puntos NO son un anuncio de marketing: son ítems reales del backlog
+ * del producto, con su bloqueo dicho en voz alta. El Informe Verifica completo
+ * depende de cuentas institucionales (SURE/CCIT) que aún no existen; la guía de
+ * alquiler está bloqueada porque el texto de la Ley de Inquilinato no está
+ * publicado en ninguna fuente estatal legible; y el plan de pago se define con
+ * el gremio. Prometer fechas sería justo lo que prohíbe §4.5 — por eso ninguno
+ * las lleva, y la nota final repite el único compromiso que sí está tomado:
+ * lo gratis sigue gratis.
+ *
+ * `flex-1` cierra la columna derecha a la altura de la izquierda — el mismo
+ * recurso que usa el Dashboard del abogado en su última card.
+ */
+function LoQueViene() {
+  const mostrarToast = usePortal((s) => s.mostrarToast);
+
+  const puntos: { icono: NombreIcono; titulo: string; desc: string }[] = [
+    {
+      icono: "candado",
+      titulo: "Informe Verifica completo",
+      desc: "Folio real de un inmueble e historial de una empresa, además de las sentencias.",
+    },
+    {
+      icono: "pasos",
+      titulo: "Más guías, una a una",
+      desc: "Alquiler y devolución del depósito están entre las próximas.",
+    },
+    {
+      icono: "planes",
+      titulo: "Un plan con más herramientas",
+      desc: "En definición con el gremio, para quien necesite más que lo gratuito.",
+    },
+  ];
+
+  return (
+    <div className="flex flex-1 flex-col rounded-2xl border-2 border-dashed border-borde bg-white/70 p-5">
+      <div className="flex items-baseline gap-2">
+        <h2 className="text-[11px] font-semibold tracking-[1.2px] text-dorado uppercase">
+          Lo que viene
+        </h2>
+      </div>
+      <p className="mt-1.5 text-[12.5px] leading-[1.55] text-texto-3">
+        En lo que estamos trabajando. Sin fechas: se publica cuando esté verificado.
+      </p>
+
+      <ul className="mt-3.5 flex flex-1 flex-col content-start gap-3">
+        {puntos.map((p) => (
+          <li key={p.titulo} className="flex items-start gap-2.5">
+            <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-lienzo text-texto-4">
+              <Icono nombre={p.icono} size={12} />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[13px] font-semibold text-marino">{p.titulo}</span>
+              <span className="mt-0.5 block text-[12px] leading-[1.5] text-texto-3">
+                {p.desc}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <button
+        type="button"
+        onClick={() => mostrarToast("Te avisaremos por correo cuando salga algo nuevo")}
+        className="mt-4 cursor-pointer rounded-lg border border-borde bg-lienzo px-4 py-2.5 text-[12.5px] font-medium text-marino hover:border-celeste"
+      >
+        Avísame cuando salga
+      </button>
+      <p className="mt-2.5 text-[11.5px] leading-[1.5] text-texto-4">
+        Lo que hoy es gratis seguirá siendo gratis.
       </p>
     </div>
   );
