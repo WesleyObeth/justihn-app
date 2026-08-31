@@ -63,45 +63,64 @@ export function EscenaLogo({
       className={`escena-logo relative ${bucle ? "escena-logo--bucle" : ""}`}
       style={{ width: ancho, height: SIMBOLO * escala + (pie ? 64 : 0) }}
     >
+      {/* El LIENZO centra y reduce; el GRUPO solo hace la animación. Antes el
+          grupo llevaba `zoom`, que no es estándar y en algunos motores escala
+          el texto de otra manera — el lockup salía descompensado. Con
+          `transform: scale` el resultado es idéntico en todos. */}
       <div
-        className="esc-grupo absolute top-1/2 left-1/2 flex items-center"
+        className="absolute top-1/2 left-1/2"
         style={{
-          gap: HUECO,
           width: ANCHO,
-          // El grupo se dibuja a tamaño intrínseco y se reduce desde su
-          // centro: así el shift de 294px del archivo sigue siendo válido.
-          zoom: escala,
+          height: SIMBOLO,
+          transform: `translate(-50%, -50%) scale(${escala})`,
         }}
       >
-        <svg
-          width={SIMBOLO}
-          height={SIMBOLO}
-          viewBox="0 0 48 48"
-          className="shrink-0"
-          aria-hidden="true"
+        <div
+          className="esc-grupo absolute inset-0 flex items-center"
+          style={{ gap: HUECO }}
         >
-          <defs>
-            <clipPath id={clip}>
-              {/* El recorte acompaña a la página izquierda: si se quedara
-                  quieto, el cruce aparecería fuera del solape. */}
-              <rect className="esc-pagina esc-pagina-izq" {...pagina} />
-            </clipPath>
-          </defs>
-
-          <rect className="esc-pagina esc-pagina-izq" {...pagina} fill="#ffffff" />
-          <rect className="esc-pagina esc-pagina-der" {...pagina} fill="#1584c7" />
-          <g clipPath={`url(#${clip})`}>
-            <rect className="esc-pagina esc-pagina-der" {...pagina} fill="#0e5f92" />
-          </g>
-        </svg>
-
-        <div style={{ width: CAJA_NOMBRE, overflow: "hidden" }}>
-          <p
-            className="wordmark esc-nombre whitespace-nowrap text-white"
-            style={{ fontSize: 128, letterSpacing: "-2px", lineHeight: 1.15 }}
+          <svg
+            width={SIMBOLO}
+            height={SIMBOLO}
+            viewBox="0 0 48 48"
+            className="shrink-0"
+            aria-hidden="true"
           >
-            Justihn
-          </p>
+            <defs>
+              <clipPath id={clip}>
+                {/* El recorte acompaña a la página izquierda: si se quedara
+                  quieto, el cruce aparecería fuera del solape. */}
+                <rect className="esc-pagina esc-pagina-izq" {...pagina} />
+              </clipPath>
+            </defs>
+
+            <rect
+              className="esc-pagina esc-pagina-izq"
+              {...pagina}
+              fill="#ffffff"
+            />
+            <rect
+              className="esc-pagina esc-pagina-der"
+              {...pagina}
+              fill="#1584c7"
+            />
+            <g clipPath={`url(#${clip})`}>
+              <rect
+                className="esc-pagina esc-pagina-der"
+                {...pagina}
+                fill="#0e5f92"
+              />
+            </g>
+          </svg>
+
+          <div style={{ width: CAJA_NOMBRE, overflow: "hidden" }}>
+            <p
+              className="wordmark esc-nombre whitespace-nowrap text-white"
+              style={{ fontSize: 128, letterSpacing: "-2px", lineHeight: 1.15 }}
+            >
+              Justihn
+            </p>
+          </div>
         </div>
       </div>
 

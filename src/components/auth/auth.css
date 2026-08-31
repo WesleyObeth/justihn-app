@@ -120,55 +120,64 @@
 @keyframes escGrupo {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) translateX(294px) scale(0.92);
+    transform: translateX(294px) scale(0.92);
   }
   2.21% {
     opacity: 0;
-    transform: translate(-50%, -50%) translateX(294px) scale(0.92);
+    transform: translateX(294px) scale(0.92);
     animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
   }
   13.24% {
     opacity: 1;
-    transform: translate(-50%, -50%) translateX(294px) scale(1);
+    transform: translateX(294px) scale(1);
   }
   44.12% {
     opacity: 1;
-    transform: translate(-50%, -50%) translateX(294px) scale(1);
+    transform: translateX(294px) scale(1);
     animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
   }
   58.82%,
   83.82% {
     opacity: 1;
-    transform: translate(-50%, -50%) translateX(0) scale(1);
+    transform: translateX(0) scale(1);
     animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
   }
   99.26%,
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) translateX(0) scale(1);
+    transform: translateX(0) scale(1);
   }
 }
 
+/* La separación va en el atributo `x` (propiedad de geometría SVG: SIEMPRE
+   unidades del viewBox) y el giro sobre el centro de la propia página
+   (`fill-box` + 50% 50%, sin longitudes de por medio). Antes iba con
+   `translateX(7px)`, cuya unidad dentro de un SVG depende del motor — y ahí
+   estaba el logo torcido. */
 @keyframes escPaginaIzq {
   0%,
   20.59% {
-    transform: translateX(0) rotate(0deg);
+    x: 18.15px;
+    transform: rotate(0deg);
     animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   39.71%,
   100% {
-    transform: translateX(-7px) rotate(-26deg);
+    x: 11.15px;
+    transform: rotate(-26deg);
   }
 }
 @keyframes escPaginaDer {
   0%,
   20.59% {
-    transform: translateX(0) rotate(0deg);
+    x: 18.15px;
+    transform: rotate(0deg);
     animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   39.71%,
   100% {
-    transform: translateX(7px) rotate(26deg);
+    x: 25.15px;
+    transform: rotate(26deg);
   }
 }
 
@@ -204,12 +213,13 @@
 .escena-logo .esc-grupo {
   animation: escGrupo var(--ciclo) linear both;
 }
-/* Las dos páginas comparten pivote: el centro del rect cuando aún están
-   superpuestas. Girar ahí y luego trasladar da el mismo resultado que mover
-   la x y girar sobre el centro nuevo — y evita animar un atributo SVG. */
+/* Cada página gira sobre SU PROPIO centro, que es como se define el logo
+   oficial (`rotate(-26 17 21)` = el centro del rect izquierdo). En
+   porcentajes sobre `fill-box` no hay ninguna longitud que el motor pueda
+   interpretar en otra unidad. */
 .escena-logo .esc-pagina {
-  transform-box: view-box;
-  transform-origin: 24px 21px;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 .escena-logo .esc-pagina-izq {
   animation: escPaginaIzq var(--ciclo) linear both;
@@ -244,16 +254,18 @@
   /* Sin movimiento se enseña el logo YA abierto y el nombre visible. */
   .escena-logo .esc-grupo {
     animation: none;
-    transform: translate(-50%, -50%);
+    transform: none;
     opacity: 1;
   }
   .escena-logo .esc-pagina-izq {
     animation: none;
-    transform: translateX(-7px) rotate(-26deg);
+    x: 11.15px;
+    transform: rotate(-26deg);
   }
   .escena-logo .esc-pagina-der {
     animation: none;
-    transform: translateX(7px) rotate(26deg);
+    x: 25.15px;
+    transform: rotate(26deg);
   }
   .escena-logo .esc-nombre {
     animation: none;

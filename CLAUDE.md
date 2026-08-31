@@ -507,7 +507,17 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
       visible—, no dos barras juntas. Se consigue con `translateX(±7)
       rotate(±26°)` sobre `transform-origin: 24px 21px`, que es idéntico a
       mover la `x` y girar sobre el centro nuevo, y **termina exactamente en la
-      geometría oficial** (−26° en 17,21 · +26° en 31,21). Verificado.
+      geometría oficial** (−26° en 17,21 · +26° en 31,21).
+    - ⚠️ **Bug corregido el mismo día (el logo salía torcido en Safari):** la
+      separación iba con `translateX(7px)` dentro del SVG, y **la unidad de
+      esa longitud depende del motor** (unidades del viewBox o píxeles CSS);
+      y el lienzo se reducía con `zoom`, que no es estándar y escala el texto
+      de otra manera, así que el lockup salía descompensado. Ahora la
+      separación va en la propiedad de geometría **`x`** (siempre unidades del
+      viewBox) con el giro sobre el centro de cada página (`fill-box` + 50%
+      50%, sin longitudes de por medio), y el lienzo usa **`transform:
+      scale`**. Verificado en **Chromium y WebKit**: `x` 18,15 → 11,15/25,15 y
+      centros en 17/31 en ambos.
     - Easings del archivo, portados como curvas cúbicas: `easeOutCubic` en el
       fade de entrada, **`easeOutBack`** en la apertura (el rebote) y
       `easeInOutQuart` en el recentrado, el wordmark y el fade final. Los
