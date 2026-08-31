@@ -140,6 +140,24 @@ export interface RespuestaConsulta {
   cuando: string;
 }
 
+/**
+ * Un mensaje que la persona le envía a un abogado desde su perfil.
+ *
+ * Vive DENTRO de Justihn a propósito (§4.5): sacar el contacto a WhatsApp en el
+ * primer toque dejaría al abogado sin poder demostrar cuántos contactos le
+ * trajo la plataforma — que es lo que sostiene que pague la suscripción.
+ *
+ * TODO(data): tabla `mensajes_abogado` con FK a `abogados` y `personas`, y RLS
+ * a las dos puntas: solo el remitente y el destinatario lo leen.
+ */
+export interface MensajeAbogado {
+  abogadoId: string;
+  /** Materia del asunto — el abogado necesita saber de qué le hablan. */
+  materia: Materia;
+  texto: string;
+  cuando: string;
+}
+
 export interface Lead {
   id: string;
   materia: Materia;

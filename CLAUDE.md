@@ -59,12 +59,12 @@ Perfil · Planes · Configuración · Ayuda.
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
   disclaimer de homónimos y exclusión de materias reservadas.
 
-### 1.2 Portal ciudadano — `/personas` (16 rutas)
+### 1.2 Portal ciudadano — `/personas` (17 rutas)
 
 El patrón Jusbrasil completo: la landing da la probadita y "crear cuenta gratis"
 abre un portal con shell propio (persona demo Carlos Zelaya en `data/persona.ts`).
 Inicio · Trámites (con **checklist persistido**, `pasosTramite` en el store) ·
-Consultas (+ detalle) · Instituciones (+ detalle) · Directorio · Calculadoras · Informe
+Consultas (+ detalle) · Instituciones (+ detalle) · Directorio (+ perfil) · Calculadoras · Informe
 Verifica · Mi nombre · Notificaciones · Plan · Perfil · Configuración · Ayuda.
 El sidebar los agrupa en **Mis gestiones · Herramientas · Verificación**.
 
@@ -187,6 +187,25 @@ promesas que ya estaban hechas y no existían:
   importa entonces es seguirlas) y **se cierra solo al publicar**: guarda
   cuántas consultas había al abrirse, no un booleano, así que publicar lo cierra
   sin un efecto — que además no pasaría el lint (§4.7.18).
+- **Cada abogado tiene perfil, y desde ahí se le escribe**
+  (`/personas/directorio/[id]`, 2026-08-31). El mensaje se envía **dentro de
+  Justihn**, no a WhatsApp: §4.5 ya decía que sacar el contacto en el primer
+  toque deja al abogado sin poder demostrar cuántos le trajo la plataforma —
+  que es lo que sostiene que pague. El formulario pide **materia además del
+  texto** (el abogado necesita saber de qué le hablan), exige un par de líneas,
+  y **dice que hoy el mensaje se guarda en el navegador**: no promete un envío
+  que aún no existe. Store: `mensajesAbogado`.
+  ⚠️ **Bug encontrado al revisar**: el botón "Consultar con X" llevaba
+  `background: var(--turq)` y **esa variable solo existe en `landing.css`** —
+  en el portal el botón quedaba **sin fondo, blanco sobre blanco, invisible**.
+  Esta card vive en TRES superficies, así que ninguno de sus colores puede salir
+  del shell aurora; se pasaron todos a tokens del tema.
+  Filtros: se suman **buscador** (nombre, ciudad, bio y materias, sin tildes) y
+  **ciudad**; cada materia lleva su conteo y se deshabilita en 0; **notarios va
+  en fila aparte** porque ser notario NO es una materia, y mezclarlos los hacía
+  parecer lo mismo. Todo vive en la URL, así que un enlace filtrado es
+  compartible. `filtrarDirectorio` está en `data/` porque el orden —Premium
+  primero— es regla de negocio, no de pantalla.
 - **Instituciones** (2026-08-31) es el pedido literal del socio: "ver todas las
   instituciones del Estado y los trámites de cada una — ej. el IP". El seed ya
   lo tenía (`INSTITUCIONES`, 9, todas con trámite). ⚠️ No contradice §1.3: allí
@@ -624,7 +643,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (104 tests de invariantes)
+pnpm test         # Vitest (115 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

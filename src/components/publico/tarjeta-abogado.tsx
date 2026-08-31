@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 /**
  * **La card oficial del abogado** (elegida por Wesley 2026-08-30 entre tres
  * prototipos: "la card que habla"). Es la que ve una persona cuando busca a
@@ -45,9 +46,16 @@ function primerNombre(nombre: string) {
 export function TarjetaAbogado({
   abogado: a,
   compacta = false,
+  href,
 }: {
   abogado: AbogadoDirectorio;
   compacta?: boolean;
+  /**
+   * Perfil al que lleva la acción. Solo existe dentro del portal
+   * (`/personas/directorio/[id]`): en la home no hay detalle, así que allí la
+   * card mantiene su aviso de demo en vez de enlazar a una ruta inexistente.
+   */
+  href?: string;
 }) {
   const mostrarToast = usePortal((s) => s.mostrarToast);
 
@@ -83,7 +91,7 @@ export function TarjetaAbogado({
           >
             {a.nombre}
           </span>
-          <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
+          <span className="text-[11.5px] text-texto-3">
             {a.ciudad} · {a.anios} años
           </span>
         </div>
@@ -107,44 +115,47 @@ export function TarjetaAbogado({
       </div>
 
       {compacta ? (
-        <p
-          className="mt-3 flex-1 text-[12.5px] leading-[1.55]"
-          style={{ color: "var(--muted)" }}
-        >
-          {a.bio}
-        </p>
+        <p className="mt-3 flex-1 text-[12.5px] leading-[1.55] text-texto-3">{a.bio}</p>
       ) : (
         <blockquote
-          className="mt-4 flex-1 rounded-[12px] border-l-[3px] py-2.5 pr-3 pl-3.5 text-[13px] leading-[1.6]"
-          style={{
-            borderColor: "var(--color-celeste)",
-            background: "rgba(21,132,199,.06)",
-            color: "var(--ink)",
-          }}
+          className="mt-4 flex-1 rounded-[12px] border-l-[3px] border-celeste py-2.5 pr-3 pl-3.5 text-[13px] leading-[1.6] text-marino"
+          style={{ background: "rgba(21,132,199,.06)" }}
         >
           “{a.cita}”
-          <footer className="mt-1.5 text-[11px]" style={{ color: "var(--muted)" }}>
+          <footer className="mt-1.5 text-[11px] text-texto-3">
             De una respuesta suya en el consultorio
           </footer>
         </blockquote>
       )}
 
-      {/* TODO(fase 2): abre una consulta DIRIGIDA — el mismo circuito del
-          consultorio pero con destinatario, para que le llegue como lead a
-          este abogado y quede trazado que Justihn se lo trajo. */}
-      <button
-        type="button"
-        onClick={() =>
-          mostrarToast(
-            `Así le escribes a ${a.nombre} desde Justihn — su respuesta queda pública (demo de validación)`,
-          )
-        }
-        className={`w-full cursor-pointer rounded-lg font-semibold text-white ${compacta ? "mt-3.5 py-2 text-[12.5px]" : "mt-4 py-2.5 text-[13px]"}`}
-        style={{ background: "var(--turq)" }}
-      >
-        Consultar con {primerNombre(a.nombre)}
-      </button>
-      <p className="mt-2 text-center text-[11px]" style={{ color: "var(--muted)" }}>
+      {/* Con perfil, la acción NAVEGA a él: ahí está el formulario que le
+          escribe dentro de Justihn. Sin perfil (la home), se queda en el aviso
+          de demo — no se enlaza a una ruta que no existe.
+          ⚠️ El fondo llevaba `var(--turq)`, y esa variable SOLO existe en
+          `landing.css`: en el portal el botón se quedaba sin fondo, blanco
+          sobre blanco e invisible. Esta card vive en tres superficies, así que
+          su color sale del tema global. */}
+      {href ? (
+        <Link
+          href={href}
+          className={`block w-full cursor-pointer rounded-lg bg-celeste text-center font-semibold text-white hover:bg-cruce hover:text-white ${compacta ? "mt-3.5 py-2 text-[12.5px]" : "mt-4 py-2.5 text-[13px]"}`}
+        >
+          Consultar con {primerNombre(a.nombre)}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          onClick={() =>
+            mostrarToast(
+              `Así le escribes a ${a.nombre} desde Justihn — su respuesta queda pública (demo de validación)`,
+            )
+          }
+          className={`w-full cursor-pointer rounded-lg bg-celeste font-semibold text-white hover:bg-cruce hover:text-white ${compacta ? "mt-3.5 py-2 text-[12.5px]" : "mt-4 py-2.5 text-[13px]"}`}
+        >
+          Consultar con {primerNombre(a.nombre)}
+        </button>
+      )}
+      <p className="mt-2 text-center text-[11px] text-texto-3">
         Suele responder {a.responde}
         {compacta ? "" : ` · ${a.enLinea ? "en línea y presencial" : "presencial"}`}
       </p>

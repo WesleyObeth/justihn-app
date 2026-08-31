@@ -187,6 +187,44 @@ export function buscarNotarios(): AbogadoDirectorio[] {
 }
 
 /** Premium primero (feature del plan), luego por valoración. */
+/** Ciudades con al menos un abogado — el filtro no ofrece opciones vacías. */
+export function ciudadesDelDirectorio(): string[] {
+  return [...new Set(DIRECTORIO.map((a) => a.ciudad))].sort((a, b) => a.localeCompare(b, "es"));
+}
+
+/**
+ * Filtro combinado del directorio. Vive aquí y no en la pantalla porque el
+ * orden (Premium primero) es una regla de negocio: aplicarlo en la UI dejaría
+ * la puerta abierta a que otra superficie lo ordenara distinto.
+ */
+export function filtrarDirectorio(opciones: {
+  materia?: Materia | "todas";
+  ciudad?: string;
+  q?: string;
+  soloNotarios?: boolean;
+}): AbogadoDirectorio[] {
+  const { materia = "todas", ciudad = "todas", q = "", soloNotarios = false } = opciones;
+  const termino = q
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "");
+
+  return ordenar(
+    DIRECTORIO.filter((a) => {
+      if (soloNotarios && !a.notario) return false;
+      if (materia !== "todas" && !a.materias.includes(materia)) return false;
+      if (ciudad !== "todas" && a.ciudad !== ciudad) return false;
+      if (!termino) return true;
+      const texto = `${a.nombre} ${a.ciudad} ${a.bio} ${a.materias.join(" ")}`
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{M}/gu, "");
+      return texto.includes(termino);
+    }),
+  );
+}
+
 export function buscarAbogados(materia?: Materia | "todas"): AbogadoDirectorio[] {
   return ordenar(
     !materia || materia === "todas"

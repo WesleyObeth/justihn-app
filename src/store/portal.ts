@@ -21,6 +21,7 @@ import type {
   MensajeChat,
   NombreVigilado,
   PlanId,
+  MensajeAbogado,
   RespuestaConsulta,
 } from "@/types/dominio";
 
@@ -71,6 +72,8 @@ interface PortalState {
    * de la abogada demo — misma lección que las notificaciones.
    */
   nombresVigiladosPersona: NombreVigilado[];
+  /** Mensajes que la persona ha enviado a abogados, por abogado. */
+  mensajesAbogado: Record<string, MensajeAbogado[]>;
   /** Preguntas hechas desde el consultorio público (Vía B) — aparecen como
    *  leads en el portal de abogados: es el mismo flujo, visto de ambos lados. */
   preguntasPublico: Lead[];
@@ -103,6 +106,7 @@ interface PortalState {
   responderLead: (leadId: string, respuesta: string, abogadoId?: string) => void;
   vigilarNombre: (nombre: string, tipo: NombreVigilado["tipo"]) => void;
   vigilarNombrePersona: (nombre: string) => void;
+  escribirAAbogado: (abogadoId: string, materia: Materia, texto: string) => void;
   dejarDeVigilarPersona: (id: string) => void;
   dejarDeVigilar: (id: string) => void;
   preguntarConsultorio: (materia: Materia, ciudad: string, pregunta: string) => void;
@@ -149,6 +153,7 @@ export const usePortal = create<PortalState>()(
       leadsRespondidos: {},
       nombresVigilados: VIGILADOS_INICIALES,
       nombresVigiladosPersona: VIGILADOS_INICIALES_PERSONA,
+      mensajesAbogado: {},
       preguntasPublico: [],
       pasosTramite: {},
       prefsPersona: { respuestas: true, tramites: true, novedades: false },
@@ -239,6 +244,16 @@ export const usePortal = create<PortalState>()(
             ],
           };
         }),
+      escribirAAbogado: (abogadoId, materia, texto) =>
+        set((s) => ({
+          mensajesAbogado: {
+            ...s.mensajesAbogado,
+            [abogadoId]: [
+              ...(s.mensajesAbogado[abogadoId] ?? []),
+              { abogadoId, materia, texto, cuando: "reciente" },
+            ],
+          },
+        })),
       dejarDeVigilarPersona: (id) =>
         set((s) => ({
           nombresVigiladosPersona: s.nombresVigiladosPersona.filter((v) => v.id !== id),
@@ -326,6 +341,7 @@ export const usePortal = create<PortalState>()(
         leadsRespondidos: s.leadsRespondidos,
         nombresVigilados: s.nombresVigilados,
         nombresVigiladosPersona: s.nombresVigiladosPersona,
+        mensajesAbogado: s.mensajesAbogado,
         preguntasPublico: s.preguntasPublico,
         pasosTramite: s.pasosTramite,
         prefsPersona: s.prefsPersona,

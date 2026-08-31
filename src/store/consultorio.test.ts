@@ -82,3 +82,41 @@ describe("getFirmante — quién firma cada respuesta", () => {
     expect(getFirmante("")).toBeUndefined();
   });
 });
+
+/**
+ * Mensajes a un abogado. Viven dentro de Justihn a propósito (§4.5): sacar el
+ * contacto a WhatsApp en el primer toque dejaría al abogado sin poder demostrar
+ * cuántos contactos le trajo la plataforma.
+ */
+describe("escribirAAbogado", () => {
+  beforeEach(() => {
+    usePortal.setState({ mensajesAbogado: {} });
+  });
+
+  it("guarda el mensaje bajo su abogado, con la materia del caso", () => {
+    usePortal.getState().escribirAAbogado("gabriela-nunez", "Consumidor", "Producto vencido");
+    const m = usePortal.getState().mensajesAbogado["gabriela-nunez"]!;
+    expect(m).toHaveLength(1);
+    expect(m[0]!.materia).toBe("Consumidor");
+    expect(m[0]!.texto).toBe("Producto vencido");
+  });
+
+  it("acumula la conversación en vez de reemplazarla", () => {
+    const { escribirAAbogado } = usePortal.getState();
+    escribirAAbogado("gabriela-nunez", "Consumidor", "Primero");
+    escribirAAbogado("gabriela-nunez", "Civil", "Segundo");
+    expect(usePortal.getState().mensajesAbogado["gabriela-nunez"]!.map((x) => x.texto)).toEqual([
+      "Primero",
+      "Segundo",
+    ]);
+  });
+
+  it("no mezcla los de un abogado con los de otro", () => {
+    const { escribirAAbogado } = usePortal.getState();
+    escribirAAbogado("gabriela-nunez", "Consumidor", "Para Gabriela");
+    escribirAAbogado("carlos-mejia", "Mercantil", "Para Carlos");
+    const estado = usePortal.getState().mensajesAbogado;
+    expect(estado["gabriela-nunez"]).toHaveLength(1);
+    expect(estado["carlos-mejia"]![0]!.texto).toBe("Para Carlos");
+  });
+});
