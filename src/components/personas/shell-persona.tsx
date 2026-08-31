@@ -12,8 +12,9 @@ import { useEffect, useState } from "react";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { LogoJustihn, SimboloJustihn } from "@/components/brand/logos";
 import { DrawerMenuMovil, IconoColapsar } from "@/components/portal/sidebar";
+import { useTodosLosAvisos } from "./notificaciones-persona";
 import { PERSONA_DEMO } from "@/data/persona";
-import { usePortal } from "@/store/portal";
+import { usePortal, useNotifsSinLeer } from "@/store/portal";
 import { cn } from "@/lib/utils";
 
 interface ItemNav {
@@ -161,6 +162,7 @@ export function SidebarPersona({
 function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
   const router = useRouter();
   const mostrarToast = usePortal((s) => s.mostrarToast);
+  const sinLeer = useNotifsSinLeer(useTodosLosAvisos());
   const [abierto, setAbierto] = useState(false);
 
   useEffect(() => {
@@ -232,8 +234,15 @@ function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
               </ItemMenu>
             </div>
 
-            {/* Soporte */}
+            {/* Avisos y soporte */}
             <div className="my-1 border-t border-white/10 pt-1">
+              <ItemMenu
+                icono="bell"
+                onClick={() => ir("/personas/notificaciones")}
+                insignia={sinLeer}
+              >
+                Notificaciones
+              </ItemMenu>
               <ItemMenu icono="help" onClick={() => ir("/personas/ayuda")}>
                 Ayuda
               </ItemMenu>
@@ -263,8 +272,19 @@ function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
         title={PERSONA_DEMO.nombre}
         className="flex w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-2 py-[7px] text-left hover:bg-white/[0.08]"
       >
-        <span className="font-display grid h-[34px] w-[34px] min-w-[34px] place-items-center rounded-full bg-celeste text-[12.5px] font-semibold text-white">
-          {PERSONA_DEMO.iniciales}
+        {/* El punto sobre el avatar es lo único que delata avisos sin leer con
+            el menú cerrado — y con la barra colapsada, lo único visible. */}
+        <span className="relative grid h-[34px] w-[34px] min-w-[34px] place-items-center">
+          <span className="font-display grid h-[34px] w-[34px] place-items-center rounded-full bg-celeste text-[12.5px] font-semibold text-white">
+            {PERSONA_DEMO.iniciales}
+          </span>
+          {sinLeer > 0 && !abierto && (
+            <span
+              className="absolute -top-px -right-px h-2.5 w-2.5 rounded-full bg-urgente ring-2 ring-[#0b1d3a]"
+              aria-label={`${sinLeer} notificaciones sin leer`}
+              role="img"
+            />
+          )}
         </span>
         {expandido && (
           <>
@@ -288,11 +308,13 @@ function ItemMenu({
   icono,
   onClick,
   children,
+  insignia,
   destructivo,
 }: {
   icono: NombreIcono;
   onClick: () => void;
   children: React.ReactNode;
+  insignia?: number;
   destructivo?: boolean;
 }) {
   return (
@@ -309,6 +331,11 @@ function ItemMenu({
         <Icono nombre={icono} size={15} />
       </span>
       <span className="flex-1">{children}</span>
+      {insignia !== undefined && insignia > 0 && (
+        <span className="rounded-full bg-urgente px-[7px] py-px text-[10.5px] font-bold text-white">
+          {insignia}
+        </span>
+      )}
     </button>
   );
 }

@@ -9,7 +9,6 @@ import { usePortal, useNotifsSinLeer } from "@/store/portal";
 import { cn } from "@/lib/utils";
 
 export function PantallaNotificaciones() {
-  const leidas = usePortal((s) => s.notifsLeidas);
   const leidasIds = usePortal((s) => s.notifsLeidasIds);
   const marcarLeidas = usePortal((s) => s.marcarNotifsLeidas);
   const marcarLeida = usePortal((s) => s.marcarNotifLeida);
@@ -25,7 +24,10 @@ export function PantallaNotificaciones() {
             <span className="font-semibold text-exito">✓ Todo al día</span>
           )}
         </div>
-        <Boton onClick={marcarLeidas} className="px-3.5 py-2 text-[12.5px]">
+        <Boton
+          onClick={() => marcarLeidas(NOTIFICACIONES.map((n) => n.id))}
+          className="px-3.5 py-2 text-[12.5px]"
+        >
           Marcar todas como leídas
         </Boton>
       </div>
@@ -40,7 +42,7 @@ export function PantallaNotificaciones() {
             </div>
             <div className="flex flex-col gap-2.5">
               {delGrupo.map((n) => {
-                const noLeida = !leidas && n.noLeidaPorDefecto && !leidasIds.includes(n.id);
+                const noLeida = n.noLeidaPorDefecto && !leidasIds.includes(n.id);
                 return (
             <Link
               key={n.id}

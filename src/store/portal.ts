@@ -42,7 +42,6 @@ interface PortalState {
   /** Demo del loop de validación: al "subir" la constancia, el aviso desaparece
    *  en toda la app y el documento pasa a "en revisión". */
   constanciaSubida: boolean;
-  notifsLeidas: boolean;
   /** Notificaciones leídas una a una (clic); convive con "marcar todas". */
   notifsLeidasIds: string[];
   sidebarColapsado: boolean;
@@ -79,7 +78,7 @@ interface PortalState {
   togglePreferencia: (clave: keyof PreferenciasNotificacion) => void;
   ocultarBannerValidacion: () => void;
   subirConstancia: () => void;
-  marcarNotifsLeidas: () => void;
+  marcarNotifsLeidas: (ids: string[]) => void;
   marcarNotifLeida: (id: string) => void;
   toggleSidebar: () => void;
   setMenuMovil: (abierto: boolean) => void;
@@ -125,7 +124,6 @@ export const usePortal = create<PortalState>()(
       prefs: { digest: true, email: true, leads: true, nombres: false },
       bannerValidacionOculto: false,
       constanciaSubida: false,
-      notifsLeidas: false,
       notifsLeidasIds: [],
       sidebarColapsado: false,
       menuMovil: false,
@@ -156,7 +154,8 @@ export const usePortal = create<PortalState>()(
         set((s) => ({ prefs: { ...s.prefs, [clave]: !s.prefs[clave] } })),
       ocultarBannerValidacion: () => set({ bannerValidacionOculto: true }),
       subirConstancia: () => set({ constanciaSubida: true }),
-      marcarNotifsLeidas: () => set({ notifsLeidas: true }),
+      marcarNotifsLeidas: (ids) =>
+        set((s) => ({ notifsLeidasIds: [...new Set([...s.notifsLeidasIds, ...ids])] })),
       marcarNotifLeida: (id) =>
         set((s) =>
           s.notifsLeidasIds.includes(id) ? s : { notifsLeidasIds: [...s.notifsLeidasIds, id] },
@@ -250,7 +249,6 @@ export const usePortal = create<PortalState>()(
         preguntasPublico: s.preguntasPublico,
         pasosTramite: s.pasosTramite,
         prefsPersona: s.prefsPersona,
-        notifsLeidas: s.notifsLeidas,
         notifsLeidasIds: s.notifsLeidasIds,
         sidebarColapsado: s.sidebarColapsado,
       }),
@@ -258,12 +256,17 @@ export const usePortal = create<PortalState>()(
   ),
 );
 
-/** Notificaciones sin leer — un único lugar para el badge del sidebar y la vista. */
-export function useNotifsSinLeer(): number {
-  const leidas = usePortal((s) => s.notifsLeidas);
+/**
+ * Notificaciones sin leer — un único lugar para la insignia del menú y la
+ * vista. Recibe la lista porque cada portal tiene la suya: los ids del abogado
+ * y los del ciudadano conviven en `notifsLeidasIds` sin pisarse, y así "marcar
+ * todas" en un portal no silencia las del otro.
+ */
+export function useNotifsSinLeer(
+  lista: { id: string; noLeidaPorDefecto: boolean }[] = NOTIFICACIONES,
+): number {
   const ids = usePortal((s) => s.notifsLeidasIds);
-  if (leidas) return 0;
-  return NOTIFICACIONES.filter((n) => n.noLeidaPorDefecto && !ids.includes(n.id)).length;
+  return lista.filter((n) => n.noLeidaPorDefecto && !ids.includes(n.id)).length;
 }
 
 /** Cuota derivada — un único lugar decide qué significa "ilimitada". */

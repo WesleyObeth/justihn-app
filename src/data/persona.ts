@@ -30,3 +30,22 @@ export const PREFERENCIAS_PERSONA = [
     desc: "Cuando publicamos guías de trámites que te pueden servir",
   },
 ] as const;
+
+/**
+ * Novedades de Justihn para el ciudadano — la única parte estática de su
+ * bandeja. El resto se deriva EN VIVO de lo que la persona hizo (consultas
+ * respondidas, trámites a medias): una notificación semilla que dijera "un
+ * abogado respondió" a quien no ha preguntado sería fabricar evidencia (§4.5).
+ *
+ * TODO(data): tabla `novedades` — anuncios de producto con fecha de publicación.
+ */
+export const NOVEDADES_PERSONA = [
+  {
+    id: "notif-p-bienvenida",
+    titulo: "Tu cuenta gratis está lista",
+    meta: "Guías con tu avance guardado, consultorio y calculadoras — sin costo",
+    destino: "/personas",
+    /** Se estrena sin leer: es lo primero que la persona ve al entrar. */
+    noLeidaPorDefecto: true,
+  },
+] as const;
