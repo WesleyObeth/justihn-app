@@ -3,6 +3,7 @@ import { FondoAurora } from "@/components/landing/fondo-aurora";
 import { NavAurora } from "@/components/landing/nav-aurora";
 import { PieAurora } from "@/components/landing/pie-aurora";
 import { BotonesMagneticos } from "@/components/landing/magnetico";
+import { DesplazamientoSuave } from "@/components/landing/desplazamiento-suave";
 import { Toast } from "@/components/portal/capas-globales";
 import { HidratarStore } from "@/components/portal/marco";
 
@@ -50,6 +51,7 @@ export default function LayoutPublico({ children }: { children: React.ReactNode 
         nota="Habeas data (art. 182 de la Constitución): revisa o pide la supresión de tus datos — respondemos en 72 horas hábiles. · © 2026 Justihn (demo de validación)"
       />
       <BotonesMagneticos />
+      <DesplazamientoSuave />
       <Toast />
     </div>
   );

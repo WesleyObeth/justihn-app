@@ -363,6 +363,23 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     servidor. Todo lo nuevo lo lee el crawler (la home ya tuvo un incidente de
     contenido invisible — ver la nota de `useSearchParams` bajo Suspense).
 
+- **⤵️ DESPLAZAMIENTO SUAVE A LAS ANCLAS —
+  `components/landing/desplazamiento-suave.tsx` (2026-08-30):** al pulsar un
+  enlace del nav (o del pie, o cualquier ancla de la página) la página baja o
+  sube animada y la sección de destino da un **destello** de 1,4 s
+  (`.destello-ancla`, pseudo-elemento con halo celeste). El destello no es
+  adorno: al frenar el scroll no siempre está claro qué bloque pediste.
+  - ⚠️ **Va en JS y NO con `html { scroll-behavior: smooth }`**, que era lo
+    obvio: esa regla es global y alcanza también al salto al principio que
+    hace Next al cambiar de ruta — en una home de 8.000px, abrir un trámite se
+    volvería un scroll animado de varios segundos. Aquí se interceptan solo
+    las anclas de la propia página (`#x` y `/#x` estando en `/`), respetando
+    los atajos del navegador (⌘/ctrl/shift-clic). Verificado: cambiar de ruta
+    sigue siendo instantáneo.
+  - Se detiene 96px por debajo del borde para que la nav fija no tape el
+    encabezado, actualiza el hash con `pushState` (que no desplaza) y con
+    `prefers-reduced-motion` salta directo y sin destello.
+
 - **🧲 BOTÓN MAGNÉTICO (GSAP) — `components/landing/magnetico.tsx` (2026-08-30):**
   los elementos con clase **`.magnetic`** se van hacia el cursor (factor
   **0.35**) con `gsap.quickTo` y ease **`elastic.out(1,0.4)`**, y vuelven a

@@ -380,6 +380,36 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
+/* ── Destello del ancla ──
+   Tras el desplazamiento suave, la sección de destino se señala un instante.
+   Es un pseudo-elemento para no tocar el fondo real del bloque, y no captura
+   el ratón. Con `prefers-reduced-motion` no se añade la clase (lo decide el
+   JS), así que aquí no hace falta guardarlo. */
+@keyframes destelloAncla {
+  0% {
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.destello-ancla {
+  position: relative;
+}
+.destello-ancla::before {
+  content: "";
+  position: absolute;
+  inset: -14px -20px;
+  border-radius: 22px;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(70% 60% at 50% 40%, rgba(21, 132, 199, 0.13), transparent 72%);
+  animation: destelloAncla 1.4s ease-out both;
+}
+
 /* ── Utilidades de la landing (contenido z-2, cards glass) ── */
 .landing-contenido {
   position: relative;
