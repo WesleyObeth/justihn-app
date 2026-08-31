@@ -263,7 +263,7 @@ export const ABOGADA_DEMO: PerfilAbogado = {
   iniciales: "MC",
   colegiacion: "Colegiación CAH Nº 00000",
   ciudad: "Tegucigalpa, M.D.C.",
-  bio: "12 años de ejercicio · Litigio laboral y civil, derecho de familia. Atiende consultas en línea.",
+  bio: "Litigio laboral y civil, derecho de familia. Atiende consultas en línea.",
   especialidades: ["Laboral", "Civil", "Familia"],
   email: "maria.castillo@bufete.hn",
   whatsapp: "+504 9999-0000",

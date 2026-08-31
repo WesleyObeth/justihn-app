@@ -196,6 +196,12 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   una respuesta suya en el consultorio → la acción, con su nombre.
   - **La cita es el diferencial.** Deja juzgar CÓMO explica antes de
     escribirle, y ningún competidor puede copiarla sin un consultorio detrás.
+    **Pero solo donde se decide:** la card tiene variante **`compacta`**
+    (decisión Wesley) que la home usa para meter TRES por fila, cambiando la
+    cita por el resumen de especialidad. La home es vitrina —enseña que hay
+    abogados y de qué materia—; la cita es munición para decidir y va entera
+    en el directorio completo. Clamparla a dos líneas la cortaría a media
+    frase, que es peor que no ponerla.
     ⚠️ `TODO(data)`: sale de su última respuesta destacada en `leads`, NO de un
     campo que el abogado redacte — si lo escribe él, vuelve a ser marketing.
   - **Fuera "★ valoración"** de TODAS las superficies públicas (eran 5: home,

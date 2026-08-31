@@ -17,6 +17,12 @@
  *      círculo del producto (responder en público es lo que trae clientes).
  *   5. **La acción** — con su nombre, porque se le escribe a una persona.
  *
+ * **`compacta`** (decisión Wesley 2026-08-30): en la home caben TRES por fila
+ * y la cita se cambia por el resumen de especialidad. La home es vitrina —
+ * enseña que hay abogados y de qué materia; la cita es munición para DECIDIR,
+ * y ahí sí va entera, en el directorio completo. Además una cita clampada a
+ * dos líneas se cortaría a media frase, que es peor que no ponerla.
+ *
  * ⚠️ Lo que NO lleva, a propósito:
  *   - **★ valoración** — no existe sistema de reseñas: ese número no lo
  *     produce nadie. Prueba fabricada, y aquí decide a quién contrata alguien.
@@ -36,11 +42,17 @@ function primerNombre(nombre: string) {
   return nombre.replace(/^Abg\.\s*/, "").split(" ")[0];
 }
 
-export function TarjetaAbogado({ abogado: a }: { abogado: AbogadoDirectorio }) {
+export function TarjetaAbogado({
+  abogado: a,
+  compacta = false,
+}: {
+  abogado: AbogadoDirectorio;
+  compacta?: boolean;
+}) {
   const mostrarToast = usePortal((s) => s.mostrarToast);
 
   return (
-    <div className="glass-card flex flex-col p-5">
+    <div className={`glass-card flex flex-col ${compacta ? "p-4.5" : "p-5"}`}>
       <div className="flex flex-wrap gap-1.5">
         {a.materias.map((m) => (
           <span
@@ -53,17 +65,26 @@ export function TarjetaAbogado({ abogado: a }: { abogado: AbogadoDirectorio }) {
         ))}
       </div>
 
-      <div className="mt-3.5 flex items-center gap-3">
+      <div className={`flex items-center gap-3 ${compacta ? "mt-3" : "mt-3.5"}`}>
         <span
-          className="font-display grid h-[46px] w-[46px] shrink-0 place-items-center rounded-full text-[15px] font-semibold text-white"
-          style={{ background: "linear-gradient(180deg,#0d2144,#0a1830)" }}
+          className="font-display grid shrink-0 place-items-center rounded-full font-semibold text-white"
+          style={{
+            width: compacta ? 40 : 46,
+            height: compacta ? 40 : 46,
+            fontSize: compacta ? 13 : 15,
+            background: "linear-gradient(180deg,#0d2144,#0a1830)",
+          }}
         >
           {a.iniciales}
         </span>
         <div className="min-w-0">
-          <span className="block text-[15px] leading-[1.25] font-bold">{a.nombre}</span>
-          <span className="text-[12px]" style={{ color: "var(--muted)" }}>
-            {a.ciudad} · {a.anios} años de ejercicio
+          <span
+            className={`block leading-[1.25] font-bold ${compacta ? "text-[14px]" : "text-[15px]"}`}
+          >
+            {a.nombre}
+          </span>
+          <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
+            {a.ciudad} · {a.anios} años
           </span>
         </div>
       </div>
@@ -85,19 +106,28 @@ export function TarjetaAbogado({ abogado: a }: { abogado: AbogadoDirectorio }) {
         {a.notario && <InsigniaNotario verificado={a.notario.verificado} />}
       </div>
 
-      <blockquote
-        className="mt-4 flex-1 rounded-[12px] border-l-[3px] py-2.5 pr-3 pl-3.5 text-[13px] leading-[1.6]"
-        style={{
-          borderColor: "var(--color-celeste)",
-          background: "rgba(21,132,199,.06)",
-          color: "var(--ink)",
-        }}
-      >
-        “{a.cita}”
-        <footer className="mt-1.5 text-[11px]" style={{ color: "var(--muted)" }}>
-          De una respuesta suya en el consultorio
-        </footer>
-      </blockquote>
+      {compacta ? (
+        <p
+          className="mt-3 flex-1 text-[12.5px] leading-[1.55]"
+          style={{ color: "var(--muted)" }}
+        >
+          {a.bio}
+        </p>
+      ) : (
+        <blockquote
+          className="mt-4 flex-1 rounded-[12px] border-l-[3px] py-2.5 pr-3 pl-3.5 text-[13px] leading-[1.6]"
+          style={{
+            borderColor: "var(--color-celeste)",
+            background: "rgba(21,132,199,.06)",
+            color: "var(--ink)",
+          }}
+        >
+          “{a.cita}”
+          <footer className="mt-1.5 text-[11px]" style={{ color: "var(--muted)" }}>
+            De una respuesta suya en el consultorio
+          </footer>
+        </blockquote>
+      )}
 
       {/* TODO(fase 2): abre una consulta DIRIGIDA — el mismo circuito del
           consultorio pero con destinatario, para que le llegue como lead a
@@ -109,13 +139,14 @@ export function TarjetaAbogado({ abogado: a }: { abogado: AbogadoDirectorio }) {
             `Así le escribes a ${a.nombre} desde Justihn — su respuesta queda pública (demo de validación)`,
           )
         }
-        className="mt-4 w-full cursor-pointer rounded-lg py-2.5 text-[13px] font-semibold text-white"
+        className={`w-full cursor-pointer rounded-lg font-semibold text-white ${compacta ? "mt-3.5 py-2 text-[12.5px]" : "mt-4 py-2.5 text-[13px]"}`}
         style={{ background: "var(--turq)" }}
       >
         Consultar con {primerNombre(a.nombre)}
       </button>
       <p className="mt-2 text-center text-[11px]" style={{ color: "var(--muted)" }}>
-        Suele responder {a.responde} · {a.enLinea ? "en línea y presencial" : "presencial"}
+        Suele responder {a.responde}
+        {compacta ? "" : ` · ${a.enLinea ? "en línea y presencial" : "presencial"}`}
       </p>
     </div>
   );

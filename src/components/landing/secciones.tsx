@@ -519,9 +519,9 @@ export function SeccionDirectorio() {
         ))}
       </div>
 
-      <div className="mx-auto mt-7 grid max-w-[900px] grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {abogados.map((a) => (
-          <TarjetaAbogado key={a.id} abogado={a} />
+          <TarjetaAbogado key={a.id} abogado={a} compacta />
         ))}
       </div>
     </section>
