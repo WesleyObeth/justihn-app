@@ -154,6 +154,24 @@ promesas que ya estaban hechas y no existían:
     el consultorio — porque puede que la guía no exista todavía.
   - **La card muestra pasos y `tasaCorta`**, que estaba en el seed sin usarse:
     "cuánto me cuesta" obligaba a abrir la guía para saberlo.
+- **El detalle de una guía pone lo PRÁCTICO antes que el procedimiento**
+  (refinado 2026-08-31). Requisitos, costo y el sello de fuente estaban **al
+  final**, después de seis pasos largos — y son justo lo que hay que saber
+  ANTES de salir de casa. Ahora van arriba; los pasos, después.
+  - **El checklist no se veía marcable**: el círculo numerado ES el control,
+    pero se leía como numeración. Ahora la sección lo dice ("Marca lo que ya
+    hiciste"), el número **se cambia por un check al pasar por encima**, y
+    **toda la fila es clicable** — a un objetivo de 26px se le apunta mal, sobre
+    todo en un teléfono. ⚠️ El aviso de profesional va FUERA del botón: lleva su
+    propio enlace, y un enlace dentro de un botón no se puede activar.
+  - **La ruta se hace visible** (`getContextoRuta`): que el RTN habilita el CAI
+    y el CAI el permiso es "lo que no se encuentra googleando" (§1.3) y solo
+    existía en la home pública — quien abría la guía desde el portal terminaba
+    sin enterarse de que había un siguiente. La columna lateral muestra los 5
+    pasos de la ruta, marca en verde los que ya completó, y **completar ofrece
+    el siguiente**. Los procesos judiciales no pertenecen a ninguna ruta y la
+    pantalla no se la inventa; hay test.
+  - La institución del encabezado **enlaza a su pantalla**, que ahora existe.
 - **Instituciones** (2026-08-31) es el pedido literal del socio: "ver todas las
   instituciones del Estado y los trámites de cada una — ej. el IP". El seed ya
   lo tenía (`INSTITUCIONES`, 9, todas con trámite). ⚠️ No contradice §1.3: allí
@@ -566,7 +584,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (87 tests de invariantes)
+pnpm test         # Vitest (91 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

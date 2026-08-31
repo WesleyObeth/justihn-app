@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
-import { buscarGuias, RUTAS_TRAMITE, TRAMITES } from "@/data/tramites";
+import { buscarGuias, getContextoRuta, RUTAS_TRAMITE, TRAMITES } from "@/data/tramites";
 import { isFuenteOficial } from "@/lib/security/sanitize";
 
 /**
@@ -194,5 +194,48 @@ describe("tipos de guía — las dos secciones cubren todo", () => {
     const tramites = TRAMITES.filter((t) => t.tipo === "tramite").length;
     const procesos = TRAMITES.filter((t) => t.tipo === "proceso").length;
     expect(tramites + procesos).toBe(TRAMITES.length);
+  });
+});
+
+/**
+ * El encadenamiento (el RTN habilita el CAI, el CAI el permiso) es lo que el
+ * producto sabe y no se encuentra googleando. El detalle lo dibuja a partir de
+ * este helper: si devolviera mal el vecino, la guía mandaría a la persona al
+ * trámite equivocado.
+ */
+describe("getContextoRuta — el siguiente de la ruta", () => {
+  it("encadena en el orden del seed", () => {
+    const rtn = getContextoRuta("abrir-rtn");
+    expect(rtn?.indice).toBe(0);
+    expect(rtn?.anterior).toBeUndefined();
+    expect(rtn?.siguiente?.tramite.id).toBe("facturacion-cai");
+
+    const cai = getContextoRuta("facturacion-cai");
+    expect(cai?.anterior?.tramite.id).toBe("abrir-rtn");
+    expect(cai?.siguiente?.tramite.id).toBe("permiso-operacion");
+  });
+
+  it("el último de una ruta no tiene siguiente", () => {
+    for (const ruta of RUTAS_TRAMITE) {
+      const ultimo = ruta.pasos[ruta.pasos.length - 1]!;
+      expect(getContextoRuta(ultimo.tramiteId)?.siguiente, ruta.id).toBeUndefined();
+    }
+  });
+
+  it("una guía fuera de toda ruta no inventa una", () => {
+    // Los procesos judiciales no se encadenan (§1.3).
+    expect(getContextoRuta("divorcio-ciudadano")).toBeUndefined();
+    expect(getContextoRuta("reclamo-consumidor")).toBeUndefined();
+    expect(getContextoRuta("no-existe")).toBeUndefined();
+  });
+
+  it("indice y total concuerdan con la ruta", () => {
+    for (const ruta of RUTAS_TRAMITE) {
+      ruta.pasos.forEach((paso, i) => {
+        const c = getContextoRuta(paso.tramiteId)!;
+        expect(c.indice, paso.tramiteId).toBe(i);
+        expect(c.total, paso.tramiteId).toBe(ruta.pasos.length);
+      });
+    }
   });
 });

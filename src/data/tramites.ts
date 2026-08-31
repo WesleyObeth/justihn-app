@@ -1060,6 +1060,43 @@ export function buscarGuias(termino: string): Tramite[] {
   );
 }
 
+/**
+ * Dónde cae una guía dentro de su ruta, si pertenece a alguna.
+ *
+ * `RUTAS_TRAMITE` ya sabe que el RTN habilita el CAI y el CAI el permiso de
+ * operación — ese encadenamiento es "lo que no se encuentra googleando" (§1.3)
+ * y hasta ahora solo se veía en la home pública: quien abría la guía desde el
+ * portal terminaba el trámite sin enterarse de que había un siguiente.
+ */
+export function getContextoRuta(tramiteId: string):
+  | {
+      ruta: RutaTramite;
+      indice: number;
+      total: number;
+      anterior?: { tramite: Tramite; nota: string };
+      siguiente?: { tramite: Tramite; nota: string; condicional: boolean };
+    }
+  | undefined {
+  for (const ruta of RUTAS_TRAMITE) {
+    const indice = ruta.pasos.findIndex((p) => p.tramiteId === tramiteId);
+    if (indice < 0) continue;
+    const enlazar = (i: number) => {
+      const paso = ruta.pasos[i];
+      if (!paso) return undefined;
+      const tramite = TRAMITES.find((t) => t.id === paso.tramiteId);
+      return tramite ? { tramite, nota: paso.nota, condicional: paso.condicional === true } : undefined;
+    };
+    return {
+      ruta,
+      indice,
+      total: ruta.pasos.length,
+      anterior: enlazar(indice - 1),
+      siguiente: enlazar(indice + 1),
+    };
+  }
+  return undefined;
+}
+
 export function getInstitucion(id: string): Institucion | undefined {
   return INSTITUCIONES.find((i) => i.id === id);
 }
