@@ -5,7 +5,7 @@ import type { Materia } from "@/types/dominio";
  * grande del feedback del socio abogado (2026-08-29). Sirve a las DOS vías:
  * la gente común busca "cómo sacar el RTN"; el abogado lo usa de referencia.
  *
- * HONESTIDAD (regla #1): las 13 guías están VERIFICADAS contra su fuente
+ * HONESTIDAD (regla #1): todas las guías están VERIFICADAS contra su fuente
  * oficial (backlog #3c, cerrado 2026-08-29) — cada una lleva `fuenteUrl` y
  * `fuenteNombre`, que es lo que enciende el sello "Verificado con la fuente
  * oficial" en la UI. Ya no quedan marcadores "L ___": los montos, plazos y
@@ -130,6 +130,13 @@ export const INSTITUCIONES: Institucion[] = [
     nombre: "Secretaría de Trabajo y Seguridad Social",
     sigla: "STSS",
     descripcion: "Conciliación laboral y reclamos administrativos antes de demandar.",
+  },
+  {
+    id: "dgpc",
+    nombre: "Dirección General de Protección al Consumidor",
+    sigla: "DGPC",
+    descripcion: "Denuncias por productos vencidos, defectuosos y mala prestación de servicios.",
+    sitio: "https://sde.gob.hn/proteccion-al-consumidor/",
   },
   {
     id: "registro-mercantil",
@@ -704,6 +711,77 @@ export const TRAMITES: Tramite[] = [
       "⏳ DOS MESES. Es el plazo del art. 864 y corre desde que terminó el contrato — es la razón #1 por la que se pierden reclamos legítimos en Honduras.\n\n✍️ Cuidado con el finiquito: el preaviso, el auxilio de cesantía y la indemnización no pueden ser objeto de compensación, venta o cesión, ni ser embargados, salvo en la mitad por pensiones alimenticias (art. 123 a). Y es absolutamente nula la cláusula del contrato que pretenda interrumpir la continuidad de tus servicios (art. 123 d): la antigüedad no se «reinicia» por firmar contratos nuevos.\n\n🩺 La continuidad del trabajo no se interrumpe por enfermedad, vacaciones, huelga o paros legales (art. 123 c).",
     fuenteUrl: "https://www.poderjudicial.gob.hn/Cedij/Cdigos/Codigo%20del%20Trabajo%20(mayo%202018).pdf",
     fuenteNombre: "Código del Trabajo (edición CEDIJ, mayo 2018) — Poder Judicial de Honduras",
+  },
+  /**
+   * Reclamo de consumo (2026-08-31). Nace del caso más común que el portal no
+   * cubría: comprar algo vencido o que sale malo. Todo lo que afirma sale de
+   * dos fuentes estatales verificadas el 2026-08-31:
+   *  · Reglamento de la Ley (Acuerdo 084-2021, La Gaceta 35,807 del 27-dic-2021),
+   *    PDF con texto en el Tribunal Superior de Cuentas — arts. 28, 31, 50 y la
+   *    tabla de infracciones del art. 99.
+   *  · La ficha de la DGPC en la Secretaría de Desarrollo Económico (canales,
+   *    requisitos y gratuidad de la denuncia).
+   * ⚠️ La LEY misma (Decreto 24-2008) está escaneada sin capa de texto en el
+   * TSC: por eso esta guía cita sus artículos SOLO cuando el Reglamento los
+   * transcribe, y enlaza como fuente el Reglamento, que sí es legible.
+   */
+  {
+    id: "reclamo-consumidor",
+    nombre: "Me vendieron algo vencido o defectuoso",
+    tipo: "proceso",
+    institucionId: "dgpc",
+    paraQuien:
+      "Cualquiera que compró un producto vencido, que salió malo, o que pagó por un servicio que no le cumplieron",
+    resumen:
+      "Vender un producto después de su fecha de vencimiento es una infracción MUY GRAVE —de 6 a 10 salarios mínimos la primera vez— y denunciarlo no te cuesta nada. Dos cosas que casi nadie sabe: el establecimiento está obligado a tener un libro de quejas a la vista en la caja, y si lo que compraste tiene desperfecto de fábrica tienes 30 días para reclamar y ellos 15 para cambiártelo o devolverte el dinero.",
+    materia: "Consumidor",
+    pasos: [
+      {
+        titulo: "No botes nada: la factura es tu caso",
+        detalle:
+          "Guarda el producto tal como está, con su empaque y su fecha de vencimiento visible, y sobre todo la factura o el comprobante. La DGPC pide expresamente «fotocopia de tarjeta de identidad y facturas que sustenten la denuncia»: sin comprobante de compra la denuncia se sostiene mucho peor. Tómale fotos ese mismo día — al producto, a la etiqueta con la fecha y al ticket.",
+      },
+      {
+        titulo: "Pide el libro de quejas ahí mismo, antes de irte",
+        detalle:
+          "Todo establecimiento debe tener un libro de quejas, físico o digital, para que dejes asentada tu reclamación (art. 28 del Reglamento). Y no puede estar guardado en una oficina: el art. 31 obliga a exhibirlo «en las cercanías de los lugares de cobranza o atención al cliente», con un cartel en la línea de caja que avise que existe. Si te dicen que no hay o que no te lo pueden dar, eso también es denunciable — anota la hora y con quién hablaste.",
+      },
+      {
+        titulo: "Si el producto salió defectuoso: 30 días tuyos, 15 días suyos",
+        detalle:
+          "Cuando reclamas al vendedor por un desperfecto de fábrica dentro de los treinta (30) días calendario de la compra, el proveedor debe darte el cambio en un plazo de quince (15) días calendario, por otro producto de idénticas características o de distintas del mismo valor, «en su defecto la devolución del dinero» (art. 50 del Reglamento). Ojo: no aplica si la falla la causaste tú.",
+      },
+      {
+        titulo: "Producto vencido: es de las infracciones más graves que hay",
+        detalle:
+          "«Ofrecer o vender bienes con posterioridad a su fecha de vencimiento» está clasificado como infracción MUY GRAVE, con sanción de 6 a 10 salarios mínimos por primera vez (tabla de infracciones del Reglamento, referida al art. 20 numeral 13 de la Ley). Para graduar la multa se toma en cuenta el tipo y la cantidad de producto, el daño que pueda causar a la salud y la capacidad económica del establecimiento (art. 99). No es un descuido menor: si el producto es alimento o medicina, dilo en la denuncia.",
+      },
+      {
+        titulo: "Denuncia ante la DGPC — es gratis y tienes cuatro vías",
+        detalle:
+          "La Dirección General de Protección al Consumidor recibe la denuncia sin costo: «este trámite no tiene costo para el ciudadano». Puedes hacerlo por la línea gratuita 115 (fijo o celular), por WhatsApp al 8863-1086, en línea desde la plataforma SDE-SOL, o presencialmente en sus oficinas. Lleva copia de tu identidad y las facturas, tus datos de contacto, los datos del establecimiento denunciado, el relato de lo que pasó y qué pides concretamente (cambio, devolución del dinero, o sanción).",
+      },
+      {
+        titulo: "Si el monto es alto o hubo daño a la salud, habla con un abogado",
+        detalle:
+          "La denuncia administrativa busca sancionar al proveedor y que te repongan lo tuyo, pero no siempre resuelve una indemnización por el daño causado. Si el producto te enfermó, si el monto es importante, o si el establecimiento se niega después de la resolución, un abogado de consumo o civil te dice si conviene la vía judicial además de la administrativa.",
+        profesional: "abogado",
+      },
+    ],
+    requisitos: [
+      "Fotocopia de tu tarjeta de identidad",
+      "Factura o comprobante que sustente la denuncia",
+      "El producto, con su empaque y la fecha de vencimiento visible",
+      "Tus datos: nombre, identidad, dirección y teléfono",
+      "Datos del establecimiento denunciado: nombre, dirección y teléfono",
+      "Relato de lo ocurrido y qué pides (cambio, devolución o sanción)",
+    ],
+    tasa: "Gratuito. La DGPC lo dice expresamente: «este trámite no tiene costo para el ciudadano». Tampoco cuesta nada usar el libro de quejas del establecimiento.",
+    tasaCorta: "Gratuito",
+    nota: "El texto de la Ley de Protección al Consumidor (Decreto 24-2008) solo está publicado como PDF escaneado, así que esta guía cita sus artículos a través del Reglamento vigente (Acuerdo 084-2021), que sí es consultable.",
+    fuenteUrl: "https://www.tsc.gob.hn/web/leyes/Acuerdo-084-2021.pdf",
+    fuenteNombre:
+      "Reglamento de la Ley de Protección al Consumidor (Acuerdo 084-2021), La Gaceta 35,807 — Tribunal Superior de Cuentas · canales y requisitos: DGPC (Secretaría de Desarrollo Económico)",
   },
   {
     id: "pension-alimenticia",

@@ -105,6 +105,18 @@ promesas que ya estaban hechas y no existían:
   Mercantil, vigilancia 30 días) aparece **en preparación**: depende de cuentas
   SURE/CCIT que no existen, así que no se cobra por adelantado ni se le pone
   precio (§4.5).
+- **Reclamo de consumo** (2026-08-31, guía 14ª) cierra el hueco más grande que
+  tenía la vía B: comprar algo vencido o defectuoso. `consumidor` no aparecía en
+  ningún archivo del proyecto, y **la materia `Consumidor` no existía**, así que
+  la guía no habría podido recomendar abogado — el funnel guía→lead se cortaba.
+  Nacen con ella la materia, la institución `dgpc` y un perfil de esa rama;
+  `tramites.test.ts` ya lo exigía y falló antes de que existiera.
+  ⚠️ **La Ley (Decreto 24-2008) está escaneada sin capa de texto** en el TSC, así
+  que la guía cita sus artículos SOLO donde el Reglamento vigente los transcribe
+  (Acuerdo 084-2021, La Gaceta 35,807), que sí es legible y es la `fuenteUrl`.
+  Verificado textualmente: arts. 28 y 31 (libro de quejas exhibido en caja),
+  art. 50 (30 días para reclamar, 15 para cambiar o devolver el dinero) y la
+  tabla del art. 99 (vender vencido = MUY GRAVE, 6-10 salarios mínimos).
 - **La calculadora de plazos NO es la del abogado con otro nombre.** La suya pide
   "días de plazo", que un ciudadano no sabe: aquí elige el **hecho** que le pasó
   y el plazo lo pone la ley. Los tres salen de guías ya verificadas
@@ -423,6 +435,11 @@ oscuro, no después.
     el seed y en su URL. Es invisible leyendo el código, así que `tramites.test.ts`
     lo topa (cada trámite en exactamente una ruta, sin repetir, sin inventar ids,
     sin colar procesos judiciales, y todas con `tasaCorta`).
+13b. **Un conteo de guías escrito a mano se queda viejo al nacer la 14ª.** La
+    tarjeta social de la home decía "13 guías con fuente" y el número vive en
+    `TRAMITES.length`: ahora se deriva del seed. `og.test.ts` acepta plantillas
+    además de comillas por eso — si vuelve a aceptar solo `"..."`, el sello
+    derivado desaparece del conteo y el test miente.
 13. **`tasaCorta` y `tasa` no pueden decir cosas distintas** — la corta es la
     verificada condensada a una línea, no un dato nuevo. Al editar una, revisar la otra.
 14. **Ninguna página nombra la marca sin `absolute`**, o la pestaña dice "Justihn"
@@ -488,7 +505,7 @@ diferencias de motor de §4.7).
 Los tests cubren lo que no se ve leyendo el código: el harness de seguridad
 (inyección, enmascarado, hosts oficiales), el determinismo y honestidad del router
 (expedientes reales / inexistentes / casos propios), prestaciones, plazos, vía
-procesal, las 13 guías con fuente en la whitelist, los plazos legales (que su artículo
+procesal, las 14 guías con fuente en la whitelist, los plazos legales (que su artículo
 siga en el texto de su guía, y el cálculo por meses/años en bisiestos y meses
 cortos), las instituciones (ninguna card vacía, ningún `institucionId` huérfano,
 ningún portal fuera de la whitelist), los títulos de página, las
@@ -600,7 +617,7 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
   comportamiento esperado, no como fallo.
 - ⚙️ **Pendientes del socio abogado:** revisar las `respuestaDemo` de los leads
   (orientaciones generales que se añadieron para que el consultorio no prometiera
-  respuestas y enseñara preguntas sin contestar) · contrastar las 13 guías contra
+  respuestas y enseñara preguntas sin contestar) · contrastar las 14 guías contra
   la práctica real y vigilar las tarifas (la de ARSA es una tabla viva) · decir
   cómo se comprueba una habilitación notarial vigente (el PJ no publica padrón, así
   que hoy el exequátur del directorio es **declarado, no verificado**, y la UI lo

@@ -19,7 +19,10 @@ export type Materia =
   | "Contencioso Adm."
   | "Familia"
   | "Mercantil"
-  | "Notarial";
+  | "Notarial"
+  // Nace 2026-08-31 con la guía de reclamo de consumo: sin materia propia, la
+  // guía no podría recomendar abogado y el funnel guía→lead quedaría cortado.
+  | "Consumidor";
 
 export type PlanId = "gratis" | "profesional" | "premium";
 

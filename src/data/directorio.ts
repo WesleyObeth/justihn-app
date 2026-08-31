@@ -142,6 +142,23 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     notario: { exequatur: "N-2011-0288", verificado: false },
   },
   {
+    id: "gabriela-nunez",
+    nombre: "Abg. Gabriela Núñez",
+    iniciales: "GN",
+    ciudad: "San Pedro Sula",
+    materias: ["Consumidor", "Civil"],
+    bio: "Reclamos de consumo y garantías: productos vencidos o defectuosos, cobros indebidos y servicios que no cumplieron lo prometido.",
+    anios: 11,
+    responde: "en 24 horas",
+    cita:
+      "Antes de pelear, pide el libro de quejas y deja constancia ahí. Ese asiento vale más que diez llamadas al gerente.",
+    enLinea: true,
+    valoracion: "4.8",
+    contactos: 11,
+    validado: true,
+    premium: false,
+  },
+  {
     id: "ana-varela",
     nombre: "Abg. Ana Varela",
     iniciales: "AV",

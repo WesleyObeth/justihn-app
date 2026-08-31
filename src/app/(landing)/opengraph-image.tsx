@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { fuentesOg, OG_CONTENT_TYPE, OG_SIZE, TarjetaOg } from "@/lib/og/tarjeta";
+import { TRAMITES } from "@/data/tramites";
 
 /**
  * Tarjeta de la vía B (home ciudadana). Habla como la gente busca —
@@ -17,7 +18,9 @@ export default async function Imagen() {
         eyebrow="Para personas"
         titulo="Tu trámite, paso a paso y sin vueltas"
         bajada="Requisitos, costos y tiempos de los trámites del Estado. Consulta gratis con abogados de Honduras."
-        sellos={["13 guías con fuente", "Consultorio gratis", "Abogados por materia"]}
+        // El conteo sale del seed: escrito a mano se queda viejo en cuanto
+        // nace una guía, y esta tarjeta es lo que se ve al compartir el enlace.
+        sellos={[`${TRAMITES.length} guías con fuente`, "Consultorio gratis", "Abogados por materia"]}
       />
     ),
     { ...size, fonts: await fuentesOg() },

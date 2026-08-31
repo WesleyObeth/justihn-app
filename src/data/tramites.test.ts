@@ -11,7 +11,7 @@ import { isFuenteOficial } from "@/lib/security/sanitize";
  */
 
 describe("guías de trámites — sello de fuente oficial", () => {
-  it("las 13 guías están verificadas contra una fuente", () => {
+  it("toda guía está verificada contra una fuente", () => {
     const sinFuente = TRAMITES.filter((t) => !t.fuenteUrl);
     expect(sinFuente.map((t) => t.id)).toEqual([]);
   });

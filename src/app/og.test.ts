@@ -66,10 +66,15 @@ describe("vista previa social (Open Graph)", () => {
   it("los sellos son tres y cortos — son chips, no frases", () => {
     for (const f of tarjetas) {
       const src = readFileSync(f, "utf8");
-      const sellos = /sellos=\{\[([^\]]+)\]\}/
-        .exec(src)?.[1]
-        ?.match(/"([^"]+)"/g)
-        ?.map((s) => s.slice(1, -1));
+      const lista = /sellos=\{\[([^\]]+)\]\}/.exec(src)?.[1];
+      // Acepta comillas y plantillas: un sello puede derivar un conteo del seed
+      // (`${TRAMITES.length} guías…`) para no quedarse viejo al nacer una guía.
+      const sellos = lista
+        ?.match(/"[^"]+"|`[^`]+`/g)
+        ?.map((s) => s.slice(1, -1))
+        // Una interpolación cuenta como su valor renderizado, no como su código:
+        // se mide con un número de dos cifras, el peor caso realista.
+        .map((s) => s.replace(/\$\{[^}]+\}/g, "00"));
       expect(sellos, f).toHaveLength(3);
       for (const s of sellos!) expect(s.length, `${f}: "${s}"`).toBeLessThanOrEqual(24);
     }
