@@ -13,9 +13,16 @@
 import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { CUOTA_BASE, NOTIFICACIONES } from "@/data/catalogo";
+import { ABOGADA_DEMO, CUOTA_BASE, NOTIFICACIONES } from "@/data/catalogo";
 import { VIGILADOS_INICIALES, VIGILADOS_INICIALES_PERSONA } from "@/data/monitoreo";
-import type { Lead, Materia, MensajeChat, NombreVigilado, PlanId } from "@/types/dominio";
+import type {
+  Lead,
+  Materia,
+  MensajeChat,
+  NombreVigilado,
+  PlanId,
+  RespuestaConsulta,
+} from "@/types/dominio";
 
 export interface PreferenciasNotificacion {
   digest: boolean;
@@ -54,7 +61,8 @@ interface PortalState {
   /** Checklist del "paso a paso": índices completados por proceso. Persistido. */
   pasosHechos: Record<string, number[]>;
   /** Respuestas publicadas en el consultorio, por lead. Persistido. */
-  leadsRespondidos: Record<string, string>;
+  /** Varias por consulta: el ciudadano compara antes de escribirle a uno. */
+  leadsRespondidos: Record<string, RespuestaConsulta[]>;
   /** Nombres bajo monitoreo (feature Pro). Persistido. */
   nombresVigilados: NombreVigilado[];
   /**
@@ -92,7 +100,7 @@ interface PortalState {
   setConsultaPendiente: (consulta: string | null) => void;
   togglePasoHecho: (procesoId: string, indice: number) => void;
   reiniciarProceso: (procesoId: string) => void;
-  responderLead: (leadId: string, respuesta: string) => void;
+  responderLead: (leadId: string, respuesta: string, abogadoId?: string) => void;
   vigilarNombre: (nombre: string, tipo: NombreVigilado["tipo"]) => void;
   vigilarNombrePersona: (nombre: string) => void;
   dejarDeVigilarPersona: (id: string) => void;
@@ -183,8 +191,22 @@ export const usePortal = create<PortalState>()(
         }),
       reiniciarProceso: (procesoId) =>
         set((s) => ({ pasosHechos: { ...s.pasosHechos, [procesoId]: [] } })),
-      responderLead: (leadId, respuesta) =>
-        set((s) => ({ leadsRespondidos: { ...s.leadsRespondidos, [leadId]: respuesta } })),
+      // Añade, no reemplaza. Un mismo abogado reescribe LA SUYA; otro abogado
+      // suma la propia — que es lo que el portal del abogado ya prometía.
+      responderLead: (leadId, respuesta, abogadoId = ABOGADA_DEMO.id) =>
+        set((s) => {
+          const previas = s.leadsRespondidos[leadId] ?? [];
+          const mia: RespuestaConsulta = { abogadoId, texto: respuesta, cuando: "reciente" };
+          const yaEstaba = previas.some((r) => r.abogadoId === abogadoId);
+          return {
+            leadsRespondidos: {
+              ...s.leadsRespondidos,
+              [leadId]: yaEstaba
+                ? previas.map((r) => (r.abogadoId === abogadoId ? mia : r))
+                : [...previas, mia],
+            },
+          };
+        }),
       // id = slug del nombre: determinista y evita duplicados por diseño.
       vigilarNombre: (nombre, tipo) =>
         set((s) => {
@@ -256,13 +278,38 @@ export const usePortal = create<PortalState>()(
       name: "justihn-portal-v1",
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
-      // v1: los ids de plan cambiaron (base→profesional, pro→premium) al fijar
-      // la marca de los planes; el storage anterior se migra sin romperse.
-      version: 1,
-      migrate: (persistido) => {
-        const s = persistido as { plan?: string } | undefined;
-        if (s?.plan === "base") s.plan = "profesional";
-        if (s?.plan === "pro") s.plan = "premium";
+      /**
+       * Migraciones encadenadas, de la más vieja a la más nueva.
+       *  v1: los ids de plan (base→profesional, pro→premium) al fijar la marca.
+       *  v2: `leadsRespondidos` pasó de `Record<id, string>` a una LISTA de
+       *      respuestas. Sin esto, un navegador con datos previos haría `.map`
+       *      sobre un string y la pantalla reventaría — el store se persiste
+       *      desde el primer día, así que hay gente con el formato viejo.
+       */
+      version: 2,
+      migrate: (persistido, version) => {
+        const s = persistido as
+          | { plan?: string; leadsRespondidos?: Record<string, unknown> }
+          | undefined;
+        if (!s) return persistido;
+
+        if (version < 1) {
+          if (s.plan === "base") s.plan = "profesional";
+          if (s.plan === "pro") s.plan = "premium";
+        }
+
+        if (version < 2 && s.leadsRespondidos) {
+          s.leadsRespondidos = Object.fromEntries(
+            Object.entries(s.leadsRespondidos).map(([id, valor]) => [
+              id,
+              typeof valor === "string"
+                ? [{ abogadoId: ABOGADA_DEMO.id, texto: valor, cuando: "reciente" }]
+                : Array.isArray(valor)
+                  ? valor
+                  : [],
+            ]),
+          );
+        }
         return persistido;
       },
       partialize: (s) => ({

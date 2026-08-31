@@ -427,6 +427,19 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
    tocar un prompt (§3.2 del blueprint). Cubierto por tests.
 3. **Fallar cerrado.** Rutas `role: "session"` devuelven 401 mientras Supabase Auth
    no esté cableado. Nunca "pasa por ahora".
+3.5. **Una consulta admite VARIAS respuestas** (decisión Wesley 2026-08-31,
+   patrón Jusbrasil): cualquier abogado Premium puede responder y la persona
+   compara antes de escribirle a uno. No es un reparto de leads — asignar la
+   consulta al primero dejaría al ciudadano con quien llegó primero, y dejaría
+   sin vitrina a los demás, que es el argumento de por qué se paga Premium.
+   `leadsRespondidos` es `Record<id, RespuestaConsulta[]>`; **era un solo
+   `string`**, así que el segundo abogado en responder borraba al primero
+   mientras el portal del abogado ya decía "tu respuesta + N de otros abogados".
+   Cada respuesta guarda solo `abogadoId` y `getFirmante()` la resuelve —
+   **sin autor identificable no se pinta** (§4.5), y cada una lleva SU botón de
+   contacto, porque un único botón al pie obligaría a recordar cuál convenció.
+   ⚠️ El store va por **`version: 2` con migración encadenada**: hay navegadores
+   con el formato viejo y `.map` sobre un string revienta la pantalla.
 4. **Un solo lugar por dato de dominio.** Precios en `data/catalogo.ts` (incluido
    `destacado`, que decide insignia, realce e imán en las cuatro superficies donde
    aparecen planes); cálculo laboral en `lib/prestaciones.ts`. Si la UI y Jus IA
@@ -599,7 +612,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (91 tests de invariantes)
+pnpm test         # Vitest (98 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

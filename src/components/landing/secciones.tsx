@@ -363,7 +363,7 @@ export function SeccionConsultorio() {
           {propia ? (
             <Intercambio
               lead={propia}
-              respuesta={respondidos[propia.id]}
+              respuesta={respondidos[propia.id]?.[0]?.texto}
               etiqueta="Tu consulta"
             />
           ) : (

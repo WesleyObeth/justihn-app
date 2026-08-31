@@ -42,10 +42,10 @@ export function PantallaLeads() {
   const materias = [...new Set(todos.map((l) => l.materia))];
   const filtrados = todos.filter((l) => {
     const porMateria = filtroMateria === "todas" || l.materia === filtroMateria;
-    const porNuevo = !soloNuevos || (l.nuevo && !respondidos[l.id]);
+    const porNuevo = !soloNuevos || (l.nuevo && !respondidos[l.id]?.length);
     return porMateria && porNuevo;
   });
-  const nuevosSinResponder = todos.filter((l) => l.nuevo && !respondidos[l.id]).length;
+  const nuevosSinResponder = todos.filter((l) => l.nuevo && !respondidos[l.id]?.length).length;
 
   return (
     <>
@@ -107,7 +107,11 @@ function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
   const [abierto, setAbierto] = useState(false);
   const [texto, setTexto] = useState("");
 
-  const miRespuesta = respondidos[lead.id];
+  const respuestas = respondidos[lead.id] ?? [];
+  // "La mía" es la de ESTA abogada: otro abogado puede haber respondido la
+  // misma consulta y su respuesta no es editable desde aquí.
+  const miRespuesta = respuestas.find((r) => r.abogadoId === ABOGADA_DEMO.id)?.texto;
+  const deOtros = respuestas.filter((r) => r.abogadoId !== ABOGADA_DEMO.id);
 
   const responder = () => {
     if (!esPremium) {
@@ -203,22 +207,32 @@ function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
             {esPremium ? (abierto ? "Cerrar" : "Responder") : "Responder (Premium)"}
           </Boton>
         )}
-        <span className="text-xs text-texto-4">{etiquetaRespuestas(lead, miRespuesta)}</span>
+        <span className="text-xs text-texto-4">
+          {etiquetaRespuestas(lead, miRespuesta, deOtros.length)}
+        </span>
       </div>
     </Card>
   );
 }
 
 /** Conteo de respuestas con gramática correcta y sin contar la tuya como "de otros". */
-function etiquetaRespuestas(lead: Lead, miRespuesta: string | undefined): string {
+/**
+ * Las de otros son las REALES del store más el contador del seed: la consulta
+ * queda abierta a varios abogados, así que este número tiene que sumar las dos
+ * fuentes o diría menos de lo que la persona ve en su pantalla.
+ */
+function etiquetaRespuestas(
+  lead: Lead,
+  miRespuesta: string | undefined,
+  deOtrosReales: number,
+): string {
+  const otras = lead.respuestas + deOtrosReales;
   if (miRespuesta) {
-    return lead.respuestas === 0
-      ? "Tu respuesta es la primera"
-      : `Tu respuesta + ${lead.respuestas} de otros abogados`;
+    return otras === 0 ? "Tu respuesta es la primera" : `Tu respuesta + ${otras} de otros abogados`;
   }
-  if (lead.respuestas === 0) return "Sin respuestas aún — sé el primero";
-  if (lead.respuestas === 1) return "1 respuesta de otro abogado";
-  return `${lead.respuestas} respuestas de otros abogados`;
+  if (otras === 0) return "Sin respuestas aún — sé el primero";
+  if (otras === 1) return "1 respuesta de otro abogado";
+  return `${otras} respuestas de otros abogados`;
 }
 
 // ── Columna lateral ────────────────────────────────────────────────────────

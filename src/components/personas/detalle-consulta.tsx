@@ -13,9 +13,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
 import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
-import { buscarAbogados } from "@/data/directorio";
+import { buscarAbogados, getFirmante } from "@/data/directorio";
 import { getInstitucion, guiasDeMateria } from "@/data/tramites";
 import { usePortal, useStoreHidratado } from "@/store/portal";
+import type { RespuestaConsulta } from "@/types/dominio";
 
 export function DetalleConsulta({ id }: { id: string }) {
   const preguntas = usePortal((s) => s.preguntasPublico);
@@ -29,7 +30,7 @@ export function DetalleConsulta({ id }: { id: string }) {
   if (!hidratado) return <Cargando />;
   if (!lead) notFound();
 
-  const respuesta = respondidos[lead.id];
+  const respuestas = respondidos[lead.id] ?? [];
   const guias = guiasDeMateria(lead.materia).slice(0, 3);
   const abogados = buscarAbogados(lead.materia).slice(0, 2);
 
@@ -53,10 +54,12 @@ export function DetalleConsulta({ id }: { id: string }) {
               <span className="text-[12px] text-texto-4">
                 {lead.ciudad} · {lead.cuando}
               </span>
-              {respuesta ? (
+              {respuestas.length > 0 ? (
                 <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-exito-bg px-2.5 py-[3px] text-[10.5px] font-bold text-exito">
                   <Icono nombre="check" size={9} strokeWidth={2.6} />
-                  Respondida
+                  {respuestas.length === 1
+                    ? "Respondida"
+                    : `${respuestas.length} respuestas`}
                 </span>
               ) : (
                 <span className="ml-auto inline-flex items-center gap-1 text-[11.5px] text-texto-4">
@@ -75,27 +78,21 @@ export function DetalleConsulta({ id }: { id: string }) {
               la ven sin saber quién eres.
             </p>
 
-            {respuesta ? (
-              <div className="mt-4 rounded-xl border-l-[3px] border-exito bg-exito-bg/40 px-4 py-4">
-                <div className="flex items-center gap-2.5">
-                  <span className="font-display grid h-9 w-9 shrink-0 place-items-center rounded-full bg-celeste text-[12px] font-semibold text-white">
-                    {ABOGADA_DEMO.iniciales}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-[13.5px] font-semibold">
-                      {ABOGADA_DEMO.nombre}
-                    </span>
-                    <span className="block text-[11.5px] text-texto-4">
-                      {ABOGADA_DEMO.colegiacion}
-                    </span>
-                  </span>
-                </div>
-                <p className="mt-3 text-[13.5px] leading-[1.65] whitespace-pre-line text-texto-2">
-                  {respuesta}
-                </p>
-                <p className="mt-3 border-t border-exito/25 pt-3 text-[11.5px] leading-[1.55] text-texto-4">
-                  Es orientación general sobre lo que preguntaste, no asesoría sobre tu caso: para
-                  eso hace falta ver tus documentos.
+            {respuestas.length > 0 ? (
+              <div className="mt-4 flex flex-col gap-3">
+                {respuestas.length > 1 && (
+                  <p className="text-[12.5px] leading-[1.55] text-texto-3">
+                    Te respondieron <b className="text-marino">{respuestas.length} abogados</b>.
+                    Compara cómo lo explica cada uno y escríbele al que te convenza — no tienes
+                    que elegir ahora.
+                  </p>
+                )}
+                {respuestas.map((r) => (
+                  <RespuestaDeAbogado key={r.abogadoId} respuesta={r} />
+                ))}
+                <p className="text-[11.5px] leading-[1.55] text-texto-4">
+                  Son orientaciones generales sobre lo que preguntaste, no asesoría sobre tu
+                  caso: para eso hace falta ver tus documentos.
                 </p>
               </div>
             ) : (
@@ -165,6 +162,49 @@ export function DetalleConsulta({ id }: { id: string }) {
           )}
         </aside>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Una respuesta, con su firma y su vía de contacto.
+ *
+ * Cada una lleva SU botón: el valor de que respondan varios es poder comparar
+ * cómo explica cada uno y escribirle a ese — un único botón al pie obligaría a
+ * la persona a recordar cuál le convenció.
+ */
+function RespuestaDeAbogado({ respuesta }: { respuesta: RespuestaConsulta }) {
+  const mostrarToast = usePortal((s) => s.mostrarToast);
+  const firmante = getFirmante(respuesta.abogadoId);
+  // Sin autor identificable no se muestra: una respuesta anónima en una
+  // pantalla que promete abogados colegiados no prueba nada (§4.5).
+  if (!firmante) return null;
+
+  return (
+    <div className="rounded-xl border-l-[3px] border-exito bg-exito-bg/40 px-4 py-4">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <span className="font-display grid h-9 w-9 shrink-0 place-items-center rounded-full bg-celeste text-[12px] font-semibold text-white">
+          {firmante.iniciales}
+        </span>
+        <span className="min-w-0">
+          <span className="block text-[13.5px] font-semibold">{firmante.nombre}</span>
+          <span className="block text-[11.5px] text-texto-4">
+            {firmante.colegiacion ?? `${firmante.ciudad}${firmante.anios ? ` · ${firmante.anios} años` : ""}`}
+          </span>
+        </span>
+        <button
+          type="button"
+          onClick={() =>
+            mostrarToast(`Así le escribes a ${firmante.nombre} desde Justihn (demo de validación)`)
+          }
+          className="ml-auto cursor-pointer rounded-lg bg-celeste px-3.5 py-2 text-[12px] font-semibold text-white hover:bg-cruce"
+        >
+          Consultar con {firmante.nombre.replace(/^Abg\.\s*/, "").split(" ")[0]}
+        </button>
+      </div>
+      <p className="mt-3 text-[13.5px] leading-[1.65] whitespace-pre-line text-texto-2">
+        {respuesta.texto}
+      </p>
     </div>
   );
 }

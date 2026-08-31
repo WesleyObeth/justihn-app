@@ -16,7 +16,8 @@ import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
 import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
 import { cn } from "@/lib/utils";
-import type { Lead } from "@/types/dominio";
+import { getFirmante } from "@/data/directorio";
+import type { Lead, RespuestaConsulta } from "@/types/dominio";
 
 type Filtro = "todas" | "respondidas" | "esperando";
 
@@ -32,8 +33,8 @@ export function ConsultasPersona() {
   const [abiertoCon, setAbiertoCon] = useState<number | null>(null);
   const abierto = abiertoCon !== null && preguntas.length === abiertoCon;
 
-  const respondidas = preguntas.filter((p) => respondidos[p.id]);
-  const esperando = preguntas.filter((p) => !respondidos[p.id]);
+  const respondidas = preguntas.filter((p) => respondidos[p.id]?.length);
+  const esperando = preguntas.filter((p) => !respondidos[p.id]?.length);
   const lista =
     filtro === "respondidas" ? respondidas : filtro === "esperando" ? esperando : preguntas;
 
@@ -101,7 +102,7 @@ export function ConsultasPersona() {
 
           <div className="mt-3.5 flex flex-col gap-3">
             {lista.map((p) => (
-              <FilaConsulta key={p.id} lead={p} respuesta={respondidos[p.id]} />
+              <FilaConsulta key={p.id} lead={p} respuestas={respondidos[p.id] ?? []} />
             ))}
             {lista.length === 0 && (
               <p className="rounded-2xl border border-borde bg-white px-6 py-8 text-center text-[13.5px] text-texto-3">
@@ -144,7 +145,9 @@ function Resumen({
 }
 
 /** Cada consulta lleva a su detalle: la lista resume, el detalle desarrolla. */
-function FilaConsulta({ lead, respuesta }: { lead: Lead; respuesta?: string }) {
+function FilaConsulta({ lead, respuestas }: { lead: Lead; respuestas: RespuestaConsulta[] }) {
+  const primera = respuestas[0];
+  const firmante = primera ? getFirmante(primera.abogadoId) : undefined;
   return (
     <Link
       href={`/personas/consultas/${lead.id}`}
@@ -158,10 +161,10 @@ function FilaConsulta({ lead, respuesta }: { lead: Lead; respuesta?: string }) {
           <span className="text-[12px] text-texto-4">
             {lead.ciudad} · {lead.cuando}
           </span>
-          {respuesta ? (
+          {primera ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-exito-bg px-2 py-[3px] text-[10.5px] font-bold text-exito">
               <Icono nombre="check" size={9} strokeWidth={2.6} />
-              Respondida
+              {respuestas.length === 1 ? "Respondida" : `${respuestas.length} respuestas`}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-[11.5px] text-texto-4">
@@ -173,9 +176,9 @@ function FilaConsulta({ lead, respuesta }: { lead: Lead; respuesta?: string }) {
 
         <p className="mt-2 line-clamp-2 text-[14px] leading-[1.55]">{lead.pregunta}</p>
 
-        {respuesta && (
+        {primera && firmante && (
           <p className="mt-2 line-clamp-1 text-[12.5px] text-texto-3">
-            <b className="font-semibold text-marino">{ABOGADA_DEMO.nombre}:</b> {respuesta}
+            <b className="font-semibold text-marino">{firmante.nombre}:</b> {primera.texto}
           </p>
         )}
       </div>

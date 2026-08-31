@@ -122,6 +122,24 @@ export interface Plantilla {
 }
 
 /** Tabla `leads` — consultas del consultorio gratuito (Vía B del modelo). */
+/**
+ * Una respuesta del consultorio.
+ *
+ * Es una LISTA por consulta, no un texto: varios abogados responden la misma
+ * pregunta y la persona compara antes de escribirle a uno (patrón Jusbrasil,
+ * decisión Wesley 2026-08-31). Antes era `Record<leadId, string>` y el segundo
+ * abogado en responder habría borrado al primero — mientras el portal del
+ * abogado ya decía "tu respuesta + N de otros abogados".
+ *
+ * TODO(data): tabla `respuestas_consulta` con FK a `consultas` y `abogados`.
+ */
+export interface RespuestaConsulta {
+  /** `id` del directorio, o el de la abogada demo. */
+  abogadoId: string;
+  texto: string;
+  cuando: string;
+}
+
 export interface Lead {
   id: string;
   materia: Materia;

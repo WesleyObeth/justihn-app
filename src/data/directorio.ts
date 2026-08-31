@@ -201,3 +201,38 @@ function ordenar(lista: AbogadoDirectorio[]): AbogadoDirectorio[] {
     (a, b) => Number(b.premium) - Number(a.premium) || Number(b.valoracion) - Number(a.valoracion),
   );
 }
+
+/**
+ * Quién firma una respuesta del consultorio.
+ *
+ * `DIRECTORIO` y `ABOGADA_DEMO` tienen formas distintas (uno es el perfil
+ * público, el otro el del suscriptor), así que las respuestas guardan solo el
+ * `abogadoId` y aquí se resuelve a lo que la UI necesita para firmar. Devuelve
+ * `undefined` en vez de inventar un nombre: una respuesta sin autor
+ * identificable no se muestra como si lo tuviera.
+ */
+export interface Firmante {
+  id: string;
+  nombre: string;
+  iniciales: string;
+  ciudad: string;
+  /** Solo la tiene el suscriptor; el directorio no publica colegiación. */
+  colegiacion?: string;
+  anios?: number;
+}
+
+export function getFirmante(abogadoId: string): Firmante | undefined {
+  if (abogadoId === ABOGADA_DEMO.id) {
+    return {
+      id: ABOGADA_DEMO.id,
+      nombre: ABOGADA_DEMO.nombre,
+      iniciales: ABOGADA_DEMO.iniciales,
+      ciudad: ABOGADA_DEMO.ciudad,
+      colegiacion: ABOGADA_DEMO.colegiacion,
+    };
+  }
+  const a = DIRECTORIO.find((x) => x.id === abogadoId);
+  return a
+    ? { id: a.id, nombre: a.nombre, iniciales: a.iniciales, ciudad: a.ciudad, anios: a.anios }
+    : undefined;
+}

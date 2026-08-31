@@ -169,7 +169,7 @@ function Metricas() {
   const completos = TRAMITES.filter(
     (t) => (pasosTramite[t.id] ?? []).length === t.pasos.length,
   ).length;
-  const respondidas = preguntas.filter((p) => respondidos[p.id]).length;
+  const respondidas = preguntas.filter((p) => respondidos[p.id]?.length).length;
 
   return (
     <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">

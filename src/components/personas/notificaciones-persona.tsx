@@ -37,13 +37,17 @@ export function useAvisosPersona(): { etiqueta: string; avisos: AvisoPersona[] }
   const pasosTramite = usePortal((s) => s.pasosTramite);
 
   const respuestas: AvisoPersona[] = preguntas.map((p) => {
-    const respuesta = respondidos[p.id];
-    return respuesta
+    const suyas = respondidos[p.id] ?? [];
+    const primera = suyas[0];
+    return primera
       ? {
           id: `notif-p-resp-${p.id}`,
           icono: "leads" as const,
-          titulo: `Un abogado respondió tu consulta de ${p.materia}`,
-          meta: recortar(respuesta, 88),
+          titulo:
+            suyas.length > 1
+              ? `${suyas.length} abogados respondieron tu consulta de ${p.materia}`
+              : `Un abogado respondió tu consulta de ${p.materia}`,
+          meta: recortar(primera.texto, 88),
           destino: "/personas/consultas",
           // Lo único que cuenta para la insignia: es noticia de verdad.
           noLeidaPorDefecto: true,
