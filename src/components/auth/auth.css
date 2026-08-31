@@ -88,124 +88,137 @@
   background: #1584c7;
 }
 
-/* ── Escena del logo — 4 actos en 6,8 s ────────────────────────────────────
-   Especificación de `justihn-logo-scene.jsx`, portada a keyframes CSS. Los
-   tiempos van en PORCENTAJE del ciclo para que el bucle sea una sola
-   animación por elemento y las cuatro escenas no puedan desincronizarse:
+/* ── Escena del logo — portada de `justihn-logo-scene.jsx` ────────────────
+   Los tiempos del archivo son segundos sobre CUES; aquí van en PORCENTAJE de
+   un ciclo de 6,8 s (Cerrado 0 · Apertura 1,4 · Nombre 3,0 · Final 5,2), para
+   que el bucle sea UNA animación por elemento y los actos no se
+   desincronicen. Conversión aplicada: t / 6,8.
 
-     Cerrado   0 → 1,4 s   (  0 %  → 20,6 %)  libro cerrado, centrado
-     Apertura  1,4 → 3,0 s ( 20,6 % → 44,1 %)  páginas a ±26° + cruce
-     Nombre    3,0 → 5,2 s ( 44,1 % → 76,5 %)  se revela el wordmark
-     Final     5,2 → 6,8 s ( 76,5 % → 100 %)   respiración y fade
+     fadeIn + scale   0,15 → 0,90 s   =  2,21 % → 13,24 %   easeOutCubic
+     apertura         1,40 → 2,70 s   = 20,59 % → 39,71 %   easeOutBack
+     shift del grupo  3,00 → 4,00 s   = 44,12 % → 58,82 %   easeInOutQuart
+     wordmark         3,25 → 4,30 s   = 47,79 % → 63,24 %   easeInOutQuart
+     fadeOut          5,70 → 6,75 s   = 83,82 % → 99,26 %   easeInOutQuart
 
-   El símbolo "se desliza a la izquierda" como CONSECUENCIA de que el wordmark
-   ocupe sitio: el grupo está centrado y el ancho del nombre crece de 0. Así
-   no hay que codificar a mano cuántos píxeles mide "Justihn" — si cambia la
-   fuente o el tamaño, el encuadre sigue centrado solo. */
+   Easings del archivo, como curvas cúbicas:
+     easeOutCubic   cubic-bezier(.33, 1, .68, 1)
+     easeOutBack    cubic-bezier(.34, 1.56, .64, 1)   ← el rebote de la apertura
+     easeInOutQuart cubic-bezier(.76, 0, .24, 1)
+
+   ⚠️ Lo que más se nota del archivo y no era obvio en la descripción: las dos
+   páginas **arrancan superpuestas** (mismo `x = 24 − W/2`) y se SEPARAN ±7
+   unidades mientras giran. Eso es el libro cerrado de verdad — una sola forma
+   visible— en vez de dos barras juntas. Aquí se consigue con
+   `translateX(±7) rotate(±26°)` sobre `transform-origin: 24px 21px`, que es
+   matemáticamente idéntico a mover la `x` y girar sobre el centro nuevo, y
+   además termina exactamente en la geometría oficial (−26° en 17,21 · +26° en
+   31,21). */
 .escena-logo {
   --ciclo: 6.8s;
 }
 
+@keyframes escGrupo {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(294px) scale(0.92);
+  }
+  2.21% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(294px) scale(0.92);
+    animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  13.24% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateX(294px) scale(1);
+  }
+  44.12% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateX(294px) scale(1);
+    animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  58.82%,
+  83.82% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateX(0) scale(1);
+    animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  99.26%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(0) scale(1);
+  }
+}
+
 @keyframes escPaginaIzq {
   0%,
-  20.6% {
-    transform: rotate(0deg);
+  20.59% {
+    transform: translateX(0) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  44.1%,
+  39.71%,
   100% {
-    transform: rotate(-26deg);
+    transform: translateX(-7px) rotate(-26deg);
   }
 }
 @keyframes escPaginaDer {
   0%,
-  20.6% {
-    transform: rotate(0deg);
+  20.59% {
+    transform: translateX(0) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  44.1%,
+  39.71%,
   100% {
-    transform: rotate(26deg);
+    transform: translateX(7px) rotate(26deg);
   }
 }
-/* El cruce nace cuando las páginas ya se solapan, no antes. */
-@keyframes escCruce {
-  0%,
-  32% {
-    opacity: 0;
-  }
-  44.1%,
-  100% {
-    opacity: 1;
-  }
-}
+
 @keyframes escNombre {
   0%,
-  44.1% {
-    max-width: 0;
+  47.79% {
     opacity: 0;
+    transform: translateX(-105%);
+    animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
   }
-  60% {
-    opacity: 1;
-  }
-  76.5%,
+  63.24%,
   100% {
-    max-width: 440px;
     opacity: 1;
+    transform: translateX(0);
   }
 }
-/* Escena 4: respira y se desvanece para volver a empezar. */
-@keyframes escRespira {
-  0%,
-  76.5% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  88% {
-    transform: scale(1.035);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
+
 @keyframes escPie {
   0%,
-  50% {
+  63% {
     opacity: 0;
   }
-  64%,
-  90% {
+  72%,
+  83% {
     opacity: 1;
   }
+  99.26%,
   100% {
     opacity: 0;
   }
 }
 
 .escena-logo .esc-grupo {
-  animation: escRespira var(--ciclo) cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: escGrupo var(--ciclo) linear both;
 }
-/* ⚠️ El pivote va en (17,21)/(31,21) — el centro de cada rect— y NO en su
-   base, aunque la spec dijera "base". Motivo: el logo oficial se define como
-   `rotate(-26 17 21)` (`logo/justihn-icon.svg`, geometría FIJA). Girando
-   desde la base, ese mismo ángulo deja las páginas desplazadas y el
-   fotograma final NO sería el logo de la marca. El gesto de libro abriéndose
-   se conserva igual; lo que se garantiza es dónde termina. */
+/* Las dos páginas comparten pivote: el centro del rect cuando aún están
+   superpuestas. Girar ahí y luego trasladar da el mismo resultado que mover
+   la x y girar sobre el centro nuevo — y evita animar un atributo SVG. */
+.escena-logo .esc-pagina {
+  transform-box: view-box;
+  transform-origin: 24px 21px;
+}
 .escena-logo .esc-pagina-izq {
-  transform-origin: 17px 21px;
-  animation: escPaginaIzq var(--ciclo) cubic-bezier(0.3, 0, 0.2, 1) both;
+  animation: escPaginaIzq var(--ciclo) linear both;
 }
 .escena-logo .esc-pagina-der {
-  transform-origin: 31px 21px;
-  animation: escPaginaDer var(--ciclo) cubic-bezier(0.3, 0, 0.2, 1) both;
-}
-.escena-logo .esc-cruce {
-  animation: escCruce var(--ciclo) ease both;
+  animation: escPaginaDer var(--ciclo) linear both;
 }
 .escena-logo .esc-nombre {
-  overflow: hidden;
-  white-space: nowrap;
-  animation: escNombre var(--ciclo) cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: escNombre var(--ciclo) linear both;
 }
 .escena-logo .esc-pie {
   animation: escPie var(--ciclo) ease both;
@@ -215,7 +228,6 @@
 .escena-logo--bucle .esc-grupo,
 .escena-logo--bucle .esc-pagina-izq,
 .escena-logo--bucle .esc-pagina-der,
-.escena-logo--bucle .esc-cruce,
 .escena-logo--bucle .esc-nombre,
 .escena-logo--bucle .esc-pie {
   animation-iteration-count: infinite;
@@ -224,25 +236,28 @@
 /* Con reduced-motion el splash no anima: muestra el logo terminado y el texto,
    y el redirect de 5 s sigue su curso. */
 @media (prefers-reduced-motion: reduce) {
-  .escena-logo .esc-grupo,
-  .escena-logo .esc-cruce,
   .escena-logo .esc-pie,
   .auth-fadeup,
   .auth-fadeup-card {
     animation: none;
   }
   /* Sin movimiento se enseña el logo YA abierto y el nombre visible. */
+  .escena-logo .esc-grupo {
+    animation: none;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
   .escena-logo .esc-pagina-izq {
     animation: none;
-    transform: rotate(-26deg);
+    transform: translateX(-7px) rotate(-26deg);
   }
   .escena-logo .esc-pagina-der {
     animation: none;
-    transform: rotate(26deg);
+    transform: translateX(7px) rotate(26deg);
   }
   .escena-logo .esc-nombre {
     animation: none;
-    max-width: 440px;
     opacity: 1;
+    transform: none;
   }
 }

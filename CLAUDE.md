@@ -491,8 +491,8 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     **`consultaPendiente` del composer se conserva**: se muestra sobre el card
     ("Tu pregunta te espera") y se dispara al llegar al chat, igual que antes.
   - **Escena del logo — el libro que se abre** (`components/auth/escena-logo.tsx`,
-    reescrita 2026-08-30 según la spec `justihn-logo-scene.jsx` que pasó
-    Wesley). Cuatro actos en **6,8 s**: Cerrado 1,4 s (libro cerrado y
+    portada del archivo **`../design_handoff_auth/justihn-logo-scene.jsx`**,
+    que Wesley pasó después y está copiado ahí). Cuatro actos en **6,8 s**: Cerrado 1,4 s (libro cerrado y
     centrado) · Apertura 1,6 s (páginas a ±26° y nace el cruce) · Nombre 2,2 s
     (se revela el wordmark) · Final 1,6 s (respiración y fade). Los tiempos van
     en **porcentaje de un ciclo único** en `auth.css`, para que el bucle sea
@@ -501,11 +501,21 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
       wordmark ocupe sitio (el grupo está centrado y el ancho del nombre crece
       de 0), no con un desplazamiento en píxeles: si cambia la fuente o el
       tamaño, el encuadre se recentra solo.
-    - ⚠️ **El pivote va en (17,21)/(31,21) —el centro de cada rect— y NO en su
-      base**, aunque la spec dijera "base": el logo oficial se define como
-      `rotate(-26 17 21)` y girando desde la base ese mismo ángulo deja las
-      páginas desplazadas, o sea que **el fotograma final no sería el logo de
-      la marca**. Verificado que termina en −26°/+26° sobre esos orígenes.
+    - ⚠️ **Lo que el archivo tiene y la descripción no dejaba ver: las dos
+      páginas ARRANCAN SUPERPUESTAS** (misma `x = 24 − W/2 = 18,15`) y se
+      separan ±7 al girar. Ese es el libro cerrado de verdad — una sola forma
+      visible—, no dos barras juntas. Se consigue con `translateX(±7)
+      rotate(±26°)` sobre `transform-origin: 24px 21px`, que es idéntico a
+      mover la `x` y girar sobre el centro nuevo, y **termina exactamente en la
+      geometría oficial** (−26° en 17,21 · +26° en 31,21). Verificado.
+    - Easings del archivo, portados como curvas cúbicas: `easeOutCubic` en el
+      fade de entrada, **`easeOutBack`** en la apertura (el rebote) y
+      `easeInOutQuart` en el recentrado, el wordmark y el fade final. Los
+      tiempos van en porcentaje de un ciclo de 6,8 s para que el bucle sea una
+      animación por elemento y los actos no se desincronicen.
+    - El lienzo se construye a la **escala intrínseca del archivo** (símbolo
+      200 · hueco 28 · wordmark 560 = lockup 788) y se reduce con `zoom`, para
+      que el desplazamiento de **294px** siga siendo exactamente medio lockup.
     - `SplashJustihn` hace **una sola pasada** y navega a los 5 s — justo al
       cerrar el tercer acto, con el nombre ya revelado y antes del fade del
       cuarto. `bucle` lo repite (escaparate). Con reduced-motion se muestra el

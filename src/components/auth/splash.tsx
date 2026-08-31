@@ -28,7 +28,7 @@ export function SplashJustihn({ destino = "/abogados" }: { destino?: string }) {
       role="status"
       aria-label="Preparando tu portal"
     >
-      <EscenaLogo size={120} pie="Preparando tu portal…" />
+      <EscenaLogo ancho={520} pie="Preparando tu portal…" />
     </div>
   );
 }
