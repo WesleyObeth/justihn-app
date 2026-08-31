@@ -107,7 +107,7 @@ export function LandingProfesional() {
         <Encabezado
           eyebrow="Qué incluye"
           titulo="Lo que encuentras dentro"
-          sub="Nueve herramientas que ya son pantallas del portal — no promesas de un roadmap. Elige una categoría y mírala por dentro."
+          sub="Nueve herramientas que ya son pantallas del portal, no promesas de un roadmap — agrupadas por el trabajo que resuelven."
         />
         <Capacidades />
       </section>

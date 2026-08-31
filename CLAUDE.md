@@ -426,27 +426,28 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
     medidas/alt, y que titulares (≤48), sellos (≤24) y los títulos y
     descripciones compartibles (≤70/≤170) no se corten en la burbuja.
 
-- **🗂️ "LO QUE ENCUENTRAS DENTRO" — tres categorías con vista previa
-  (`components/profesional/capacidades.tsx`, 2026-08-30):** sustituye al muro
-  de 8 cards iguales sobre una referencia que pasó Wesley — lista seleccionable
-  a la izquierda, panel de producto a la derecha. Categorías: **Investigar con
-  fuente · No perder nada de vista · Producir y conseguir clientes**.
-  - Arregla tres cosas del muro anterior: **no incluía Jus IA** (el corazón del
-    producto), llamaba a cada función por el nombre de su pantalla en vez de
-    por el trabajo que resuelve, y no daba ninguna jerarquía.
-  - **Cada card lleva sus funciones como chips aunque no esté activa.** La
-    referencia son tres servicios; aquí son nueve funciones, y si solo se
-    vieran las de la categoría abierta el inventario desaparecería.
-  - ⚠️ **Los tres paneles se MONTAN siempre**, el inactivo va con `hidden`.
-    Montar solo el activo dejaría 6 de 9 funciones fuera del HTML del servidor.
-    Verificado que las nueve salen en el SSR.
-  - **Los tres miden lo mismo** (`min-h`, 513×404 medido): con alturas
-    distintas la página saltaba al cambiar de categoría.
-  - El contenido de los paneles sale de los **seeds reales** (sentencia
-    CL-528-24 del piloto, alerta de Gaceta, modelo y lead), no de maquetas.
-    ⚙️ **Capturas del portal: diferidas a propósito** — una captura driftea en
+- **🗂️ "LO QUE ENCUENTRAS DENTRO" — mosaico en tres categorías
+  (`components/profesional/capacidades.tsx`, 2026-08-30, tres rondas):**
+  **Investigar con fuente · No perder nada de vista · Producir y conseguir
+  clientes**, con una celda ancha por fila que alterna de lado.
+  - Arregla tres cosas del muro de 8 cards iguales que había antes: **no
+    incluía Jus IA** (el corazón del producto), llamaba a cada función por el
+    nombre de su pantalla en vez de por el trabajo que resuelve, y no daba
+    ninguna jerarquía.
+  - ⚠️ **Por qué NO lleva panel de producto**, aunque una ronda intermedia lo
+    tuvo (patrón de una referencia de Wesley): la página quedaba con **CUATRO
+    secciones seguidas con ventana** —esta y los tres demos— y las tres
+    ventanas de aquí enseñaban Jus IA, Gaceta y Leads, que son exactamente los
+    tres demos de después. No era parecido: era lo mismo dos veces. **Reparto
+    definitivo: esta sección es el INVENTARIO, los demos son la DEMOSTRACIÓN.**
+  - La celda ancha alterna de posición por fila (izq · der · izq): con la ancha
+    siempre al principio, las tres filas se leerían idénticas.
+  - **Sin estado ni interacción** — componente de servidor, así que las nueve
+    funciones llegan íntegras al HTML sin depender de hidratación.
+  - ⚙️ **Capturas del portal: diferidas a propósito** — una captura driftea en
     cuanto cambia una pantalla, no le da texto al crawler, y la UI se moverá
-    mucho al entrar Supabase. Se reevalúa entonces (ver §6.5b).
+    mucho al entrar Supabase. Se reevalúa entonces, y con script de captura
+    commiteado (ver §6.5b).
 
 - **🌑 LANDING BLACK — `/para-abogados-black` (2026-08-30):** la MISMA landing
   de la vía A en tema oscuro, para comparar con Wesley cuál versión queda.
