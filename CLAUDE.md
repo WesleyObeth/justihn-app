@@ -1,671 +1,207 @@
-# CLAUDE.md — Justihn · plataforma (portal de abogados)
+# CLAUDE.md — Justihn · plataforma (portal de abogados + sitio público)
 
-> Cerebro técnico del portal. Manda en su dominio sobre `justihn/CLAUDE.md`
+> Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-30** (E2E de las
-> cinco pantallas públicas: gate de cuenta y áreas táctiles).
+> Creado: **2026-08-25** · Última actualización: **2026-08-30** (reorganización:
+> §1 comprimida, trampas verificadas a §4.7).
+>
+> **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
+> renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
+> leyendo el código. Antes de tocar una landing o una pantalla pública, leer §4.7.
 
 ---
 
 ## 1. Qué es
 
-Portal SaaS para abogados de Honduras: jurisprudencia, alertas de La Gaceta,
-paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
-**Jus IA** — el asistente que responde **solo citando fuentes oficiales**.
+Producto de dos vías sobre un mismo código:
 
-- **Diseño (hifi, pixel-perfect):** `../design_handoff_portal/` — `README.md`
-  (specs), `04 Justihn Portal Abogados.dc.html` (prototipo), tokens de marca y
-  logos. Es la fuente de verdad visual: **no improvisar valores**.
-- **Estado:** Fase 1 del blueprint (§4) — UI completa contra seed determinístico.
-  Sin backend, sin claves: corre en cualquier lado con `pnpm dev`.
-  **Refinado integral 2026-08-25/26:** las 13 pantallas revisadas una a una
-  (filtros, deep-links en URL, estados vacíos que derivan a Jus IA, checklist
-  de procesos, responder leads inline, caja de herramientas del litigante,
-  menú de avatar reorganizado, habeas data en Configuración). Jus IA con chat
-  centrado, titular dinámico, animaciones de pensando y borde aurora; botón
-  canónico `BotonJusIA` (gradiente vivo) en toda acción de IA. **El seed de
-  jurisprudencia es REAL** (12 sentencias del piloto del corpus, ver §8).
-- **Rutas (decisión Wesley 2026-08-25):** el portal vive bajo **`/abogados`**
-  (antes `/portal`; redirects permanentes en `next.config.ts`). La pantalla
-  "Paso a paso" se renombró a **"Procesos"** (`/abogados/procesos`) y
-  "Plantillas" a **"Modelos"** (`/abogados/modelos` — "modelo" es el término del
-  gremio y el que se googlea; los identificadores internos `PLANTILLAS`/
-  `plantillaId` no cambian). Ambos con redirect. La raíz del
-  dominio queda **reservada para la vía B** (gente común: landing, consultorio,
-  Informe Verifica, contenido SEO) — patrón Jusbrasil: lo público indexable en
-  la raíz, el app de suscriptores bajo su prefijo.
-- **Pantalla nueva 2026-08-26 — Legislación (`/abogados/legislacion`):** cierra la
-  promesa "legislación ilimitada" del plan Base (estaba vendida y no existía).
-  Muestra REAL del CPC: artículos verificados contra el PDF oficial del PJ en el
-  PoC del monitorio (399–400, 676–685, 782–783) con síntesis propia — nunca texto
-  fingido; los demás códigos aparecen "en preparación" (sin fuente no hay texto).
-  Seed en `data/legislacion.ts` (contrato de `codigos`+`articulos_codigo`, seam
-  del scraper de legislación PJ — backlog #3/#5). Deep-link `?codigo=`, entrada
-  en sidebar y en el buscador global (indexa artículos), cross-link con la
-  calculadora de vía procesal.
-- **Pantalla nueva 2026-08-26 — Monitoreo de nombres (`/abogados/monitoreo`, Pro):**
-  materializa el último feature Pro que era solo un toggle. El matching corre EN
-  VIVO sobre el texto oficial de las 12 sentencias del piloto (los vigilados
-  iniciales son partes reales: Wilson P. Henríquez → CL-528-24; Estado de
-  Honduras → 4 apariciones) con rol inferido del encabezado del extracto.
-  Vigilados en el store (`nombresVigilados`, persistido, alta/baja); gating Pro
-  patrón Modelos; disclaimer de homónimos + exclusión de materias reservadas
-  (reglas legales día 1); copy honesto "vigilamos lo que el Estado publica".
-  Seed/motor en `data/monitoreo.ts`. Con estas dos el portal tiene **15
-  pantallas** y la tabla de planes queda 100% respaldada por UI.
-- **Dashboard (decisión Wesley 2026-08-25):** la vista de `/abogados/dashboard`
-  se llama "Dashboard" (título, sidebar y metadata). Regla de
-  la pantalla: nada inerte — toda card navega o dispara una acción. Su
-  "Pendientes de hoy" usa `usePreguntarAJusIA(pregunta, { enviarDirecto })`,
-  que deja la consulta enviándose al llegar al chat.
-- **Jus IA (decisión Wesley 2026-08-25):** chat en una sola columna centrada
-  (~760px); el historial vive en un panel lateral (slide-over), no en columna
-  fija. El titular del hero es dinámico: una frase del pool `TITULARES_HERO`
-  (`data/jus-ia.ts`) por carga, elegida en cliente tras el mount — unas llevan
-  el nombre y otras no.
+- **Vía A — abogados** (`/abogados`): SaaS de suscripción. Jurisprudencia,
+  legislación, alertas de La Gaceta, procesos con plazos, modelos de escritos,
+  leads, calculadoras, monitoreo de nombres y **Jus IA**, el asistente que
+  responde **solo citando fuentes oficiales**.
+- **Vía B — gente común** (`/` y `/personas`): guías de trámites y procesos,
+  consultorio gratuito, directorio de abogados y calculadora de prestaciones.
+  Es la cara indexable del dominio y el funnel que alimenta los leads de la vía A.
 
-- **🌐 VÍA B CONSTRUIDA (2026-08-29, decisión Wesley tras el feedback del socio):**
-  el sitio público para la gente común vive en la **raíz** (grupo de rutas
-  `src/app/(publico)/`, shell propio header+footer en `components/publico/`):
-  Home con buscador · **/tramites** (9 guías de 7 instituciones — la lista del
-  socio: RTN, CAI, permiso de operación, ARSA, ambiental, ONCAE, tradición de
-  dominio, traspaso vehicular, constitución de sociedad; seed `data/tramites.ts`,
-  tasas con marcadores "L ___" hasta verificación del socio) · **/directorio**
-  (abogados por materia, `data/directorio.ts` — María Castillo es EL MISMO seed
-  del portal; Premium aparece primero) · **/consultorio** (pregunta pública →
-  entra a `preguntasPublico` del store → **aparece como lead en
-  /abogados/leads**, y la respuesta del abogado aparece pública — la
-  integración Vía A ↔ Vía B en vivo) · **/calculadora-prestaciones** (usa el
-  mismo `lib/prestaciones`, §0.5). Cada guía de trámite recomienda abogados de
-  su materia (funnel guía→lead). Planes público: Gratis + pago "en definición".
-- **🏛️ PORTAL CIUDADANO `/personas` (2026-08-29, decisión Wesley):** el patrón
-  Jusbrasil completo — la landing da la probadita y "crear cuenta gratis" abre
-  un portal con shell propio (`components/personas/`, sidebar marino gemelo del
-  de abogados; persona demo Carlos Zelaya, `data/persona.ts`). Pantallas:
-  Inicio · Trámites (guías completas con **checklist persistido**,
-  `pasosTramite` en el store) · Mis consultas (form + respuestas de abogados)
-  · Encuentra abogado · Calculadora · Mi plan (Gratis + pago en definición).
-  **Gates de la landing:** el detalle de trámite muestra solo el paso 1 (resto
-  difuminado) → CTA `/personas/tramites/[id]`; preguntar en el consultorio
-  "crea la cuenta" y redirige a `/personas/consultas`. Los componentes públicos
-  compartidos aceptan `enPortal` para rutas/wrapper. **Menú del avatar**
-  (patrón abogados) con Mi perfil (actividad real del store), Configuración
-  (cuenta + prefs `prefsPersona` + habeas data) y Ayuda (FAQ ciudadana) —
-  9 rutas en el portal ciudadano.
-  **Renombrado 2026-08-29:** era `/persona` (singular) y su pantalla de
-  búsqueda era `/persona/abogados`. Ahora **`/personas`** —para leer como
-  pareja de `/abogados`, las dos vías del producto, y para coincidir con
-  `components/personas/`— y **`/personas/directorio`**, que mata la colisión
-  de `/abogados` significando a la vez el portal de suscriptores y una
-  pantalla del ciudadano. El label de la UI sigue siendo "Encuentra abogado".
-  Redirects 308 en `next.config.ts` para las cuatro formas viejas.
-  `data/persona.ts` se queda en singular: es UNA persona demo, no la audiencia.
-- **💼 LANDING DE LA VÍA A — `/para-abogados` (2026-08-29):** el "Para
-  abogados" del header ya no tira al portal: ahora hay una página que VENDE
-  antes de dejar entrar. Grupo `(profesional)` con shell aurora propio
-  (`components/profesional/landing-profesional.tsx`); `NavAurora` quedó
-  parametrizada (`enlaces`/`secundario`/`cta`) porque la misma superficie
-  sirve a las dos audiencias. Secciones: hero · **cómo cita** (el diferencial
-  contra un chatbot: sin fuente no hay respuesta · solo fuentes del Estado ·
-  derecho hondureño) · 8 capacidades mapeadas a pantallas que EXISTEN ·
-  **leads** (el funnel vía B → vía A, con las materias reales del seed) ·
-  planes desde `data/catalogo.ts` con el ancla L25 y el anual −33% · CTA.
-  **Ruta:** `/para-abogados`, no `/profesional` — el plan intermedio se llama
-  "Profesional" (`PlanId`), así que esa URL habría chocado con el nombre del
-  tier. Entradas: nav de la landing, "Soy abogado" del shell público y la
-  sección de abogados de la home.
-  ⚠️ **Regla de esta página: no promete lo que el portal no hace hoy.** No
-  anuncia cifras de sentencias mientras el corpus no esté indexado. En la
-  misma pasada se corrigió la home, que afirmaba "Jus IA responde citando las
-  20,202 sentencias del corpus oficial" con 12 en el seed y el motor apagado.
-  **Refinado 2026-08-29 (sesión con Wesley), en este orden:**
-  - **Hero = composer de Jus IA** (`composer-jus-ia.tsx`), gemelo del buscador
-    ciudadano: la caja no busca, pregunta. Enter envía · Shift+Enter salta
-    línea · 3 chips de arranque de **materias y fuentes distintas** (Código del
-    Trabajo · CPC + jurisprudencia · IP), elegidos para enseñar alcance, no
-    frecuencia. Titular al patrón Jusbrasil ("Tu investigación jurídica empieza
-    en Justihn") y subtítulo que dice **qué se puede preguntar** — ahí el
-    lenguaje de inventario SÍ trabaja, porque está encima de la caja.
-  - **Puerta de cuenta:** escribir es libre; al ENVIAR se pasa por
-    **`/crear-cuenta`** (`crear-cuenta.tsx`). La pregunta se guarda en el store
-    ANTES de navegar, la pantalla la muestra ("Tu pregunta te espera") y se
-    dispara sola al llegar al chat. Se gatea en enviar y no en la primera
-    tecla: cortar a media escritura se siente roto.
-  - **Anillo de bienvenida** (`.borde-aurora--intro`): el borde aurora se
-    enciende, dura ~4 s y se apaga solo; al recargar vuelve. Es animación CSS,
-    así que reinicia con el montaje sin estado ni temporizadores.
-  - **Tres secciones con demostración** (`demos.tsx`) — Jus IA · Gaceta ·
-    Leads — con **datos reales de los seeds**, no maquetas: la sentencia citada
-    es CL-528-24 del piloto, con su órgano y magistrada verdaderos. Se
-    **reproducen** al entrar en vista (pregunta → pensando → respuesta →
-    fuente) y se rearman al salir. No son video a propósito: el HTML conserva
-    el texto para el crawler y las vistas siguen atadas al seed.
-  - **CTA final oscuro**, único bloque marino de la página. Su titular ("Tu
-    próxima búsqueda ya no empieza en Google") evita el paralelo tentador con
-    la referencia —"tu próximo cliente ya está preguntando"— porque los leads
-    del consultorio son seed: sería la misma sobreventa del corpus.
+**Estado: Fase 1 del blueprint (§4) — mock-first.** La UI completa corre contra
+seeds deterministas, sin backend ni claves (`pnpm dev` y listo). Los seeds **son
+el contrato literal** de las tablas Supabase de Fase 2. Deployado en
+**https://justihn-app.vercel.app** (repo `github.com/WesleyObeth/justihn-app`,
+env `JUSTIHN_DEMO_SESSION=1`, `noindex` hasta lanzar).
 
-  **End-to-end 2026-08-30 (sesión con Wesley):**
-  - **Encabezado canónico** (`Encabezado` en `landing-profesional.tsx`): las
-    secciones centradas (Cómo cita · Qué incluye · Planes · FAQ) llevan el
-    mismo patrón eyebrow + título + bajada — antes cada una tenía jerarquía
-    distinta y Capacidades ni subtítulo tenía. Las secciones de demo conservan
-    su eyebrow a la izquierda.
-  - **Planes rediseñados:** (a) las TRES cards llevan siempre la línea bajo el
-    precio (pago = anual −33% · Gratis = "para siempre — sin tarjeta") para
-    que las features arranquen a la misma altura; (b) tagline `resumen` por
-    plan, nuevo campo en `Plan`/`data/catalogo.ts` (fuente única); (c) features
-    acumulativas ("Todo lo del plan X, y además:"); (d) el plan **recomendado** destacado con
-    anillo por box-shadow — NO border-2, que encogería el contenido 1px y
-    desalinearía las cards. **Desde 2026-08-30 el recomendado es Profesional**
-    (decisión Wesley; antes Premium): es el escalón de entrada al pago y queda
-    en la card del medio, el patrón clásico de pricing. `destacado` en
-    `data/catalogo.ts` es la ÚNICA fuente — de ahí salen la insignia, el
-    realce y el imán en la landing, en la black, en la card puente de la home
-    ciudadana y en la pantalla de planes del portal; (e) los CTAs van a `/crear-cuenta` (antes
-    `/abogados/planes`, que saltaba la puerta de cuenta); (f) nota del ancla
-    L25 + anual bajo el grid. El subtítulo ya no dice "todo el contenido está
-    en todos los planes" — la card Gratis dice "búsqueda limitada" y se
-    contradecía a sí misma.
-  - **Sección FAQ** (`#faq`, entre Planes y el CTA final): 6 preguntas con
-    `<details>` nativo (server-rendered, cero JS, el crawler lee todo), copy
-    `FAQ_LANDING` local a la landing — NO reutiliza `FAQS` del catálogo, que
-    son dudas de uso interno del portal. Precios interpolados de
-    `PLANES`/`OFERTA`, nada escrito a mano. En la nav ("Preguntas") y el footer.
-  - **Footer:** enlaces de sección a anclas de esta página (un visitante sin
-    cuenta no cae dentro del portal por accidente; "Portal" sí queda como
-    entrada deliberada) + fila de cierre con copyright.
-    **Unificado 2026-08-30 en `components/landing/pie-aurora.tsx`**, que usan
-    las DOS landings (y la black): mismo pie, distinto contenido por props.
-    Es un **bloque marino a sangre** (decisión Wesley) — transparente, la
-    página se deshilachaba sobre el aurora en vez de cerrar. Los tonos viven
-    en `.pie-aurora` (landing.css) y NO se ponen inline: un color inline le
-    ganaría a la clase y dejaría texto marino sobre marino.
-  ⚠️ **Trampa de esta landing:** `.landing-aurora a { color: inherit }` le gana
-  por especificidad a `text-white` de Tailwind. Cualquier utilidad de color
-  sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
-  Pasó con los botones del CTA (texto marino sobre azul, ilegible).
+**Fuentes de verdad visuales** (no improvisar valores): `../design_handoff_portal/`
+para el portal y `../design_handoff_auth/` para login y onboarding.
 
-- **🎨 LAS PÁGINAS PÚBLICAS INTERIORES USAN EL SHELL AURORA (2026-08-30):**
-  el detalle de trámite y la calculadora tenían cabecera blanca y fondo plano,
-  así que abrir una guía desde la home se sentía como **salir del sitio**.
-  Ahora `(publico)/layout.tsx` monta el mismo `FondoAurora` + `NavAurora` +
-  `PieAurora` que la home; `HeaderPublico`/`FooterPublico` quedan sin uso.
-  - **Se coló una superficie con "Contactar por WhatsApp"** que la limpieza
-    anterior no tocó (esas páginas usan tiras propias, no `TarjetaAbogado`):
-    corregidas las tres públicas + la vista previa del perfil en el portal,
-    que enseñaba al abogado un botón que los ciudadanos ya no ven.
-  - ⚠️ **La trampa del shell, otra vez:** al entrar bajo `.landing-aurora`,
-    tres `<Link>` con `text-white` perdieron el color y quedaron con el texto
-    invisible sobre su fondo oscuro ("Ir al consultorio" entre ellos). Regla:
-    **al mover una página al shell aurora, revisar todo `text-white` sobre
-    `<a>`** — el color va inline.
+### 1.1 Portal de abogados — `/abogados` (15 pantallas)
 
-- **👤 LA CARD OFICIAL DEL ABOGADO — `components/publico/tarjeta-abogado.tsx`
-  (2026-08-30, elegida entre prototipos: "la card que habla"):** es la que ve
-  una persona al decidir a quién contratar, así que vive en UN solo sitio y la
-  usan la home, el directorio público y el del portal ciudadano.
-  Orden = orden de la duda: **materias** (lo primero que se busca; el nombre
-  aún no dice nada) → quién es (ciudad, años) → **credenciales** (colegiación
-  validada / en trámite + habilitación notarial) → **su voz**: un fragmento de
-  una respuesta suya en el consultorio → la acción, con su nombre.
-  - **La cita es el diferencial.** Deja juzgar CÓMO explica antes de
-    escribirle, y ningún competidor puede copiarla sin un consultorio detrás.
-    **Pero solo donde se decide:** la card tiene variante **`compacta`**
-    (decisión Wesley) que la home usa para meter TRES por fila, cambiando la
-    cita por el resumen de especialidad. La home es vitrina —enseña que hay
-    abogados y de qué materia—; la cita es munición para decidir y va entera
-    en el directorio completo. Clamparla a dos líneas la cortaría a media
-    frase, que es peor que no ponerla.
-    ⚠️ `TODO(data)`: sale de su última respuesta destacada en `leads`, NO de un
-    campo que el abogado redacte — si lo escribe él, vuelve a ser marketing.
-  - **Fuera "★ valoración"** de TODAS las superficies públicas (eran 5: home,
-    directorio público, guías de trámites, calculadora y trámites del portal
-    ciudadano). No existe sistema de reseñas: ese número no lo producía nadie
-    y aquí decide a quién contrata alguien. Se sustituye por años de ejercicio,
-    que sí es verificable. El campo `valoracion` sigue en el seed porque el
-    panel del abogado lo muestra como métrica propia — anotado ahí.
-  - **Fuera los conteos** (contactos, respuestas): vanidad. Uno con 34
-    respuestas no es mejor que uno con 12, y contarlas premiaría publicar por
-    publicar.
-  - **Fuera "Contactar por WhatsApp".** Sacaba el contacto de Justihn en el
-    primer toque: sin registro, sin trazabilidad y sin poder demostrarle al
-    abogado cuántos contactos le trajo la plataforma — que es lo que sostiene
-    que pague. Ahora **"Consultar con [nombre]"**; WhatsApp llega después,
-    cuando ya hay conversación. `TODO(fase 2)`: abrir una consulta DIRIGIDA
-    (mismo circuito del consultorio, con destinatario).
+Rutas reales, no estado: el deep-link a una sentencia o a una publicación
+funciona y es compartible. Dashboard · Jus IA · Jurisprudencia · Legislación ·
+Gaceta · Procesos · Modelos · Leads · Calculadoras · Monitoreo · Notificaciones ·
+Perfil · Planes · Configuración · Ayuda.
 
-- **🔍 REFINADO DE LA HOME CIUDADANA (2026-08-30, auditoría + ajustes):**
-  - **Procesos habla el mismo idioma que Trámites**: pasa de 4 cards en grid a
-    la misma `FilaTramite`, pero **sin el riel numerado** — despido, pensión,
-    divorcio y herencia no se encadenan entre sí y numerarlos inventaría un
-    orden. Se unifica el lenguaje visual, no el significado (861 → 656px).
-  - **La página ya no termina dos veces:** la cross-sell "Para profesionales
-    del derecho" iba DESPUÉS del CTA oscuro, así que el cierre se deshinchaba
-    y la última impresión de un ciudadano era una oferta que no es para él.
-    Ahora va antes.
-  - **El eyebrow "Guías de trámites" se repetía** en el demo y en la sección;
-    el del demo pasa a "Dentro de una guía".
-  - **Directorio:** el subtítulo afirmaba "Perfiles con insignia de validado"
-    y una de las tres cards no la lleva (`verificado: false` en el seed) —
-    ahora **describe qué significa** la insignia. Y se enseñan **los cinco**
-    perfiles en vez de tres: esconder dos tras una cuenta fingía que hay más
-    de lo que hay, así que se quitó "Ver todo el directorio", que además metía
-    al visitante dentro del portal sin pasar por el alta.
-  - **Consultorio compactado:** el formulario era una card DENTRO de la card.
-    `FormularioPregunta` gana `sinMarco` para vivir dentro de un contenedor
-    que ya pone marco y titular (984 → 889px).
+- **Nombres cerrados** (decisión Wesley 2026-08-25): vive bajo `/abogados` (antes
+  `/portal`); "Paso a paso" → **Procesos**; "Plantillas" → **Modelos** (es el
+  término del gremio y el que se googlea). Los identificadores internos
+  (`PLANTILLAS`, `plantillaId`) no cambiaron. Redirects permanentes en
+  `next.config.ts`.
+- **Regla del Dashboard:** nada inerte — toda card navega o dispara una acción.
+  "Pendientes de hoy" usa `usePreguntarAJusIA(pregunta, { enviarDirecto })`, que
+  deja la consulta enviándose al llegar al chat.
+- **Jus IA:** chat en una sola columna centrada (~760px); el historial va en un
+  panel lateral, no en columna fija. El titular del hero sale del pool
+  `TITULARES_HERO` (`data/jus-ia.ts`), elegido en cliente tras el mount.
+- **Legislación** y **Monitoreo de nombres** existen para que la tabla de planes
+  quede 100% respaldada por UI (estaban vendidas y no existían). Legislación
+  muestra los artículos del CPC verificados contra el PDF oficial del PJ; los
+  demás códigos aparecen "en preparación" — sin fuente no hay texto. Monitoreo
+  hace el matching **en vivo** sobre el texto de las 12 sentencias del piloto
+  (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
+  disclaimer de homónimos y exclusión de materias reservadas.
 
-- **💬 CONSULTORIO: la conversación primero (2026-08-30, elegido de un
-  prototipo de tres):** la sección `#consultorio` abre con un **intercambio
-  real** —consulta ciudadana + respuesta firmada por la colegiada, con su
-  número CAH y sus materias— y el formulario va debajo. El obstáculo aquí no
-  es que la persona no sepa dónde escribir: es que no cree que alguien vaya a
-  responderle. Si el visitante ya preguntó en esta sesión, se muestra SU
-  consulta en vez del ejemplo.
-  - ⚠️ **Hallazgo de fondo:** `leadsRespondidos` arranca vacío, así que la
-    sección prometía "te responde un abogado colegiado" y enseñaba preguntas
-    SIN contestar — probaba lo contrario de su título. Se añadió
-    **`respuestaDemo`** a los leads del seed (orientaciones generales, sin
-    citar artículos sin verificar). ⚙️ **Pendiente del socio: revisarlas.**
-  - **Fuera el demo duplicado.** El bloque *"Tu duda, respondida por un
-    abogado colegiado"* repetía esta sección y además fallaba el criterio de
-    los demos —enseñar lo que hay DETRÁS de la cuenta gratis—, porque
-    preguntar es gratis SIN cuenta. Lo sustituye **"Los trámites no se hacen
-    de una sentada"** (`DemoMisTramites`): el panel con el avance guardado,
-    que es lo único genuinamente tras la cuenta y no vivía en ningún otro
-    sitio de la home. Responde la pregunta que provoca la card del plan: si
-    todo es gratis, ¿para qué me registro?
-  - **Publicar pasa por la puerta de cuenta** (2026-08-30): la consulta se
-    guarda primero y el visitante va a `/crear-cuenta?tipo=persona&desde=consultorio`,
-    que lo reconoce ("Tu consulta ya está publicada"), cambia el titular a
-    "Sigue tu consulta" y al terminar lo deja en `/personas/consultas` con la
-    pregunta ahí. Antes saltaba directo al portal y se saltaba el alta entera.
-    Hace pareja con el composer de la vía A. ⚠️ La consulta se publica ANTES
-    del alta: al cablear Supabase hay que asignarle dueño en cuanto exista la
-    cuenta, y decidir qué pasa si el visitante la abandona (hoy queda
-    publicada y anónima, que es lo que la sección promete).
-  - También se quitaron dos salidas que competían con el paso siguiente: "Ver
-    todas las consultas del consultorio" y el enlace al directorio bajo las
-    guías de procesos (cada guía ya cierra recomendando abogado de su materia).
+### 1.2 Portal ciudadano — `/personas` (9 rutas)
 
-- **🗺️ TRÁMITES EN RUTAS, no en 9 cards (2026-08-30, decisión Wesley tras
-  comparar tres estructuras en un prototipo):** la sección `#tramites` de la
-  home agrupa las guías por **situación de vida** —Abrir un negocio · Comprar
-  o vender · Formalizar y vender al Estado— y las muestra **numeradas y
-  encadenadas** con un riel: el RTN habilita el CAI, el CAI el permiso de
-  operación. Ese orden es lo que no se encuentra googleando (hay que
-  reconstruirlo leyendo tres portales del Estado) y es la promesa del producto
-  hecha visible: asesoría, no directorio de links.
-  - **Se ve una ruta a la vez** (arranca en "Abrir un negocio") y los chips
-    cambian de categoría. ⚠️ **Filtran OCULTANDO, no montando**: las tres se
-    renderizan siempre y el chip activo esconde las otras con `hidden`. Si se
-    montara solo la activa, 4 de las 9 guías dejarían de existir para el
-    crawler — y en esta página eso ya costó un incidente (130 → 7.452
-    caracteres). Verificado: las 3 rutas y las 9 guías, con sus costos, salen
-    en el HTML del servidor aunque solo se vea una.
-  - **Buscar rompe el orden a propósito:** con término, resultados planos —
-    quien escribe "RTN" quiere su guía, no la ruta entera. Sin término, rutas.
-  - **Fuera el filtro por institución.** Pensaba como burócrata: nadie busca
-    "un trámite de ONCAE", busca "voy a abrir un negocio".
-  - **`tasaCorta` nuevo en el seed** (§0.5): la `tasa` verificada condensada a
-    una línea ("Gratuito", "L 300", "Desde L 341"). No es dato nuevo — al
-    editar `tasa` hay que revisarla, no pueden decir cosas distintas.
-  - **`RUTAS_TRAMITE` vive en `data/tramites.ts`**, junto a lo que agrupa.
-    ⚠️ Una guía fuera de toda ruta **desaparece de la home** aunque exista en
-    el seed y en su URL: invisible leyendo el código, así que `tramites.test.ts`
-    lo topa (cada trámite en exactamente una ruta, sin repetir, sin inventar
-    ids, sin colar procesos judiciales, y todas con `tasaCorta`).
+El patrón Jusbrasil completo: la landing da la probadita y "crear cuenta gratis"
+abre un portal con shell propio (sidebar marino gemelo del de abogados; persona
+demo Carlos Zelaya en `data/persona.ts`). Inicio · Trámites (con **checklist
+persistido**, `pasosTramite` en el store) · Consultas · Directorio · Calculadora ·
+Plan · Perfil · Configuración · Ayuda.
 
-- **🏠 HOME CIUDADANA REESTRUCTURADA como la de abogados (2026-08-30, pedido
-  de Wesley):** la vía B pasa a tener la misma arquitectura persuasiva de
-  `/para-abogados`, **manteniendo el hero intacto**. Se suman: encabezado a
-  las puertas de entrada, **3 secciones con demostración**, **plan** y **FAQ**
-  ciudadano y **CTA final oscuro**.
-  **Recorte 2026-08-30 (Wesley):** los 3 pilares "Por qué confiar" existieron
-  y **se quitaron** — la home llegaba larga y ese argumento ya lo repiten el
-  sello de fuente de cada guía y el FAQ. Y las cuatro cards de "¿Qué necesitas
-  resolver hoy?" **dejaron de navegar**: eran enlaces con "Empezar →" que
-  competían con las secciones reales de justo debajo, así que el visitante
-  decidía dos veces lo mismo. Llevan `glass-card--estatica`, que les quita el
-  hover que levanta la card — en algo no clicable ese gesto promete un clic
-  que no existe. Las 4 secciones interactivas de verdad (Trámites,
-  Procesos, Consultorio, Directorio) **se conservan** — son la sustancia del
-  producto y el motor SEO; los demos van ANTES y enseñan lo que hay detrás de
-  la cuenta gratis (que es lo que la landing gatea), no lo mismo dos veces.
-  - **Marco de demo compartido** en `components/landing/demo-marco.tsx`
-    (`Ventana` + `SeccionDemo`), extraído de `profesional/demos.tsx` — las dos
-    landings usan el mismo chrome y cada una pone su contenido.
-  - **`components/publico/demos-personas.tsx`** con la misma regla de la vía A
-    (**datos reales del seed, nunca maquetas**): guía del RTN con checklist
-    (verificada contra el SAR) · consulta del `LEADS` respondida por la
-    colegiada del directorio · cálculo hecho por **`lib/prestaciones`**, el
-    mismo módulo de la calculadora real (§0.5) — si la fórmula cambia, la demo
-    cambia con ella y no puede quedar enseñando una cifra que el producto ya
-    no da.
-  - **Planes: UNA card y es gratis** (decisión Wesley). Tres cards inventarían
-    una decisión que la persona no tiene. El plan de pago que pidió el socio
-    se nombra al pie con **las mismas palabras que usa el portal ciudadano**
-    ("en definición"), para que las dos pantallas no se contradigan.
-    **Rediseñada 2026-08-30** siguiendo una referencia que pasó Wesley (la
-    card de plan de Sonriprev): dos columnas separadas por una línea —promesa,
-    precio grande y CTA a la izquierda; "Incluido" con divisores y la nota del
-    plan de pago a la derecha—. Se lee "cuánto" y luego "qué", que es el orden
-    de la duda. ⚠️ **La referencia usa escasez** ("los primeros 200 aseguran
-    estas condiciones") y eso NO se copió: sería inventarse un cupo que no
-    existe. El gancho es la gratuidad, que sí es verdad.
-  - ⚠️ **Honestidad:** el copy de la demo de calculadora NO dice "usa el
-    Código del Trabajo" ni "el mismo número que vería tu abogado" — sería
-    sobreventa mientras `lib/prestaciones` siga sin validar con el socio y
-    contradiga la escalera literal que ya publica la guía de despido (ver
-    §8, deuda conocida). Dice "desglose orientativo".
-  - **SSR verificado: 7.452 → 12.597 caracteres** de texto en el HTML del
-    servidor. Todo lo nuevo lo lee el crawler (la home ya tuvo un incidente de
-    contenido invisible — ver la nota de `useSearchParams` bajo Suspense).
+**Nombres cerrados (2026-08-29):** `/personas` en plural, para leer como pareja
+de `/abogados`; y su buscador es `/personas/directorio`, no `/personas/abogados`
+— esa forma hacía que `/abogados` significara a la vez el portal de suscriptores
+y una pantalla del ciudadano. El label de la UI sigue siendo "Encuentra abogado",
+y `data/persona.ts` se queda en singular porque es UNA persona demo. Redirects
+308 para las cuatro formas viejas.
 
-- **⤵️ DESPLAZAMIENTO SUAVE A LAS ANCLAS —
-  `components/landing/desplazamiento-suave.tsx` (2026-08-30):** al pulsar un
-  enlace del nav (o del pie, o cualquier ancla de la página) la página baja o
-  sube animada y la sección de destino da un **destello** de 1,4 s
-  (`.destello-ancla`, pseudo-elemento con halo celeste). El destello no es
-  adorno: al frenar el scroll no siempre está claro qué bloque pediste.
-  - ⚠️ **Va en JS y NO con `html { scroll-behavior: smooth }`**, que era lo
-    obvio: esa regla es global y alcanza también al salto al principio que
-    hace Next al cambiar de ruta — en una home de 8.000px, abrir un trámite se
-    volvería un scroll animado de varios segundos. Aquí se interceptan solo
-    las anclas de la propia página (`#x` y `/#x` estando en `/`), respetando
-    los atajos del navegador (⌘/ctrl/shift-clic). Verificado: cambiar de ruta
-    sigue siendo instantáneo.
-  - Se detiene 96px por debajo del borde para que la nav fija no tape el
-    encabezado, actualiza el hash con `pushState` (que no desplaza) y con
-    `prefers-reduced-motion` salta directo y sin destello.
+### 1.3 Páginas públicas
 
-- **🧲 BOTÓN MAGNÉTICO (GSAP) — `components/landing/magnetico.tsx` (2026-08-30):**
-  los elementos con clase **`.magnetic`** se van hacia el cursor (factor
-  **0.35**) con `gsap.quickTo` y ease **`elastic.out(1,0.4)`**, y vuelven a
-  0,0 en `pointerleave`. `BotonesMagneticos` se monta una vez por shell de
-  landing (clara, black y ciudadana) y trabaja sobre el DOM con delegación +
-  `MutationObserver`: un botón se vuelve magnético con solo añadirle la clase,
-  sin envolverlo ni pasarle props. GSAP entra por **import dinámico** (es
-  decoración; no debe pesar en el primer render de una landing que se mide por
-  SEO) y el efecto **se apaga** con `prefers-reduced-motion` y sin
-  `(hover:hover) and (pointer:fine)` — en táctil el botón se escaparía justo
-  al tocarlo. **Va SOLO en los botones azules sólidos** (decisión Wesley
-  2026-08-30): CTA del nav · enviar del composer · plan destacado · CTA del
-  cierre. En un botón de solo borde el imán no se lee como intención sino como
-  que el botón tiembla, y si todo se mueve el efecto deja de señalar la acción
-  principal porque ya no distingue a nadie. Hay auditoría hecha: los 4 con
-  imán son `rgb(21,132,199)` y ningún botón azul quedó sin él.
-  ⚠️ **Trampa:** GSAP escribe `transform`; si el elemento ya tiene un `:hover`
-  con transform (la `.glass-card` sube 2px, `.btn-celeste` −1px) una de las dos
-  animaciones se pierde en silencio. `magnetico.test.ts` lo topa.
+**Home ciudadana `/`** — grupo `(landing)`, shell aurora. Hero con buscador ·
+4 puertas de entrada (no navegan: ver §3) · 3 demos · Trámites en rutas ·
+Procesos · Consultorio · Directorio · Plan gratis · FAQ · CTA · cross-sell a la
+vía A.
 
-- **📲 VISTA PREVIA EN WHATSAPP — tarjetas Open Graph (2026-08-30):** el sitio
-  **no tenía NINGUNA etiqueta Open Graph** (cero `og:*`), así que cada enlace
-  compartido salía como burbuja de texto pelado, sin miniatura — justo el
-  enlace que Wesley y el socio pasan a abogados. Resuelto con:
-  - **`metadataBase`** en el layout raíz (constante `SITIO`, con
-    `NEXT_PUBLIC_SITIO_URL` como override). Sin esto Next emite el `og:image`
-    relativo y WhatsApp no pinta nada. **Al comprar el dominio se cambia AHÍ
-    y en ningún otro lado.**
-  - **Tres tarjetas 1200×630** generadas con `next/og` en el BUILD (rutas
-    estáticas, ~150 KB c/u — WhatsApp descarta las imágenes pesadas): la
-    general (`app/opengraph-image.tsx`, la heredan portal/auth/trámites), la
-    ciudadana (`(landing)/`) y la de abogados (`(profesional)/para-abogados/`).
-    Componente único en **`lib/og/tarjeta.tsx`** — fondo marino del login,
-    lockup oficial, titular, bajada y tres sellos de prueba.
-  - **Fuentes en `app/_og-fuentes/` (TTF, OFL).** satori **no lee woff2**, que
-    es lo único que deja `next/font` en el build: por eso van versionadas.
-  - **`og:url` por página, no global** — un `og:url` fijo en el layout haría
-    que toda página compartida se canonizara como la home. Lo declaran las dos
-    landings; el resto no emite ninguno y vale el enlace que se pegó.
-  - `noindex` **no** afecta esto: el rastreador de WhatsApp lee las Open Graph
-    igual. Son cosas distintas.
-  - **`app/og.test.ts`** (6 tests) fija lo que no se ve leyendo el código: que
-    exista `metadataBase` https, que haya una tarjeta por audiencia con
-    medidas/alt, y que titulares (≤48), sellos (≤24) y los títulos y
-    descripciones compartibles (≤70/≤170) no se corten en la burbuja.
+- **Trámites agrupados por situación de vida** (Abrir un negocio · Comprar o
+  vender · Formalizar y vender al Estado), **numerados y encadenados** con un
+  riel: el RTN habilita el CAI, el CAI el permiso de operación. Ese orden es lo
+  que no se encuentra googleando y es la promesa del producto hecha visible.
+  Se ve una ruta a la vez; buscar rompe el orden a propósito (resultados planos:
+  quien escribe "RTN" quiere su guía, no la ruta). No hay filtro por institución
+  — nadie busca "un trámite de ONCAE", busca "voy a abrir un negocio".
+- **Procesos** usa la misma `FilaTramite` pero **sin el riel numerado**: despido,
+  pensión, divorcio y herencia no se encadenan y numerarlos inventaría un orden.
+- **Consultorio: la conversación primero.** Abre con un intercambio real
+  (consulta + respuesta firmada por la colegiada, con su número CAH) y el
+  formulario debajo. El obstáculo no es no saber dónde escribir: es no creer que
+  alguien vaya a responder. Si el visitante ya preguntó en esta sesión, se
+  muestra SU consulta. Publicar pasa por `/crear-cuenta?tipo=persona&desde=consultorio`.
+- **Directorio:** los cinco perfiles, sin esconder ninguno tras una cuenta.
 
-- **🗂️ "LO QUE ENCUENTRAS DENTRO" — mosaico de nueve piezas
-  (`components/profesional/capacidades.tsx`, 2026-08-30, tres rondas):**
-  con una celda ancha por fila que alterna de lado. **Sin encabezados de
-  categoría** (decisión Wesley): el orden sigue agrupando por trabajo
-  —investigar → vigilar → producir— pero sin rotularlo; tres titulares dentro
-  de una sección que ya tiene el suyo hacían cuatro niveles de jerarquía en el
-  mismo bloque y partían el mosaico en tres rejillas sueltas.
-  - Arregla tres cosas del muro de 8 cards iguales que había antes: **no
-    incluía Jus IA** (el corazón del producto), llamaba a cada función por el
-    nombre de su pantalla en vez de por el trabajo que resuelve, y no daba
-    ninguna jerarquía.
-  - ⚠️ **Por qué NO lleva panel de producto**, aunque una ronda intermedia lo
-    tuvo (patrón de una referencia de Wesley): la página quedaba con **CUATRO
-    secciones seguidas con ventana** —esta y los tres demos— y las tres
-    ventanas de aquí enseñaban Jus IA, Gaceta y Leads, que son exactamente los
-    tres demos de después. No era parecido: era lo mismo dos veces. **Reparto
-    definitivo: esta sección es el INVENTARIO, los demos son la DEMOSTRACIÓN.**
-  - La celda ancha alterna de posición por fila (izq · der · izq): con la ancha
-    siempre al principio, las tres filas se leerían idénticas. Con 4 columnas
-    cada fila suma 2+1+1, así que teja sin huecos (verificado 3+3+3).
-  - **Sin estado ni interacción** — componente de servidor, así que las nueve
-    funciones llegan íntegras al HTML sin depender de hidratación.
-  - ⚙️ **Capturas del portal: diferidas a propósito** — una captura driftea en
-    cuanto cambia una pantalla, no le da texto al crawler, y la UI se moverá
-    mucho al entrar Supabase. Se reevalúa entonces, y con script de captura
-    commiteado (ver §6.5b).
+**Landing de abogados `/para-abogados`** — grupo `(profesional)`. Hero con
+**composer de Jus IA** (la caja no busca, pregunta; Enter envía, Shift+Enter
+salta línea, 3 chips de materias y fuentes distintas para enseñar alcance) ·
+Cómo cita · Lo que encuentras dentro · 3 demos · Planes · FAQ · CTA oscuro.
 
-- **🌑 LANDING BLACK — `/para-abogados-black` (2026-08-30):** la MISMA landing
-  de la vía A en tema oscuro, para comparar con Wesley cuál versión queda.
-  Cero duplicación: la página reutiliza `LandingProfesional` tal cual y el
-  tema lo hace `.landing-aurora--black` (landing.css) remapeando los tokens
-  (`--ink/--muted/--card/--line/--mint` + `--color-texto-4`) sobre el aurora
-  noche del login; shell propio en `(profesional-black)/layout.tsx` con
-  `NavAurora logoVariante="oscuro"` (prop nuevo) y enlace "Versión clara" de
-  vuelta a `/para-abogados`. **Patrón `superficie-dia`** (composer del hero +
-  ventanas de demo): en la landing clara son cards blancas con los tokens
-  claros re-anclados; en black van en **glass oscuro** (decisión Wesley
-  2026-08-30) — la regla `.landing-aurora--black .superficie-dia` les gana a
-  las utilidades Tailwind del componente y remapea TODOS los tokens interiores
-  (`--color-marino/texto-2/chip/exito…`), con los fondos internos de las
-  ventanas como clases (`ventana-cabecera`, `caja-panel`) y un fix
-  `polygon[fill="#0d2144"]` para aclarar el símbolo de Jus IA. Cuando se elija
-  una versión, borrar la otra ruta (o convertirla en redirect).
+- **La URL es `/para-abogados`, no `/profesional`** — el plan intermedio se llama
+  "Profesional" (`PlanId`) y habría chocado con el nombre del tier.
+- **Puerta de cuenta:** escribir es libre; al ENVIAR se pasa por `/crear-cuenta`.
+  Se gatea en enviar y no en la primera tecla: cortar a media escritura se
+  siente roto. La pregunta se guarda en el store ANTES de navegar y se dispara
+  sola al llegar al chat.
+- **Anillo de bienvenida** (`.borde-aurora--intro`): el borde aurora se enciende
+  ~4 s y se apaga solo. Es animación CSS, así que reinicia con el montaje sin
+  estado ni temporizadores.
+- **Los tres demos** (`demos.tsx`) usan **datos reales de los seeds**, no
+  maquetas: la sentencia citada es CL-528-24 del piloto, con su órgano y
+  magistrada verdaderos. Se reproducen al entrar en vista y se rearman al salir.
+  No son video a propósito: el HTML conserva el texto para el crawler.
+- **"Lo que encuentras dentro"** (`capacidades.tsx`) es un **mosaico de nueve
+  piezas** con una celda ancha por fila alternando de lado, **sin encabezados de
+  categoría** y **sin ventana de producto**. El reparto es deliberado: **esta
+  sección es el INVENTARIO, los demos son la DEMOSTRACIÓN**. Una ronda intermedia
+  sí tuvo panel y dejaba la página con cuatro secciones seguidas con ventana,
+  enseñando los mismos Jus IA / Gaceta / Leads que los demos de debajo. Con 4
+  columnas cada fila suma 2+1+1, así que teja sin huecos. Es componente de
+  servidor: las nueve funciones llegan al HTML sin depender de hidratación.
 
-- **🔐 AUTH CONSTRUIDO — `/iniciar-sesion` + `/crear-cuenta` (2026-08-30):**
-  las dos pantallas del handoff **`../design_handoff_auth/`** (Claude Design,
-  copiado del Desktop de Wesley — es la fuente de verdad visual de auth),
-  recreadas pixel-perfect en el grupo **`(auth)`** con shell propio y sin
-  navegación.
-  ⚗️ **Prueba en curso (2026-08-30):** el shell usa la **aurora CLARA** de las
-  landings, no la variante noche del handoff — Wesley quiere comparar. Las
-  tarjetas se adaptaron a fondo claro (blanca en vez de glass oscuro, inputs
-  `input-dia`, logo `claro`, sombras recalibradas). **Camino de vuelta:**
-  revertir ese único commit — `landing-aurora--noche` + `FondoAurora
-  variante="noche"` y `.input-noche` siguen en el CSS a propósito.
-  - **`/iniciar-sesion`** (`components/auth/iniciar-sesion.tsx`): card glass
-    oscuro con login, recuperar contraseña y "enlace enviado".
-  - **`/crear-cuenta`** (`components/auth/onboarding.tsx`): **reemplaza la
-    maqueta anterior** (misma URL, se borró `profesional/crear-cuenta.tsx`).
-    Onboarding en 3 pasos (Cuenta con medidor de fuerza · Validación CAH
-    opcional con dropzone · Materias en chips, 14 áreas de práctica — más
-    amplias que las 6 del corpus) + bienvenida con resumen y checklist. La
-    **`consultaPendiente` del composer se conserva**: se muestra sobre el card
-    ("Tu pregunta te espera") y se dispara al llegar al chat, igual que antes.
-  - **Escena del logo — el libro que se abre** (`components/auth/escena-logo.tsx`,
-    portada del archivo **`../design_handoff_auth/justihn-logo-scene.jsx`**,
-    que Wesley pasó después y está copiado ahí). Cuatro actos en **6,8 s**: Cerrado 1,4 s (libro cerrado y
-    centrado) · Apertura 1,6 s (páginas a ±26° y nace el cruce) · Nombre 2,2 s
-    (se revela el wordmark) · Final 1,6 s (respiración y fade). Los tiempos van
-    en **porcentaje de un ciclo único** en `auth.css`, para que el bucle sea
-    una animación por elemento y los actos no puedan desincronizarse.
-    - El símbolo **se corre a la izquierda como consecuencia** de que el
-      wordmark ocupe sitio (el grupo está centrado y el ancho del nombre crece
-      de 0), no con un desplazamiento en píxeles: si cambia la fuente o el
-      tamaño, el encuadre se recentra solo.
-    - ⚠️ **Lo que el archivo tiene y la descripción no dejaba ver: las dos
-      páginas ARRANCAN SUPERPUESTAS** (misma `x = 24 − W/2 = 18,15`) y se
-      separan ±7 al girar. Ese es el libro cerrado de verdad — una sola forma
-      visible—, no dos barras juntas. Se consigue con `translateX(±7)
-      rotate(±26°)` sobre `transform-origin: 24px 21px`, que es idéntico a
-      mover la `x` y girar sobre el centro nuevo, y **termina exactamente en la
-      geometría oficial** (−26° en 17,21 · +26° en 31,21).
-    - ⚠️ **Bug corregido el mismo día (el logo salía torcido en Safari):** la
-      separación iba con `translateX(7px)` dentro del SVG, y **la unidad de
-      esa longitud depende del motor** (unidades del viewBox o píxeles CSS);
-      y el lienzo se reducía con `zoom`, que no es estándar y escala el texto
-      de otra manera, así que el lockup salía descompensado. Ahora la
-      separación va en la propiedad de geometría **`x`** (siempre unidades del
-      viewBox) con el giro sobre el centro de cada página (`fill-box` + 50%
-      50%, sin longitudes de por medio), y el lienzo usa **`transform:
-      scale`**. Verificado en **Chromium y WebKit**: `x` 18,15 → 11,15/25,15 y
-      centros en 17/31 en ambos.
-    - Easings del archivo, portados como curvas cúbicas: `easeOutCubic` en el
-      fade de entrada, **`easeOutBack`** en la apertura (el rebote) y
-      `easeInOutQuart` en el recentrado, el wordmark y el fade final. Los
-      tiempos van en porcentaje de un ciclo de 6,8 s para que el bucle sea una
-      animación por elemento y los actos no se desincronicen.
-    - El lienzo se construye a la **escala intrínseca del archivo** (símbolo
-      200 · hueco 28 · wordmark 560 = lockup 788) y se reduce con `zoom`, para
-      que el desplazamiento de **294px** siga siendo exactamente medio lockup.
-    - `SplashJustihn` hace **una sola pasada** y navega a los 5 s — justo al
-      cerrar el tercer acto, con el nombre ya revelado y antes del fade del
-      cuarto. `bucle` lo repite (escaparate). Con reduced-motion se muestra el
-      logo abierto y el nombre, sin movimiento. La geometría del handoff resultó idéntica a la
-    oficial de `brand/logos.tsx`, y sus fuentes (Space Grotesk títulos +
-    Instrument Sans UI) son las que el proyecto ya tenía — cero tokens nuevos.
-  - **🔗 LOGIN COMPARTIDO POR LAS DOS VÍAS (2026-08-30, decisión Wesley):**
-    `/iniciar-sesion` sirve a abogados y a personas. Es UNA base de cuentas:
-    dos logins duplicarían recuperación, enlaces mágicos, rate limit y errores,
-    y sobre todo obligarían a acertar por qué puerta se registró uno — quien
-    elige mal ve "no existe esa cuenta" y se va creyendo que perdió su
-    registro. **El alta sí es distinta** y por eso `?tipo=persona` solo cambia
-    el copy, el placeholder del correo, a qué alta manda y a qué portal entra;
-    nunca lo que se pide para entrar. En **Fase 2 el parámetro sobra**: el
-    destino lo resuelve la cuenta (¿tiene ficha de abogado? → `/abogados`).
-  - **Alta ciudadana corta** (`components/auth/registro-persona.tsx`, en
-    `/crear-cuenta?tipo=persona`): nombre, correo y contraseña. El abogado pasa
-    por tres pasos porque el producto necesita colegiación, materias y
-    solvencia; a un ciudadano eso lo espantaría y su portal no usa ninguno de
-    esos datos. `components/auth/alta.tsx` es la puerta única que elige
-    formulario — una sola URL, haciendo pareja con el login.
-  - **El `?tipo=` se lee en el SERVIDOR** (`searchParams` de la page), no con
-    un hook de cliente: leerlo en cliente hacía que el HTML llegara siempre
-    con la variante del abogado y se viera un parpadeo del stepper antes de
-    cambiar al formulario corto. A cambio las dos rutas se sirven dinámicas
-    (`ƒ`), que en pantallas de auth sin SEO no cuesta nada. Tampoco se usa
-    `useSearchParams`: ese hook bajo Suspense vació el HTML de la home (ver el
-    incidente de SSR). **`hooks/use-busqueda-url.ts`** queda para el cliente
-    —lo usa el filtro del directorio— unificando el helper que estaba
-    duplicado en `secciones.tsx`.
-  - **Honestidad Fase 1:** ambas pantallas validan formato y entran con la
-    sesión demo; nota visible bajo el card ("todavía no se crean cuentas
-    reales") y `TODO(auth)` con el cableado Supabase exacto en cada archivo.
-  - **La nav de las landings (corregido 2026-08-30):** el botón lleno es
-    **"Crear cuenta gratis"** en las DOS, e **"Iniciar sesión"** va como enlace
-    de texto (`login` en `NavAurora`). `/para-abogados` lo tenía al revés —
-    su botón más prominente servía a quien ya era cliente, en una página que
-    existe para convertir abogados nuevos. Dos razones: el botón lleno es para
-    la acción que la página busca, y **por debajo de 980px el nav esconde los
-    enlaces de texto y solo sobrevive ese botón** (verificado a 7 anchos).
-  - El CTA de la nav de `/para-abogados` pasó de "Entrar al portal"
-    (→ `/abogados` directo) a la puerta de cuenta. La
-    entrada directa al portal —la de enseñárselo al socio— vive en el pie
-    ("Abogados → Portal"); el botón "Ver el portal por dentro" que estaba en
-    el CTA final **se quitó** (decisión Wesley 2026-08-30): competía con el
-    botón azul y ofrecía entrar sin cuenta justo donde se pide crearla.
-  - Trampa de contraste: `.landing-aurora--noche a` pinta los links
-    celeste-claro — dentro del card BLANCO del onboarding serían ilegibles;
-    `.card-dia` los devuelve al celeste de marca.
+**`/para-abogados-black`** — la MISMA landing en tema oscuro, para que Wesley
+elija. Cero duplicación: reutiliza `LandingProfesional` tal cual y el tema lo
+hace `.landing-aurora--black` remapeando los tokens sobre el aurora noche.
+El **patrón `superficie-dia`** (composer del hero + ventanas de demo) son cards
+blancas en la landing clara y **glass oscuro** en la black: la regla
+`.landing-aurora--black .superficie-dia` les gana a las utilidades Tailwind del
+componente y remapea todos los tokens interiores.
+⚙️ **Cuando se elija una versión, borrar la otra ruta** (o convertirla en redirect).
 
-- **✅ E2E DE LAS CINCO PANTALLAS PÚBLICAS (2026-08-30):** recorrido completo
-  de los tres caminos que un visitante puede tomar —ciudadano, abogado, volver
-  a entrar— más los cruces de móvil, enlaces, SSR y accesibilidad en **Chromium
-  y WebKit**. Scripts en el scratchpad de la sesión (no commiteados: dependen
-  del servidor de desarrollo). Encontró **dos defectos que solo se ven
-  recorriendo, no leyendo**:
+**Interiores** (`/tramites/[id]`, `/calculadora-prestaciones`) — grupo `(publico)`,
+**mismo shell aurora que la home** desde 2026-08-30: antes tenían cabecera blanca
+y fondo plano, así que abrir una guía se sentía como salir del sitio.
 
-  1. **El gate de cuenta se saltaba el alta.** En el detalle de un trámite y en
-     la calculadora, "Crear mi cuenta gratis" enlazaba **directo a
-     `/personas/…`**: el visitante entraba al portal ciudadano sin crear nada,
-     así que la puerta era decorativa. Ahora pasan por
-     `/crear-cuenta?tipo=persona&next=…` y aterrizan en la guía que estaban
-     leyendo (`tramites.tsx`, `calculadora.tsx`, `registro-persona.tsx`).
-     ⚠️ **Ese `next` lo valida `destinoSeguro()`** en
-     `app/(auth)/crear-cuenta/page.tsx`: debe empezar por `/personas` y no por
-     `//`. **No quitarlo** — sin él el parámetro es un redirect abierto colgando
-     de un formulario que pide correo y contraseña, que es justo donde sirve
-     para mandar a alguien a una página falsa después de escribir sus datos.
-  2. **Áreas táctiles bajo el mínimo.** El toggle "Ver" de la contraseña medía
-     **18×19,5 px** en las tres pantallas con clave, y los enlaces del pie
-     18,8 px apilados. Se agrandó el área **sin mover el texto**: el toggle está
-     en posición absoluta, así que `right-3 → right-1 + px-2` compensa los 8px
-     exactos. Criterio: **24×24 de WCAG 2.5.8**, que **exime a los enlaces
-     dentro de una frase** ("Términos de servicio", "Inicia sesión") — ahí el
-     tamaño lo manda el texto, no el diseño. El listón de 32px que usé al
-     principio era más estricto que el estándar y daba falsos positivos.
+**Shell compartido:** `FondoAurora` (three.js, shader FBM; navy #0a1830 · celeste
+#1584c7 · claro #7cc7f0) + `NavAurora` (parametrizada: `enlaces`/`secundario`/
+`cta`/`login`/`logoVariante`) + `PieAurora` (un pie, distinto contenido por
+props; bloque marino a sangre). Stacking: fondo z-0 · canvas+scrim z-1 ·
+contenido z-2 · nav z-100.
 
-  Lo verde: 33 comprobaciones de recorrido (la pregunta del composer llega al
-  chat de Jus IA; la consulta pública aparece como lead en el portal), 0
-  desbordes horizontales y 0 errores de JS en móvil y escritorio en los dos
-  motores, 21 enlaces internos vivos, un solo `h1` por página, todo control con
-  nombre accesible, y la home sirviendo **11.462 caracteres de texto sin JS**.
+### 1.4 Auth — `/iniciar-sesion` + `/crear-cuenta`
 
-- **🎨 MARCA — favicon y lockup corregidos (2026-08-29):** el favicon no era
-  el símbolo oficial sino una versión aparte, con **otra geometría** (barras más
-  gordas y encimadas), **sin el cruce** `#0e5f92` y con un
-  `prefers-color-scheme: dark` que le volvía la barra izquierda casi blanca.
-  Ahora `src/app/icon.svg` ES `logo/justihn-icon.svg`, con el viewBox recortado
-  a la tinta (`4.1 1.1 39.9 39.9`) para llenar la pestaña; sin adaptación a modo
-  oscuro — el logo no cambia de color, a costa de que la barra marina quede
-  tenue en pestaña oscura. `favicon.ico` se genera del mismo SVG (16/32/48/64/128,
-  alfa 0) y `logo/justihn-favicon.svg` se mantiene igual para que no drifteen.
-  ⚠️ **Rompe la ficha de marca**, que pedía la variante favicon "sin cruce" a
-  ≤20px: se prioriza que la pestaña se vea como el logo.
-  **Lockup:** el gap del nav de la landing (11px) no coincidía con el de
-  `LogoJustihn` (7px). Ambos a **5px**, medido sobre el render a 4× contando
-  columnas con tinta: 9.2px de hueco visual en los dos. El símbolo aporta ~2.4px
-  de aire propio dentro de su viewBox — descontarlo es lo que faltaba.
+Grupo `(auth)`, shell propio sin navegación, del handoff `../design_handoff_auth/`.
 
-- **✨ LANDING AURORA (2026-08-29):** la home se movió al grupo `(landing)` con
-  shell propio estilo Jusbrasil: fondo aurora WebGL (three.js, shader FBM
-  replicado verbatim de otro proyecto de Wesley — solo se adaptaron los vec3 a
-  la marca: navy #0a1830 · celeste #1584c7 · claro #7cc7f0) + nav fija glassy
-  con estado sólido al scroll. Módulo en `components/landing/` (aurora.ts,
-  fondo-aurora.tsx con fallback sin-WebGL/reduced-motion, nav-aurora.tsx,
-  landing.css scopeado bajo .landing-aurora). Stacking: fondo z-0 ·
-  canvas+scrim z-1 · contenido z-2 · nav z-100. Las páginas públicas
-  interiores conservan el shell claro de `(publico)`.
-  **Secciones en la landing (2026-08-29, decisión Wesley):** trámites,
-  consultorio y directorio dejaron de ser páginas propias y viven como
-  SECCIONES interactivas de la home (`components/landing/secciones.tsx`, ids
-  `#tramites/#consultorio/#directorio`, nav y footer con anclas). El buscador
-  del hero y el de la sección comparten estado (buscar arriba filtra abajo y
-  hace scroll). Las rutas viejas redirigen a su ancla; sobreviven como página
-  el detalle `/tramites/[id]` (SEO + gate de cuenta) y la calculadora.
-  ⚡ **SSR arreglado (2026-08-29):** la home salía casi VACÍA en el HTML —
-  13.627 bytes de los que el único texto era el `<title>` y el menú; cero
-  apariciones de "RTN", "despido", "divorcio". La causa no era "es client
-  component" (el nav también lo es y sí salía): toda la landing iba dentro de un
-  `<Suspense fallback={null}>` y `SeccionDirectorio` llamaba `useSearchParams()`
-  para leer `?materia=`/`?notarios=1`; ese hook bajo un Suspense hace que Next
-  abandone el prerenderizado del subárbol y emita el fallback. Se cambió a
-  `useSyncExternalStore` sobre `window.location.search` (servidor "" · cliente el
-  valor real) y se quitó el Suspense. **Resultado: 130 → 7.452 caracteres de
-  texto.** Regla para la próxima pantalla pública: `useSearchParams` bajo
-  Suspense = contenido invisible para Google.
-  **Procesos legales ciudadanos (2026-08-29, pedido del socio):** `tramites.ts`
-  gana `tipo: "tramite" | "proceso"` y 4 guías judiciales — me despidieron
-  (Laboral, el ejemplo que pidió), pensión alimenticia, divorcio y herencia —
-  con instituciones nuevas (Juzgados, STSS). Viven en la sección `#procesos`
-  de la landing y comparten TODA la UI (detalle con gate, checklist del
-  portal, buscador). Cada guía cierra con el abogado de esa materia:
-  contacto directo + "Buscar abogado de [materia]" →
-  `/?materia=X#directorio` (el directorio lee el filtro de la URL). El portal
-  ciudadano separa ambos con un toggle Todos/Trámites/Procesos.
+- **Un solo login para las dos vías** (decisión Wesley 2026-08-30). Es UNA base
+  de cuentas: dos logins duplicarían recuperación, enlaces mágicos, rate limit y
+  errores, y obligarían a acertar por qué puerta te registraste — quien elige mal
+  ve "no existe esa cuenta" y se va creyendo que perdió su registro. `?tipo=persona`
+  solo cambia copy y destino, **nunca lo que se pide para entrar**. En Fase 2 el
+  parámetro sobra: lo resuelve la cuenta (¿tiene ficha de abogado? → `/abogados`).
+- **El alta sí es distinta.** Abogado: 3 pasos (cuenta con medidor de fuerza ·
+  validación CAH opcional con dropzone · materias en chips, 14 áreas) + bienvenida.
+  Ciudadano: nombre, correo y contraseña. `alta.tsx` es la puerta única que elige
+  formulario. El abogado pasa por tres pasos porque el producto necesita
+  colegiación y materias; a un ciudadano eso lo espantaría y su portal no usa
+  ninguno de esos datos.
+- **`?tipo=` se lee en el SERVIDOR** (`searchParams` de la page), no con un hook
+  de cliente: en cliente el HTML llegaba siempre con la variante del abogado y se
+  veía un parpadeo del stepper. A cambio las dos rutas se sirven dinámicas, que
+  en pantallas sin SEO no cuesta nada.
+- **`next` validado** — ver §4.7.
+- **Escena del logo: el libro que se abre** (`escena-logo.tsx`, portada de
+  `../design_handoff_auth/justihn-logo-scene.jsx`). Cuatro actos en 6,8 s:
+  Cerrado 1,4 s · Apertura 1,6 s (páginas a ±26°, nace el cruce) · Nombre 2,2 s ·
+  Final 1,6 s. Los tiempos van en **porcentaje de un ciclo único** en `auth.css`,
+  para que el bucle sea una animación por elemento y los actos no se
+  desincronicen. Easings del archivo portados a curvas cúbicas (`easeOutBack` en
+  la apertura). El símbolo **se corre a la izquierda como consecuencia** de que
+  el wordmark ocupe sitio, no con un desplazamiento en píxeles: si cambia la
+  fuente, el encuadre se recentra solo. Las dos páginas **arrancan superpuestas**
+  (misma `x = 24 − W/2 = 18,15`) y se separan ±7 al girar — ese es el libro
+  cerrado de verdad, una sola forma visible. `SplashJustihn` hace una pasada y
+  navega a los 5 s, justo al cerrar el tercer acto. Con reduced-motion se muestra
+  el logo abierto, sin movimiento.
+- ⚗️ **Prueba en curso:** el shell usa la **aurora CLARA** de las landings, no la
+  variante noche del handoff — Wesley quiere comparar. **Camino de vuelta:**
+  revertir ese único commit; `landing-aurora--noche`, `FondoAurora variante="noche"`
+  y `.input-noche` siguen en el CSS a propósito.
+
+### 1.5 Marca
+
+- **Favicon:** `src/app/icon.svg` **ES** `logo/justihn-icon.svg`, con el viewBox
+  recortado a la tinta (`4.1 1.1 39.9 39.9`) y sin adaptación a modo oscuro — el
+  logo no cambia de color. ⚠️ Rompe a propósito la ficha de marca (que pedía la
+  variante "sin cruce" a ≤20px): se prioriza que la pestaña se vea como el logo.
+  `favicon.ico` se genera del mismo SVG.
+- **Lockup:** gap de **5px** en el nav y en `LogoJustihn` — medido sobre el render
+  a 4× contando columnas con tinta (9.2px de hueco visual). El símbolo aporta
+  ~2.4px de aire propio dentro de su viewBox; descontarlo es lo que faltaba.
+- **Tarjetas Open Graph:** tres 1200×630 generadas con `next/og` **en el build**
+  (~150 KB c/u — WhatsApp descarta las pesadas): la general, la ciudadana y la de
+  abogados. Componente único en `lib/og/tarjeta.tsx`. Ver §4.7 para las trampas.
+
+---
 
 ## 2. Stack (pins reales)
 
 Next.js 16.3 (App Router) · React 19.2 · TypeScript 5.9 · Tailwind v4 ·
-Zustand 5 (persist) · Zod 4 · Radix Dialog · Vitest 4 · pnpm.
+Zustand 5 (persist) · Zod 4 · Radix Dialog · Vitest 4 · pnpm. GSAP por import
+dinámico (solo decoración).
 
 Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 `@upstash/ratelimit`, `@tanstack/react-query`, `lucide-react`.
@@ -674,35 +210,156 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 
 | Ruta | Qué vive ahí |
 |---|---|
-| `src/app/abogados/` | Las 13 vistas como **rutas reales** (no estado, a diferencia del prototipo): deep-link a una sentencia o publicación funciona y es compartible |
+| `src/app/abogados/` · `src/app/personas/` | Los dos portales, cada pantalla una **ruta real** (no estado) |
+| `src/app/(landing)/` · `(profesional)/` · `(profesional-black)/` · `(publico)/` · `(auth)/` | Las superficies públicas, cada grupo con su shell |
 | `src/app/api/ia/consultar/` | Único endpoint. Todo pasa por `guard()` antes de gastar nada |
 | `src/lib/security/` | **El harness (§3 del blueprint).** `api-guard` · `rate-limit` · `sanitize` · `ai-safety`. Toda superficie de servidor lo consume; no reinventar por ruta |
 | `src/lib/ai/` | `router-demo` (Fase 1, determinístico) · `motor-claude` (Fase 2, apagado) · `tipos` (el contrato que cumplen ambos) |
+| `src/lib/og/tarjeta.tsx` | El componente único de las tres tarjetas sociales |
 | `src/data/` | Seeds = **contrato literal** de las tablas Supabase futuras. Cada archivo lleva su `TODO(data)` con la fuente real |
 | `src/store/portal.ts` | Zustand + persist en `justihn-portal-v1` (misma clave del prototipo) |
-| `src/hooks/` | `use-saludo` (franja + titular del hero — único lugar que los decide) · `use-preguntar-jus-ia` (prefill o `enviarDirecto` + navegar al chat; lo usan todas las pantallas) · `use-jus-ia` |
-| `src/components/ia/` | Chat de Jus IA + `boton-jus-ia.tsx` (botón canónico de la acción de IA — gradiente vivo, único lugar que define su look) |
+| `src/hooks/` | `use-saludo` · `use-preguntar-jus-ia` (prefill o `enviarDirecto` + navegar al chat) · `use-jus-ia` · `use-busqueda-url` (leer la query en cliente sin romper el SSR) · `use-en-vista` |
+| `src/components/landing/` | Lo compartido por las tres landings: `fondo-aurora` · `nav-aurora` · `pie-aurora` · `demo-marco` · `magnetico` · `desplazamiento-suave` · `secciones` · `landing.css` |
+| `src/components/publico/tarjeta-abogado.tsx` | **La card oficial del abogado** — un solo sitio, tres superficies (ver §4.5) |
+| `src/components/ia/` | Chat de Jus IA + `boton-jus-ia.tsx` (botón canónico de la acción de IA) |
 | `src/components/brand/` | Logos e iconografía con la **geometría oficial** del handoff |
 | `src/components/ui/primitivos.tsx` | Primitivos patrón shadcn, copiados y personalizables |
 
 ## 4. Reglas propias de este proyecto
 
 1. **Sin fuente no hay respuesta.** Es la promesa del producto, no una
-   optimización: `motor-claude.ts` prefiere decir "no encontré fuentes" antes
-   que responder de memoria. No relajar esto para "que se vea mejor la demo".
-2. **Todo dato externo es DATO, nunca instrucción.** Sentencias con OCR, PDFs
-   de Gaceta y documentos que sube el abogado pasan por `wrapExternalData()`
-   antes de tocar un prompt (§3.2). Cubierto por tests.
-3. **Fallar cerrado.** Rutas `role: "session"` devuelven 401 mientras Supabase
-   Auth no esté cableado. Nunca "pasa por ahora".
-4. **Un solo lugar por dato de dominio.** Precios en `data/catalogo.ts`, cálculo
-   laboral en `lib/prestaciones.ts`. Si la UI y Jus IA dan números distintos,
-   es un bug de duplicación.
+   optimización: `motor-claude.ts` prefiere decir "no encontré fuentes" antes que
+   responder de memoria. No relajar esto para "que se vea mejor la demo".
+2. **Todo dato externo es DATO, nunca instrucción.** Sentencias con OCR, PDFs de
+   Gaceta y documentos que sube el abogado pasan por `wrapExternalData()` antes de
+   tocar un prompt (§3.2 del blueprint). Cubierto por tests.
+3. **Fallar cerrado.** Rutas `role: "session"` devuelven 401 mientras Supabase Auth
+   no esté cableado. Nunca "pasa por ahora".
+4. **Un solo lugar por dato de dominio.** Precios en `data/catalogo.ts` (incluido
+   `destacado`, que decide insignia, realce e imán en las cuatro superficies donde
+   aparecen planes); cálculo laboral en `lib/prestaciones.ts`. Si la UI y Jus IA
+   dan números distintos, es un bug de duplicación.
 5. **Determinismo/SSR.** Nada de `Date.now()`/`Math.random()` en carga de módulo.
    El saludo por hora y el store persistido se hidratan **tras el mount**.
 6. **Fidelidad de marca.** Geometría de logos fija; el cruce `#0e5f92` solo vive
    dentro del símbolo y en el hover de botones celestes — nunca como color de
    interfaz suelto.
+
+### 4.5 No fabricar pruebas (la regla que más ha corregido código)
+
+Lo público decide a quién contrata una persona y a qué se suscribe un abogado.
+Nada que sugiera evidencia puede salir de la nada:
+
+- **Fuera "★ valoración"** de todas las superficies públicas (estaba en cinco):
+  no existe sistema de reseñas, ese número no lo producía nadie. Se sustituye por
+  **años de ejercicio**, que sí es verificable. El campo `valoracion` sigue en el
+  seed solo porque el panel del abogado lo muestra como métrica propia.
+- **Fuera los conteos** (contactos, respuestas): vanidad. Uno con 34 respuestas no
+  es mejor que uno con 12, y contarlas premiaría publicar por publicar.
+- **La cita de la card** sale de una respuesta real del abogado en el consultorio,
+  **no de un campo que él redacte** — si lo escribe él, vuelve a ser marketing.
+  Es el diferencial: deja juzgar CÓMO explica antes de escribirle, y nadie puede
+  copiarla sin un consultorio detrás. Va entera en el directorio (donde se decide)
+  y la variante `compacta` la cambia por el resumen en la home (donde solo se
+  enseña que hay abogados).
+- **Nada de "Contactar por WhatsApp" en el primer toque:** sacaba el contacto de
+  Justihn sin registro ni trazabilidad, y sin poder demostrarle al abogado cuántos
+  contactos le trajo la plataforma — que es lo que sostiene que pague. Es
+  **"Consultar con [nombre]"**; WhatsApp llega cuando ya hay conversación.
+- **No prometer inventario que no existe.** La landing no anuncia cifras de
+  sentencias mientras el corpus no esté indexado (la home llegó a afirmar que Jus
+  IA citaba "las 20.202 sentencias" con 12 en el seed y el motor apagado). El
+  lenguaje de inventario solo trabaja encima del composer, diciendo qué se puede
+  preguntar.
+- **No copiar la escasez de las referencias** ("los primeros 200 aseguran estas
+  condiciones"): sería inventarse un cupo. El gancho es la gratuidad, que sí es verdad.
+- **Sin fuente no hay sello.** Al tocar una guía de trámite, o se mantiene su
+  `fuenteUrl`, o se quita el sello "Verificado con la fuente oficial".
+
+### 4.6 Una salida por decisión
+
+Cada bloque empuja al paso siguiente y nada compite con él. Se quitaron por esto:
+"Ver todas las consultas del consultorio", el enlace al directorio bajo las guías
+(cada guía ya cierra recomendando abogado de su materia), "Ver todo el directorio",
+"Ver el portal por dentro" en el CTA final (ofrecía entrar sin cuenta justo donde
+se pide crearla), y el "Empezar →" de las cuatro puertas de la home (competían con
+las secciones reales de justo debajo, así que el visitante decidía dos veces lo
+mismo; llevan `glass-card--estatica`, sin el hover que promete un clic que no existe).
+
+La página tampoco termina dos veces: la cross-sell a la vía A va **antes** del CTA
+oscuro, no después.
+
+### 4.7 Trampas verificadas (leer antes de tocar una landing)
+
+1. **`.landing-aurora a { color: inherit }` le gana por especificidad a
+   `text-white` de Tailwind.** Cualquier utilidad de color sobre un `<a>` de una
+   landing se pierde en silencio — **el color va inline**. Ha mordido tres veces
+   (botones del CTA, "Conocer Justihn para abogados", "Ir al consultorio"). Al
+   mover una página al shell aurora, **revisar todo `text-white` sobre `<a>`**.
+2. **`useSearchParams` bajo `<Suspense>` = contenido invisible para Google.** Ese
+   hook hace que Next abandone el prerenderizado del subárbol y emita el fallback:
+   la home llegó a servir 130 caracteres de texto en vez de 7.452. Se lee la query
+   con `useSyncExternalStore` sobre `window.location.search` (`hooks/use-busqueda-url.ts`),
+   o en el servidor con `searchParams` de la page.
+3. **Los filtros ocultan, no montan.** Las tres rutas de trámites se renderizan
+   siempre y el chip activo esconde las otras con `hidden`. Si se montara solo la
+   activa, 4 de las 9 guías dejarían de existir para el crawler.
+4. **Un `<a>` con transform propio pierde una animación.** GSAP escribe `transform`
+   para el imán magnético; si el elemento ya tiene un `:hover` con transform
+   (`.glass-card` sube 2px, `.btn-celeste` −1px), una de las dos se pierde en
+   silencio. `magnetico.test.ts` lo topa.
+5. **Longitudes dentro de un SVG dependen del motor.** `translateX(7px)` se
+   interpreta como unidades del viewBox o como píxeles CSS según el navegador — el
+   logo salía torcido en Safari. La separación va en la propiedad de geometría
+   **`x`** (siempre unidades del viewBox), con el giro sobre el centro de cada
+   pieza (`transform-box: fill-box` + `50% 50%`). Y **`zoom` no es estándar** y
+   escala el texto de otra manera: para reducir un lienzo, `transform: scale`.
+6. **satori (`next/og`) no lee woff2**, que es lo único que deja `next/font` en el
+   build — por eso las fuentes van versionadas en TTF (`app/_og-fuentes/`, OFL).
+   Y sin **`metadataBase`** Next emite el `og:image` relativo y WhatsApp no pinta
+   nada. **Al comprar el dominio se cambia en la constante `SITIO` y en ningún
+   otro lado.** El `og:url` va **por página**: uno global en el layout haría que
+   toda página compartida se canonizara como la home. `noindex` no afecta a esto
+   — el rastreador de WhatsApp lee las Open Graph igual.
+7. **Chromium fuerza `line-height: normal !important` en `<select>`.** Dos campos
+   contiguos (input + select) no se igualan tocando el interlineado: hay que darles
+   **altura explícita**. Pasó en el formulario del consultorio (40 vs 42,3px) y en
+   el onboarding (44 vs 45px).
+8. **El `next` del alta se valida** (`destinoSeguro()` en
+   `app/(auth)/crear-cuenta/page.tsx`): debe empezar por `/personas` y no por `//`.
+   **No quitarlo** — sin él es un redirect abierto colgando de un formulario que
+   pide correo y contraseña, justo donde sirve para mandar a alguien a una página
+   falsa después de escribir sus datos.
+9. **Área táctil = 24×24 (WCAG 2.5.8), con los enlaces dentro de una frase
+   exentos** — ahí el tamaño lo manda el texto. Un listón de 32px da falsos
+   positivos. El toggle "Ver" de la contraseña está en posición absoluta: se
+   agranda con `right-3 → right-1 + px-2`, que compensa los 8px exactos sin mover
+   el texto.
+10. **El desplazamiento suave va en JS, no en `html { scroll-behavior: smooth }`.**
+    Esa regla es global y alcanza también al salto al principio que hace Next al
+    cambiar de ruta: en una home de 8.000px, abrir un trámite se volvería un scroll
+    animado de varios segundos. `desplazamiento-suave.tsx` intercepta solo las
+    anclas de la propia página, respeta ⌘/ctrl/shift-clic, frena 96px antes para
+    que la nav no tape el encabezado y da un destello de 1,4 s en el destino.
+11. **Los colores del pie van en `.pie-aurora` (landing.css), no inline** — un
+    color inline le ganaría a la clase y dejaría texto marino sobre marino.
+12. **Una guía fuera de `RUTAS_TRAMITE` desaparece de la home** aunque exista en
+    el seed y en su URL. Es invisible leyendo el código, así que `tramites.test.ts`
+    lo topa (cada trámite en exactamente una ruta, sin repetir, sin inventar ids,
+    sin colar procesos judiciales, y todas con `tasaCorta`).
+13. **`tasaCorta` y `tasa` no pueden decir cosas distintas** — la corta es la
+    verificada condensada a una línea, no un dato nuevo. Al editar una, revisar la otra.
+14. **Ninguna página nombra la marca sin `absolute`**, o la pestaña dice "Justihn"
+    dos veces. Se coló en tres páginas a la vez; `app/titulos.test.ts` lo topa.
+15. **El imán magnético va SOLO en los botones azules sólidos** (nav, enviar del
+    composer, plan destacado, CTA de cierre). En un botón de solo borde no se lee
+    como intención sino como que el botón tiembla, y si todo se mueve el efecto
+    deja de señalar la acción principal. Se apaga con `prefers-reduced-motion` y
+    sin `(hover:hover) and (pointer:fine)` — en táctil el botón se escaparía al tocarlo.
+16. **El botón lleno de la nav es "Crear cuenta gratis", no "Iniciar sesión"** en
+    las dos landings. Dos razones: el botón lleno es para la acción que la página
+    busca, y **por debajo de 980px el nav esconde los enlaces de texto y solo
+    sobrevive ese botón**.
 
 ## 5. Comandos
 
@@ -714,129 +371,107 @@ pnpm build        # gate antes de cualquier entrega
 ```
 
 **Gate de verificación (§5 del blueprint):** `lint` + `type-check` + `test` +
-`build` verdes en cada incremento, más verificación visual con Playwright. Los
-tests cubren lo crítico: el harness de seguridad (inyección, enmascarado, hosts
-oficiales), el determinismo y honestidad del router (expedientes reales /
-inexistentes / casos propios), prestaciones, plazos y vía procesal. Se sumaron
-2026-08-29: **`data/tramites.test.ts`** (las 13 guías con fuente en la
-whitelist, cero marcadores pendientes, y que un paso de notario resuelva a un
-notario habilitado y no a un abogado de materia "Notarial") y
-**`app/titulos.test.ts`** (ninguna página nombra la marca sin `absolute`, para
-que la pestaña no diga "Justihn" dos veces — error invisible leyendo el código,
-que se coló en tres páginas a la vez).
+`build` verdes en cada incremento, más verificación visual con Playwright (y con
+**WebKit** cuando se toque SVG, animación o layout fino: ahí es donde aparecen las
+diferencias de motor de §4.7).
+
+Los tests cubren lo que no se ve leyendo el código: el harness de seguridad
+(inyección, enmascarado, hosts oficiales), el determinismo y honestidad del router
+(expedientes reales / inexistentes / casos propios), prestaciones, plazos, vía
+procesal, las 13 guías con fuente en la whitelist, los títulos de página, las
+rutas de trámites y las colisiones de transform del imán.
+
+**Recorridos E2E** (2026-08-30): los scripts de los tres caminos de un visitante
+viven en el scratchpad de la sesión, no commiteados — dependen del servidor de
+desarrollo. Encontraron dos defectos que solo se ven recorriendo: el gate de
+cuenta que se saltaba el alta y las áreas táctiles (ambos en §4.7). Estado verde:
+33 comprobaciones de recorrido, 0 desbordes y 0 errores de JS en móvil y
+escritorio en Chromium y WebKit, 21 enlaces internos vivos, un solo `h1` por
+página, y la home sirviendo **11.462 caracteres de texto sin JS**.
 
 ## 6. Pendientes — próxima sesión (en orden)
 
-1. [x] ✅ **Validación y refinado integral** (2026-08-26): las 15 pantallas
-   revisadas una a una con Wesley (escritorio + móvil, 0 overflow), fechas
-   vivas, deep-links en URL en todas las vistas, orden/búsqueda honestos en
-   jurisprudencia, y 2 pantallas nuevas (Legislación, Monitoreo).
-2. [x] ✅ **DEPLOY EN VERCEL** (2026-08-26): **https://justihn-app.vercel.app**
-   — repo `github.com/WesleyObeth/justihn-app` (main), env
-   `JUSTIHN_DEMO_SESSION=1` en Vercel. Verificado en producción: rutas 200,
-   redirects `/portal`→`/abogados`, headers de seguridad, `noindex` de
-   validación (quitar al lanzar) y el chat de Jus IA respondiendo con citas.
-3. [x] ✅ **GATE ABIERTO — el socio abogado revisó el sistema (2026-08-29).**
-   Su feedback no pide cambios a lo construido: pide AGREGADOS (detalle en
-   justihn/CLAUDE.md backlog #1b). Lo relevante para este repo: (a) un vertical
-   nuevo de **trámites administrativos por institución del Estado** (IP, ARSA,
-   MiAmbiente, ONCAE, SAR, municipalidades — permiso de operación, licencia
-   sanitaria/ambiental, tradición de dominio, CAI, RTN, traspaso de vehículos),
-   pariente de la pantalla Procesos pero de fuente institucional, no judicial;
-   (b) la **vía B toma forma**: directorio de abogados por materia + guías
-   ciudadanas que recomiendan abogado (funnel guía→lead) + **plan gratuito y
-   plan pago para el público** (cambio al modelo original); (c) Modelos validada
-   con roadmap de catálogo creciente. Las entidades nuevas (instituciones,
-   trámites, directorio público, planes vía B) se diseñan mock-first ANTES de
-   congelar el esquema completo.
-4. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
-   workflow del corpus de Data Table → Postgres + embeddings pgvector (el
-   esquema SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Los seeds
-   del portal de abogados quedaron validados; decidir si las tablas nuevas del
-   feedback entran al esquema inicial o en una migración posterior.
-5. [x] ✅ **LAS 13 GUÍAS DE TRÁMITES VERIFICADAS** (2026-08-29, backlog #3c
-   cerrado). `src/data/tramites.ts` ya no tiene marcadores "L ___": las 13
-   guías llevan `fuenteUrl`/`fuenteNombre` y encienden el sello "Verificado
-   con la fuente oficial". Hosts nuevos en la whitelist de
-   `lib/security/sanitize.ts`: `ip.gob.hn`, `arsa.gob.hn`, `oncae.gob.hn`,
-   `honducompras.gob.hn`. Detalle de fuentes y muros en justihn/CLAUDE.md §3.
-   **Regla de edición desde ahora:** al tocar una guía, o se mantiene su
-   fuente, o se quita el sello — nunca texto sin respaldo.
-   ⚠️ **Deuda que dejó la verificación:** `lib/prestaciones.ts` calcula el
-   preaviso como "1 mes si <2 años, 2 meses si ≥2" y la cesantía sin los
-   tramos cortos, pero la guía de despido ya publica la escalera literal del
-   Código del Trabajo — preaviso art. 116 (24 h · 1 semana · 2 semanas ·
-   1 mes · 2 meses) y cesantía art. 120 (10 días de 3-6 meses · 20 días de
-   6-12 · 1 mes por año después, tope 25 meses, 15 si el patrono es
-   microempresa de ≤10 empleados, art. 120-A). **Hoy la calculadora
-   contradice a la guía dentro del mismo producto.** No se corrigió porque
-   el cálculo laboral está gated a la validación del socio (§7.6); el texto
-   oficial ya está localizado, así que es un cambio corto.
-
-5b. **🎨 SEGUIR REFINANDO LAS LANDINGS** (en curso con Wesley, 2026-08-29).
-   Lo hecho hoy queda arriba, en el bloque de `/para-abogados`. Lo que sigue
-   sobre la mesa, sin orden fijo:
-   - **Más demos con seed real**: los candidatos naturales son *Calculadoras*
-     (prestaciones, con el resultado que da `lib/prestaciones`) y *Modelos de
-     escritos*. El patrón ya está: `SeccionDemo` + una vista en `demos.tsx`.
-   - ~~La home ciudadana no tiene demos~~ — hecho 2026-08-30: tres
-     `SeccionDemo` en `landing-content.tsx`, con el mismo patrón de la vía A.
-   - **SEO de la vía B**: no hay `sitemap.xml` ni datos estructurados
-     (`HowTo`/`FAQPage` en las guías de trámites, que es lo que gana los rich
-     snippets). Y `robots` sigue en `noindex` en el layout raíz: **acordarse de
-     quitarlo al lanzar**, o nada de esto rankea.
-   - **Video real del portal**: hoy los demos son animación HTML a propósito
-     (siguen al seed, pesan bytes, el crawler lee el texto). Cuando la UI se
-     estabilice tras Supabase, grabar footage real con Playwright sí aporta.
-   - **CTA de WhatsApp**: la referencia de Wesley lo lleva; Justihn no tiene
-     número configurado y no se inventó un enlace muerto.
-   - **`prestaciones.ts` sigue contradiciendo a la guía de despido** (ver el
-     punto 5 de esta lista): si se toca la landing laboral, cuidado con
-     publicar dos cifras distintas del mismo cálculo.
-   - **"Procesos" no está en las features de ningún plan** (`data/catalogo.ts`):
-     la pantalla existe y la landing la vende, pero la tabla de planes no dice
-     a partir de cuál se tiene. Decidirlo con Wesley antes de cobrar.
-
-6. **Cron `launchd` en la Mac** para el scraper de escala (20,202 sentencias,
-   ~1,000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende
-   del gate: el destino provisional (Data Table de n8n) sigue válido.
+1. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
+   workflow del corpus de Data Table → Postgres + embeddings pgvector (el esquema
+   SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Los seeds del portal de
+   abogados quedaron validados por el socio; decidir si las entidades nuevas de su
+   feedback (instituciones, trámites, directorio público, planes vía B) entran al
+   esquema inicial o en una migración posterior.
+2. **Cron `launchd` en la Mac** para el scraper de escala (20.202 sentencias,
+   ~1.000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende de
+   nada: el destino provisional (Data Table de n8n) sigue válido.
+3. **Elegir entre `/para-abogados` y `/para-abogados-black`** y borrar la ruta
+   perdedora (o convertirla en redirect). Ídem con la prueba de la aurora clara en
+   auth (§1.4).
+4. **SEO de la vía B:** no hay `sitemap.xml` ni datos estructurados
+   (`HowTo`/`FAQPage` en las guías, que es lo que gana los rich snippets). Y
+   `robots` sigue en **`noindex`** en el layout raíz: **quitarlo al lanzar**, o
+   nada de esto rankea.
+5. **Decidir en qué plan entra "Procesos"** (`data/catalogo.ts`): la pantalla
+   existe y la landing la vende, pero la tabla de planes no dice desde cuál se
+   tiene. Antes de cobrar.
+6. **Más demos con seed real** si se sigue refinando: los candidatos son
+   Calculadoras y Modelos de escritos. El patrón está: `SeccionDemo` + una vista.
+   **Video real del portal**: hoy los demos son animación HTML a propósito (siguen
+   al seed y el crawler lee el texto); cuando la UI se estabilice tras Supabase,
+   grabar footage con Playwright sí aporta. **CTA de WhatsApp**: Justihn no tiene
+   número configurado y no se inventó un enlace muerto.
 7. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
-   2026-08-26): "Mis casos" (+agenda de plazos integrada) es la #16 priorizada
-   — gancho de retención/uso diario; referidos como card, no pantalla. No
-   construir hasta tener feedback de la validación (backlog #4 del producto).
+   2026-08-26): "Mis casos" (+agenda de plazos) es la #16 priorizada — gancho de
+   retención; referidos como card, no pantalla. No construir hasta tener el
+   feedback (backlog #4 del producto).
 
 ## 7. Qué falta para Fase 2 (en orden)
 
 1. **Corpus** — scraper n8n de la API del PJ (`searchFreeRecords` →
    `getRecord`/`getHtml`) → Postgres + embeddings pgvector. Es el bloqueante de
    todo lo demás: sin corpus, Jus IA real no puede encenderse.
-2. **Supabase Auth + RLS** por `abogado_id` → cambiar las rutas a
-   `role: "session"` y quitar `JUSTIHN_DEMO_SESSION`.
+2. **Supabase Auth + RLS** por `abogado_id` → cambiar las rutas a `role: "session"`
+   y quitar `JUSTIHN_DEMO_SESSION`. Cada archivo de auth lleva su `TODO(auth)` con
+   el cableado exacto. ⚠️ La consulta del consultorio **se publica antes del alta**:
+   hay que asignarle dueño en cuanto exista la cuenta, y decidir qué pasa si el
+   visitante la abandona (hoy queda publicada y anónima, que es lo que la sección
+   promete).
 3. **Ledger de créditos** — `debitarCreditos()` en `api-guard.ts` es hoy un seam
    vacío: implementarlo como RPC atómico (decremento + auditoría en una
    transacción) y devolver 402 al agotarse.
 4. **Rate limit distribuido** — configurar Upstash antes del go-live.
 5. **Pagos** — mismo cuello de BAC que Sonriprev; el pago anual único lo esquiva.
-6. **Validar el cálculo laboral** con el socio abogado antes de que un
-   profesional lo use en un caso real (`lib/prestaciones.ts` lleva el aviso).
+6. **Validar el cálculo laboral** con el socio antes de que un profesional lo use
+   en un caso real (`lib/prestaciones.ts` lleva el aviso).
 
 ## 8. Deuda conocida
 
-- **Las sentencias del seed son REALES desde 2026-08-26**: 12 del piloto del
-  corpus (API del PJ), con resumen CEDIJ, órgano, magistrado y fallo reales;
-  el extracto es un fragmento del texto oficial. `data/sentencias.ts` se genera
-  con `generar-seed.mjs` (scratchpad del piloto) — regenerar, no editar a mano.
-  Los expedientes `CAS-…` que persisten en brief/adjuntos son los **casos
-  propios de la abogada demo**, no sentencias publicadas (el router los trata
-  como tales).
+- **`lib/prestaciones.ts` contradice a la guía de despido dentro del mismo
+  producto.** Calcula el preaviso como "1 mes si <2 años, 2 meses si ≥2" y la
+  cesantía sin los tramos cortos, pero la guía ya publica la escalera literal del
+  Código del Trabajo: preaviso art. 116 (24 h · 1 semana · 2 semanas · 1 mes ·
+  2 meses) y cesantía art. 120 (10 días de 3-6 meses · 20 días de 6-12 · 1 mes por
+  año después, tope 25 meses; 15 si el patrono es microempresa de ≤10 empleados,
+  art. 120-A). No se corrigió porque el cálculo está gated a la validación del
+  socio (§7.6), pero el texto oficial ya está localizado: es un cambio corto.
+- **Las sentencias del seed son REALES** (12 del piloto del corpus, con resumen
+  CEDIJ, órgano, magistrado y fallo verdaderos; el extracto es un fragmento del
+  texto oficial). `data/sentencias.ts` se genera con `generar-seed.mjs` —
+  regenerar, no editar a mano. Los expedientes `CAS-…` de brief y adjuntos son los
+  **casos propios de la abogada demo**, no sentencias publicadas.
 - Los `art. ___` de los procesos son marcadores deliberados hasta cargar los
   códigos (backlog #5 del proyecto).
-- Login y onboarding EXISTEN desde 2026-08-30 (`/iniciar-sesion`,
-  `/crear-cuenta`) pero son maqueta: validan formato y **entran con cualquier
-  correo y contraseña** usando la sesión demo — hay nota visible bajo el card y
-  `TODO(auth)` con el cableado Supabase exacto en cada archivo (§7.2). El E2E
-  del 2026-08-30 lo confirma como comportamiento esperado, no como fallo.
-- Responsive móvil **base** hecho (2026-08-25): header con hamburguesa + drawer
-  (`HeaderMovil`/`CapaMenuMovil` en `sidebar.tsx`, corte en `lg`) y grids
-  apilados en todas las vistas. Falta pulido fino (tablas del chat, editor de
-  escritos en pantallas muy chicas).
+- **Login y onboarding son maqueta:** validan formato y **entran con cualquier
+  correo y contraseña** usando la sesión demo. Hay nota visible bajo el card y
+  `TODO(auth)` en cada archivo. El E2E del 2026-08-30 lo confirma como
+  comportamiento esperado, no como fallo.
+- ⚙️ **Pendientes del socio abogado:** revisar las `respuestaDemo` de los leads
+  (orientaciones generales que se añadieron para que el consultorio no prometiera
+  respuestas y enseñara preguntas sin contestar) · contrastar las 13 guías contra
+  la práctica real y vigilar las tarifas (la de ARSA es una tabla viva) · decir
+  cómo se comprueba una habilitación notarial vigente (el PJ no publica padrón, así
+  que hoy el exequátur del directorio es **declarado, no verificado**, y la UI lo
+  dice; ningún perfil puede marcarse `verificado: true` — hay test que lo impide).
+- Responsive móvil **base** hecho: header con hamburguesa + drawer
+  (`HeaderMovil`/`CapaMenuMovil` en `sidebar.tsx`, corte en `lg`) y grids apilados.
+  Falta pulido fino (tablas del chat, editor de escritos en pantallas muy chicas).
+- ⚙️ **Capturas del portal en la landing: diferidas a propósito** — una captura
+  driftea en cuanto cambia una pantalla, no le da texto al crawler, y la UI se
+  moverá mucho al entrar Supabase. Se reevalúa entonces, con script de captura
+  commiteado.
