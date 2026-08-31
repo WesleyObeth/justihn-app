@@ -7,7 +7,6 @@ import { buscarAbogados } from "@/data/directorio";
 import { AvisoProfesional } from "@/components/publico/paso-profesional";
 import { usePortal } from "@/store/portal";
 
-
 // ── Detalle de un trámite ──────────────────────────────────────────────────
 
 export function DetalleTramite({ tramite }: { tramite: Tramite }) {
@@ -29,7 +28,9 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
           <h1 className="font-display mt-1.5 text-[24px] leading-[1.25] font-bold">
             {tramite.nombre}
           </h1>
-          <p className="mt-2 text-[14px] leading-[1.65] text-texto-2">{tramite.resumen}</p>
+          <p className="mt-2 text-[14px] leading-[1.65] text-texto-2">
+            {tramite.resumen}
+          </p>
 
           {tramite.fuenteUrl && (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-[12.5px]">
@@ -56,7 +57,9 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
                 1
               </span>
               <div>
-                <div className="text-[14.5px] font-semibold">{tramite.pasos[0]!.titulo}</div>
+                <div className="text-[14.5px] font-semibold">
+                  {tramite.pasos[0]!.titulo}
+                </div>
                 <p className="mt-1 text-[13.5px] leading-[1.6] text-texto-3">
                   {tramite.pasos[0]!.detalle}
                 </p>
@@ -70,15 +73,25 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
             </li>
           </ol>
 
-          <div aria-hidden className="pointer-events-none flex flex-col gap-3 opacity-50 blur-[3px] select-none">
+          <div
+            aria-hidden
+            className="pointer-events-none flex flex-col gap-3 opacity-50 blur-[3px] select-none"
+          >
             {tramite.pasos.slice(1, 3).map((paso, i) => (
-              <div key={paso.titulo} className="flex gap-3.5 border-t border-borde-suave py-4">
+              <div
+                key={paso.titulo}
+                className="flex gap-3.5 border-t border-borde-suave py-4"
+              >
                 <span className="grid h-[28px] w-[28px] min-w-[28px] place-items-center rounded-full bg-chip text-[13px] font-bold text-celeste">
                   {i + 2}
                 </span>
                 <div>
-                  <div className="text-[14.5px] font-semibold">{paso.titulo}</div>
-                  <p className="mt-1 text-[13.5px] leading-[1.6] text-texto-3">████ ███ ██████</p>
+                  <div className="text-[14.5px] font-semibold">
+                    {paso.titulo}
+                  </div>
+                  <p className="mt-1 text-[13.5px] leading-[1.6] text-texto-3">
+                    ████ ███ ██████
+                  </p>
                 </div>
               </div>
             ))}
@@ -89,18 +102,22 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
               Crea tu cuenta gratis para ver la guía completa
             </div>
             <p className="mx-auto mt-1 max-w-[420px] text-[12.5px] leading-[1.55] text-texto-3">
-              Los {tramite.pasos.length} pasos con requisitos y costos, tu avance guardado, y el
-              consultorio para preguntar gratis.
+              Los {tramite.pasos.length} pasos con requisitos y costos, tu
+              avance guardado, y el consultorio para preguntar gratis.
             </p>
             <Link
-              href={`/personas/tramites/${tramite.id}`}
+              // El gate promete "crear cuenta": tiene que PASAR por el alta y volver
+              // aquí después, no colar al visitante dentro del portal.
+              href={`/crear-cuenta?tipo=persona&next=${encodeURIComponent(`/personas/tramites/${tramite.id}`)}`}
               className="mt-3.5 inline-block rounded-xl bg-celeste px-6 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
-            
+
               style={{ color: "#fff" }}
             >
               Crear mi cuenta gratis
             </Link>
-            <p className="mt-2 text-[11px] text-texto-4">Sin tarjeta · demo de validación</p>
+            <p className="mt-2 text-[11px] text-texto-4">
+              Sin tarjeta · demo de validación
+            </p>
           </div>
         </article>
 
@@ -119,12 +136,16 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
                   <div className="flex items-center gap-3">
                     <span
                       className="font-display grid h-10 w-10 place-items-center rounded-full text-[14px] font-semibold text-white"
-                      style={{ background: "linear-gradient(180deg,#0d2144,#0a1830)" }}
+                      style={{
+                        background: "linear-gradient(180deg,#0d2144,#0a1830)",
+                      }}
                     >
                       {a.iniciales}
                     </span>
                     <div className="min-w-0">
-                      <div className="text-[13.5px] font-semibold">{a.nombre}</div>
+                      <div className="text-[13.5px] font-semibold">
+                        {a.nombre}
+                      </div>
                       <div className="text-[11.5px] text-texto-4">
                         {a.ciudad} · {a.anios} años
                       </div>
@@ -139,7 +160,8 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
                     }
                     className="mt-3 w-full cursor-pointer rounded-lg bg-celeste py-2 text-[12.5px] font-semibold text-white hover:bg-cruce"
                   >
-                    Consultar con {a.nombre.replace(/^Abg\.\s*/, "").split(" ")[0]}
+                    Consultar con{" "}
+                    {a.nombre.replace(/^Abg\.\s*/, "").split(" ")[0]}
                   </button>
                 </div>
               ))}
@@ -153,14 +175,17 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
           </div>
 
           <div className="rounded-2xl border border-borde bg-white p-5">
-            <h2 className="font-display text-[15px] font-bold">¿Tu caso es distinto?</h2>
+            <h2 className="font-display text-[15px] font-bold">
+              ¿Tu caso es distinto?
+            </h2>
             <p className="mt-1 text-[12.5px] leading-[1.55] text-texto-3">
-              Pregunta gratis en el consultorio y un abogado colegiado te orienta.
+              Pregunta gratis en el consultorio y un abogado colegiado te
+              orienta.
             </p>
             <Link
               href="/#consultorio"
               className="mt-3 inline-block rounded-lg bg-marino px-4 py-2.5 text-[12.5px] font-semibold text-white hover:bg-celeste hover:text-white"
-            
+
               style={{ color: "#fff" }}
             >
               Ir al consultorio

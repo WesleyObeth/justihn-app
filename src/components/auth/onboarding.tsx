@@ -217,7 +217,7 @@ export function PantallaOnboarding() {
                   <button
                     type="button"
                     onClick={() => setVerPass(!verPass)}
-                    className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-[12px] font-semibold transition-colors select-none hover:text-celeste"
+                    className="absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer px-2 py-2 text-[12px] font-semibold transition-colors select-none hover:text-celeste"
                     style={{ color: "#8095ad" }}
                   >
                     {verPass ? "Ocultar" : "Ver"}

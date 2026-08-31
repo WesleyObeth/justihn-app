@@ -19,14 +19,30 @@ export const metadata: Metadata = {
  * ruta se sirve dinámica, que en una pantalla de auth (sin SEO, `noindex`) no
  * cuesta nada.
  */
+/**
+ * A dónde volver tras el alta. Se acepta SOLO una ruta interna del portal
+ * ciudadano: un `next` sin validar es un redirect abierto — bastaría un
+ * `?next=https://otro-sitio` para que Justihn mande al usuario fuera después
+ * de que escriba su correo y su contraseña.
+ */
+function destinoSeguro(next?: string): string | undefined {
+  if (!next) return undefined;
+  // `//host` y `/\host` son rutas protocolo-relativas: salen del dominio.
+  if (!next.startsWith("/personas") || next.startsWith("//")) return undefined;
+  return next;
+}
+
 export default async function PaginaCrearCuenta({
   searchParams,
 }: {
-  searchParams: Promise<{ tipo?: string; desde?: string }>;
+  searchParams: Promise<{ tipo?: string; desde?: string; next?: string }>;
 }) {
-  const { tipo, desde } = await searchParams;
+  const { tipo, desde, next } = await searchParams;
   return tipo === "persona" ? (
-    <RegistroPersona desdeConsultorio={desde === "consultorio"} />
+    <RegistroPersona
+      desdeConsultorio={desde === "consultorio"}
+      destino={destinoSeguro(next)}
+    />
   ) : (
     <PantallaOnboarding />
   );

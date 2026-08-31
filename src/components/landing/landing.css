@@ -346,6 +346,9 @@
   color: #ffffff;
 }
 .pie-aurora .pie-enlace {
+  /* El texto mide 18.8px: el relleno vertical lleva el área táctil a 24px,
+     que es el mínimo con el que se puede acertar en un pie apilado. */
+  padding-block: 2.6px;
   color: rgba(226, 238, 248, 0.72);
   transition: color 0.2s;
 }

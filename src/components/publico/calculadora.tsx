@@ -123,7 +123,7 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
                   hacer después.
                 </p>
                 <Link
-                  href={destinoConDatos}
+                  href={`/crear-cuenta?tipo=persona&next=${encodeURIComponent(destinoConDatos)}`}
                   className="mt-3.5 block rounded-xl bg-celeste px-5 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
                 
               style={{ color: "#fff" }}

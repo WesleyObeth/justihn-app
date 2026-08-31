@@ -122,7 +122,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                   <button
                     type="button"
                     onClick={() => ir("recuperar")}
-                    className="cursor-pointer text-[12px] font-semibold transition-colors hover:text-celeste"
+                    className="-my-2 -mr-1 cursor-pointer px-1 py-2 text-[12px] font-semibold transition-colors hover:text-celeste"
                     style={{ color: "var(--color-celeste)" }}
                   >
                     ¿La olvidaste?
@@ -145,7 +145,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
                   <button
                     type="button"
                     onClick={() => setVerPass(!verPass)}
-                    className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-[12px] font-semibold transition-colors select-none hover:text-celeste"
+                    className="absolute top-1/2 right-1 -translate-y-1/2 cursor-pointer px-2 py-2 text-[12px] font-semibold transition-colors select-none hover:text-celeste"
                     style={{ color: "#8095ad" }}
                   >
                     {verPass ? "Ocultar" : "Ver"}
@@ -155,7 +155,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
               <button
                 type="button"
                 onClick={() => setRecordar(!recordar)}
-                className="flex cursor-pointer items-center gap-2.5 select-none"
+                className="-my-1.5 flex cursor-pointer items-center gap-2.5 py-1.5 select-none"
               >
                 <CheckCuadro marcado={recordar} bordeApagado="#b9c8da" fondoApagado="#fff" />
                 <span className="text-[13px]" style={{ color: "#5a6b82" }}>
