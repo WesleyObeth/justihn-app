@@ -164,15 +164,11 @@ export function DemoMisTramites() {
  * enseñando una cifra que el producto ya no da.
  */
 const SALARIO_EJEMPLO = 15_000;
-const ANIOS_EJEMPLO = 4;
+const MESES_EJEMPLO = 48; // 4 años — la escalera de la ley se mide en meses.
 
 export function DemoCalculadora() {
-  const p = calcularPrestaciones(SALARIO_EJEMPLO, ANIOS_EJEMPLO);
-  const filas = [
-    { etiqueta: "Auxilio de cesantía", valor: p.cesantia },
-    { etiqueta: "Preaviso", valor: p.preaviso },
-    { etiqueta: "Vacaciones y aguinaldo proporcionales", valor: p.proporcionales },
-  ];
+  const p = calcularPrestaciones(SALARIO_EJEMPLO, MESES_EJEMPLO);
+  const filas = p.conceptos.map((c) => ({ etiqueta: c.etiqueta, valor: c.monto }));
 
   return (
     <Ventana etiqueta="Calculadora de prestaciones">
@@ -185,7 +181,7 @@ export function DemoCalculadora() {
         </div>
         <div className="caja-panel rounded-[10px] border px-3 py-2">
           <p className="text-[10.5px] text-texto-4">Años trabajados</p>
-          <p className="mt-0.5 text-[14px] font-bold text-marino">{ANIOS_EJEMPLO}</p>
+          <p className="mt-0.5 text-[14px] font-bold text-marino">{MESES_EJEMPLO / 12}</p>
         </div>
       </div>
 

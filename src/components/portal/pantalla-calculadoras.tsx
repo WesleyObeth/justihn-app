@@ -5,7 +5,7 @@ import { useState, useSyncExternalStore } from "react";
 import { Icono } from "@/components/brand/iconos";
 import { BotonJusIA } from "@/components/ia/boton-jus-ia";
 import { Boton, Card, Rotulo } from "@/components/ui/primitivos";
-import { calcularPrestaciones } from "@/lib/prestaciones";
+import { aMeses, calcularPrestaciones } from "@/lib/prestaciones";
 import { calcularVencimiento } from "@/lib/plazos";
 import {
   determinarViaCivil,
@@ -45,24 +45,31 @@ export function PantallaCalculadoras() {
 function CalculadoraPrestaciones() {
   const [salario, setSalario] = useState("15000");
   const [anios, setAnios] = useState("3");
+  const [meses, setMeses] = useState("0");
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const abrirEscrito = usePortal((s) => s.abrirEscrito);
   const preguntar = usePreguntarAJusIA();
 
   const salarioNum = Number(salario);
   const aniosNum = Number(anios);
-  const valido = salarioNum > 0 && aniosNum > 0;
-  const resultado = calcularPrestaciones(salarioNum, aniosNum);
+  const mesesNum = Number(meses);
+  const totalMeses = aMeses(aniosNum, mesesNum);
+  const valido = salarioNum > 0 && totalMeses > 0;
+  const resultado = calcularPrestaciones(salarioNum, totalMeses);
 
   const desglose = [
     "CÁLCULO DE PRESTACIONES LABORALES (estimación orientativa)",
     "",
     `Salario mensual: ${fmtLempiras(salarioNum || 0)}`,
-    `Antigüedad: ${aniosNum || 0} años`,
+    `Antigüedad: ${totalMeses} meses`,
     "",
-    `Cesantía: ${fmtLempiras(resultado.cesantia)}`,
-    `Preaviso: ${fmtLempiras(resultado.preaviso)}`,
-    `Vacaciones y aguinaldos proporcionales: ${fmtLempiras(resultado.proporcionales)}`,
+    // Cada renglón con su artículo: es lo que el abogado pega en el escrito.
+    ...resultado.conceptos.map(
+      (c) =>
+        `${c.etiqueta}: ${fmtLempiras(c.monto)}${c.articulo ? ` (Código del Trabajo, ${c.articulo})` : " (sin artículo verificado)"}`,
+    ),
+    "",
+    `SUBTOTAL RESPALDADO POR EL CÓDIGO DEL TRABAJO: ${fmtLempiras(resultado.totalVerificado)}`,
     `TOTAL ESTIMADO: ${fmtLempiras(resultado.total)}`,
     "",
     "[Validar contra el expediente y el Código del Trabajo vigente antes de presentar.]",
@@ -94,25 +101,33 @@ function CalculadoraPrestaciones() {
 
       <div className="mt-4.5 flex flex-col gap-3.5">
         <CampoNumero etiqueta="Salario mensual (L)" value={salario} onChange={setSalario} min={0} />
-        <CampoNumero etiqueta="Años trabajados" value={anios} onChange={setAnios} min={0} max={60} />
+        <div className="grid grid-cols-2 gap-3">
+          <CampoNumero etiqueta="Años" value={anios} onChange={setAnios} min={0} max={60} />
+          <CampoNumero etiqueta="Meses" value={meses} onChange={setMeses} min={0} max={11} />
+        </div>
       </div>
 
       {valido ? (
         <div className="mt-4.5 flex flex-col gap-2 rounded-[10px] bg-lienzo p-4">
-          <Fila etiqueta="Cesantía" valor={fmtLempiras(resultado.cesantia)} />
-          <Fila etiqueta="Preaviso" valor={fmtLempiras(resultado.preaviso)} />
-          <Fila
-            etiqueta="Vacaciones + 13º y 14º proporcionales"
-            valor={fmtLempiras(resultado.proporcionales)}
-          />
-          <div className="flex justify-between border-t border-borde pt-2 text-[14.5px]">
+          {resultado.conceptos.map((c) => (
+            <Fila
+              key={c.clave}
+              etiqueta={`${c.etiqueta}${c.articulo ? ` · ${c.articulo}` : ""}`}
+              valor={fmtLempiras(c.monto)}
+            />
+          ))}
+          <div className="flex justify-between border-t border-borde pt-2 text-[12.5px] text-texto-3">
+            <span>Respaldado por el Código del Trabajo</span>
+            <b>{fmtLempiras(resultado.totalVerificado)}</b>
+          </div>
+          <div className="flex justify-between text-[14.5px]">
             <span className="font-semibold">Total estimado</span>
             <b className="text-celeste">{fmtLempiras(resultado.total)}</b>
           </div>
         </div>
       ) : (
         <div className="mt-4.5 rounded-[10px] bg-lienzo p-4 text-center text-[12.5px] text-texto-4">
-          Ingresa salario y años trabajados para calcular.
+          Ingresa salario y tiempo trabajado para calcular.
         </div>
       )}
 

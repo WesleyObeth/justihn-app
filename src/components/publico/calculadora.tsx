@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
-import { calcularPrestaciones } from "@/lib/prestaciones";
+import { aMeses, calcularPrestaciones } from "@/lib/prestaciones";
 import { buscarAbogados } from "@/data/directorio";
 import { usePortal } from "@/store/portal";
 import { fmtLempiras } from "@/lib/utils";
@@ -27,30 +27,60 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const [salario, setSalario] = useState(enPortal ? (params.get("salario") ?? "") : "");
   const [anios, setAnios] = useState(enPortal ? (params.get("anios") ?? "") : "");
+  // Meses aparte: la escalera del Código del Trabajo tiene tramos de 3-6 y de
+  // 6-12 meses, y con un campo de años enteros no se pueden expresar.
+  const [meses, setMeses] = useState(enPortal ? (params.get("meses") ?? "") : "");
 
   const salarioNum = Number(salario);
   const aniosNum = Number(anios);
-  const valido = salarioNum > 0 && aniosNum > 0;
+  const mesesNum = Number(meses);
+  const totalMeses = aMeses(aniosNum, mesesNum);
+  const valido = salarioNum > 0 && totalMeses > 0;
   const bloqueado = !enPortal && valido;
-  const r = calcularPrestaciones(salarioNum, aniosNum);
+  const r = calcularPrestaciones(salarioNum, totalMeses);
   const laborales = buscarAbogados("Laboral").slice(0, 2);
 
   /** Con los valores puestos: al entrar ve su propio cálculo hecho. */
-  const destinoConDatos = `/personas/calculadora?salario=${salarioNum}&anios=${aniosNum}`;
+  const destinoConDatos = `/personas/calculadora?salario=${salarioNum}&anios=${aniosNum || 0}&meses=${mesesNum || 0}`;
 
   const iniciarSesion = () => {
     mostrarToast("Sesión de demostración — el login real llega con la Fase 2");
     router.push(destinoConDatos);
   };
 
+  /**
+   * Cada renglón con la regla que lo produce y su artículo: el producto se
+   * define por citar la fuente, y un total suelto no deja comprobar nada. Los
+   * décimos van aparte porque NO están en el Código del Trabajo.
+   */
   const desglose = (
-    <div className="flex flex-col gap-2 rounded-xl bg-lienzo p-5">
-      <Fila etiqueta="Cesantía (auxilio por el despido)" valor={fmtLempiras(r.cesantia)} />
-      <Fila etiqueta="Preaviso" valor={fmtLempiras(r.preaviso)} />
-      <Fila etiqueta="Vacaciones + 13º y 14º proporcionales" valor={fmtLempiras(r.proporcionales)} />
-      <div className="flex justify-between gap-3 border-t border-borde pt-2.5 text-[16px]">
-        <span className="font-semibold">Total estimado</span>
-        <b className="whitespace-nowrap text-celeste">{fmtLempiras(r.total)}</b>
+    <div className="flex flex-col gap-3 rounded-xl bg-lienzo p-5">
+      {r.conceptos.map((c) => (
+        <div key={c.clave} className={c.verificado ? "" : "border-t border-borde pt-3"}>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="text-[13.5px] font-medium">{c.etiqueta}</span>
+            <b className="text-[14px] whitespace-nowrap">{fmtLempiras(c.monto)}</b>
+          </div>
+          <p className="mt-0.5 text-[11.5px] leading-[1.5] text-texto-4">
+            {c.articulo && (
+              <span className="font-semibold text-celeste">
+                Código del Trabajo, {c.articulo}.{" "}
+              </span>
+            )}
+            {c.detalle}
+          </p>
+        </div>
+      ))}
+
+      <div className="border-t border-borde pt-3">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="text-[13px] text-texto-3">Respaldado por el Código del Trabajo</span>
+          <b className="text-[14px] whitespace-nowrap">{fmtLempiras(r.totalVerificado)}</b>
+        </div>
+        <div className="mt-1.5 flex items-baseline justify-between gap-3 text-[16px]">
+          <span className="font-semibold">Total estimado</span>
+          <b className="whitespace-nowrap text-celeste">{fmtLempiras(r.total)}</b>
+        </div>
       </div>
     </div>
   );
@@ -84,24 +114,44 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
               className="rounded-lg border border-borde px-3 py-2.5 text-sm text-marino outline-none focus:border-celeste"
             />
           </label>
-          <label className="flex flex-col gap-1.5 text-[12.5px] text-texto-3">
-            ¿Cuántos años trabajaste?
-            <input
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={60}
-              value={anios}
-              onChange={(e) => setAnios(e.target.value)}
-              placeholder="Ej. 4"
-              className="rounded-lg border border-borde px-3 py-2.5 text-sm text-marino outline-none focus:border-celeste"
-            />
-          </label>
+          <fieldset className="flex flex-col gap-1.5 text-[12.5px] text-texto-3">
+            <legend className="mb-1.5">¿Cuánto tiempo trabajaste ahí?</legend>
+            <div className="flex gap-2.5">
+              <label className="flex flex-1 items-center gap-2">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={60}
+                  value={anios}
+                  onChange={(e) => setAnios(e.target.value)}
+                  placeholder="0"
+                  aria-label="Años trabajados"
+                  className="w-full rounded-lg border border-borde px-3 py-2.5 text-sm text-marino outline-none focus:border-celeste"
+                />
+                <span className="text-[12.5px]">años</span>
+              </label>
+              <label className="flex flex-1 items-center gap-2">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={11}
+                  value={meses}
+                  onChange={(e) => setMeses(e.target.value)}
+                  placeholder="0"
+                  aria-label="Meses trabajados"
+                  className="w-full rounded-lg border border-borde px-3 py-2.5 text-sm text-marino outline-none focus:border-celeste"
+                />
+                <span className="text-[12.5px]">meses</span>
+              </label>
+            </div>
+          </fieldset>
         </div>
 
         {!valido && (
           <div className="mt-5 rounded-xl bg-lienzo p-5 text-center text-[13px] text-texto-4">
-            Escribe tu salario y tus años trabajados para ver el cálculo.
+            Escribe tu salario y cuánto tiempo trabajaste para ver el cálculo.
           </div>
         )}
 
@@ -221,11 +271,3 @@ function Titular({
   );
 }
 
-function Fila({ etiqueta, valor }: { etiqueta: string; valor: string }) {
-  return (
-    <div className="flex justify-between gap-3 text-[13.5px]">
-      <span className="text-texto-3">{etiqueta}</span>
-      <b className="whitespace-nowrap">{valor}</b>
-    </div>
-  );
-}

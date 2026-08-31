@@ -650,7 +650,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (118 tests de invariantes)
+pnpm test         # Vitest (128 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -755,14 +755,22 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
 
 ## 8. Deuda conocida
 
-- **`lib/prestaciones.ts` contradice a la guía de despido dentro del mismo
-  producto.** Calcula el preaviso como "1 mes si <2 años, 2 meses si ≥2" y la
-  cesantía sin los tramos cortos, pero la guía ya publica la escalera literal del
-  Código del Trabajo: preaviso art. 116 (24 h · 1 semana · 2 semanas · 1 mes ·
-  2 meses) y cesantía art. 120 (10 días de 3-6 meses · 20 días de 6-12 · 1 mes por
-  año después, tope 25 meses; 15 si el patrono es microempresa de ≤10 empleados,
-  art. 120-A). No se corrigió porque el cálculo está gated a la validación del
-  socio (§7.6), pero el texto oficial ya está localizado: es un cambio corto.
+- ✅ **Resuelta 2026-08-31 — `lib/prestaciones.ts` ya no contradice a la guía.**
+  Calculaba la cesantía como `salario × años` y el preaviso como "1 mes / 2
+  meses", mientras la guía de despido publicaba la escalera literal de la ley:
+  el producto se contradecía a sí mismo. Reescrito contra el **PDF del CEDIJ,
+  verificado artículo por artículo**: cesantía art. 120 (10 días de 3-6 meses ·
+  20 días de 6-12 · 1 mes por año después, proporcional en la fracción · tope de
+  25 meses, 15 en microempresa por art. 120-A), preaviso art. 116 (24 h · 1
+  semana · 2 semanas · 1 mes · 2 meses) y vacaciones art. 346 (10/12/15/20 días
+  laborables por tramo). Devuelve **conceptos con su artículo**, no tres cifras
+  sueltas, y la entrada pasa a **años + meses** porque la escalera se mide en
+  meses. ⚠️ **El 13º y 14º NO están en el Código del Trabajo** (cero menciones
+  en el texto oficial): van `verificado: false`, sin artículo y **fuera del
+  subtotal respaldado por la ley**, en vez de disolverse en un total que
+  parecería todo igual de firme. 14 tests fijan cada tramo.
+  ⚙️ Sigue pendiente que el socio lo contraste con la práctica (§7.6): esto
+  respalda cada línea con su artículo, no sustituye esa revisión.
 - **Las sentencias del seed son REALES** (12 del piloto del corpus, con resumen
   CEDIJ, órgano, magistrado y fallo verdaderos; el extracto es un fragmento del
   texto oficial). `data/sentencias.ts` se genera con `generar-seed.mjs` —
