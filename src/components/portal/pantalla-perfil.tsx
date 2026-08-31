@@ -183,9 +183,13 @@ function ModalVistaPublica({
             <Boton
               variante="celeste"
               className="mt-4.5 w-full py-[11px]"
-              onClick={() => mostrarToast("Así inicia el contacto un cliente del directorio")}
+              onClick={() => mostrarToast("Así te escribe un cliente desde el directorio")}
             >
-              Contactar por WhatsApp
+              {/* Tiene que decir lo MISMO que la card pública real
+                  (`publico/tarjeta-abogado.tsx`): esto es la vista previa de
+                  su perfil, y si no coinciden le estamos enseñando al abogado
+                  algo que los ciudadanos no ven. */}
+              Consultar con {ABOGADA_DEMO.nombreCorto.split(" ")[0]}
             </Boton>
             {!validado && (
               <p className="mt-2.5 text-center text-[11.5px] text-texto-4">

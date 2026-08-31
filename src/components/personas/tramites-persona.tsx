@@ -325,11 +325,13 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
                   <button
                     type="button"
                     onClick={() =>
-                      mostrarToast(`Así inicia el contacto con ${a.nombre} (demo de validación)`)
+                      mostrarToast(
+                        `Así le escribes a ${a.nombre} desde Justihn (demo de validación)`,
+                      )
                     }
                     className="mt-2.5 w-full cursor-pointer rounded-lg bg-celeste py-2 text-[12px] font-semibold text-white hover:bg-cruce"
                   >
-                    Contactar por WhatsApp
+                    Consultar con {a.nombre.replace(/^Abg\.\s*/, "").split(" ")[0]}
                   </button>
                 </div>
               ))}

@@ -95,6 +95,8 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
             <Link
               href={`/personas/tramites/${tramite.id}`}
               className="mt-3.5 inline-block rounded-xl bg-celeste px-6 py-2.5 text-[13.5px] font-semibold text-white hover:bg-cruce"
+            
+              style={{ color: "#fff" }}
             >
               Crear mi cuenta gratis
             </Link>
@@ -131,11 +133,13 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
                   <button
                     type="button"
                     onClick={() =>
-                      mostrarToast(`Así inicia el contacto con ${a.nombre} (demo de validación)`)
+                      mostrarToast(
+                        `Así le escribes a ${a.nombre} desde Justihn (demo de validación)`,
+                      )
                     }
                     className="mt-3 w-full cursor-pointer rounded-lg bg-celeste py-2 text-[12.5px] font-semibold text-white hover:bg-cruce"
                   >
-                    Contactar por WhatsApp
+                    Consultar con {a.nombre.replace(/^Abg\.\s*/, "").split(" ")[0]}
                   </button>
                 </div>
               ))}
@@ -156,6 +160,8 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
             <Link
               href="/#consultorio"
               className="mt-3 inline-block rounded-lg bg-marino px-4 py-2.5 text-[12.5px] font-semibold text-white hover:bg-celeste hover:text-white"
+            
+              style={{ color: "#fff" }}
             >
               Ir al consultorio
             </Link>

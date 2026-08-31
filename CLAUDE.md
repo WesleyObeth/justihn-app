@@ -186,6 +186,21 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **🎨 LAS PÁGINAS PÚBLICAS INTERIORES USAN EL SHELL AURORA (2026-08-30):**
+  el detalle de trámite y la calculadora tenían cabecera blanca y fondo plano,
+  así que abrir una guía desde la home se sentía como **salir del sitio**.
+  Ahora `(publico)/layout.tsx` monta el mismo `FondoAurora` + `NavAurora` +
+  `PieAurora` que la home; `HeaderPublico`/`FooterPublico` quedan sin uso.
+  - **Se coló una superficie con "Contactar por WhatsApp"** que la limpieza
+    anterior no tocó (esas páginas usan tiras propias, no `TarjetaAbogado`):
+    corregidas las tres públicas + la vista previa del perfil en el portal,
+    que enseñaba al abogado un botón que los ciudadanos ya no ven.
+  - ⚠️ **La trampa del shell, otra vez:** al entrar bajo `.landing-aurora`,
+    tres `<Link>` con `text-white` perdieron el color y quedaron con el texto
+    invisible sobre su fondo oscuro ("Ir al consultorio" entre ellos). Regla:
+    **al mover una página al shell aurora, revisar todo `text-white` sobre
+    `<a>`** — el color va inline.
+
 - **👤 LA CARD OFICIAL DEL ABOGADO — `components/publico/tarjeta-abogado.tsx`
   (2026-08-30, elegida entre prototipos: "la card que habla"):** es la que ve
   una persona al decidir a quién contratar, así que vive en UN solo sitio y la
