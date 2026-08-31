@@ -24,7 +24,12 @@ export default function LayoutProfesional({ children }: { children: React.ReactN
           { href: "#faq", label: "Preguntas" },
         ]}
         secundario={{ href: "/", label: "Para personas" }}
-        cta={{ href: "/iniciar-sesion", label: "Iniciar sesión" }}
+        login={{ href: "/iniciar-sesion", label: "Iniciar sesión" }}
+        /* El botón lleno es el alta, no el login: esta página existe para
+           convertir abogados NUEVOS — hero, demos, planes y FAQ están todos
+           dedicados a convencer. Además, por debajo de 980px el nav esconde
+           los enlaces de texto y solo sobrevive este botón. */
+        cta={{ href: "/crear-cuenta", label: "Crear cuenta gratis" }}
       />
       {children}
       <BotonesMagneticos />

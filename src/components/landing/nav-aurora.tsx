@@ -25,11 +25,19 @@ const ENLACES_CIUDADANO: EnlaceNav[] = [
 export function NavAurora({
   enlaces = ENLACES_CIUDADANO,
   secundario = { href: "/para-abogados", label: "Para abogados" },
+  login = { href: "/iniciar-sesion?tipo=persona", label: "Iniciar sesión" },
   cta = { href: "/crear-cuenta?tipo=persona", label: "Crear cuenta gratis" },
   logoVariante = "claro",
 }: {
   enlaces?: EnlaceNav[];
   secundario?: EnlaceNav;
+  /**
+   * Entrada para quien YA tiene cuenta. Va como enlace de texto, no como
+   * botón: el botón lleno se reserva para la acción que la página busca —
+   * en una landing, crear cuenta. Sin esto, un usuario que vuelve no tiene
+   * por dónde entrar y acaba en el formulario de alta buscando la salida.
+   */
+  login?: EnlaceNav;
   cta?: EnlaceNav;
   /** "oscuro" para shells sobre fondo marino (landing black). */
   logoVariante?: "claro" | "oscuro";
@@ -61,6 +69,9 @@ export function NavAurora({
       <div className="nav-right" style={{ display: "flex", alignItems: "center", gap: 18 }}>
         <Link className="nav-login" href={secundario.href}>
           {secundario.label}
+        </Link>
+        <Link className="nav-login" href={login.href}>
+          {login.label}
         </Link>
         {/* `magnetic`: su hover solo cambia fondo y sombra, así que el
             transform que escribe GSAP no pisa nada (ver `magnetico.tsx`). */}

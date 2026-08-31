@@ -480,8 +480,15 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   - **Honestidad Fase 1:** ambas pantallas validan formato y entran con la
     sesión demo; nota visible bajo el card ("todavía no se crean cuentas
     reales") y `TODO(auth)` con el cableado Supabase exacto en cada archivo.
+  - **La nav de las landings (corregido 2026-08-30):** el botón lleno es
+    **"Crear cuenta gratis"** en las DOS, e **"Iniciar sesión"** va como enlace
+    de texto (`login` en `NavAurora`). `/para-abogados` lo tenía al revés —
+    su botón más prominente servía a quien ya era cliente, en una página que
+    existe para convertir abogados nuevos. Dos razones: el botón lleno es para
+    la acción que la página busca, y **por debajo de 980px el nav esconde los
+    enlaces de texto y solo sobrevive ese botón** (verificado a 7 anchos).
   - El CTA de la nav de `/para-abogados` pasó de "Entrar al portal"
-    (→ `/abogados` directo) a **"Iniciar sesión"** (→ `/iniciar-sesion`). La
+    (→ `/abogados` directo) a la puerta de cuenta. La
     entrada directa al portal —la de enseñárselo al socio— vive en el pie
     ("Abogados → Portal"); el botón "Ver el portal por dentro" que estaba en
     el CTA final **se quitó** (decisión Wesley 2026-08-30): competía con el
