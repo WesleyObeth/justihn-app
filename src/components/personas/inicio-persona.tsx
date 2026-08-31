@@ -1,34 +1,33 @@
 "use client";
 
 /**
- * Inicio del portal ciudadano.
+ * Inicio del portal ciudadano — adaptación del dashboard del abogado.
  *
- * NO es el dashboard del abogado con otros datos. El abogado entra a trabajar
- * y tiene qué controlar —casos, leads, cuota—; el ciudadano llega con UN
- * problema concreto ("me despidieron", "compré algo vencido") y se va. Por eso
- * lo primero es una caja donde escribir el problema, no un panel de métricas.
+ * Toma su estructura (entrada arriba · métricas · triaje + destacado · accesos)
+ * pero NO sus contenidos, porque las dos audiencias no se parecen: el abogado
+ * entra a trabajar y mide su producción (cuota de IA, búsquedas, alertas); el
+ * ciudadano llega con UN problema y lo que necesita saber es qué dejó a medias
+ * y cuánto tiempo le queda. Por eso las métricas son de SU gestión, el triaje
+ * se deriva de lo que hizo, y el destacado es un plazo legal — no un digest.
  */
 import Link from "next/link";
 import { useState } from "react";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
 import { PERSONA_DEMO } from "@/data/persona";
-import { buscarGuias, getInstitucion, TRAMITES } from "@/data/tramites";
+import { PLAZOS_CIUDADANO, etiquetaPlazo } from "@/data/plazos";
+import { buscarGuias, getInstitucion, INSTITUCIONES, TRAMITES } from "@/data/tramites";
+import { DIRECTORIO } from "@/data/directorio";
 import { usePortal } from "@/store/portal";
 import { useSaludoPorHora } from "@/hooks/use-saludo";
+import { useAvisosPersona } from "./notificaciones-persona";
 
 export function InicioPersona() {
   const franja = useSaludoPorHora();
-  const preguntas = usePortal((s) => s.preguntasPublico);
-  const respondidos = usePortal((s) => s.leadsRespondidos);
-  const pasosTramite = usePortal((s) => s.pasosTramite);
-
-  const enProgreso = TRAMITES.filter((t) => (pasosTramite[t.id] ?? []).length > 0);
-  const respondidas = preguntas.filter((p) => respondidos[p.id]).length;
 
   return (
-    <div className="max-w-[1080px]" style={{ animation: "fadeUp .3s ease" }}>
-      {/* El saludo baja a línea de contexto: el protagonista es la caja. */}
+    <div className="max-w-[1180px]" style={{ animation: "fadeUp .3s ease" }}>
+      {/* El saludo es contexto, no titular: el protagonista es la caja. */}
       <p className="text-[12.5px] text-texto-4">
         {franja ? `${franja}, ` : "Hola, "}
         {PERSONA_DEMO.nombre.split(" ")[0]}
@@ -36,133 +35,20 @@ export function InicioPersona() {
       <h1 className="font-display mt-0.5 text-[24px] font-bold">¿Qué necesitas resolver?</h1>
 
       <BuscadorProblema />
+      <Metricas />
 
-      <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.5fr_1fr]">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
         <div className="flex flex-col gap-4">
-          {/* Mis consultas */}
-          <div className="rounded-2xl border border-borde bg-white p-5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-[11px] font-semibold tracking-[1.2px] text-texto-4 uppercase">
-                Mis consultas
-              </h2>
-              <Link href="/personas/consultas" className="text-[12.5px]">
-                Ver todas →
-              </Link>
-            </div>
-            {preguntas.length > 0 ? (
-              <div className="mt-3 flex flex-col gap-2.5">
-                {preguntas.slice(0, 2).map((p) => (
-                  <Link
-                    key={p.id}
-                    href="/personas/consultas"
-                    className="rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-chip px-2.5 py-[2px] text-[11px] font-medium text-celeste">
-                        {p.materia}
-                      </span>
-                      {respondidos[p.id] ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-exito">
-                          <Icono nombre="check" size={10} strokeWidth={2.6} />
-                          Respondida
-                        </span>
-                      ) : (
-                        <span className="text-[11px] text-texto-4">Esperando respuesta…</span>
-                      )}
-                    </div>
-                    <p className="mt-1.5 line-clamp-2 text-[13px] leading-[1.55] text-texto-2">
-                      {p.pregunta}
-                    </p>
-                  </Link>
-                ))}
-                {respondidas > 0 && (
-                  <p className="text-[12px] text-exito">
-                    ✓ {respondidas}{" "}
-                    {respondidas === 1 ? "consulta respondida" : "consultas respondidas"} por
-                    abogados
-                  </p>
-                )}
-              </div>
-            ) : (
-              <ConsultorioVacio />
-            )}
-          </div>
-
-          {/* Trámites en progreso */}
-          <div className="rounded-2xl border border-borde bg-white p-5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-[11px] font-semibold tracking-[1.2px] text-texto-4 uppercase">
-                Mis trámites
-              </h2>
-              <Link href="/personas/tramites" className="text-[12.5px]">
-                Ver todos →
-              </Link>
-            </div>
-            {enProgreso.length > 0 ? (
-              <div className="mt-3 flex flex-col gap-2.5">
-                {enProgreso.slice(0, 3).map((t) => {
-                  const hechos = (pasosTramite[t.id] ?? []).length;
-                  return (
-                    <Link
-                      key={t.id}
-                      href={`/personas/tramites/${t.id}`}
-                      className="rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
-                    >
-                      <div className="flex items-baseline justify-between gap-3">
-                        <span className="text-[13.5px] font-semibold">{t.nombre}</span>
-                        <span className="text-[11.5px] whitespace-nowrap text-celeste">
-                          {hechos}/{t.pasos.length} pasos
-                        </span>
-                      </div>
-                      <div className="mt-2 h-1 overflow-hidden rounded bg-sutil">
-                        <div
-                          className="h-full rounded bg-celeste transition-[width]"
-                          style={{ width: `${(hechos / t.pasos.length) * 100}%` }}
-                        />
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="mt-3 text-[13px] text-texto-3">
-                Abre una guía y marca tu avance — aquí verás tus trámites en progreso.
-              </p>
-            )}
-          </div>
+          <TusPendientes />
+          <MisConsultas />
+          <MisTramites />
+          <LoQueOtrosPreguntan />
         </div>
 
         <div className="flex flex-col gap-4">
-          <Acceso
-            href="/personas/tramites"
-            icono="pasos"
-            titulo="Guías de trámites"
-            desc={`${TRAMITES.length} trámites paso a paso con tu avance guardado`}
-          />
-          <Acceso
-            href="/personas/calculadora"
-            icono="calc"
-            titulo="¿Te despidieron?"
-            desc="Cuánto te toca y hasta cuándo puedes reclamar, según el Código del Trabajo"
-          />
-          <Acceso
-            href="/personas/directorio"
-            icono="perfil"
-            titulo="Encuentra abogado"
-            desc="Por materia y ciudad, con perfiles validados"
-          />
-          <div className="rounded-2xl border border-borde bg-white p-5">
-            <div className="text-[11px] font-semibold tracking-[1px] text-texto-4 uppercase">
-              Tu plan
-            </div>
-            <div className="font-display mt-1 text-[18px] font-bold">Gratis</div>
-            <p className="mt-1 text-[12.5px] leading-[1.55] text-texto-3">
-              Guías, consultorio y calculadoras sin costo. El plan de pago está en definición.
-            </p>
-            <Link href="/personas/plan" className="mt-2 inline-block text-[12.5px]">
-              Ver mi plan →
-            </Link>
-          </div>
+          <PlazoDestacado />
+          <AntesDeFirmar />
+          <AccesosRapidos />
         </div>
       </div>
     </div>
@@ -175,17 +61,14 @@ export function InicioPersona() {
  * Busca sobre las guías con el motor canónico (`buscarGuias`), el mismo de la
  * pantalla Trámites. Los resultados salen AQUÍ y no navegando a otra pantalla:
  * el ciudadano llega con una duda y mandarlo a una lista con filtros es
- * pedirle que vuelva a decidir.
- *
- * Cuando no hay coincidencia no se queda en "sin resultados" — ofrece llevar
- * lo escrito al consultorio, que es la respuesta honesta: el catálogo tiene 14
- * guías y no cubre todo, pero un abogado colegiado sí puede orientar.
+ * pedirle que vuelva a decidir. Sin coincidencia ofrece el consultorio — 14
+ * guías no cubren todo, y ese es el camino honesto.
  */
 function BuscadorProblema() {
   const [q, setQ] = useState("");
   const termino = q.trim();
-  const resultados = termino.length >= 3 ? buscarGuias(termino) : [];
   const buscando = termino.length >= 3;
+  const resultados = buscando ? buscarGuias(termino) : [];
 
   return (
     <div className="mt-3">
@@ -253,18 +136,195 @@ function BuscadorProblema() {
   );
 }
 
-// ── Estado vacío del consultorio ───────────────────────────────────────────
+// ── Métricas ───────────────────────────────────────────────────────────────
+
+/**
+ * Las tres del abogado miden su producción; estas miden la gestión del
+ * ciudadano. Con la cuenta recién creada dos valen cero, así que en vez del
+ * "0" seco llevan la invitación a empezar: un cero sin salida es un tablero
+ * que dice que no has hecho nada.
+ */
+function Metricas() {
+  const pasosTramite = usePortal((s) => s.pasosTramite);
+  const preguntas = usePortal((s) => s.preguntasPublico);
+  const respondidos = usePortal((s) => s.leadsRespondidos);
+
+  const enProgreso = TRAMITES.filter((t) => {
+    const hechos = (pasosTramite[t.id] ?? []).length;
+    return hechos > 0 && hechos < t.pasos.length;
+  }).length;
+  const completos = TRAMITES.filter(
+    (t) => (pasosTramite[t.id] ?? []).length === t.pasos.length,
+  ).length;
+  const respondidas = preguntas.filter((p) => respondidos[p.id]).length;
+
+  return (
+    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <Metrica
+        href="/personas/tramites"
+        rotulo="Trámites en curso"
+        valor={enProgreso > 0 ? String(enProgreso) : "—"}
+        pie={
+          enProgreso > 0
+            ? completos > 0
+              ? `${completos} ${completos === 1 ? "terminado" : "terminados"}`
+              : "Retómalos donde los dejaste"
+            : "Abre una guía y marca tu avance"
+        }
+      />
+      <Metrica
+        href="/personas/consultas"
+        rotulo="Mis consultas"
+        valor={preguntas.length > 0 ? String(preguntas.length) : "—"}
+        pie={
+          preguntas.length > 0
+            ? respondidas > 0
+              ? `${respondidas} ${respondidas === 1 ? "respondida" : "respondidas"}`
+              : "Esperando a los abogados"
+            : "Preguntar es gratis"
+        }
+        acento={respondidas > 0}
+      />
+      <Metrica
+        href="/personas/tramites"
+        rotulo="Guías disponibles"
+        valor={String(TRAMITES.length)}
+        pie="Todas con su fuente oficial"
+      />
+    </div>
+  );
+}
+
+function Metrica({
+  href,
+  rotulo,
+  valor,
+  pie,
+  acento,
+}: {
+  href: string;
+  rotulo: string;
+  valor: string;
+  pie: string;
+  acento?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className="rounded-2xl border border-borde bg-white px-5 py-4.5 text-marino hover:border-celeste"
+    >
+      <div className="text-xs tracking-[.4px] text-texto-3 uppercase">{rotulo}</div>
+      <div className="font-display mt-1.5 text-[30px] leading-none font-bold">{valor}</div>
+      <div className={`mt-2 text-xs ${acento ? "font-semibold text-exito" : "text-texto-3"}`}>
+        {pie}
+      </div>
+    </Link>
+  );
+}
+
+// ── Triaje: qué tiene pendiente ────────────────────────────────────────────
+
+/**
+ * El equivalente de "Pendientes de hoy" del abogado. Se deriva del MISMO
+ * `useAvisosPersona` que alimenta Notificaciones — con dos derivaciones
+ * distintas, la campana y el tablero podrían contradecirse. Se descarta el
+ * grupo "De Justihn" porque una novedad no es un pendiente que resolver.
+ */
+function TusPendientes() {
+  const grupos = useAvisosPersona();
+  const pendientes = grupos
+    .filter((g) => g.etiqueta !== "De Justihn")
+    .flatMap((g) => g.avisos)
+    .slice(0, 4);
+
+  if (pendientes.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border border-borde bg-white p-5">
+      <div className="flex items-baseline gap-2.5">
+        <h2 className="font-display text-[17px] font-bold">Tus pendientes</h2>
+        <span className="text-[12px] text-texto-4">lo que dejaste a medias</span>
+      </div>
+      <div className="mt-3 flex flex-col gap-2.5">
+        {pendientes.map((a) => (
+          <Link
+            key={a.id}
+            href={a.destino}
+            className="flex items-center gap-3 rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
+          >
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-chip text-celeste">
+              <Icono nombre={a.icono} size={14} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13.5px] font-semibold">{a.titulo}</span>
+              <span className="mt-0.5 block truncate text-[12px] text-texto-3">{a.meta}</span>
+            </span>
+            {/* `chevron` apunta hacia abajo y esto es un enlace, no un
+                acordeón: se usa `atras` rotado, que es el único chevron
+                horizontal del set. */}
+            <Icono nombre="atras" size={15} className="shrink-0 rotate-180 text-texto-4" />
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Mis consultas ──────────────────────────────────────────────────────────
+
+function MisConsultas() {
+  const preguntas = usePortal((s) => s.preguntasPublico);
+  const respondidos = usePortal((s) => s.leadsRespondidos);
+
+  return (
+    <div className="rounded-2xl border border-borde bg-white p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-[17px] font-bold">Mis consultas</h2>
+        <Link href="/personas/consultas" className="text-[12.5px]">
+          Ver todas →
+        </Link>
+      </div>
+      {preguntas.length > 0 ? (
+        <div className="mt-3 flex flex-col gap-2.5">
+          {preguntas.slice(0, 2).map((p) => (
+            <Link
+              key={p.id}
+              href="/personas/consultas"
+              className="rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
+            >
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-chip px-2.5 py-[2px] text-[11px] font-medium text-celeste">
+                  {p.materia}
+                </span>
+                {respondidos[p.id] ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-exito">
+                    <Icono nombre="check" size={10} strokeWidth={2.6} />
+                    Respondida
+                  </span>
+                ) : (
+                  <span className="text-[11px] text-texto-4">Esperando respuesta…</span>
+                )}
+              </div>
+              <p className="mt-1.5 line-clamp-2 text-[13px] leading-[1.55] text-texto-2">
+                {p.pregunta}
+              </p>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <ConsultorioVacio />
+      )}
+    </div>
+  );
+}
 
 /**
  * Antes decía "Aún no has preguntado nada" y un botón. Pero el obstáculo del
  * ciudadano no es no saber dónde escribir: es no creer que alguien vaya a
- * responderle. Así que en su lugar va un intercambio REAL ya respondido y
- * firmado con su número de colegiación — mismo criterio que la sección
- * consultorio de la home pública (`landing/secciones.tsx`).
- *
- * El componente no se comparte con esa: aquella pinta sobre el shell aurora
- * (`glass-card`, `var(--muted)`) y esta sobre el tema del portal. Lo que se
- * comparte es la fuente —`respuestaDemo` del seed— y el criterio.
+ * responderle. Así que va un intercambio REAL ya respondido y firmado con su
+ * colegiación — mismo criterio que la sección consultorio de la home pública
+ * (`landing/secciones.tsx`). El componente no se comparte con aquella porque
+ * pintan sobre temas distintos; lo compartido es la fuente y el criterio.
  */
 function ConsultorioVacio() {
   const ejemplo = LEADS.find((l) => l.respuestaDemo);
@@ -316,29 +376,209 @@ function ConsultorioVacio() {
   );
 }
 
-function Acceso({
-  href,
-  icono,
-  titulo,
-  desc,
-}: {
-  href: string;
-  icono: NombreIcono;
-  titulo: string;
-  desc: string;
-}) {
+// ── Mis trámites ───────────────────────────────────────────────────────────
+
+function MisTramites() {
+  const pasosTramite = usePortal((s) => s.pasosTramite);
+  const enProgreso = TRAMITES.filter((t) => (pasosTramite[t.id] ?? []).length > 0);
+
   return (
-    <Link
-      href={href}
-      className="flex items-start gap-3.5 rounded-2xl border border-borde bg-white p-5 text-marino hover:border-celeste"
+    <div className="rounded-2xl border border-borde bg-white p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-[17px] font-bold">Mis trámites</h2>
+        <Link href="/personas/tramites" className="text-[12.5px]">
+          Ver todos →
+        </Link>
+      </div>
+      {enProgreso.length > 0 ? (
+        <div className="mt-3 flex flex-col gap-2.5">
+          {enProgreso.slice(0, 3).map((t) => {
+            const hechos = (pasosTramite[t.id] ?? []).length;
+            return (
+              <Link
+                key={t.id}
+                href={`/personas/tramites/${t.id}`}
+                className="rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
+              >
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-[13.5px] font-semibold">{t.nombre}</span>
+                  <span className="text-[11.5px] whitespace-nowrap text-celeste">
+                    {hechos}/{t.pasos.length} pasos
+                  </span>
+                </div>
+                <div className="mt-2 h-1 overflow-hidden rounded bg-sutil">
+                  <div
+                    className="h-full rounded bg-celeste transition-[width]"
+                    style={{ width: `${(hechos / t.pasos.length) * 100}%` }}
+                  />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="mt-3">
+          <p className="text-[13px] text-texto-3">
+            Aún no has empezado ninguna guía. Estas son de las más buscadas:
+          </p>
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            {["abrir-rtn", "reclamo-consumidor", "despido-injustificado", "traspaso-vehiculo"]
+              .map((id) => TRAMITES.find((t) => t.id === id))
+              .filter((t) => t !== undefined)
+              .map((t) => (
+                <Link
+                  key={t.id}
+                  href={`/personas/tramites/${t.id}`}
+                  className="rounded-full border border-borde px-3.5 py-1.5 text-[12.5px] font-medium text-marino hover:border-celeste hover:text-celeste"
+                >
+                  {t.nombre}
+                </Link>
+              ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Prueba social: el consultorio en marcha ────────────────────────────────
+
+/**
+ * El eco de "Leads en tu especialidad" del abogado, visto desde el otro lado.
+ * Enseña que el consultorio se usa —y qué clase de cosas se preguntan— sin
+ * inventar un contador de actividad: son las consultas del seed, las mismas
+ * que le llegan al abogado.
+ */
+function LoQueOtrosPreguntan() {
+  const ejemplos = LEADS.filter((l) => l.respuestaDemo).slice(1, 4);
+  if (ejemplos.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border border-borde bg-white p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-[17px] font-bold">Lo que otros preguntan</h2>
+        <Link href="/personas/consultas" className="text-[12.5px]">
+          Ir al consultorio →
+        </Link>
+      </div>
+      <p className="mt-1 text-[12.5px] text-texto-3">
+        Consultas reales del consultorio, respondidas por abogados colegiados.
+      </p>
+      <div className="mt-3 flex flex-col gap-2.5">
+        {ejemplos.map((l) => (
+          <Link
+            key={l.id}
+            href="/personas/consultas"
+            className="rounded-xl border border-borde px-4 py-3 text-marino hover:border-celeste"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-chip px-2.5 py-[2px] text-[11px] font-medium text-celeste">
+                {l.materia}
+              </span>
+              <span className="text-[11.5px] text-texto-4">{l.ciudad}</span>
+              <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-exito">
+                <Icono nombre="check" size={10} strokeWidth={2.6} />
+                Respondida
+              </span>
+            </div>
+            <p className="mt-1.5 line-clamp-2 text-[13px] leading-[1.55] text-texto-2">
+              {l.pregunta}
+            </p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Columna derecha ────────────────────────────────────────────────────────
+
+/**
+ * El destacado del abogado es su digest de Gaceta. El del ciudadano es un
+ * PLAZO: es lo que le hace perder el caso sin enterarse, y el dato ya está
+ * verificado contra el PDF del CEDIJ (`data/plazos.ts`). No es un anuncio —
+ * es el aviso más útil que este producto puede dar.
+ */
+function PlazoDestacado() {
+  const plazo = PLAZOS_CIUDADANO[0];
+
+  return (
+    <div
+      className="rounded-2xl p-5 text-[#e8eef6]"
+      style={{ background: "linear-gradient(180deg,#0d2144 0%,#0a1830 100%)" }}
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-chip text-celeste">
-        <Icono nombre={icono} size={17} />
-      </span>
-      <span>
-        <span className="font-display block text-[15px] font-bold">{titulo}</span>
-        <span className="mt-0.5 block text-[12.5px] leading-[1.5] text-texto-3">{desc}</span>
-      </span>
-    </Link>
+      <div className="text-[11px] font-semibold tracking-[1.2px] text-sobre-marino uppercase">
+        Ojo con los plazos
+      </div>
+      <p className="font-display mt-1.5 text-[16px] leading-[1.35] font-bold">
+        {plazo.hecho}: tienes {etiquetaPlazo(plazo)}
+      </p>
+      <p className="mt-2 text-[12.5px] leading-[1.6] text-sobre-marino-2">
+        {plazo.cuerpoLegal}, {plazo.articulo}. Es la razón número uno por la que se pierden
+        reclamos legítimos en Honduras.
+      </p>
+      <Link
+        href="/personas/calculadora"
+        className="mt-3.5 inline-block rounded-lg bg-celeste px-3.5 py-[9px] text-[13px] font-semibold text-white hover:bg-[#0d6ba3] hover:text-white"
+      >
+        Calcular mi plazo
+      </Link>
+    </div>
+  );
+}
+
+/** El caso de uso que motiva Verifica, dicho como lo vive la persona. */
+function AntesDeFirmar() {
+  return (
+    <div className="rounded-2xl border border-borde bg-white p-5">
+      <h2 className="font-display text-[15px] font-bold">¿Vas a firmar con alguien?</h2>
+      <p className="mt-1.5 text-[12.5px] leading-[1.6] text-texto-3">
+        Antes de comprar un terreno, alquilar o asociarte, mira qué hay publicado sobre esa
+        persona o empresa en las fuentes del Estado.
+      </p>
+      <Link href="/personas/verifica" className="mt-2.5 inline-block text-[12.5px] font-medium">
+        Hacer un Informe Verifica →
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * `flex-1` para que la columna derecha cierre a la altura de la izquierda —
+ * el mismo recurso que usa el dashboard del abogado en su última card.
+ */
+function AccesosRapidos() {
+  const accesos: { href: string; icono: NombreIcono; label: string }[] = [
+    { href: "/personas/tramites", icono: "pasos", label: "Guías de trámites" },
+    { href: "/personas/instituciones", icono: "gaceta", label: "Instituciones" },
+    { href: "/personas/directorio", icono: "perfil", label: "Encuentra abogado" },
+    { href: "/personas/calculadora", icono: "calc", label: "Calculadoras" },
+    { href: "/personas/consultas", icono: "leads", label: "Mis consultas" },
+    { href: "/personas/monitoreo", icono: "bell", label: "Mi nombre" },
+  ];
+
+  return (
+    <div className="flex flex-1 flex-col rounded-2xl border border-borde bg-white p-5">
+      <h2 className="text-[11px] font-semibold tracking-[1.2px] text-texto-4 uppercase">
+        Accesos rápidos
+      </h2>
+      <div className="mt-3 grid flex-1 grid-cols-1 content-start gap-2.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+        {accesos.map((a) => (
+          <Link
+            key={a.href}
+            href={a.href}
+            className="flex items-center gap-2.5 rounded-[10px] border border-borde bg-lienzo px-3.5 py-3 text-[12.5px] font-medium text-marino hover:border-celeste hover:text-celeste"
+          >
+            <span className="grid shrink-0 place-items-center text-texto-4">
+              <Icono nombre={a.icono} size={15} />
+            </span>
+            {a.label}
+          </Link>
+        ))}
+      </div>
+      <p className="mt-3 border-t border-borde pt-3 text-[11.5px] leading-[1.5] text-texto-4">
+        {INSTITUCIONES.length} instituciones del Estado · {DIRECTORIO.length} abogados por materia
+      </p>
+    </div>
   );
 }
