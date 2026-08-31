@@ -242,6 +242,17 @@ promesas que ya estaban hechas y no existían:
   sentencias del piloto) y **el ciudadano tiene su propia lista**
   (`nombresVigiladosPersona`): compartir la del abogado le enseñaría sus
   clientes y contrapartes.
+  **Mi nombre, refinada 2026-08-31:** arrastraba la misma contradicción que
+  Verifica —el disclaimer pedía "abre la sentencia y compruébalo" sin poder
+  abrirla—, así que el desplegable se **extrajo a `aparicion.tsx` y lo usan las
+  dos**: con dos copias, arreglar una dejaría a la otra pidiendo lo imposible
+  (hay test). El disclaimer pasa a **una vez por nombre, no por fila**: repetido
+  en cada aparición se volvía ruido y se dejaba de leer, que es lo contrario de
+  lo que un disclaimer busca. Se suman la **relación** al vigilar (Mío / De mi
+  familia — lo único que separa vigilar de acosar, y por eso no hay opción para
+  terceros), un resumen lateral y **"Cómo te avisamos"**, que enlaza a
+  Notificaciones y Configuración: antes decía "te avisamos" sin decir por dónde
+  ni dónde se elige.
   Tres reglas de §5 están cableadas en la UI, no son copy: **homónimos
   siempre** —también cuando NO hay resultados, porque "sin apariciones" se lee
   como certificado y no lo es—, **usos prohibidos a la vista antes de buscar**,
@@ -666,7 +677,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (138 tests de invariantes)
+pnpm test         # Vitest (140 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

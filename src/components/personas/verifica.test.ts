@@ -4,8 +4,11 @@ import { join } from "node:path";
 import { buscarApariciones } from "@/data/monitoreo";
 import { SENTENCIAS } from "@/data/sentencias";
 
-const RUTA = join(process.cwd(), "src/components/personas/verifica-persona.tsx");
-const FUENTE = readFileSync(RUTA, "utf8");
+const dir = join(process.cwd(), "src/components/personas");
+const FUENTE = readFileSync(join(dir, "verifica-persona.tsx"), "utf8");
+const MONITOREO = readFileSync(join(dir, "monitoreo-persona.tsx"), "utf8");
+/** El desplegable de una aparición: compartido por Verifica y Mi nombre. */
+const APARICION = readFileSync(join(dir, "aparicion.tsx"), "utf8");
 
 /**
  * Sin comentarios: varios explican precisamente las reglas que se comprueban
@@ -51,13 +54,33 @@ describe("Informe Verifica — las reglas de §5 siguen cableadas", () => {
  */
 describe("cada aparición se puede abrir", () => {
   it("la fila es un control desplegable, no texto muerto", () => {
-    expect(FUENTE).toContain('aria-expanded={abierta}');
+    expect(APARICION).toContain('aria-expanded={abierta}');
   });
 
   it("al abrirla enseña con qué contrastar el homónimo", () => {
     for (const campo of ["s.resumen", "s.ponente", "s.fallo", "s.extracto"]) {
-      expect(FUENTE, campo).toContain(campo);
+      expect(APARICION, campo).toContain(campo);
     }
+  });
+
+  /**
+   * Las DOS pantallas de Verificación piden "abre la sentencia y compruébalo".
+   * Si una se quedara con su copia, arreglar la otra la dejaría pidiendo algo
+   * imposible — que es como estaban antes de compartir el componente.
+   */
+  it("Verifica y Mi nombre usan el MISMO desplegable, no una copia", () => {
+    for (const [nombre, fuente] of [
+      ["verifica-persona", FUENTE],
+      ["monitoreo-persona", MONITOREO],
+    ] as const) {
+      expect(fuente, nombre).toContain("FilaAparicion");
+      expect(fuente, `${nombre} no debe redefinirlo`).not.toContain("function FilaAparicion");
+    }
+  });
+
+  it("Mi nombre lleva su disclaimer de homónimos UNA vez, no por fila", () => {
+    const veces = MONITOREO.split("Puede tratarse de otra persona").length - 1;
+    expect(veces).toBe(1);
   });
 
   it("el corpus trae esos cuatro campos en todas las sentencias", () => {

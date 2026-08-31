@@ -61,7 +61,13 @@ export interface PublicacionGaceta {
 export interface NombreVigilado {
   id: string;
   nombre: string;
-  tipo: "propio" | "cliente" | "contraparte";
+  /**
+   * Qué es ese nombre para quien lo vigila. `cliente`/`contraparte` son del
+   * abogado; `propio`/`familiar`, del ciudadano — que NO puede vigilar a
+   * terceros: eso convertiría el monitoreo en acoso (§5), y para mirar a otro
+   * está el Informe Verifica con sus reglas.
+   */
+  tipo: "propio" | "familiar" | "cliente" | "contraparte";
 }
 
 /** Tabla `codigos` + `articulos_codigo` — legislación consolidada del PJ. */

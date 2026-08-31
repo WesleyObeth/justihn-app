@@ -13,6 +13,9 @@ import type { NombreVigilado } from "@/types/dominio";
 
 const ETIQUETA_TIPO: Record<NombreVigilado["tipo"], string> = {
   propio: "Tu nombre",
+  // El ciudadano vigila el suyo y el de su familia; el abogado, clientes y
+  // contrapartes. El tipo es compartido, así que la etiqueta lo cubre entero.
+  familiar: "Familiar",
   cliente: "Cliente",
   contraparte: "Contraparte",
 };

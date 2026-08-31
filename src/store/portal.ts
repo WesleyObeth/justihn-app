@@ -111,7 +111,7 @@ interface PortalState {
   reiniciarProceso: (procesoId: string) => void;
   responderLead: (leadId: string, respuesta: string, abogadoId?: string) => void;
   vigilarNombre: (nombre: string, tipo: NombreVigilado["tipo"]) => void;
-  vigilarNombrePersona: (nombre: string) => void;
+  vigilarNombrePersona: (nombre: string, tipo?: "propio" | "familiar") => void;
   escribirAAbogado: (abogadoId: string, materia: Materia, texto: string) => void;
   registrarConsultaVerifica: (nombre: string) => void;
   olvidarConsultasVerifica: () => void;
@@ -237,7 +237,7 @@ export const usePortal = create<PortalState>()(
         set((s) => ({ nombresVigilados: s.nombresVigilados.filter((v) => v.id !== id) })),
       // La persona solo vigila nombres "propios": los suyos y los de su familia.
       // No hay clientes ni contrapartes en la vía B.
-      vigilarNombrePersona: (nombre) =>
+      vigilarNombrePersona: (nombre, tipo = "propio") =>
         set((s) => {
           const id = `vigp-${nombre
             .toLowerCase()
@@ -249,7 +249,7 @@ export const usePortal = create<PortalState>()(
           return {
             nombresVigiladosPersona: [
               ...s.nombresVigiladosPersona,
-              { id, nombre, tipo: "propio" as const },
+              { id, nombre, tipo },
             ],
           };
         }),
