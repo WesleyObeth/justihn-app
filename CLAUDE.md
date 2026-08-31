@@ -186,6 +186,34 @@ paso a paso de procesos, plantillas, leads del consultorio, calculadoras y
   sobre un `<a>` de la landing se pierde en silencio — el color va **inline**.
   Pasó con los botones del CTA (texto marino sobre azul, ilegible).
 
+- **👤 LA CARD OFICIAL DEL ABOGADO — `components/publico/tarjeta-abogado.tsx`
+  (2026-08-30, elegida entre prototipos: "la card que habla"):** es la que ve
+  una persona al decidir a quién contratar, así que vive en UN solo sitio y la
+  usan la home, el directorio público y el del portal ciudadano.
+  Orden = orden de la duda: **materias** (lo primero que se busca; el nombre
+  aún no dice nada) → quién es (ciudad, años) → **credenciales** (colegiación
+  validada / en trámite + habilitación notarial) → **su voz**: un fragmento de
+  una respuesta suya en el consultorio → la acción, con su nombre.
+  - **La cita es el diferencial.** Deja juzgar CÓMO explica antes de
+    escribirle, y ningún competidor puede copiarla sin un consultorio detrás.
+    ⚠️ `TODO(data)`: sale de su última respuesta destacada en `leads`, NO de un
+    campo que el abogado redacte — si lo escribe él, vuelve a ser marketing.
+  - **Fuera "★ valoración"** de TODAS las superficies públicas (eran 5: home,
+    directorio público, guías de trámites, calculadora y trámites del portal
+    ciudadano). No existe sistema de reseñas: ese número no lo producía nadie
+    y aquí decide a quién contrata alguien. Se sustituye por años de ejercicio,
+    que sí es verificable. El campo `valoracion` sigue en el seed porque el
+    panel del abogado lo muestra como métrica propia — anotado ahí.
+  - **Fuera los conteos** (contactos, respuestas): vanidad. Uno con 34
+    respuestas no es mejor que uno con 12, y contarlas premiaría publicar por
+    publicar.
+  - **Fuera "Contactar por WhatsApp".** Sacaba el contacto de Justihn en el
+    primer toque: sin registro, sin trazabilidad y sin poder demostrarle al
+    abogado cuántos contactos le trajo la plataforma — que es lo que sostiene
+    que pague. Ahora **"Consultar con [nombre]"**; WhatsApp llega después,
+    cuando ya hay conversación. `TODO(fase 2)`: abrir una consulta DIRIGIDA
+    (mismo circuito del consultorio, con destinatario).
+
 - **🔍 REFINADO DE LA HOME CIUDADANA (2026-08-30, auditoría + ajustes):**
   - **Procesos habla el mismo idioma que Trámites**: pasa de 4 cards en grid a
     la misma `FilaTramite`, pero **sin el riel numerado** — despido, pensión,

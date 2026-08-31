@@ -174,7 +174,7 @@ export function CalculadoraPublica({ enPortal = false }: { enPortal?: boolean })
               <div key={a.id} className="rounded-xl border border-borde p-4">
                 <div className="text-[13.5px] font-semibold">{a.nombre}</div>
                 <div className="text-[11.5px] text-texto-4">
-                  {a.ciudad} · ★ {a.valoracion} · Laboral
+                  {a.ciudad} · {a.anios} años · Laboral
                 </div>
                 <button
                   type="button"

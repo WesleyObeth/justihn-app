@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Icono } from "@/components/brand/iconos";
 import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
-import { InsigniaNotario } from "@/components/publico/paso-profesional";
-import { usePortal } from "@/store/portal";
+import { TarjetaAbogado } from "@/components/publico/tarjeta-abogado";
 import type { Materia } from "@/types/dominio";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +13,6 @@ export function PantallaDirectorio({ enPortal = false }: { enPortal?: boolean })
   const rutaConsultorio = enPortal ? "/personas/consultas" : "/consultorio";
   const router = useRouter();
   const params = useSearchParams();
-  const mostrarToast = usePortal((s) => s.mostrarToast);
   // `?notarios=1` llega desde un paso de trámite que exige notario.
   const soloNotarios = params.get("notarios") === "1";
   const materia = (params.get("materia") as Materia | null) ?? "todas";
@@ -67,56 +64,9 @@ export function PantallaDirectorio({ enPortal = false }: { enPortal?: boolean })
         ))}
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
         {abogados.map((a) => (
-          <div key={a.id} className="flex flex-col rounded-2xl border border-borde bg-white p-5">
-            <div className="flex items-center gap-3.5">
-              <span
-                className="font-display grid h-[52px] w-[52px] place-items-center rounded-full text-[17px] font-semibold text-white"
-                style={{ background: "linear-gradient(180deg,#0d2144,#0a1830)" }}
-              >
-                {a.iniciales}
-              </span>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[14.5px] font-bold">{a.nombre}</span>
-                  {a.validado && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-exito-bg px-2 py-[2px] text-[10px] font-bold text-exito">
-                      <Icono nombre="check" size={9} strokeWidth={2.6} />
-                      Validado
-                    </span>
-                  )}
-                  {a.notario && <InsigniaNotario verificado={a.notario.verificado} />}
-                </div>
-                <div className="text-[12px] text-texto-4">
-                  {a.ciudad} · ★ {a.valoracion} · {a.contactos} contactos
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {a.materias.map((m) => (
-                <span
-                  key={m}
-                  className="rounded-full bg-chip px-2.5 py-[3px] text-[11.5px] font-medium text-celeste"
-                >
-                  {m}
-                </span>
-              ))}
-            </div>
-
-            <p className="mt-2.5 flex-1 text-[12.5px] leading-[1.6] text-texto-3">{a.bio}</p>
-
-            <button
-              type="button"
-              onClick={() =>
-                mostrarToast(`Así inicia el contacto con ${a.nombre} (demo de validación)`)
-              }
-              className="mt-4 w-full cursor-pointer rounded-lg bg-celeste py-2.5 text-[13px] font-semibold text-white hover:bg-cruce"
-            >
-              Contactar por WhatsApp
-            </button>
-          </div>
+          <TarjetaAbogado key={a.id} abogado={a} />
         ))}
       </div>
 

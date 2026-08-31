@@ -320,7 +320,7 @@ export function DetalleTramitePersona({ tramite }: { tramite: Tramite }) {
                 <div key={a.id} className="rounded-xl border border-borde p-3.5">
                   <div className="text-[13px] font-semibold">{a.nombre}</div>
                   <div className="text-[11.5px] text-texto-4">
-                    {a.ciudad} · ★ {a.valoracion}
+                    {a.ciudad} · {a.anios} años
                   </div>
                   <button
                     type="button"

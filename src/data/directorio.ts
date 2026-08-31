@@ -42,6 +42,23 @@ export interface AbogadoDirectorio {
   /** Áreas de práctica. NO confundir con la habilitación notarial. */
   materias: Materia[];
   bio: string;
+  /** Años de ejercicio — señal verificable, a diferencia de una estrella. */
+  anios: number;
+  /** Tiempo típico de respuesta ("el mismo día", "en 2 días"). */
+  responde: string;
+  /**
+   * Fragmento de una respuesta suya en el consultorio. Es la prueba que
+   * ninguna insignia da: deja juzgar CÓMO explica antes de escribirle.
+   * ⚠️ TODO(data): sale de su última respuesta destacada en `leads`, NO de un
+   * campo que el abogado escriba — si lo redacta él, vuelve a ser marketing.
+   */
+  cita: string;
+  enLinea: boolean;
+  /**
+   * ⚠️ En desuso en las superficies públicas desde 2026-08-30: no existe
+   * sistema de reseñas, así que este número no lo produce nadie. Se conserva
+   * porque el panel del abogado aún lo muestra como métrica propia.
+   */
   valoracion: string;
   contactos: number;
   validado: boolean;
@@ -59,6 +76,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     ciudad: ABOGADA_DEMO.ciudad,
     materias: ABOGADA_DEMO.especialidades,
     bio: ABOGADA_DEMO.bio,
+    anios: 12,
+    responde: "el mismo día",
+    cita:
+      "El plazo corre desde que terminó el contrato, no desde que te pagaron. Dos meses.",
+    enLinea: true,
     valoracion: ABOGADA_DEMO.metricas.valoracion,
     contactos: ABOGADA_DEMO.metricas.contactos,
     validado: false,
@@ -71,6 +93,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     ciudad: "Tegucigalpa, M.D.C.",
     materias: ["Mercantil", "Notarial"],
     bio: "Constitución de sociedades, contratos y notariado. Acompaño negocios desde el pacto social hasta el permiso de operación.",
+    anios: 15,
+    responde: "en 1 día",
+    cita:
+      "Antes de firmar el pacto social decide quién administra: cambiarlo después cuesta otra escritura.",
+    enLinea: true,
     valoracion: "4.8",
     contactos: 21,
     validado: true,
@@ -84,6 +111,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     ciudad: "San Pedro Sula",
     materias: ["Contencioso Adm."],
     bio: "Licencias ambientales y sanitarias, permisos y litigios contra la administración. 9 años ante MiAmbiente y ARSA.",
+    anios: 9,
+    responde: "en 2 días",
+    cita:
+      "La licencia ambiental no se pide al final: si arrancas sin ella, la multa la fija MiAmbiente por día.",
+    enLinea: false,
     valoracion: "4.7",
     contactos: 14,
     validado: true,
@@ -96,6 +128,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     ciudad: "La Ceiba",
     materias: ["Civil", "Familia"],
     bio: "Propiedad, herencias y familia. Reviso el folio real antes de que firmes — la mitad de mi trabajo es evitar pleitos.",
+    anios: 18,
+    responde: "el mismo día",
+    cita:
+      "Pídeme el folio real antes de dar un adelanto. La mitad de mi trabajo es evitar ese pleito.",
+    enLinea: true,
     valoracion: "4.6",
     contactos: 9,
     validado: true,
@@ -111,6 +148,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     ciudad: "Tegucigalpa, M.D.C.",
     materias: ["Penal"],
     bio: "Defensa penal y acompañamiento en denuncias. Atención de urgencias.",
+    anios: 7,
+    responde: "en horas",
+    cita:
+      "Si te citan a declarar, no vayas solo. Puedes pedir asistencia antes de decir una palabra.",
+    enLinea: true,
     valoracion: "4.9",
     contactos: 17,
     validado: true,

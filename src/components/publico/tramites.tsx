@@ -124,7 +124,7 @@ export function DetalleTramite({ tramite }: { tramite: Tramite }) {
                     <div className="min-w-0">
                       <div className="text-[13.5px] font-semibold">{a.nombre}</div>
                       <div className="text-[11.5px] text-texto-4">
-                        {a.ciudad} · ★ {a.valoracion}
+                        {a.ciudad} · {a.anios} años
                       </div>
                     </div>
                   </div>
