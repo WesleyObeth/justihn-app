@@ -3,7 +3,7 @@
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
 > Creado: **2026-08-25** · Última actualización: **2026-08-30** (reorganización:
-> §1 comprimida, trampas verificadas a §4.7).
+> §1 comprimida, trampas a §4.7; refinado final de los portales como pendiente #1).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -391,32 +391,51 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
 
 ## 6. Pendientes — próxima sesión (en orden)
 
-1. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
+1. **🔎 REFINADO FINAL DE LOS DOS PORTALES — `/abogados` (15 pantallas) y
+   `/personas` (9 rutas) — ANTES de Supabase** (decisión Wesley 2026-08-30).
+   Va primero por un motivo técnico, no de gusto: **los seeds son el contrato
+   literal del esquema**. Si el refinado cambia un dato, renombra un campo o
+   descubre que falta uno, ahora cuesta una línea; con las tablas ya creadas
+   cuesta una migración. Las landings y auth quedaron cerradas el 2026-08-30
+   (E2E en §5), así que esto es lo único que queda de Fase 1.
+   Qué mirar, por orden de riesgo:
+   - **Los seeds como esquema:** ¿algún campo del portal no existiría en la
+     tabla? ¿Alguno sobra? ¿Nombres consistentes entre `data/*.ts` (hoy conviven
+     `plantillaId` con la pantalla llamada Modelos)? Esto es lo que congela.
+   - **Las entidades nuevas del feedback del socio** (instituciones, trámites por
+     institución, directorio público, planes vía B): decidir si entran al esquema
+     inicial o a una migración — y si necesitan pantalla mock-first primero.
+   - **Recorrido de las 24 pantallas** con el patrón que ya funcionó: escritorio
+     y móvil, deep-links, estados vacíos, y que nada prometa lo que no hace (§4.5).
+   - **Lo que el E2E dejó fuera:** los portales solo se tocaron de refilón — el
+     recorrido cubrió las cinco pantallas públicas.
+2. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
    workflow del corpus de Data Table → Postgres + embeddings pgvector (el esquema
-   SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Los seeds del portal de
-   abogados quedaron validados por el socio; decidir si las entidades nuevas de su
-   feedback (instituciones, trámites, directorio público, planes vía B) entran al
-   esquema inicial o en una migración posterior.
-2. **Cron `launchd` en la Mac** para el scraper de escala (20.202 sentencias,
+   SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Entra **después** del
+   punto 1: los seeds validados por el socio más lo que salga del refinado son el
+   contrato del esquema.
+3. **Cron `launchd` en la Mac** para el scraper de escala (20.202 sentencias,
    ~1.000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende de
-   nada: el destino provisional (Data Table de n8n) sigue válido.
-3. **Elegir entre `/para-abogados` y `/para-abogados-black`** y borrar la ruta
-   perdedora (o convertirla en redirect). Ídem con la prueba de la aurora clara en
-   auth (§1.4).
-4. **SEO de la vía B:** no hay `sitemap.xml` ni datos estructurados
+   nada: el destino provisional (Data Table de n8n) sigue válido, así que puede
+   avanzar en paralelo a todo lo demás.
+4. **Elegir entre `/para-abogados` y `/para-abogados-black`** y borrar la ruta
+   perdedora (o convertirla en redirect) — ⏸️ **aplazado a propósito** (Wesley
+   2026-08-30): es una comparación visual que no bloquea nada. Ídem con la prueba
+   de la aurora clara en auth (§1.4).
+5. **SEO de la vía B:** no hay `sitemap.xml` ni datos estructurados
    (`HowTo`/`FAQPage` en las guías, que es lo que gana los rich snippets). Y
    `robots` sigue en **`noindex`** en el layout raíz: **quitarlo al lanzar**, o
    nada de esto rankea.
-5. **Decidir en qué plan entra "Procesos"** (`data/catalogo.ts`): la pantalla
+6. **Decidir en qué plan entra "Procesos"** (`data/catalogo.ts`): la pantalla
    existe y la landing la vende, pero la tabla de planes no dice desde cuál se
    tiene. Antes de cobrar.
-6. **Más demos con seed real** si se sigue refinando: los candidatos son
+7. **Más demos con seed real** si se sigue refinando: los candidatos son
    Calculadoras y Modelos de escritos. El patrón está: `SeccionDemo` + una vista.
    **Video real del portal**: hoy los demos son animación HTML a propósito (siguen
    al seed y el crawler lee el texto); cuando la UI se estabilice tras Supabase,
    grabar footage con Playwright sí aporta. **CTA de WhatsApp**: Justihn no tiene
    número configurado y no se inventó un enlace muerto.
-7. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
+8. **Pantallas futuras tras validar con abogados reales** (decisión Wesley
    2026-08-26): "Mis casos" (+agenda de plazos) es la #16 priorizada — gancho de
    retención; referidos como card, no pantalla. No construir hasta tener el
    feedback (backlog #4 del producto).
