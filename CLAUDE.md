@@ -799,9 +799,26 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
 
 ## 7. Qué falta para Fase 2 (en orden)
 
-1. **Corpus** — scraper n8n de la API del PJ (`searchFreeRecords` →
-   `getRecord`/`getHtml`) → Postgres + embeddings pgvector. Es el bloqueante de
-   todo lo demás: sin corpus, Jus IA real no puede encenderse.
+1. [~] **Corpus — EN CURSO desde el 2026-09-01.** El proyecto Supabase existe
+   (`eemgphtiywxwrqwpylkv`) con `sentencias` + `sentencia_chunks` (pgvector,
+   HNSW) y el RPC `buscar_corpus` que `motor-claude.ts` ya nombraba en su
+   `TODO(data)`. **1.705 sentencias y 20.739 fragmentos** dentro; el resto entra
+   solo, cada noche (`justihn/automatizaciones/corpus-csj/`, launchd 02:00).
+   Falta capturar ~18.500 (≈3 semanas) y **vectorizar** al final.
+   - **Credenciales:** la `anon` va en `.env.local` (`NEXT_PUBLIC_*`, ignorada
+     por git). ⚠️ La `service_role` **NUNCA** entra en este repo: se deploya a
+     Vercel y un `NEXT_PUBLIC_` la publicaría en el bundle. Vive en
+     `automatizaciones/corpus-csj/.env`, fuera de git.
+   - **Los fragmentos guardan posición, no texto** (`inicio`/`largo` sobre
+     `sentencias.texto`; el RPC extrae con `substring`). Ahorra ~192 MB, pero la
+     razón de peso es otra: con texto propio, un cambio en la limpieza del HTML
+     dejaría al fragmento citando una versión que ya no coincide con su
+     documento — justo lo que §4.1 promete que no pasa.
+   - ⚠️ **§5 no estaba excluyendo nada.** Filtraba por materia, y el CEDIJ
+     clasifica por rama del derecho: una violación en perjuicio de menor llega
+     como "Derecho Penal". Reescrita sobre el contenido (`reserva.mjs`, 7
+     pruebas) → ~11% reservado. **Verificado con la clave `anon`:** se leen
+     1.517 de 1.705, la reservada devuelve `[]` y escribir da 401.
 2. **Supabase Auth + RLS** por `abogado_id` → cambiar las rutas a `role: "session"`
    y quitar `JUSTIHN_DEMO_SESSION`. Cada archivo de auth lleva su `TODO(auth)` con
    el cableado exacto. ⚠️ La consulta del consultorio **se publica antes del alta**:
