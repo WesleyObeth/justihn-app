@@ -6,7 +6,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   return (
     <ProveedorUpgrade>
       <HidratarStore />
-      <div className="flex h-screen overflow-hidden bg-lienzo text-marino">
+      <div className="flex h-screen overflow-hidden lienzo-cielo text-marino">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <HeaderMovil />

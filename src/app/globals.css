@@ -281,6 +281,18 @@
   }
 }
 
+/* El lienzo "Cielo" de los portales (elegido por Wesley 2026-09-01 entre 4
+   prototipos): la luz celeste entra por arriba — como la aurora de la landing —
+   y se disuelve en el gris de trabajo antes de llegar al contenido. CSS
+   estático a propósito: un shader corriendo todo el día debajo de la jornada
+   de un abogado es batería y ventilador, no marca. Es una clase aparte y no un
+   cambio de --color-lienzo porque el token también pinta botones y superficies
+   pequeñas, que no deben llevar degradado. El wrapper es h-screen con el
+   scroll en <main>, así que el cielo no se desplaza con el contenido. */
+.lienzo-cielo {
+  background: linear-gradient(180deg, #d8e9f8 0%, #ecf3fa 38%, #f5f7fa 100%);
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }
