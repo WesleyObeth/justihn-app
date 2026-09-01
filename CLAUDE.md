@@ -521,12 +521,22 @@ cada fragmento → modelo → respuesta con citas.
   filtra otra vez en `recuperar.ts`: la base ya tiene filas viejas, y una cita
   mal formada es lo primero que se ve del producto.
 
-**Límite conocido:** preguntas de LEGISLACIÓN ("¿qué artículo regula la
-cesantía?", "salario mínimo 2026") **contestan pero no deberían** — los códigos
-no están indexados y el motor se apoya en sentencias que mencionan el artículo.
-Puede acertar de rebote y eso es justo lo que el producto promete no hacer. Lo
-cierra cargar los códigos (backlog #5 del producto) con los PDF del CEDIJ ya
-verificados.
+**Límite conocido — EN CIERRE (2026-09-01):** preguntas de LEGISLACIÓN ("¿qué
+artículo regula la cesantía?") contestan apoyándose en sentencias que citan el
+artículo — pueden acertar de rebote. El cierre ya está construido en las dos
+puntas:
+- **App:** `recuperarDelCorpus` busca también en `buscar_legislacion` (misma
+  vectorización, la norma va antes que su aplicación en las citas; la cita del
+  artículo abre el PDF oficial en su página con `#page=N`). Mientras el RPC no
+  exista, degrada a "solo jurisprudencia" con un aviso único — verificado.
+- **Pipeline:** `justihn/automatizaciones/legislacion/` — descarga, extracción
+  y parser con tests (2.162 artículos: Trabajo 875 · Familia 357 · CPC 930,
+  contrastados con los artículos de las guías). El Penal de 1983 NO se carga:
+  derogado desde 2020.
+
+**Lo único que falta** es el gate de siempre: pasar
+`automatizaciones/legislacion/esquema/01-legislacion.sql` en el editor SQL de
+Supabase (Wesley) y correr `node ingesta.mjs && node embeddings.mjs` (~US$0,02).
 
 ### 1.5 Marca
 
