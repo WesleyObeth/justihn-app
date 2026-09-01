@@ -30,6 +30,13 @@ import type { FragmentoCorpus } from "@/lib/ai/tipos";
  */
 const UMBRAL_SIMILITUD = 0.45;
 
+/** "No se indica" y compañía son huecos del CEDIJ, no datos que enseñar. */
+const PLACEHOLDER = /^\s*(no\s+(se\s+)?indica|n\/?a|ninguno|sin\s+dato|-+)\s*$/i;
+function sinHueco(v: string | null): string | null {
+  const t = (v ?? "").trim();
+  return t && !PLACEHOLDER.test(t) ? t : null;
+}
+
 export async function recuperarDelCorpus(
   consulta: string,
   opciones: { materias?: string[]; limite?: number } = {},
@@ -44,7 +51,14 @@ export async function recuperarDelCorpus(
       tipo: "sentencia" as const,
       // El título es lo que se ve en la cita: expediente, órgano y año son lo
       // que un abogado usa para reconocer una sentencia de un vistazo.
-      titulo: [f.expediente, f.organo, f.fecha_sentencia?.slice(0, 4)]
+      //
+      // ⚠️ `sinHueco` no es defensa de sobra. El CEDIJ rellena lo que no tiene
+      // con la cadena "No se indica" —el 52% de los órganos—, y `filter(Boolean)`
+      // la deja pasar porque es un texto no vacío: las citas salían como
+      // «AC-834-22 · No se indica · 2025», enseñando el hueco. Se normaliza al
+      // ingerir, pero también aquí: la base ya tiene filas viejas, y una cita mal
+      // formada es lo primero que se ve de este producto.
+      titulo: [f.expediente, sinHueco(f.organo), f.fecha_sentencia?.slice(0, 4)]
         .filter(Boolean)
         .join(" · "),
       contenido: f.fragmento,
