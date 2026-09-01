@@ -3,6 +3,7 @@ import { z } from "zod";
 import { guard } from "@/lib/security/api-guard";
 import { LIMITES, sanitizeText } from "@/lib/security/sanitize";
 import { responderDemo } from "@/lib/ai/router-demo";
+import { motorActivo, techoDiarioIA, type MotorReal } from "@/lib/ai/motor-activo";
 import type { RespuestaIA } from "@/lib/ai/tipos";
 
 /**
@@ -17,10 +18,15 @@ const consultaSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  // El interlock decide ANTES del guard: el techo global solo existe cuando el
+  // motor real va a gastar dinero — ponérselo al demo regalaría un DoS barato.
+  const motor = motorActivo();
+
   const g = await guard(req, {
     action: "ia-consultar",
     schema: consultaSchema,
     rateLimit: { limit: 20, windowMs: 60_000 },
+    rateLimitGlobal: motor ? { limit: techoDiarioIA(), windowMs: 86_400_000 } : undefined,
     // TODO(auth): pasar a "session" al cablear Supabase Auth. Hoy la ruta es
     // pública porque el portal corre en modo demo sin datos de personas reales.
     role: "public",
@@ -44,11 +50,9 @@ export async function POST(req: Request) {
       ? "Consulta ilimitada · plan Premium"
       : `Usó 1 crédito · quedan ${Math.max(0, g.data.cuotaRestante - 1)}`;
 
-  const motor = process.env.JUSTIHN_MOTOR_IA;
-  const respuesta: RespuestaIA =
-    motor === "claude" || motor === "openai"
-      ? await responderConMotorReal(motor, consulta, metaCosto)
-      : responderDemo(consulta, g.data.turno, metaCosto);
+  const respuesta: RespuestaIA = motor
+    ? await responderConMotorReal(motor, consulta, metaCosto)
+    : responderDemo(consulta, g.data.turno, metaCosto);
 
   return NextResponse.json(respuesta);
 }
@@ -62,7 +66,7 @@ export async function POST(req: Request) {
  * fallo que este producto existe para no cometer (§4.1).
  */
 async function responderConMotorReal(
-  motor: "claude" | "openai",
+  motor: MotorReal,
   consulta: string,
   metaCosto: string,
 ): Promise<RespuestaIA> {

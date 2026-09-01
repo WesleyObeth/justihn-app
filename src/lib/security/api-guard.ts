@@ -17,6 +17,13 @@ export interface GuardOptions<S extends z.ZodType> {
   action: string;
   schema?: S;
   rateLimit?: { limit: number; windowMs: number };
+  /**
+   * Techo COMPARTIDO por todos los llamantes (identificador fijo, no la IP).
+   * Es el freno de gasto de las acciones que pagan un LLM por consulta: la
+   * ventana por IP no frena a quien rota IPs; esta sí, porque se agota para
+   * todos a la vez y el peor día queda acotado.
+   */
+  rateLimitGlobal?: { limit: number; windowMs: number };
   role?: Rol;
   /** Créditos de Jus IA que debita la acción (0 = gratuita). */
   cost?: number;
@@ -76,6 +83,31 @@ export async function guard<S extends z.ZodType>(
           {
             error: "limite_excedido",
             mensaje: `Demasiadas solicitudes. Intenta de nuevo en ${segundos} s.`,
+          },
+          { status: 429, headers: { "Retry-After": String(segundos) } },
+        ),
+      };
+    }
+  }
+
+  // 2b. Techo global — un solo contador para todos los llamantes. Va después
+  // del límite por IP (que corta al abusador barato, sin gastar una lectura
+  // del contador compartido) y antes de auth: si el techo del día se agotó,
+  // no hay nada más que decidir.
+  if (options.rateLimitGlobal) {
+    const rl = await rateLimit("todos", {
+      bucket: `${action}:global`,
+      ...options.rateLimitGlobal,
+    });
+    if (!rl.success) {
+      const segundos = Math.max(1, Math.ceil((rl.reset - Date.now()) / 1000));
+      return {
+        ok: false,
+        response: NextResponse.json(
+          {
+            error: "techo_global",
+            mensaje:
+              "El servicio alcanzó su límite de consultas por hoy. Vuelve a intentarlo más tarde.",
           },
           { status: 429, headers: { "Retry-After": String(segundos) } },
         ),

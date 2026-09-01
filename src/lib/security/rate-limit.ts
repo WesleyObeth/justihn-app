@@ -17,8 +17,25 @@ export interface RateLimitResult {
   reset: number;
 }
 
-const redisConfigurado =
-  !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN;
+/**
+ * Credenciales del Redis compartido. Se aceptan dos juegos de nombres porque
+ * llegan por caminos distintos: `UPSTASH_*` es lo que da upstash.com, y `KV_*`
+ * es lo que inyecta el Marketplace de Vercel al instalar "Upstash for Redis"
+ * (misma base, otro prefijo). Sin el alias, la instalación de un clic desde
+ * Vercel dejaría el limiter degradado a memoria sin que nadie lo note.
+ */
+function credencialesRedis(): { url: string; token: string } | null {
+  // `||` a propósito: una variable presente pero VACÍA no debe tapar el alias.
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+  return url && token ? { url, token } : null;
+}
+
+/** ¿Hay contador compartido entre instancias? El motor real de Jus IA no debe
+ *  encenderse en producción sin esto (interlock en `lib/ai/motor-activo.ts`). */
+export function rateLimitDistribuido(): boolean {
+  return credencialesRedis() !== null;
+}
 
 let avisoEmitido = false;
 
@@ -28,7 +45,8 @@ function avisarDegradacion() {
   if (process.env.NODE_ENV === "production") {
     console.error(
       "[security] Rate limit in-memory en producción: cada instancia lleva su " +
-        "propio contador. Configura UPSTASH_REDIS_REST_URL/TOKEN antes del go-live.",
+        "propio contador. Configura UPSTASH_REDIS_REST_URL/TOKEN — o instala " +
+        "'Upstash for Redis' desde el Marketplace de Vercel (sus KV_REST_API_* también valen).",
     );
   }
 }
@@ -41,7 +59,7 @@ function getUpstashLimiter(bucket: string, limit: number, windowMs: number): Rat
   let limiter = limiters.get(key);
   if (!limiter) {
     limiter = new Ratelimit({
-      redis: Redis.fromEnv(),
+      redis: new Redis(credencialesRedis()!),
       limiter: Ratelimit.slidingWindow(limit, `${windowMs} ms`),
       prefix: `justihn:rl:${bucket}`,
       analytics: false,
@@ -81,7 +99,7 @@ export async function rateLimit(
   identificador: string,
   { bucket, limit, windowMs }: { bucket: string; limit: number; windowMs: number },
 ): Promise<RateLimitResult> {
-  if (!redisConfigurado) {
+  if (!credencialesRedis()) {
     avisarDegradacion();
     return memoryLimit(`${bucket}:${identificador}`, limit, windowMs);
   }
