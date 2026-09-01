@@ -2,9 +2,8 @@
 
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-08-31** (portal
-> ciudadano: shell gemelo, Notificaciones, plazos, Instituciones y
-> Verificación — §1.2).
+> Creado: **2026-08-25** · Última actualización: **2026-09-01** (Jus IA
+> encendido: RAG real sobre el corpus del CEDIJ — §1.6 y §7.1).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -474,6 +473,61 @@ Grupo `(auth)`, shell propio sin navegación, del handoff
   revertir ese único commit; `landing-aurora--noche`, `FondoAurora variante="noche"`
   y `.input-noche` siguen en el CSS a propósito.
 
+### 1.6 Jus IA — el motor real, encendido el 2026-09-01
+
+Dejó de ser una promesa escrita y apagada: **responde citando sentencias reales
+del CEDIJ**, cada una con enlace a su ficha en el portal del Poder Judicial.
+
+**Cómo probarlo:** `pnpm dev` → `http://localhost:3000/abogados`. Consultas que
+funcionan bien hoy (probadas, 8 citas cada una): prestaciones por despido
+injustificado · amparo por debido proceso · reintegro del trabajador ·
+requisitos de la ejecución hipotecaria · prescripción de un pagaré. Y para
+enseñar el diferencial, preguntar algo fuera del corpus ("régimen fiscal de las
+criptomonedas en Islandia"): responde **"no encontré fuentes"** en vez de
+inventar, que es lo que ningún asistente genérico hace.
+
+**El camino:** `api/ia/consultar` → `recuperarDelCorpus` → embedding de la
+consulta (OpenAI) → RPC `buscar_corpus` en Supabase → `wrapExternalData` sobre
+cada fragmento → modelo → respuesta con citas.
+
+- **La recuperación es UNA, compartida por los dos motores** (`lib/corpus/`).
+  Si viviera dentro de cada motor, el otro tendría su copia y una de las dos
+  acabaría sin el filtro de materias reservadas. Cambiar de modelo generador no
+  puede cambiar qué fuentes se traen ni qué filtros legales se aplican.
+- **`motor-openai.ts` es el banco de pruebas, no el reemplazo.** Existe porque
+  encender con Claude exigía una segunda clave y una segunda factura, y lo que
+  había que validar primero no era qué modelo redacta mejor: era si la
+  recuperación trae las sentencias correctas. El destino sigue siendo Claude
+  (`JUSTIHN_MOTOR_IA=claude`).
+- **Una cita por sentencia**, no por fragmento (`distinct on` en el RPC). La
+  unidad de cita es la sentencia: a un abogado no le sirven cinco trozos del
+  mismo fallo. Y un ranking plano se llenaría con la sentencia más larga, que
+  por tener más fragmentos tiene más billetes en la rifa.
+- **Umbral 0,45, medido** (2026-09-01, sobre 2.009 sentencias): lo pertinente
+  puntúa 0,53–0,69 y lo ajeno no pasa de 0,34. Con el 0,3 inicial, "criptomonedas
+  en Islandia" devolvía **cinco citas de jurisprudencia hondureña** — el modelo
+  decía correctamente que no sabía, pero la respuesta salía con cinco enlaces
+  debajo, con el aspecto de estar respaldada (§4.5).
+- ⚠️ **La cita apunta a `sij.poderjudicial.gob.hn/sentences/{id}`, no a la API.**
+  `api/getHtml?id=` devuelve JSON (`{status, message, body:"<html>"}`), así que
+  quien pinchaba una cita veía un volcado. **"Toda cita debe poder abrirse" es
+  la promesa que separa esto de ChatGPT**, y una cita que abre JSON la incumple
+  igual que una inventada. La ruta humana la declara la propia SPA del CEDIJ
+  (`path:"sentences/:id"` en su bundle).
+- ⚠️ **"No se indica" es un hueco, no un dato.** El CEDIJ lo usa de relleno en
+  el **52% de los órganos** y el 29% de los magistrados; `filter(Boolean)` lo
+  dejaba pasar porque no es cadena vacía, y las citas salían como
+  «AC-834-22 · No se indica · 2025». Se normaliza a NULL al ingerir **y** se
+  filtra otra vez en `recuperar.ts`: la base ya tiene filas viejas, y una cita
+  mal formada es lo primero que se ve del producto.
+
+**Límite conocido:** preguntas de LEGISLACIÓN ("¿qué artículo regula la
+cesantía?", "salario mínimo 2026") **contestan pero no deberían** — los códigos
+no están indexados y el motor se apoya en sentencias que mencionan el artículo.
+Puede acertar de rebote y eso es justo lo que el producto promete no hacer. Lo
+cierra cargar los códigos (backlog #5 del producto) con los PDF del CEDIJ ya
+verificados.
+
 ### 1.5 Marca
 
 - **Favicon:** `src/app/icon.svg` **ES** `logo/justihn-icon.svg`, con el viewBox
@@ -507,7 +561,8 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 | `src/app/(landing)/` · `(profesional)/` · `(profesional-black)/` · `(publico)/` · `(auth)/` | Las superficies públicas, cada grupo con su shell |
 | `src/app/api/ia/consultar/` | Único endpoint. Todo pasa por `guard()` antes de gastar nada |
 | `src/lib/security/` | **El harness (§3 del blueprint).** `api-guard` · `rate-limit` · `sanitize` · `ai-safety`. Toda superficie de servidor lo consume; no reinventar por ruta |
-| `src/lib/ai/` | `router-demo` (Fase 1, determinístico) · `motor-claude` (Fase 2, apagado) · `tipos` (el contrato que cumplen ambos) |
+| `src/lib/ai/` | `router-demo` (Fase 1, determinístico) · `motor-claude` y `motor-openai` (Fase 2, **encendidos**) · `sin-fuentes` (la negativa, en un solo sitio) · `tipos` (el contrato que cumplen los tres) |
+| `src/lib/corpus/` | **El RAG.** `supabase` (RPC con la clave `anon`) · `embeddings` (vectoriza la consulta) · `recuperar` (**una sola recuperación para los dos motores** — ver §1.6) |
 | `src/lib/og/tarjeta.tsx` | El componente único de las tres tarjetas sociales |
 | `src/data/` | Seeds = **contrato literal** de las tablas Supabase futuras. Cada archivo lleva su `TODO(data)` con la fuente real |
 | `src/store/portal.ts` | Zustand + persist en `justihn-portal-v1` (misma clave del prototipo) |
@@ -743,6 +798,56 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
 
 ## 6. Pendientes — próxima sesión (en orden)
 
+> **Foto al cerrar el 2026-09-01:** 2.009 sentencias · 24.808 fragmentos, todos
+> vectorizados · 353 reservadas · página 42 de ~405 · `launchd` cargado. Jus IA
+> responde con citas reales **en local**; en `justihn.com` sigue el motor de
+> demostración porque Vercel no tiene las variables.
+
+0. **🚀 TERMINAR EL CORPUS Y PONERLO EN VIVO** — es lo primero de la próxima
+   sesión, y son dos cosas independientes que pueden ir en paralelo.
+
+   **(a) Capturar el resto.** Quedan ~18.200 sentencias (página 42 de ~405).
+   Dos caminos, y conviene el segundo:
+   - **Esperar el cron**: corre solo a las 02:00 (`noche.sh` captura 1.000 e
+     ingiere). A ese ritmo el corpus completo son **~18 noches**.
+   - **Correrlo a mano, que es mucho más rápido** — no hay que esperar a la
+     noche ni limitarse a 1.000:
+     ```bash
+     cd ~/Desktop/DignuxAI/justihn/automatizaciones/corpus-csj
+     ./noche.sh                    # 1.000 y las ingiere (~7 min)
+     node scraper.mjs --max=5000   # tandas más grandes
+     node ingesta.mjs              # subir lo capturado
+     node embeddings.mjs           # vectorizar lo nuevo (~US$0,01 por millar)
+     ```
+     Medido: **1.000 sentencias ≈ 7 min** de captura + 20 s de ingesta. Las
+     20.233 completas son ~2,5 h de reloj y **~US$1,20** de embeddings. El cron
+     y la corrida manual **no chocan**: el cursor (`estado.json`) es el mismo y
+     la ingesta es idempotente.
+   - ⚠️ **Solo desde la Mac.** El VPS no alcanza la API del PJ (geo-bloqueo
+     verificado). Y **`embeddings.mjs` hay que correrlo aparte** tras cada
+     captura: `noche.sh` no vectoriza a propósito, porque es el único paso que
+     cuesta dinero y no debe dispararse solo.
+
+   **(b) Poner las variables en Vercel** para que Jus IA responda en
+   `justihn.com`. Hoy el sitio en vivo usa `responderDemo` (el router de Fase 1)
+   porque `JUSTIHN_MOTOR_IA` no existe allí — el `.env.local` es local y está
+   fuera de git a propósito. En *Settings → Environment Variables*:
+
+   | Variable | Valor |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://eemgphtiywxwrqwpylkv.supabase.co` |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | la `anon` (pública por diseño; su seguridad es RLS) |
+   | `OPENAI_API_KEY` | **sin** `NEXT_PUBLIC_`, o acabaría en el bundle del navegador |
+   | `JUSTIHN_MOTOR_IA` | `openai` |
+
+   Luego redeploy. ⚠️ **Antes de activarlo, dos cosas que no son opcionales:**
+   - **Poner un límite de gasto en OpenAI** (Settings → Limits). El endpoint es
+     `role: "public"` mientras no exista Supabase Auth, así que cualquiera con
+     el enlace puede gastar el saldo. El `noindex` baja el riesgo, no lo quita.
+   - **El rate limit de hoy es en memoria, por instancia** (`lib/security/rate-limit`),
+     y en Vercel eso **no limita nada**: cada petición puede caer en una
+     instancia distinta. Es el punto 4 de §7 (Upstash) y en local no se nota.
+
 1. **🔎 REFINADO FINAL DE LOS DOS PORTALES — `/abogados` (15 pantallas) y
    `/personas` (9 rutas) — ANTES de Supabase** (decisión Wesley 2026-08-30).
    Va primero por un motivo técnico, no de gusto: **los seeds son el contrato
@@ -814,11 +919,28 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      razón de peso es otra: con texto propio, un cambio en la limpieza del HTML
      dejaría al fragmento citando una versión que ya no coincide con su
      documento — justo lo que §4.1 promete que no pasa.
-   - ⚠️ **§5 no estaba excluyendo nada.** Filtraba por materia, y el CEDIJ
-     clasifica por rama del derecho: una violación en perjuicio de menor llega
-     como "Derecho Penal". Reescrita sobre el contenido (`reserva.mjs`, 7
-     pruebas) → ~11% reservado. **Verificado con la clave `anon`:** se leen
-     1.517 de 1.705, la reservada devuelve `[]` y escribir da 401.
+   - ⚠️ **§5 no estaba excluyendo nada, y falló DOS veces.** (1) Filtraba por
+     materia, y el CEDIJ clasifica por rama del derecho: una violación en
+     perjuicio de menor llega como "Derecho Penal". (2) Reescrita sobre el
+     contenido, seguía dejando pasar **CP-429-19**, cuyo resumen dice llanamente
+     «el delito de violación» — se publicó una condena por violación de una
+     víctima de 16 años **con el nombre completo del condenado**, hasta que una
+     consulta de prueba la sacó. La trampa: **"violación" a secas no sirve como
+     señal** (en derecho es "violación de ley" — marca el 43% del corpus); lo
+     que disambigua es la palabra que la acompaña. Hoy reserva el ~17,6%
+     (`reserva.mjs`, 9 pruebas incluida la regresión de CP-429-19).
+     **Verificado con la clave `anon`:** la reservada devuelve `[]` y escribir
+     da 401.
+     ⚙️ **Decisión que el socio debe confirmar:** ahora se reservan TODOS los
+     delitos sexuales, no solo los que mencionan a un menor. Es más amplio que
+     la letra de §5 (niñez · violencia doméstica · procesos bajo reserva); el
+     motivo es que en una condena por delito sexual la víctima es identificable
+     por el expediente aunque no se la nombre, y el corpus no dice su edad de
+     forma fiable. Cuesta ~8% de la jurisprudencia penal del buscador.
+   - **`reevaluar-reserva.mjs`** reaplica la regla a lo ya cargado sin volver a
+     ingerir: la regla va a cambiar más veces, y rehacer el corpus entero para
+     mover un booleano tocaría los fragmentos y sus embeddings, que ya están
+     pagados.
 2. **Supabase Auth + RLS** por `abogado_id` → cambiar las rutas a `role: "session"`
    y quitar `JUSTIHN_DEMO_SESSION`. Cada archivo de auth lleva su `TODO(auth)` con
    el cableado exacto. ⚠️ La consulta del consultorio **se publica antes del alta**:
