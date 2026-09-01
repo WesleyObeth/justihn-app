@@ -44,20 +44,33 @@ export async function POST(req: Request) {
       ? "Consulta ilimitada · plan Premium"
       : `Usó 1 crédito · quedan ${Math.max(0, g.data.cuotaRestante - 1)}`;
 
+  const motor = process.env.JUSTIHN_MOTOR_IA;
   const respuesta: RespuestaIA =
-    process.env.JUSTIHN_MOTOR_IA === "claude"
-      ? await responderConMotorReal(consulta, metaCosto)
+    motor === "claude" || motor === "openai"
+      ? await responderConMotorReal(motor, consulta, metaCosto)
       : responderDemo(consulta, g.data.turno, metaCosto);
 
   return NextResponse.json(respuesta);
 }
 
 /**
- * Import dinámico: mantiene el SDK de Anthropic fuera del bundle mientras el
- * motor real siga apagado, y evita que un fallo del corpus tumbe la respuesta.
+ * Import dinámico: mantiene los SDK fuera del bundle mientras el motor real
+ * esté apagado, y evita que un fallo del corpus tumbe la respuesta.
+ *
+ * ⚠️ El catch NO improvisa una respuesta jurídica. Si el corpus no contesta,
+ * Jus IA lo dice y no responde — un modelo respondiendo sin sus fuentes es el
+ * fallo que este producto existe para no cometer (§4.1).
  */
-async function responderConMotorReal(consulta: string, metaCosto: string): Promise<RespuestaIA> {
+async function responderConMotorReal(
+  motor: "claude" | "openai",
+  consulta: string,
+  metaCosto: string,
+): Promise<RespuestaIA> {
   try {
+    if (motor === "openai") {
+      const { responderConOpenAI } = await import("@/lib/ai/motor-openai");
+      return await responderConOpenAI(consulta, metaCosto);
+    }
     const { responderConClaude } = await import("@/lib/ai/motor-claude");
     return await responderConClaude(consulta, metaCosto);
   } catch (error) {

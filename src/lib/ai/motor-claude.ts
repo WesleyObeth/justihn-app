@@ -1,20 +1,22 @@
 /**
  * Motor real de Jus IA — Fase 2 (Blueprint §2, AI-First Add-on).
  *
- * Este módulo está desactivado hasta que exista el corpus indexado: sin RAG, un
- * modelo respondería derecho hondureño de memoria y produciría citas inventadas
- * — exactamente lo que el producto promete NO hacer. Por eso `recuperarCorpus`
- * lanza en vez de devolver una lista vacía: fallar cerrado (§0.4) es preferible
- * a una respuesta sin fuentes.
+ * **Cableado al corpus real el 2026-09-01.** Recupera con
+ * `recuperarDelCorpus`, que es EL MISMO camino que usa `motor-openai.ts`: la
+ * recuperación y los filtros legales no pueden depender de qué modelo redacta.
  *
- * Para activarlo (backlog #3 de `justihn/CLAUDE.md`):
- *   1. Poblar `sentencias`/`legislacion`/`gaceta` con embeddings (pgvector).
- *   2. Implementar `recuperarCorpus` con el match de similitud.
- *   3. Poner `JUSTIHN_MOTOR_IA=claude` y `ANTHROPIC_API_KEY` en el servidor.
+ * Para activarlo: `JUSTIHN_MOTOR_IA=claude` + `ANTHROPIC_API_KEY` (y
+ * `OPENAI_API_KEY`, que es quien vectoriza la consulta) en el servidor.
+ *
+ * Sigue fallando cerrado: sin fragmentos no responde. Un modelo contestando
+ * derecho hondureño de memoria produce citas inventadas — exactamente lo que el
+ * producto promete NO hacer.
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { HARDENED_SYSTEM_PREAMBLE, wrapExternalData } from "@/lib/security/ai-safety";
-import type { FragmentoCorpus, RespuestaIA } from "./tipos";
+import { recuperarDelCorpus } from "@/lib/corpus/recuperar";
+import { SIN_FUENTES } from "./sin-fuentes";
+import type { RespuestaIA } from "./tipos";
 
 const MODELO = "claude-opus-5";
 
@@ -25,34 +27,14 @@ function getCliente(): Anthropic {
   return cliente;
 }
 
-/**
- * Recupera los fragmentos del corpus oficial que respaldan la consulta.
- *
- * TODO(data): `select ... from buscar_corpus(embedding, materias, limite)` en
- * Supabase con pgvector; el RPC aplica RLS y filtra materias reservadas
- * (niñez, violencia doméstica, procesos bajo reserva — regla §5 del proyecto).
- */
-async function recuperarCorpus(_consulta: string): Promise<FragmentoCorpus[]> {
-  throw new Error(
-    "Corpus no indexado: el motor Claude requiere RAG sobre las fuentes oficiales. " +
-      "Ver backlog #3 (scraper n8n del corpus CSJ).",
-  );
-}
-
 export async function responderConClaude(
   consulta: string,
   metaCosto: string,
 ): Promise<RespuestaIA> {
-  const fragmentos = await recuperarCorpus(consulta);
+  const fragmentos = await recuperarDelCorpus(consulta);
 
   // Sin fuentes no hay respuesta: es la regla de producto, no una optimización.
-  if (fragmentos.length === 0) {
-    return {
-      text: "No encontré fuentes oficiales que respalden una respuesta a esa consulta. Prefiero decírtelo a darte un artículo que no pueda enlazarte. Puedes reformularla o buscar directamente en jurisprudencia.",
-      meta: "Sin costo",
-      gratuita: true,
-    };
-  }
+  if (fragmentos.length === 0) return SIN_FUENTES;
 
   // Cada fragmento va envuelto como DATO, nunca como instrucción (§3.2).
   const contexto = fragmentos
