@@ -58,9 +58,16 @@ export async function recuperarDelCorpus(
   // (fragmentos) y códigos (artículos). La legislación degrada a [] si su
   // esquema aún no existe o si falla — quedarse sin artículos deja una
   // respuesta con menos fuentes, no una respuesta rota.
+  // Legislación con límite 8, no 4 — medido el 2026-09-01 con la consulta de
+  // la cesantía: los artículos pertinentes del C. del Trabajo puntúan APRETADOS
+  // (0,64–0,70) y el art. 120 —la respuesta canónica— quedaba 8º porque es
+  // largo y su embedding promedia varios temas. Con 4 el modelo contestaba
+  // citando el 110. ⚙️ El arreglo fino es trocear los artículos largos como a
+  // las sentencias (sub-chunks + distinct on artículo); este límite es el
+  // paliativo barato mientras tanto.
   const [filas, articulos] = await Promise.all([
     buscarCorpus(embedding, opciones),
-    buscarLegislacion(embedding).catch((error) => {
+    buscarLegislacion(embedding, 8).catch((error) => {
       console.error("[corpus] legislación no disponible:", error);
       return [] as FilaLegislacion[];
     }),
