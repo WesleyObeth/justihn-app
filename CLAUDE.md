@@ -831,22 +831,39 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
    **(b) Poner las variables en Vercel** para que Jus IA responda en
    `justihn.com`. Hoy el sitio en vivo usa `responderDemo` (el router de Fase 1)
    porque `JUSTIHN_MOTOR_IA` no existe allí — el `.env.local` es local y está
-   fuera de git a propósito. En *Settings → Environment Variables*:
+   fuera de git a propósito.
 
-   | Variable | Valor |
-   |---|---|
-   | `NEXT_PUBLIC_SUPABASE_URL` | `https://eemgphtiywxwrqwpylkv.supabase.co` |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | la `anon` (pública por diseño; su seguridad es RLS) |
-   | `OPENAI_API_KEY` | **sin** `NEXT_PUBLIC_`, o acabaría en el bundle del navegador |
-   | `JUSTIHN_MOTOR_IA` | `openai` |
+   Los dos avisos que este punto arrastraba **quedaron resueltos en código el
+   2026-09-01** (commit "Frenos de gasto…", tests en `motor-activo.test.ts`):
+   - **Interlock:** en producción, si no hay rate limit distribuido, el motor
+     real NO se enciende aunque `JUSTIHN_MOTOR_IA` lo pida — se sirve el demo
+     y `console.error` dice exactamente qué falta. Un despliegue a medias
+     degrada a demo, nunca corre con la puerta abierta.
+   - **Techo global diario:** 200 consultas/día al motor real entre TODOS los
+     llamantes (`JUSTIHN_IA_TECHO_DIA` lo ajusta). Es el freno que la ventana
+     por IP no da — rotando IPs, 20/min eran ~29.000 consultas/día (~US$900);
+     con techo, el peor día cuesta ~US$6 y se acaba.
 
-   Luego redeploy. ⚠️ **Antes de activarlo, dos cosas que no son opcionales:**
-   - **Poner un límite de gasto en OpenAI** (Settings → Limits). El endpoint es
-     `role: "public"` mientras no exista Supabase Auth, así que cualquiera con
-     el enlace puede gastar el saldo. El `noindex` baja el riesgo, no lo quita.
-   - **El rate limit de hoy es en memoria, por instancia** (`lib/security/rate-limit`),
-     y en Vercel eso **no limita nada**: cada petición puede caer en una
-     instancia distinta. Es el punto 4 de §7 (Upstash) y en local no se nota.
+   Checklist en el dashboard de Vercel (nada de esto lo puede hacer Claude —
+   el MCP de vercel está sin autenticar y no hay CLI logueada):
+   1. **Instalar "Upstash for Redis" desde el Marketplace de Vercel** (plan
+      free) y conectarlo al proyecto. Inyecta `KV_REST_API_URL/TOKEN`, que
+      `rate-limit.ts` ya acepta como alias — no hay que renombrar nada.
+   2. *Settings → Environment Variables*:
+
+      | Variable | Valor |
+      |---|---|
+      | `NEXT_PUBLIC_SUPABASE_URL` | `https://eemgphtiywxwrqwpylkv.supabase.co` |
+      | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | la `anon` (pública por diseño; su seguridad es RLS) |
+      | `OPENAI_API_KEY` | **sin** `NEXT_PUBLIC_`, o acabaría en el bundle del navegador |
+      | `JUSTIHN_MOTOR_IA` | `openai` |
+
+   3. Redeploy y probar: si responde demo, mirar los logs — el interlock dice
+      qué variable falta.
+   4. **Límite de gasto en OpenAI** (platform.openai.com → Settings → Limits):
+      sigue siendo el cinturón de seguridad externo al código. Con el techo
+      diario ya no es lo único que separa el saldo de un abuso, pero ponerlo
+      cuesta un minuto.
 
 1. **🔎 REFINADO FINAL DE LOS DOS PORTALES — `/abogados` (15 pantallas) y
    `/personas` (9 rutas) — ANTES de Supabase** (decisión Wesley 2026-08-30).
