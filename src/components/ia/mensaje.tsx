@@ -7,12 +7,14 @@ import { AvatarJusIA, SimboloJusIA, SimboloJusIALinear } from "@/components/bran
 import { ChipMateria } from "@/components/ui/primitivos";
 import { usePortal } from "@/store/portal";
 import { isFuenteOficial } from "@/lib/security/sanitize";
+import { renderMarkdownLite } from "@/lib/ai/markdown-lite";
+import { useMaquinaDeEscribir } from "./maquina-escribir";
 import type { MensajeChat } from "@/types/dominio";
 
 export function BurbujaUsuario({ mensaje }: { mensaje: MensajeChat }) {
   return (
     <div className="flex justify-end">
-      <div className="max-w-[76%] rounded-[14px] bg-[#e9eff6] px-4 py-[11px] text-sm leading-[1.6] whitespace-pre-line text-marino">
+      <div className="max-w-[76%] rounded-[14px] bg-[#e9eff6] px-4 py-[11px] text-sm leading-[1.6] whitespace-pre-line text-marino [overflow-wrap:anywhere]">
         {mensaje.adjunto && (
           <div className="mb-2 flex items-center gap-[9px] rounded-[9px] border border-[#d5dfeb] bg-white px-3 py-2">
             <span className="grid place-items-center text-celeste">
@@ -38,6 +40,9 @@ export function RespuestaJusIA({
   onChip: (texto: string) => void;
 }) {
   const mostrarToast = usePortal((s) => s.mostrarToast);
+  // El texto se revela con efecto de escritura al llegar (solo la primera
+  // vez); citas, chips y acciones esperan a que termine para no adelantarse.
+  const { parcial, terminado } = useMaquinaDeEscribir(mensaje.id, mensaje.text);
 
   const copiar = async () => {
     const citas = mensaje.citas?.map((c) => `— ${c.etiqueta}`).join("\n") ?? "";
@@ -54,16 +59,23 @@ export function RespuestaJusIA({
       <AvatarJusIA size={28} />
       <div className="min-w-0 flex-1">
         <div className="font-display text-xs font-bold text-marino">Jus IA</div>
-        <div className="mt-1 text-[14.5px] leading-[1.7] whitespace-pre-line text-[#1c3350]">
-          {mensaje.text}
-        </div>
+        {/*
+          Markdown-lite sobre texto ESCAPADO (§3.3, ver lib/ai/markdown-lite):
+          negritas y marcadores [n] del motor real se pintan; nada más pasa.
+          `overflow-wrap:anywhere` corta cualquier palabra más ancha que la
+          burbuja — sin él, una URL larga daba scroll lateral a todo el hilo.
+        */}
+        <div
+          className="mt-1 text-[14.5px] leading-[1.7] whitespace-pre-line text-[#1c3350] [overflow-wrap:anywhere]"
+          dangerouslySetInnerHTML={{ __html: renderMarkdownLite(parcial) }}
+        />
 
-        {mensaje.tabla && <TablaResultado filas={mensaje.tabla} />}
-        {mensaje.tarjeta && <TarjetaSentenciaChat tarjeta={mensaje.tarjeta} />}
-        {mensaje.escrito && <EscritoChat escrito={mensaje.escrito} />}
-        {mensaje.citas && mensaje.citas.length > 0 && <Citas citas={mensaje.citas} />}
+        {terminado && mensaje.tabla && <TablaResultado filas={mensaje.tabla} />}
+        {terminado && mensaje.tarjeta && <TarjetaSentenciaChat tarjeta={mensaje.tarjeta} />}
+        {terminado && mensaje.escrito && <EscritoChat escrito={mensaje.escrito} />}
+        {terminado && mensaje.citas && mensaje.citas.length > 0 && <Citas citas={mensaje.citas} />}
 
-        {mensaje.chips && mensaje.chips.length > 0 && (
+        {terminado && mensaje.chips && mensaje.chips.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-[7px]">
             {mensaje.chips.map((chip) => (
               <button
@@ -78,7 +90,10 @@ export function RespuestaJusIA({
           </div>
         )}
 
-        <div className="mt-2.5 flex items-center gap-3.5 text-[11.5px] text-texto-4">
+        <div
+          className="mt-2.5 flex items-center gap-3.5 text-[11.5px] text-texto-4"
+          style={terminado ? undefined : { visibility: "hidden" }}
+        >
           <button type="button" onClick={copiar} className="cursor-pointer hover:text-celeste">
             Copiar
           </button>
@@ -249,6 +264,8 @@ function Citas({ citas }: { citas: NonNullable<MensajeChat["citas"]> }) {
         const contenido = (
           <>
             <Icono nombre="libro" size={11} strokeWidth={2} className="shrink-0" />
+            {/* El número enlaza el chip con su [n] en superíndice del texto. */}
+            {cita.numero != null && <span className="font-semibold">[{cita.numero}]</span>}
             {cita.etiqueta}
           </>
         );

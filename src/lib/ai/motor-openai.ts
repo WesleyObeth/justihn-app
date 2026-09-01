@@ -17,6 +17,7 @@
  */
 import { HARDENED_SYSTEM_PREAMBLE, wrapExternalData } from "@/lib/security/ai-safety";
 import { recuperarDelCorpus } from "@/lib/corpus/recuperar";
+import { etiquetaDeFuente, seleccionarCitas, FORMATO_RESPUESTA } from "./citas";
 import { SIN_FUENTES } from "./sin-fuentes";
 import type { RespuestaIA } from "./tipos";
 
@@ -32,8 +33,10 @@ export async function responderConOpenAI(
   // optimización. Se decide ANTES de gastar un token en generar.
   if (fragmentos.length === 0) return SIN_FUENTES;
 
+  // Fuentes numeradas: el modelo referencia [n] y los chips se filtran a las
+  // usadas (ver lib/ai/citas.ts). Sin URL en la etiqueta a propósito.
   const contexto = fragmentos
-    .map((f) => wrapExternalData(f.contenido, `${f.titulo} — ${f.fuenteUrl}`))
+    .map((f, i) => wrapExternalData(f.contenido, etiquetaDeFuente(i, f)))
     .join("\n\n");
 
   const key = process.env.OPENAI_API_KEY;
@@ -46,7 +49,7 @@ export async function responderConOpenAI(
       model: MODELO,
       max_tokens: 2000,
       messages: [
-        { role: "system", content: HARDENED_SYSTEM_PREAMBLE },
+        { role: "system", content: `${HARDENED_SYSTEM_PREAMBLE}\n\n${FORMATO_RESPUESTA}` },
         {
           role: "user",
           content: `Consulta:\n${consulta}\n\nFuentes recuperadas del corpus oficial:\n${contexto}`,
@@ -67,7 +70,7 @@ export async function responderConOpenAI(
 
   return {
     text: texto,
-    citas: fragmentos.map((f) => ({ etiqueta: f.titulo, url: f.fuenteUrl })),
+    citas: seleccionarCitas(texto, fragmentos),
     meta: metaCosto,
   };
 }

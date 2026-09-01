@@ -219,6 +219,9 @@ export interface Plan {
 export interface Cita {
   etiqueta: string;
   url?: string;
+  /** Número de fuente ([1], [2]…) cuando la respuesta referencia por número:
+   *  el mismo que aparece en superíndice dentro del texto. */
+  numero?: number;
 }
 
 export interface TarjetaSentencia {

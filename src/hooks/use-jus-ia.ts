@@ -10,6 +10,7 @@
  */
 import { useCallback, useEffect, useRef } from "react";
 import { usePortal, useCuota } from "@/store/portal";
+import { marcarParaEscribir } from "@/components/ia/maquina-escribir";
 import { ESTADOS_PENSANDO, ESTADOS_PENSANDO_ADJUNTO } from "@/data/jus-ia";
 import type { RespuestaIA } from "@/lib/ai/tipos";
 import type { Adjunto, MensajeChat } from "@/types/dominio";
@@ -121,7 +122,11 @@ export function useJusIA() {
         // El borrador de escrito viaja DENTRO del mensaje y se renderiza
         // nativo en el hilo (nada de abrir el editor lateral desde el chat —
         // ese drawer queda para acciones fuera de esta pantalla).
-        agregarMensaje({ id: nuevoId(), who: "a", ...contenido });
+        const idRespuesta = nuevoId();
+        // Solo las respuestas recién llegadas se escriben con efecto — el
+        // historial recargado aparece entero (ver maquina-escribir.ts).
+        marcarParaEscribir(idRespuesta);
+        agregarMensaje({ id: idRespuesta, who: "a", ...contenido });
         if (!gratuita) consumirCuota();
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
