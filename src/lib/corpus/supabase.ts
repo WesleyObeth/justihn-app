@@ -28,6 +28,17 @@ export interface FilaCorpus {
   similitud: number;
 }
 
+export interface FilaLegislacion {
+  articulo_id: number;
+  codigo_id: string;
+  codigo_nombre: string;
+  numero: string;
+  /** Con `#page=N` armado por el RPC: la cita abre el PDF en su página. */
+  fuente_url: string;
+  texto: string;
+  similitud: number;
+}
+
 function configuracion() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -81,4 +92,49 @@ export async function buscarCorpus(
     throw new Error(`buscar_corpus ${res.status}: ${(await res.text()).slice(0, 200)}`);
   }
   return (await res.json()) as FilaCorpus[];
+}
+
+let avisoSinLegislacion = false;
+
+/**
+ * Busca en los códigos indexados (Código del Trabajo, Familia, Procesal
+ * Civil — `automatizaciones/legislacion/`). La unidad es el ARTÍCULO: aquí no
+ * hay fragmentos que colapsar, cada fila ya es una cita completa.
+ *
+ * Mientras el esquema `01-legislacion.sql` no se haya pasado en Supabase, el
+ * RPC no existe (404): se responde solo con jurisprudencia y se avisa UNA vez
+ * — degradación explícita, nunca silenciosa (mismo patrón que el rate limit).
+ */
+export async function buscarLegislacion(
+  embedding: number[],
+  limite = 4,
+): Promise<FilaLegislacion[]> {
+  const { url, key } = configuracion();
+
+  const res = await fetch(`${url}/rest/v1/rpc/buscar_legislacion`, {
+    method: "POST",
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ consulta_embedding: embedding, limite }),
+    cache: "no-store",
+  });
+
+  if (res.status === 404) {
+    if (!avisoSinLegislacion) {
+      avisoSinLegislacion = true;
+      console.warn(
+        "[corpus] buscar_legislacion no existe todavía: Jus IA responde solo con " +
+          "jurisprudencia. Pasar automatizaciones/legislacion/esquema/01-legislacion.sql " +
+          "y correr su ingesta + embeddings.",
+      );
+    }
+    return [];
+  }
+  if (!res.ok) {
+    throw new Error(`buscar_legislacion ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  }
+  return (await res.json()) as FilaLegislacion[];
 }

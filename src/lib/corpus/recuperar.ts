@@ -6,7 +6,7 @@
  * ni qué filtros legales se aplican. Si esto estuviera dentro de un motor, el
  * otro tendría su propia copia y una de las dos acabaría sin el filtro de §5.
  */
-import { buscarCorpus } from "./supabase";
+import { buscarCorpus, buscarLegislacion, type FilaLegislacion } from "./supabase";
 import { vectorizar } from "./embeddings";
 import type { FragmentoCorpus } from "@/lib/ai/tipos";
 
@@ -37,14 +37,43 @@ function sinHueco(v: string | null): string | null {
   return t && !PLACEHOLDER.test(t) ? t : null;
 }
 
+/** Un artículo recuperado, en el shape que consumen los motores. */
+export function fragmentoDeArticulo(f: FilaLegislacion): FragmentoCorpus {
+  return {
+    id: `articulo-${f.articulo_id}`,
+    tipo: "legislacion" as const,
+    titulo: `${f.codigo_nombre} · artículo ${f.numero}`,
+    contenido: f.texto,
+    fuenteUrl: f.fuente_url,
+    score: f.similitud,
+  };
+}
+
 export async function recuperarDelCorpus(
   consulta: string,
   opciones: { materias?: string[]; limite?: number } = {},
 ): Promise<FragmentoCorpus[]> {
   const embedding = await vectorizar(consulta);
-  const filas = await buscarCorpus(embedding, opciones);
+  // La consulta se vectoriza UNA vez y busca en los dos espacios: sentencias
+  // (fragmentos) y códigos (artículos). La legislación degrada a [] si su
+  // esquema aún no existe o si falla — quedarse sin artículos deja una
+  // respuesta con menos fuentes, no una respuesta rota.
+  const [filas, articulos] = await Promise.all([
+    buscarCorpus(embedding, opciones),
+    buscarLegislacion(embedding).catch((error) => {
+      console.error("[corpus] legislación no disponible:", error);
+      return [] as FilaLegislacion[];
+    }),
+  ]);
 
-  return filas
+  // La norma va ANTES que su aplicación: si el art. 120 responde la consulta,
+  // debe ser la primera cita y las sentencias lo acompañan. No se mezclan por
+  // score: fragmento de 1.200 chars y artículo completo no puntúan igual.
+  const legislacion = articulos
+    .filter((f) => f.similitud >= UMBRAL_SIMILITUD)
+    .map(fragmentoDeArticulo);
+
+  const sentencias = filas
     .filter((f) => f.similitud >= UMBRAL_SIMILITUD)
     .map((f) => ({
       id: String(f.record_id),
@@ -65,4 +94,6 @@ export async function recuperarDelCorpus(
       fuenteUrl: f.fuente_url,
       score: f.similitud,
     }));
+
+  return [...legislacion, ...sentencias];
 }
