@@ -14,8 +14,20 @@
 -- leads, respuestas y mensajes, que sí viven en las materias del corpus.
 -- ═══════════════════════════════════════════════════════════════════════════
 
+-- La vista `directorio` depende de `materias`: Postgres no deja cambiar el
+-- tipo de una columna con una vista encima (0A000). Se suelta y se recrea
+-- idéntica al final; los grants de una vista se pierden al soltarla, así que
+-- se repiten.
+drop view if exists directorio;
+
 alter table abogados alter column materias         type text[] using materias::text[];
 alter table abogados alter column alertas_materias type text[] using alertas_materias::text[];
+
+create or replace view directorio as
+  select id, slug, nombre, iniciales, ciudad, bio, materias, anios_ejercicio,
+         notario, verificado, (plan = 'premium') as premium, creado_en
+  from abogados;
+grant select on directorio to anon, authenticated;
 
 /** «Abg. María Castillo» → «maria-castillo»; con sufijo si ya existe. */
 create or replace function slug_abogado(nombre text)
