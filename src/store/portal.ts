@@ -62,10 +62,6 @@ interface PortalState {
   /** Consulta que otra pantalla dejó lista para que el chat la envíe al montar.
    *  No se persiste: vive solo el instante de la navegación. */
   consultaPendiente: string | null;
-  /** El panel de historial de Jus IA se abre desde el sidebar: por eso vive aquí y no en la pantalla. */
-  historialJusIAAbierto: boolean;
-  /** Qué entradas del sidebar con hijos están desplegadas (por href). Persistido. */
-  navDesplegado: Record<string, boolean>;
   /** Checklist del "paso a paso": índices completados por proceso. Persistido. */
   pasosHechos: Record<string, number[]>;
   /** Respuestas publicadas en el consultorio, por lead. Persistido. */
@@ -104,8 +100,6 @@ interface PortalState {
   setPensando: (pensando: boolean, mensaje?: string) => void;
   consumirCuota: () => void;
   nuevaConsulta: () => void;
-  setHistorialJusIA: (abierto: boolean) => void;
-  setNavDesplegado: (href: string, abierto: boolean) => void;
   cargarConversacion: (id: string, mensajes: MensajeChat[]) => void;
   toggleMateria: (materia: string) => void;
   togglePreferencia: (clave: keyof PreferenciasNotificacion) => void;
@@ -267,8 +261,6 @@ export const usePortal = create<PortalState>()(
       sidebarColapsado: false,
       menuMovil: false,
       consultaPendiente: null,
-      historialJusIAAbierto: false,
-      navDesplegado: {},
       pasosHechos: {},
       leadsRespondidos: {},
       nombresVigilados: VIGILADOS_INICIALES,
@@ -311,9 +303,6 @@ export const usePortal = create<PortalState>()(
       toggleSidebar: () => set((s) => ({ sidebarColapsado: !s.sidebarColapsado })),
       setMenuMovil: (menuMovil) => set({ menuMovil }),
       setConsultaPendiente: (consultaPendiente) => set({ consultaPendiente }),
-      setHistorialJusIA: (historialJusIAAbierto) => set({ historialJusIAAbierto }),
-      setNavDesplegado: (href, abierto) =>
-        set((s) => ({ navDesplegado: { ...s.navDesplegado, [href]: abierto } })),
       togglePasoHecho: (procesoId, indice) =>
         set((s) => {
           const actuales = s.pasosHechos[procesoId] ?? [];
@@ -483,7 +472,6 @@ export const usePortal = create<PortalState>()(
         notifsLeidasIds: s.notifsLeidasIds,
         leadsVistosIds: s.leadsVistosIds,
         sidebarColapsado: s.sidebarColapsado,
-        navDesplegado: s.navDesplegado,
       }),
     },
   ),

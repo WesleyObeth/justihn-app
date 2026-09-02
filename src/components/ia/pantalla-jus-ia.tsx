@@ -1,7 +1,7 @@
 "use client";
 
 import { Cuando } from "@/components/ui/cuando";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { BurbujaUsuario, IndicadorPensando, RespuestaJusIA } from "@/components/ia/mensaje";
@@ -18,9 +18,8 @@ import { cn } from "@/lib/utils";
  */
 export function PantallaJusIA() {
   const { chat, pensando, enviar } = useJusIA();
-  // El panel lo abre el sidebar (y Escape/clic fuera lo cierran): estado del store.
-  const historialAbierto = usePortal((s) => s.historialJusIAAbierto);
-  const setHistorialAbierto = usePortal((s) => s.setHistorialJusIA);
+  const nueva = usePortal((s) => s.nuevaConsulta);
+  const [historialAbierto, setHistorialAbierto] = useState(false);
   const hayMensajes = chat.length > 0;
 
   // Consulta que otra pantalla dejó lista (brief del Dashboard): se envía al
@@ -42,11 +41,29 @@ export function PantallaJusIA() {
       className="mx-auto flex h-full w-full max-w-[760px] flex-col"
       style={{ animation: "fadeUp .3s ease" }}
     >
-      {/*
-        Sin cabecera propia: «Nueva consulta» e «Historial» viven en el
-        sidebar, como hijos de la entrada Jus IA (decisión Wesley 2026-09-02,
-        patrón Mercury). La columna queda para la conversación.
-      */}
+      <div className="flex items-center justify-between pb-2">
+        {hayMensajes ? (
+          <button
+            type="button"
+            onClick={nueva}
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-borde bg-white px-3 py-[7px] text-[12.5px] font-semibold text-marino hover:border-celeste hover:text-celeste"
+          >
+            <Icono nombre="mas" size={12} strokeWidth={2.2} />
+            Nueva consulta
+          </button>
+        ) : (
+          <span />
+        )}
+        <button
+          type="button"
+          onClick={() => setHistorialAbierto(true)}
+          className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-[7px] text-[12.5px] text-texto-3 hover:bg-white hover:text-marino"
+        >
+          <Icono nombre="reloj" size={13} strokeWidth={2} />
+          Historial
+        </button>
+      </div>
+
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         {hayMensajes ? (
           <Hilo chat={chat} pensando={pensando} onEnviar={enviar} />
