@@ -543,9 +543,9 @@ Supabase (Wesley) y correr `node ingesta.mjs && node embeddings.mjs` (~US$0,02).
 
 ### 1.7 Jurisprudencia sobre el corpus real — conectada el 2026-09-02
 
-La pantalla dejó de ser vitrina de 12 seeds: busca sobre las **17.319
-sentencias legibles** (19.742 menos las reservadas por §5, que RLS esconde a
-la clave `anon`). Todo pasa por `guard()`; nada gasta LLM.
+La pantalla dejó de ser vitrina de 12 seeds: busca sobre las **18.314
+sentencias legibles** (19.742 menos las 1.428 reservadas por §5, que RLS
+esconde a la clave `anon`). Todo pasa por `guard()`; nada gasta LLM.
 
 - **Dos modos, decididos al arrancar la sesión.** *Por palabras* (por defecto):
   Postgres puro —ILIKE sobre el resumen del CEDIJ y el expediente, AND entre
@@ -585,12 +585,27 @@ la clave `anon`). Todo pasa por `guard()`; nada gasta LLM.
   inexistente tarda 2,2 s (barrido secuencial de 192 MB — el índice trigram de
   `01-corpus.sql` no responde o no llegó a crearse) y cae por `statement
   timeout` a los 3 s. La columna `partes` (recurrente + recurrido normalizados,
-  la escribe `partes.mjs`) lo vuelve instantáneo. **Hasta que se pase, el
-  endpoint responde `disponible: false`, el hook cae al piloto y las tres
-  pantallas dicen de dónde salió la respuesta** (`NotaFuenteApariciones`). Un
-  error de red se enseña como error, nunca como «sin apariciones». La app
-  detecta sola la columna (deja de recibir `42703`): cero cambios de código al
-  migrar.
+  la escribe `partes.mjs`) lo vuelve instantáneo. ✅ **Migración pasada y
+  columna rellena el 2026-09-02** (19.742 filas, 0 sin partes): las tres
+  pantallas ya responden sobre el corpus. Si alguna vez la columna faltara, el
+  endpoint responde `disponible: false`, el hook cae al piloto y las pantallas
+  dicen de dónde salió la respuesta (`NotaFuenteApariciones`); un error de red
+  se enseña como error, nunca como «sin apariciones». La app detecta sola la
+  columna (deja de recibir `42703`): cero cambios de código.
+- ⚠️ **Rellenar `partes` destapó un falso positivo grave de §5** (mismo día):
+  la señal «delito sexual» tenía `autor` sin límite de palabra y una ventana
+  de 60 caracteres entre sujeto y «violación», así que «la sentencia
+  **acusada** y la ley, demostrando con claridad la **violación**» —fórmula de
+  toda casación técnica— reservaba **756 casaciones laborales** (entre ellas
+  CL-528-24, la del demo), 139 amparos y 13 contencioso: 1.009 sentencias
+  invisibles para Jus IA y el buscador. Regla reescrita en `reserva.mjs`
+  (sujeto SEGUIDO de «por/de violación», exclusión de «violación de ley / de
+  los deberes / de domicilio…», listas «delitos de rapto, violación y…», y
+  señales explícitas: agresión, hostigamiento, acoso, «delito sexual»,
+  «indemnidad sexual»), medida en seco sobre las 19.742 fichas locales antes
+  de aplicarla y auditadas una a una las 101 penales liberadas. Resultado:
+  **1.009 liberadas · 14 reservadas nuevas** (todas hostigamiento o agresión
+  sexual) · reservadas 2.423 → **1.428 (7,2%)**.
 - **Un resultado por nombre para toda la pantalla** (`useAparicionesDe`): la
   columna lateral y cada card salen del mismo dato; con dos derivaciones
   podrían contradecirse. Caché por nombre a nivel de módulo.
@@ -972,12 +987,12 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
    conteo exacto, ficha por `record_id` con la ficha del CEDIJ parseada, y
    Monitoreo / Mi nombre / Verifica preguntando al corpus. Verificado en
    Chromium y WebKit, escritorio y móvil, sin errores de JS ni desbordes.
-2b. **🚦 GATE (Wesley, 2 minutos): pasar `automatizaciones/corpus-csj/esquema/03-partes.sql`**
-   en el editor SQL de Supabase y correr `node automatizaciones/corpus-csj/partes.mjs`
-   (rellena 19.742 filas en unos minutos; `--simular` primero si se quiere ver).
-   Hasta entonces Monitoreo, Mi nombre y Verifica responden sobre el piloto y
-   lo dicen en pantalla. Al pasarlo, la app se entera sola. Queda sumado al
-   refresco semanal (`tareas-desde-la-mac.md` §1b).
+2b. [x] ✅ **Migración 03 pasada y `partes` rellena (2026-09-02, Wesley +
+   `partes.mjs`).** Monitoreo, Mi nombre y Verifica responden sobre el corpus
+   en producción (verificado: «Wilson Pablo Henríquez» → CL-528-24 como
+   recurrido). `partes.mjs` lleva reintentos desde la primera corrida, que se
+   cayó a mitad con `EADDRNOTAVAIL`. Queda en el refresco semanal (§1b).
+   **De paso se corrigió la regla de §5** (§1.7): 1.009 sentencias liberadas.
 2c. **Después de la migración:** el buscador global (⌘K), «Nuevo en tus
    materias» del Dashboard y los tres demos de la landing siguen sobre el seed
    de 12 — son vitrinas, no buscadores, y sus enlaces ya resuelven al corpus.
@@ -1039,6 +1054,13 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      (`reserva.mjs`, 9 pruebas incluida la regresión de CP-429-19).
      **Verificado con la clave `anon`:** la reservada devuelve `[]` y escribir
      da 401.
+     **(3) Y falló una TERCERA vez, al revés (2026-09-02):** la alternativa
+     por sujeto (`autor` sin `\b`, ventana de 60 caracteres) reservaba las
+     casaciones técnicas laborales por «la sentencia acusada … la violación».
+     1.009 sentencias legítimas ocultas hasta que rellenar `partes` sacó
+     CL-528-24 como «delito sexual». Detalle y regla nueva en §1.7; hoy
+     reserva el 7,2%. Lección: **toda regla de §5 se mide en seco sobre las
+     fichas locales (`salida/`) antes de aplicarla**, en las dos direcciones.
      ⚙️ **Decisión que el socio debe confirmar:** ahora se reservan TODOS los
      delitos sexuales, no solo los que mencionan a un menor. Es más amplio que
      la letra de §5 (niñez · violencia doméstica · procesos bajo reserva); el
