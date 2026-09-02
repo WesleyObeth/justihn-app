@@ -25,6 +25,7 @@ import { CheckCuadro } from "@/components/auth/iniciar-sesion";
 import { SplashJustihn } from "@/components/auth/splash";
 import { LogoJustihn } from "@/components/brand/logos";
 import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
+import { CodigoCorreo } from "@/components/auth/codigo-correo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -231,23 +232,23 @@ export function RegistroPersona({
             </div>
           )}
 
-          {confirmarCorreo && (
-            <div
-              className="rounded-[10px] border px-3.5 py-3 text-[12.5px] leading-[1.55]"
-              style={{ background: "#e7f6ee", borderColor: "#bfe3cf", color: "#1a5c3a" }}
-              role="status"
+          {confirmarCorreo ? (
+            <CodigoCorreo
+              correo={correo}
+              onVerificado={() => {
+                setConfirmarCorreo(false);
+                setEntrando(true);
+              }}
+            />
+          ) : (
+            <button
+              type="submit"
+              disabled={ocupado}
+              className="btn-marino mt-1 cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold disabled:opacity-60"
             >
-              <b>Revisa tu correo.</b> Enviamos un enlace a {correo} para confirmar tu cuenta.
-              Al abrirlo entras directo a tu portal.
-            </div>
+              {ocupado ? "Creando tu cuenta…" : "Crear cuenta gratis"}
+            </button>
           )}
-          <button
-            type="submit"
-            disabled={ocupado || confirmarCorreo}
-            className="btn-marino mt-1 cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold disabled:opacity-60"
-          >
-            {ocupado ? "Creando tu cuenta…" : confirmarCorreo ? "Enlace enviado" : "Crear cuenta gratis"}
-          </button>
           <p className="text-center text-[13px]" style={{ color: "#5a6b82" }}>
             ¿Ya tienes cuenta?{" "}
             <Link href="/iniciar-sesion?tipo=persona" className="font-semibold">

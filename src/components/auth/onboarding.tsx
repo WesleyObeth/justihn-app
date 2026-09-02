@@ -28,6 +28,7 @@ import { CheckCuadro } from "@/components/auth/iniciar-sesion";
 import { SplashJustihn } from "@/components/auth/splash";
 import { usePortal } from "@/store/portal";
 import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
+import { CodigoCorreo } from "@/components/auth/codigo-correo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -657,10 +658,10 @@ export function PantallaOnboarding() {
                 ok={!pendienteCorreo}
                 texto={
                   pendienteCorreo
-                    ? `Confirma tu correo: enviamos un enlace a ${correo}`
+                    ? `Confirma tu correo ${correo}`
                     : `Cuenta creada con ${correo || "tu correo"}`
                 }
-                tag={pendienteCorreo ? "Revisa tu correo" : "Listo"}
+                tag={pendienteCorreo ? "Falta el código" : "Listo"}
               />
               {validacionEnviada ? (
                 <FilaResumen ok texto="Validación CAH enviada a revisión" tag="1–2 días" />
@@ -673,6 +674,7 @@ export function PantallaOnboarding() {
                 tag="Listo"
               />
             </div>
+            {!pendienteCorreo && (
             <div className="mt-5 w-full text-left">
               <p
                 className="text-[11px] font-semibold tracking-[1.4px] uppercase"
@@ -703,14 +705,10 @@ export function PantallaOnboarding() {
                 ))}
               </div>
             </div>
+            )}
             {pendienteCorreo ? (
-              <p
-                className="mt-[22px] w-full rounded-[10px] border px-3.5 py-3 text-[12.5px] leading-[1.55]"
-                style={{ background: "#e7f6ee", borderColor: "#bfe3cf", color: "#1a5c3a" }}
-              >
-                Al abrir el enlace del correo entras directo a tu portal. Si no llega en unos
-                minutos, revisa la carpeta de spam.
-              </p>
+              // Con el código verificado ya hay sesión: el mismo botón de siempre.
+              <CodigoCorreo correo={correo} onVerificado={() => setPendienteCorreo(false)} />
             ) : (
               <button
                 type="button"
