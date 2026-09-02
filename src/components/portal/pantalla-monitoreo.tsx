@@ -5,7 +5,8 @@ import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
 import { BotonJusIA } from "@/components/ia/boton-jus-ia";
 import { Boton, Card, ChipMateria, Meta, TituloSeccion } from "@/components/ui/primitivos";
-import { buscarApariciones } from "@/data/monitoreo";
+import { NotaFuenteApariciones } from "@/components/ui/fuente-apariciones";
+import { useAparicionesDe, type EstadoApariciones } from "@/hooks/use-apariciones";
 import { usePortal } from "@/store/portal";
 import { useUpgrade } from "@/components/portal/marco";
 import { usePreguntarAJusIA } from "@/hooks/use-preguntar-jus-ia";
@@ -22,14 +23,19 @@ const ETIQUETA_TIPO: Record<NombreVigilado["tipo"], string> = {
 
 /**
  * Monitoreo de nombres — el feature Pro que faltaba por materializar. El
- * matching corre EN VIVO sobre el texto oficial de las sentencias del piloto:
- * la demo demuestra el motor real, no lo finge. Copy honesto: se vigila lo
- * que el Estado publica, no movimientos de expedientes (eso no es público).
+ * matching corre EN VIVO contra el corpus real (`/api/corpus/apariciones`,
+ * desde el 2026-09-02): busca el nombre como PARTE —recurrente o recurrido—
+ * en las sentencias publicadas. Copy honesto: se vigila lo que el Estado
+ * publica, no movimientos de expedientes (eso no es público).
  */
 export function PantallaMonitoreo() {
   const esPremium = usePortal((s) => s.plan) === "premium";
   const vigilados = usePortal((s) => s.nombresVigilados);
   const solicitarUpgrade = useUpgrade();
+  // Un resultado por nombre para toda la pantalla: cada card y la nota de
+  // fuente salen del mismo dato.
+  const porNombre = useAparicionesDe(vigilados.map((v) => v.nombre));
+  const resuelto = Object.values(porNombre).find((e) => e.estado === "listo");
 
   return (
     <>
@@ -52,8 +58,15 @@ export function PantallaMonitoreo() {
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="flex flex-col gap-4">
           <FormularioVigilar esPremium={esPremium} />
+          {resuelto && (
+            <NotaFuenteApariciones
+              fuente={resuelto.fuente}
+              totalCorpus={resuelto.totalCorpus}
+              className="mx-0.5"
+            />
+          )}
           {vigilados.map((v) => (
-            <CardVigilado key={v.id} vigilado={v} />
+            <CardVigilado key={v.id} vigilado={v} estado={porNombre[v.nombre]!} />
           ))}
         </div>
 
@@ -83,12 +96,9 @@ function FormularioVigilar({ esPremium }: { esPremium: boolean }) {
       return;
     }
     vigilarNombre(limpio, tipo);
-    const encontradas = buscarApariciones(limpio).length;
-    mostrarToast(
-      encontradas > 0
-        ? `"${limpio}" en vigilancia — ${encontradas} ${encontradas === 1 ? "aparición encontrada" : "apariciones encontradas"} en lo ya publicado`
-        : `"${limpio}" en vigilancia — te avisamos apenas el PJ publique algo`,
-    );
+    // El conteo lo dice la card cuando el corpus responda: un toast con un
+    // número que aún no existe sería adivinarlo.
+    mostrarToast(`"${limpio}" en vigilancia — buscando en lo ya publicado`);
     setNombre("");
   };
 
@@ -127,8 +137,8 @@ function FormularioVigilar({ esPremium }: { esPremium: boolean }) {
       </div>
       <p className="mt-2.5 text-[11.5px] leading-[1.5] text-texto-4">
         Las coincidencias pueden ser <b>homónimos</b> — verifica siempre la identidad en el
-        documento oficial antes de sacar conclusiones. Prohibido usarlo para acoso o
-        discriminación; canal de habeas data en{" "}
+        documento oficial antes de sacar conclusiones. Prohibido usarlo para acoso o discriminación;
+        canal de habeas data en{" "}
         <Link href="/abogados/configuracion" className="text-celeste hover:text-marino">
           Configuración
         </Link>
@@ -140,11 +150,17 @@ function FormularioVigilar({ esPremium }: { esPremium: boolean }) {
 
 // ── Card de un nombre vigilado (matching real sobre el corpus) ─────────────
 
-function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
+function CardVigilado({
+  vigilado,
+  estado,
+}: {
+  vigilado: NombreVigilado;
+  estado: EstadoApariciones;
+}) {
   const dejarDeVigilar = usePortal((s) => s.dejarDeVigilar);
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const preguntar = usePreguntarAJusIA();
-  const apariciones = buscarApariciones(vigilado.nombre);
+  const apariciones = estado.estado === "listo" ? estado.apariciones : [];
 
   return (
     <Card className="p-5">
@@ -155,8 +171,10 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
         </span>
         <span className="flex-1" />
         <span className="text-[12px] whitespace-nowrap text-texto-4">
-          {apariciones.length}{" "}
-          {apariciones.length === 1 ? "aparición" : "apariciones"} en lo publicado
+          {estado.estado === "cargando" && "buscando…"}
+          {estado.estado === "error" && "sin respuesta del corpus"}
+          {estado.estado === "listo" &&
+            `${apariciones.length} ${apariciones.length === 1 ? "aparición" : "apariciones"} en lo publicado`}
         </span>
         <button
           type="button"
@@ -171,7 +189,18 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
         </button>
       </div>
 
-      {apariciones.length > 0 ? (
+      {estado.estado === "cargando" && (
+        <div className="mt-3 rounded-[10px] bg-lienzo px-4 py-3 text-[13px] text-texto-3">
+          Buscando «{vigilado.nombre}» en las sentencias publicadas…
+        </div>
+      )}
+      {estado.estado === "error" && (
+        <div className="mt-3 rounded-[10px] bg-lienzo px-4 py-3 text-[13px] text-texto-3">
+          No se pudo consultar el corpus ahora mismo. No es que no haya apariciones: es que no
+          pudimos buscar. Vuelve a cargar la página en unos segundos.
+        </div>
+      )}
+      {estado.estado === "listo" && apariciones.length > 0 && (
         <div className="mt-3 flex flex-col gap-2.5">
           {apariciones.map(({ sentencia, rol }) => (
             <div key={sentencia.id} className="rounded-[10px] border border-borde px-4 py-3">
@@ -183,7 +212,7 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
                   </span>
                 )}
                 <Meta>
-                  {sentencia.organo} · {sentencia.fecha}
+                  {sentencia.organo} · {sentencia.fecha} · Fallo: {sentencia.fallo}
                 </Meta>
                 <span className="ml-auto font-mono text-[11px] text-texto-4">
                   {sentencia.expediente}
@@ -191,10 +220,7 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
               </div>
               <div className="mt-1.5 text-[13.5px] font-medium">{sentencia.titulo}</div>
               <div className="mt-2 flex flex-wrap items-center gap-3">
-                <Link
-                  href={`/abogados/jurisprudencia/${sentencia.id}`}
-                  className="text-[12.5px]"
-                >
+                <Link href={`/abogados/jurisprudencia/${sentencia.id}`} className="text-[12.5px]">
                   Ver sentencia íntegra →
                 </Link>
                 <BotonJusIA
@@ -211,7 +237,8 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
             </div>
           ))}
         </div>
-      ) : (
+      )}
+      {estado.estado === "listo" && apariciones.length === 0 && (
         <div className="mt-3 flex items-center gap-2.5 rounded-[10px] bg-lienzo px-4 py-3 text-[13px] text-texto-3">
           <Icono nombre="check" size={14} strokeWidth={2.4} className="shrink-0 text-exito" />
           Sin apariciones en lo publicado — te avisamos apenas el Poder Judicial o La Gaceta
@@ -261,8 +288,8 @@ function QueNoMonitorea() {
           <span className="mt-px grid shrink-0 place-items-center text-texto-4">
             <Icono nombre="alerta" size={12} />
           </span>
-          Movimientos de expedientes en trámite — no son públicos en Honduras; vigilamos lo que
-          el Estado publica, cuando lo publica.
+          Movimientos de expedientes en trámite — no son públicos en Honduras; vigilamos lo que el
+          Estado publica, cuando lo publica.
         </li>
         <li className="flex items-start gap-2">
           <span className="mt-px grid shrink-0 place-items-center text-texto-4">

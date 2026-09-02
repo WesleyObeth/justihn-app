@@ -22,7 +22,10 @@ export type Materia =
   | "Notarial"
   // Nace 2026-08-31 con la guía de reclamo de consumo: sin materia propia, la
   // guía no podría recomendar abogado y el funnel guía→lead quedaría cortado.
-  | "Consumidor";
+  | "Consumidor"
+  // Nace 2026-09-02 al conectar Jurisprudencia al corpus real: el CEDIJ
+  // clasifica unas pocas sentencias como "Derechos Humanos Grupos Vulnerables".
+  | "DD.HH.";
 
 export type PlanId = "gratis" | "profesional" | "premium";
 

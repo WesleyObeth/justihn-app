@@ -270,9 +270,7 @@ function ActividadReciente() {
           >
             <span className="min-w-[52px] text-[11px] text-texto-4">{item.when}</span>
             <div className="flex-1">
-              <div className="text-[13.5px] font-medium group-hover:text-celeste">
-                {item.title}
-              </div>
+              <div className="text-[13.5px] font-medium group-hover:text-celeste">{item.title}</div>
               <div className="mt-0.5 text-xs text-texto-3">{item.meta}</div>
             </div>
             <span className="text-texto-4 opacity-0 transition-opacity group-hover:opacity-100">
@@ -326,7 +324,7 @@ function NuevoEnTusMaterias() {
       </div>
 
       <Link href="/abogados/jurisprudencia" className="mt-2.5 inline-block text-[12.5px]">
-        Buscar en las 20,189 sentencias →
+        Buscar en todo el corpus →
       </Link>
     </Card>
   );
@@ -434,11 +432,7 @@ function AccesoRapido({
       className="flex items-center gap-2.5 rounded-[10px] border border-borde bg-lienzo px-3.5 py-3 text-[12.5px] font-medium text-marino hover:border-celeste hover:text-celeste"
     >
       <span className="grid shrink-0 place-items-center text-texto-4">
-        {icono === "ia" ? (
-          <SimboloJusIALinear size={15} />
-        ) : (
-          <Icono nombre={icono} size={15} />
-        )}
+        {icono === "ia" ? <SimboloJusIALinear size={15} /> : <Icono nombre={icono} size={15} />}
       </span>
       {children}
     </Link>

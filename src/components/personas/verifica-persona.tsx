@@ -17,14 +17,17 @@
  * conclusión la saca quien lee, con la sentencia delante.
  *
  * Y una regla de §4.5: la parte que HOY funciona es la búsqueda en sentencias
- * publicadas —motor real sobre el corpus—; folio real y Registro Mercantil
+ * publicadas —motor real sobre el corpus, por `/api/corpus/apariciones`, que
+ * busca el nombre como parte—; folio real y Registro Mercantil
  * exigen cuenta institucional (SURE/CCIT) que aún no existe, así que aparecen
  * como lo que son, en preparación.
  */
 import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
-import { buscarApariciones, type Aparicion } from "@/data/monitoreo";
+import type { Aparicion } from "@/data/monitoreo";
+import { NotaFuenteApariciones } from "@/components/ui/fuente-apariciones";
+import { consultarApariciones, type ResultadoApariciones } from "@/hooks/use-apariciones";
 import { FilaAparicion } from "./aparicion";
 import { usePortal } from "@/store/portal";
 import { cn } from "@/lib/utils";
@@ -34,23 +37,33 @@ export function VerificaPersona() {
   const registrar = usePortal((s) => s.registrarConsultaVerifica);
   const [nombre, setNombre] = useState("");
   const [consultado, setConsultado] = useState<string | null>(null);
-  const [resultados, setResultados] = useState<Aparicion[]>([]);
+  const [resultado, setResultado] = useState<
+    | { estado: "cargando" }
+    | { estado: "error" }
+    | ({ estado: "listo" } & ResultadoApariciones)
+    | null
+  >(null);
 
   const buscar = (texto?: string) => {
     const limpio = (texto ?? nombre).trim();
     if (limpio.length < 4) return;
     setNombre(limpio);
-    setResultados(buscarApariciones(limpio));
     setConsultado(limpio);
+    setResultado({ estado: "cargando" });
     registrar(limpio);
+    consultarApariciones(limpio)
+      .then((r) => setResultado({ estado: "listo", ...r }))
+      // Un fallo NO se enseña como «sin apariciones»: sería un certificado
+      // que nadie emitió.
+      .catch(() => setResultado({ estado: "error" }));
   };
 
   return (
     <div className="max-w-[1080px]">
       <h1 className="font-display text-[24px] font-bold">Informe Verifica</h1>
       <p className="mt-1 max-w-[650px] text-[13px] leading-[1.6] text-texto-3">
-        Antes de comprar un terreno, alquilar, contratar o asociarte: mira qué hay publicado
-        sobre esa persona o empresa en las fuentes del Estado.
+        Antes de comprar un terreno, alquilar, contratar o asociarte: mira qué hay publicado sobre
+        esa persona o empresa en las fuentes del Estado.
       </p>
 
       <UsosProhibidos />
@@ -80,14 +93,32 @@ export function VerificaPersona() {
           </div>
         </label>
         <p className="mt-2 text-[11.5px] leading-[1.55] text-texto-4">
-          Busca en las sentencias que el Poder Judicial publica. Es gratis y no se le avisa a
-          nadie que lo buscaste.
+          Busca en las sentencias que el Poder Judicial publica. Es gratis y no se le avisa a nadie
+          que lo buscaste.
         </p>
 
         <Historial onElegir={(n) => buscar(n)} />
       </div>
 
-      {consultado && <Resultado nombre={consultado} apariciones={resultados} />}
+      {consultado && resultado?.estado === "cargando" && (
+        <div className="mt-4 rounded-2xl border border-borde bg-white px-5 py-6 text-[13px] text-texto-3">
+          Buscando «{consultado}» en las sentencias publicadas…
+        </div>
+      )}
+      {consultado && resultado?.estado === "error" && (
+        <div className="mt-4 rounded-2xl border border-borde bg-white px-5 py-6 text-[13px] leading-[1.6] text-texto-3">
+          No pudimos consultar el corpus ahora mismo. No significa que no haya nada sobre esa
+          persona: significa que no pudimos buscar. Inténtalo de nuevo en unos segundos.
+        </div>
+      )}
+      {consultado && resultado?.estado === "listo" && (
+        <Resultado
+          nombre={consultado}
+          apariciones={resultado.apariciones}
+          fuente={resultado.fuente}
+          totalCorpus={resultado.totalCorpus}
+        />
+      )}
 
       <InformeCompleto />
     </div>
@@ -102,9 +133,9 @@ function UsosProhibidos() {
         <Icono nombre="alerta" size={15} />
       </span>
       <p className="text-[12.5px] leading-[1.6] text-texto-2">
-        <b>Para verificar, no para perseguir.</b> Está prohibido usar esto para acosar a alguien
-        o para descartar candidatos por su historial: en Honduras nadie pierde derechos por
-        aparecer en un expediente. Lo que ves aquí es información que el Estado ya publicó.
+        <b>Para verificar, no para perseguir.</b> Está prohibido usar esto para acosar a alguien o
+        para descartar candidatos por su historial: en Honduras nadie pierde derechos por aparecer
+        en un expediente. Lo que ves aquí es información que el Estado ya publicó.
       </p>
     </div>
   );
@@ -151,7 +182,17 @@ function Historial({ onElegir }: { onElegir: (nombre: string) => void }) {
   );
 }
 
-function Resultado({ nombre, apariciones }: { nombre: string; apariciones: Aparicion[] }) {
+function Resultado({
+  nombre,
+  apariciones,
+  fuente,
+  totalCorpus,
+}: {
+  nombre: string;
+  apariciones: Aparicion[];
+  fuente: ResultadoApariciones["fuente"];
+  totalCorpus: number | null;
+}) {
   const [materia, setMateria] = useState<Materia | "todas">("todas");
   const hay = apariciones.length > 0;
   const materias = [...new Set(apariciones.map((a) => a.sentencia.materia))];
@@ -189,12 +230,14 @@ function Resultado({ nombre, apariciones }: { nombre: string; apariciones: Apari
           </>
         ) : (
           <>
-            <b>Esto no acredita nada.</b> Que no aparezca solo dice que no está en lo que el
-            Estado publica: puede tener un proceso en trámite —que no es público— o figurar con
-            otro nombre.
+            <b>Esto no acredita nada.</b> Que no aparezca solo dice que no está en lo que el Estado
+            publica: puede tener un proceso en trámite —que no es público— o figurar con otro
+            nombre.
           </>
         )}
       </p>
+
+      <NotaFuenteApariciones fuente={fuente} totalCorpus={totalCorpus} className="mt-2.5" />
 
       {hay && (
         <>
@@ -220,9 +263,7 @@ function Resultado({ nombre, apariciones }: { nombre: string; apariciones: Apari
       )}
 
       <div className="mt-3.5 border-t border-borde pt-3 text-[12.5px]">
-        <Link href="/personas/directorio">
-          ¿Vas a firmar algo? Consulta con un abogado antes →
-        </Link>
+        <Link href="/personas/directorio">¿Vas a firmar algo? Consulta con un abogado antes →</Link>
       </div>
     </div>
   );
@@ -285,8 +326,8 @@ function InformeCompleto() {
         ))}
       </ul>
       <p className="mt-3.5 border-t border-borde pt-3 text-[11.5px] leading-[1.6] text-texto-4">
-        Será de pago único, sin suscripción. El precio se define con el gremio; lo que hoy es
-        gratis seguirá siéndolo.
+        Será de pago único, sin suscripción. El precio se define con el gremio; lo que hoy es gratis
+        seguirá siéndolo.
       </p>
     </div>
   );

@@ -3,8 +3,9 @@
 /**
  * "Mi nombre" — el monitoreo visto desde el ciudadano.
  *
- * Es el mismo motor del abogado (`buscarApariciones` sobre el texto oficial de
- * las sentencias del piloto) con dos diferencias que importan:
+ * Es el mismo motor del abogado (`/api/corpus/apariciones`: el nombre como
+ * parte en las sentencias publicadas del corpus real) con dos diferencias que
+ * importan:
  *  1. Solo vigila nombres PROPIOS o de su familia. Ofrecer vigilar a un tercero
  *     aquí convertiría la función en acoso — mirar a otro es el Informe
  *     Verifica, que tiene sus reglas (§5).
@@ -14,7 +15,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
-import { buscarApariciones } from "@/data/monitoreo";
+import { NotaFuenteApariciones } from "@/components/ui/fuente-apariciones";
+import {
+  totalApariciones,
+  useAparicionesDe,
+  type EstadoApariciones,
+} from "@/hooks/use-apariciones";
 import { PERSONA_DEMO } from "@/data/persona";
 import { usePortal } from "@/store/portal";
 import { cn } from "@/lib/utils";
@@ -23,10 +29,12 @@ import { FilaAparicion } from "./aparicion";
 
 export function MonitoreoPersona() {
   const vigilados = usePortal((s) => s.nombresVigiladosPersona);
-  const totalApariciones = vigilados.reduce(
-    (n, v) => n + buscarApariciones(v.nombre).length,
-    0,
-  );
+  // Un resultado por nombre para toda la pantalla: la columna lateral y cada
+  // card salen del MISMO dato — con dos derivaciones podrían contradecirse.
+  const porNombre = useAparicionesDe(vigilados.map((v) => v.nombre));
+  const total = totalApariciones(porNombre);
+  const resuelto = Object.values(porNombre).find((e) => e.estado === "listo");
+  const pendientes = Object.values(porNombre).some((e) => e.estado === "cargando");
 
   return (
     <div className="max-w-[1180px]">
@@ -40,8 +48,16 @@ export function MonitoreoPersona() {
         <div className="flex flex-col gap-4">
           <FormularioVigilar />
 
+          {resuelto && (
+            <NotaFuenteApariciones
+              fuente={resuelto.fuente}
+              totalCorpus={resuelto.totalCorpus}
+              className="mx-0.5"
+            />
+          )}
+
           {vigilados.map((v) => (
-            <CardVigilado key={v.id} vigilado={v} />
+            <CardVigilado key={v.id} vigilado={v} estado={porNombre[v.nombre]!} />
           ))}
 
           {vigilados.length === 0 && (
@@ -68,9 +84,11 @@ export function MonitoreoPersona() {
               </span>
             </div>
             <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-3">
-              {totalApariciones === 0
-                ? "Sin apariciones por ahora en lo que el Estado publica."
-                : `${totalApariciones} ${totalApariciones === 1 ? "aparición encontrada" : "apariciones encontradas"} en lo publicado.`}
+              {pendientes
+                ? "Buscando en lo que el Estado publica…"
+                : total === 0
+                  ? "Sin apariciones por ahora en lo que el Estado publica."
+                  : `${total} ${total === 1 ? "aparición encontrada" : "apariciones encontradas"} en lo publicado.`}
             </p>
           </div>
 
@@ -165,10 +183,16 @@ const ETIQUETA_TIPO: Record<string, string> = {
   familiar: "De tu familia",
 };
 
-function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
+function CardVigilado({
+  vigilado,
+  estado,
+}: {
+  vigilado: NombreVigilado;
+  estado: EstadoApariciones;
+}) {
   const dejarDeVigilar = usePortal((s) => s.dejarDeVigilarPersona);
   const mostrarToast = usePortal((s) => s.mostrarToast);
-  const apariciones = buscarApariciones(vigilado.nombre);
+  const apariciones = estado.estado === "listo" ? estado.apariciones : [];
 
   return (
     <div className="rounded-2xl border border-borde bg-white p-5">
@@ -179,7 +203,10 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
         </span>
         <span className="flex-1" />
         <span className="text-[12px] whitespace-nowrap text-texto-4">
-          {apariciones.length} {apariciones.length === 1 ? "aparición" : "apariciones"}
+          {estado.estado === "cargando" && "buscando…"}
+          {estado.estado === "error" && "sin respuesta"}
+          {estado.estado === "listo" &&
+            `${apariciones.length} ${apariciones.length === 1 ? "aparición" : "apariciones"}`}
         </span>
         <button
           type="button"
@@ -194,15 +221,26 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
         </button>
       </div>
 
-      {apariciones.length > 0 ? (
+      {estado.estado === "cargando" && (
+        <div className="mt-3 rounded-[10px] bg-lienzo px-4 py-3 text-[13px] text-texto-3">
+          Buscando «{vigilado.nombre}» en las sentencias publicadas…
+        </div>
+      )}
+      {estado.estado === "error" && (
+        <div className="mt-3 rounded-[10px] bg-lienzo px-4 py-3 text-[13px] leading-[1.55] text-texto-3">
+          No pudimos consultar el corpus ahora mismo. No significa que no haya nada: significa que
+          no pudimos buscar. Vuelve a cargar la página en unos segundos.
+        </div>
+      )}
+      {estado.estado === "listo" && apariciones.length > 0 && (
         <>
           {/* Una vez por nombre, no por fila: repetido en cada aparición se
               volvía ruido y se dejaba de leer, que es lo contrario de lo que
               un disclaimer tiene que conseguir. */}
           <p className="mt-3 rounded-[10px] bg-lienzo px-4 py-3 text-[12px] leading-[1.6] text-texto-3">
-            <b>Puede tratarse de otra persona con tu mismo nombre.</b> Los nombres se repiten y
-            el corpus no trae documento de identidad: abre cada una y contrasta las partes y las
-            fechas antes de dar nada por hecho.
+            <b>Puede tratarse de otra persona con tu mismo nombre.</b> Los nombres se repiten y el
+            corpus no trae documento de identidad: abre cada una y contrasta las partes y las fechas
+            antes de dar nada por hecho.
           </p>
           <div className="mt-3 flex flex-col gap-2.5">
             {apariciones.map((a) => (
@@ -210,9 +248,15 @@ function CardVigilado({ vigilado }: { vigilado: NombreVigilado }) {
             ))}
           </div>
         </>
-      ) : (
+      )}
+      {estado.estado === "listo" && apariciones.length === 0 && (
         <div className="mt-3 flex items-start gap-2.5 rounded-[10px] bg-lienzo px-4 py-3 text-[13px] leading-[1.55] text-texto-3">
-          <Icono nombre="check" size={14} strokeWidth={2.4} className="mt-0.5 shrink-0 text-exito" />
+          <Icono
+            nombre="check"
+            size={14}
+            strokeWidth={2.4}
+            className="mt-0.5 shrink-0 text-exito"
+          />
           <span>
             Sin apariciones en lo que el Estado publica. Te avisamos apenas salga algo con este
             nombre.
@@ -235,7 +279,10 @@ function ComoAvisamos() {
           "Cada vez que el Poder Judicial publica sentencias nuevas, las cruzamos con tus nombres.",
           "Si hay coincidencia, te llega un aviso y la aparición sale aquí.",
         ].map((t, i) => (
-          <li key={t} className="flex items-start gap-2.5 text-[12.5px] leading-[1.55] text-texto-2">
+          <li
+            key={t}
+            className="flex items-start gap-2.5 text-[12.5px] leading-[1.55] text-texto-2"
+          >
             <span className="grid h-[19px] w-[19px] min-w-[19px] place-items-center rounded-full bg-chip text-[10.5px] font-bold text-celeste">
               {i + 1}
             </span>
@@ -276,8 +323,8 @@ function QueNoEs() {
         ))}
       </ul>
       <p className="mt-3.5 border-t border-borde pt-3 text-[11.5px] leading-[1.6] text-texto-4">
-        Puedes pedir la revisión o supresión de tus datos cuando quieras (habeas data, art. 182
-        de la Constitución) desde <Link href="/personas/configuracion">Configuración</Link>.
+        Puedes pedir la revisión o supresión de tus datos cuando quieras (habeas data, art. 182 de
+        la Constitución) desde <Link href="/personas/configuracion">Configuración</Link>.
       </p>
     </div>
   );

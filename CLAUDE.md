@@ -2,8 +2,8 @@
 
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-09-01** (Jus IA
-> encendido: RAG real sobre el corpus del CEDIJ — §1.6 y §7.1).
+> Creado: **2026-08-25** · Última actualización: **2026-09-02** (Jurisprudencia,
+> Monitoreo, Mi nombre y Verifica conectados al corpus real — §1.7).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -56,13 +56,16 @@ Perfil · Planes · Configuración · Ayuda.
 - **Jus IA:** chat en una sola columna centrada (~760px); el historial va en un
   panel lateral, no en columna fija. El titular del hero sale del pool
   `TITULARES_HERO` (`data/jus-ia.ts`), elegido en cliente tras el mount.
-- **Legislación** y **Monitoreo de nombres** existen para que la tabla de planes
-  quede 100% respaldada por UI (estaban vendidas y no existían). Legislación
-  muestra los artículos del CPC verificados contra el PDF oficial del PJ; los
-  demás códigos aparecen "en preparación" — sin fuente no hay texto. Monitoreo
-  hace el matching **en vivo** sobre el texto de las 12 sentencias del piloto
+- **Jurisprudencia busca sobre el corpus real desde el 2026-09-02** (§1.7):
+  dos modos, filtros de materia/proceso/año, paginación con conteo exacto y
+  ficha por `record_id`. **Legislación** y **Monitoreo de nombres** existen
+  para que la tabla de planes quede 100% respaldada por UI (estaban vendidas y
+  no existían). Legislación muestra los artículos del CPC verificados contra el
+  PDF oficial del PJ; los demás códigos aparecen "en preparación" — sin fuente
+  no hay texto. Monitoreo pregunta al corpus por `/api/corpus/apariciones`
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
-  disclaimer de homónimos y exclusión de materias reservadas.
+  disclaimer de homónimos y exclusión de materias reservadas; mientras la
+  migración 03 no esté pasada, responde sobre el piloto **y lo dice** (§1.7).
 
 ### 1.2 Portal ciudadano — `/personas` (17 rutas)
 
@@ -538,6 +541,60 @@ puntas:
 `automatizaciones/legislacion/esquema/01-legislacion.sql` en el editor SQL de
 Supabase (Wesley) y correr `node ingesta.mjs && node embeddings.mjs` (~US$0,02).
 
+### 1.7 Jurisprudencia sobre el corpus real — conectada el 2026-09-02
+
+La pantalla dejó de ser vitrina de 12 seeds: busca sobre las **17.319
+sentencias legibles** (19.742 menos las reservadas por §5, que RLS esconde a
+la clave `anon`). Todo pasa por `guard()`; nada gasta LLM.
+
+- **Dos modos, decididos al arrancar la sesión.** *Por palabras* (por defecto):
+  Postgres puro —ILIKE sobre el resumen del CEDIJ y el expediente, AND entre
+  palabras—, conteo exacto, 20 por página, más recientes primero. *Por
+  significado*: vectoriza la consulta (~US$0,00002) y usa el MISMO RPC
+  `buscar_corpus` que Jus IA; hasta 30 afines ordenadas por afinidad, sin
+  páginas — un ranking semántico no tiene «página 7», y la UI lo dice. El modo
+  semántico lleva techo global propio (3.000/día) porque no es gratis.
+- **`sentencias.texto` NO es la sentencia: es la FICHA JURISPRUDENCIAL** del
+  CEDIJ (verificado sobre 400 filas: las 400 terminan en «Sentencia ·
+  @documento»). `lib/corpus/ficha.ts` la parsea —rótulos de una línea y bloques
+  Tesauro / Respuesta / Consideraciones / Legislación aplicada, repetibles (1,5
+  problemas jurídicos por ficha)— y extrae fallo, partes, tesauro y legislación
+  en **400 de 400**. Se parsea en la app, no en la base: un solo dato de origen.
+- ⚠️ **Dos columnas mienten con su nombre.** `fallo` guarda el estado de
+  publicación («Publicada» en el 100% de la muestra): el fallo real solo vive
+  en la línea «Fallo …» de la ficha. Y `organo` es el **tribunal de
+  procedencia** (la instancia recurrida), no quien resolvió: en una card se
+  leería como si la Corte de Apelaciones hubiera dictado la casación. Toda
+  sentencia del corpus la dictó la CSJ; la procedencia va en la ficha, con su
+  rótulo. Hay test para las dos.
+- **El título se deriva**: solo el 3% de las fichas trae «Tema». Para el resto,
+  la ruta del tesauro del primer problema sin su primer nivel (la rama); último
+  recurso, proceso + expediente. Nunca texto inventado.
+- **Umbral semántico 0,45, remedido sobre el corpus completo.** Con 0,35,
+  «criptomonedas en Islandia» devolvía 15 sentencias hondureñas (0,36–0,40):
+  sobre 17.000 fichas el ruido sube a 0,40; lo pertinente sigue en 0,58–0,70.
+- **El CEDIJ tiene sentencias publicadas dos veces** (CL-463-01: `record_id`
+  1173 y 1224, misma fecha). Se colapsan por expediente + fecha en lo que se
+  enseña; el conteo total no se toca.
+- **Los slugs del piloto siguen vivos** (`/abogados/jurisprudencia/cl-528-24`,
+  enlazados desde Dashboard, Jus IA y demos): la ruta resuelve el expediente en
+  la base y redirige al `record_id`; si no está (reservada o sin capturar),
+  enseña el seed como antes.
+- **Búsqueda por nombre (Monitoreo · Mi nombre · Verifica): gateada por la
+  migración `03-partes.sql`.** ILIKE sobre `texto` NO sirve: medido, un término
+  inexistente tarda 2,2 s (barrido secuencial de 192 MB — el índice trigram de
+  `01-corpus.sql` no responde o no llegó a crearse) y cae por `statement
+  timeout` a los 3 s. La columna `partes` (recurrente + recurrido normalizados,
+  la escribe `partes.mjs`) lo vuelve instantáneo. **Hasta que se pase, el
+  endpoint responde `disponible: false`, el hook cae al piloto y las tres
+  pantallas dicen de dónde salió la respuesta** (`NotaFuenteApariciones`). Un
+  error de red se enseña como error, nunca como «sin apariciones». La app
+  detecta sola la columna (deja de recibir `42703`): cero cambios de código al
+  migrar.
+- **Un resultado por nombre para toda la pantalla** (`useAparicionesDe`): la
+  columna lateral y cada card salen del mismo dato; con dos derivaciones
+  podrían contradecirse. Caché por nombre a nivel de módulo.
+
 ### 1.5 Marca
 
 - **Favicon:** `src/app/icon.svg` **ES** `logo/justihn-icon.svg`, con el viewBox
@@ -569,10 +626,10 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 |---|---|
 | `src/app/abogados/` · `src/app/personas/` | Los dos portales, cada pantalla una **ruta real** (no estado) |
 | `src/app/(landing)/` · `(profesional)/` · `(profesional-black)/` · `(publico)/` · `(auth)/` | Las superficies públicas, cada grupo con su shell |
-| `src/app/api/ia/consultar/` | Único endpoint. Todo pasa por `guard()` antes de gastar nada |
+| `src/app/api/` | `ia/consultar` (Jus IA) · `jurisprudencia/buscar` (dos modos, §1.7) · `corpus/apariciones` (nombre como parte). Todo pasa por `guard()` antes de gastar nada |
 | `src/lib/security/` | **El harness (§3 del blueprint).** `api-guard` · `rate-limit` · `sanitize` · `ai-safety`. Toda superficie de servidor lo consume; no reinventar por ruta |
 | `src/lib/ai/` | `router-demo` (Fase 1, determinístico) · `motor-claude` y `motor-openai` (Fase 2, **encendidos**) · `sin-fuentes` (la negativa, en un solo sitio) · `tipos` (el contrato que cumplen los tres) |
-| `src/lib/corpus/` | **El RAG.** `supabase` (RPC con la clave `anon`) · `embeddings` (vectoriza la consulta) · `recuperar` (**una sola recuperación para los dos motores** — ver §1.6) |
+| `src/lib/corpus/` | **El RAG y el buscador.** `supabase` (RPC con la clave `anon`) · `embeddings` (vectoriza la consulta) · `recuperar` (**una sola recuperación para los dos motores** — ver §1.6) · `ficha` (parser de la ficha del CEDIJ) · `catalogo` (materias/procesos, puro, lo importa la pantalla) · `sentencias` (búsqueda, ficha por id, apariciones por nombre — §1.7) |
 | `src/lib/og/tarjeta.tsx` | El componente único de las tres tarjetas sociales |
 | `src/data/` | Seeds = **contrato literal** de las tablas Supabase futuras. Cada archivo lleva su `TODO(data)` con la fuente real |
 | `src/store/portal.ts` | Zustand + persist en `justihn-portal-v1` (misma clave del prototipo) |
@@ -778,7 +835,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (145 tests de invariantes)
+pnpm test         # Vitest (195 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -796,7 +853,9 @@ cortos), las instituciones (ninguna card vacía, ningún `institucionId` huérfa
 ningún portal fuera de la whitelist), el buscador de guías (que encuentre por
 las palabras del ciudadano, sin tildes, y que toda guía sea alcanzable), los
 títulos de página, las
-rutas de trámites y las colisiones de transform del imán.
+rutas de trámites, las colisiones de transform del imán, y el parser de la ficha
+del CEDIJ (fallo real vs estado de publicación, partes, problemas múltiples,
+título derivado) con el mapeo fila → `Sentencia`.
 
 **Recorridos E2E** (2026-08-30): los scripts de los tres caminos de un visitante
 viven en el scratchpad de la sesión, no commiteados — dependen del servidor de
@@ -856,18 +915,21 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      y móvil, deep-links, estados vacíos, y que nada prometa lo que no hace (§4.5).
    - **Lo que el E2E dejó fuera:** los portales solo se tocaron de refilón — el
      recorrido cubrió las cinco pantallas públicas.
-2. **🔌 CONECTAR JURISPRUDENCIA AL CORPUS REAL** (recomendación aceptada por
-   Wesley 2026-09-02). La pantalla Jurisprudencia sigue siendo vitrina de Fase 1
-   sobre los 12 seeds del piloto — su letrero lo dice honestamente ("muestra
-   real del corpus, piloto de 100") — mientras Jus IA ya busca sobre las 19.742.
-   Ahora que el corpus está en Supabase con la `anon` + RLS probados, cablearla
-   es el incremento natural: endpoint de búsqueda pasando por `guard()` (sin
-   costo de LLM — es Postgres puro), filtros de materia/órgano/año contra datos
-   reales, paginación de verdad y la ficha de detalle por `record_id`. Decidir
-   en el camino: ¿búsqueda por texto (ILIKE/FTS) o semántica (pgvector), o las
-   dos? Arrastra a **Monitoreo** y **Mi nombre**, que hacen su matching sobre
-   los mismos 12 seeds (`buscarApariciones`) y pasarían a buscar en la base.
-   El letrero del piloto muere aquí, sustituido por el conteo real.
+2. [x] ✅ **JURISPRUDENCIA CONECTADA AL CORPUS REAL (2026-09-02)** — §1.7.
+   Las dos búsquedas (palabras + significado), filtros reales, paginación con
+   conteo exacto, ficha por `record_id` con la ficha del CEDIJ parseada, y
+   Monitoreo / Mi nombre / Verifica preguntando al corpus. Verificado en
+   Chromium y WebKit, escritorio y móvil, sin errores de JS ni desbordes.
+2b. **🚦 GATE (Wesley, 2 minutos): pasar `automatizaciones/corpus-csj/esquema/03-partes.sql`**
+   en el editor SQL de Supabase y correr `node automatizaciones/corpus-csj/partes.mjs`
+   (rellena 19.742 filas en unos minutos; `--simular` primero si se quiere ver).
+   Hasta entonces Monitoreo, Mi nombre y Verifica responden sobre el piloto y
+   lo dicen en pantalla. Al pasarlo, la app se entera sola. Queda sumado al
+   refresco semanal (`tareas-desde-la-mac.md` §1b).
+2c. **Después de la migración:** el buscador global (⌘K), «Nuevo en tus
+   materias» del Dashboard y los tres demos de la landing siguen sobre el seed
+   de 12 — son vitrinas, no buscadores, y sus enlaces ya resuelven al corpus.
+   Candidatos a conectarse cuando se refine el Dashboard (§6.1).
 4. **Elegir entre `/para-abogados` y `/para-abogados-black`** y borrar la ruta
    perdedora (o convertirla en redirect) — ⏸️ **aplazado a propósito** (Wesley
    2026-08-30): es una comparación visual que no bloquea nada. Ídem con la prueba
