@@ -858,7 +858,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (208 tests de invariantes)
+pnpm test         # Vitest (214 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -972,19 +972,33 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      con test: lo persistido sin instante recibe el de la migración (la cota
      honesta: se escribió antes de ahora). Verificado en Chromium: Hoy / Ayer
      / Anteriores se reparten por reloj y no hay errores de hidratación.
-   - ⏳ **`Lead` mezcla fila con estado de quien mira:** `nuevo` es «no leído
-     por este abogado» (va per-usuario, como `notifsLeidasIds`), `respuestas`
-     es un conteo derivable de `respuestas_consulta`, y `respuestaDemo` es solo
-     de demostración. La fila real es id · materia · ciudad · pregunta ·
-     creado_en · persona_id.
-   - ⏳ **Cadenas compuestas que en la tabla son dos campos:**
-     `PublicacionGaceta.meta` («La Gaceta Nº ___ · 19 ago 2026» → número +
-     fecha, y la fecha ya existe en `fechaIso`), `PerfilAbogado.colegiacion`
-     («Colegiación CAH Nº 00000» → el número) y `PERSONA_DEMO.miembroDesde`
-     («agosto 2026» → `creado_en`).
-   - ⏳ **`NombreVigilado.id` es un slug del nombre** (`vig-<slug>`): en la
-     tabla será uuid con unicidad por (dueño, nombre normalizado). No cambia
-     la UI; se anota para el esquema.
+   - ✅ **`Lead` es solo la fila** (2026-09-02, tercera pasada): id · materia
+     · ciudad · pregunta · `creadoEn` · `personaId` (null = anónima, §7.2).
+     Lo que sobraba se fue a su sitio: `nuevo` → `leadsVistosIds` en el store
+     (estado del lector, como `notifsLeidasIds`; abrir «Responder» lo apaga,
+     y el Dashboard cuenta los no abiertos y sin respuesta propia);
+     `respuestas` → se deriva; y **`respuestaDemo` → `RESPUESTAS_SEED`**,
+     filas de `respuestas_consulta` con autor y fecha. **`respuestasDe(id,
+     store)` es el ÚNICO sitio que junta seed y store** — el abogado y el
+     ciudadano ven la misma lista (hay test), y si el mismo abogado
+     reescribió la suya manda la del store. Consecuencia visible: las
+     laborales las firma la abogada demo (su portal las ve RESPONDIDAS) y
+     las otras dos, abogados del directorio de esa materia — antes las cuatro
+     vitrinas del ciudadano pintaban a `ABOGADA_DEMO` a mano, así que una
+     respuesta de otro abogado habría salido firmada por ella. Ahora la
+     firma se resuelve del `abogadoId` (`FirmaRespuesta`, y `credencial()`:
+     colegiación si la publica; si no, ciudad y años). Store v5 con test.
+   - ✅ **Cadenas compuestas partidas** (mismo día): `PublicacionGaceta.meta`
+     → `numeroGaceta: string | null` + `fechaIso` (el «Nº ______» era un
+     marcador de maqueta; `etiquetaPublicacion()` arma «La Gaceta · 19 ago
+     2026» y pondrá el número cuando exista); `PerfilAbogado.colegiacion` →
+     `colegiacionNumero` + `etiquetaColegiacion()`; `PERSONA_DEMO.miembroDesde`
+     → `creadoEn` + `mesAnio()`. ⚠️ `fechaTexto()` parsea el día a mano: un
+     `new Date("2026-08-19")` es medianoche UTC y en Honduras (UTC−6) la
+     Gaceta del 19 salía fechada el 18. Hay test.
+   - ✅ **`NombreVigilado.id`** anotado en el tipo: hoy slug (`vig-<slug>`),
+     en la tabla uuid con unicidad por (dueño, nombre normalizado). Sin
+     cambio de UI.
    - 📌 **`Proceso.plantillaId` se queda** aunque la pantalla se llame Modelos:
      `plantillas` es el nombre de tabla; «Modelos» es el término del gremio en
      la UI (decisión ya tomada el 2026-08-25).

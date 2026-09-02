@@ -64,7 +64,14 @@ export interface PublicacionGaceta {
   id: string;
   materia: Materia;
   titulo: string;
-  meta: string;
+  /**
+   * Número de La Gaceta («35,807»), o `null` mientras no se conozca. Hasta el
+   * 2026-09-02 era `meta: "La Gaceta Nº ___ · 19 ago 2026"`: dos campos en
+   * una cadena, con la fecha repetida de `fechaIso`. `etiquetaPublicacion()`
+   * los vuelve a juntar para la pantalla.
+   */
+  numeroGaceta: string | null;
+  /** Día de publicación (YYYY-MM-DD) → `fecha_publicacion`. */
   fechaIso: string;
   resumen: string;
   /** Lectura de impacto sobre la práctica del abogado (valor del producto). */
@@ -74,6 +81,12 @@ export interface PublicacionGaceta {
 
 /** Tabla `nombres_vigilados` — monitoreo Pro sobre lo que el Estado publica. */
 export interface NombreVigilado {
+  /**
+   * Hoy es un slug del nombre (`vig-<nombre normalizado>`), que de paso evita
+   * duplicados. En la tabla será `uuid`, y la unicidad va por
+   * (dueño, nombre normalizado): dos personas pueden vigilar el mismo nombre.
+   * No cambia la UI; se anota para el esquema.
+   */
   id: string;
   nombre: string;
   /**
@@ -182,9 +195,15 @@ export interface MensajeAbogado {
 }
 
 /**
- * Tabla `leads`. Hasta el 2026-09-02 llevaba `cuando: "hace 2 h"` — el texto
- * de pantalla dentro del dato. Una tabla guarda el instante; el relativo es
- * una vista y la pinta `<Cuando>`.
+ * Tabla `leads` — una consulta del consultorio gratuito. SOLO la fila: lo que
+ * hasta el 2026-09-02 viajaba aquí y no es columna se fue a su sitio:
+ *   · `nuevo` era «no leído por ESTE abogado» → estado por usuario
+ *     (`leadsVistosIds` en el store, como `notifsLeidasIds`).
+ *   · `respuestas` era un conteo → se deriva de `respuestas_consulta`
+ *     (`respuestasDe()` en `data/catalogo.ts`).
+ *   · `respuestaDemo` era la respuesta pegada al lead → ahora es una fila de
+ *     `respuestas_consulta` con autor y fecha (`RESPUESTAS_SEED`).
+ *   · `cuando: "hace 2 h"` → `creadoEn` y `<Cuando>` lo pinta.
  */
 export interface Lead {
   id: string;
@@ -192,17 +211,12 @@ export interface Lead {
   ciudad: string;
   /** ISO 8601 → `creado_en`. */
   creadoEn: string;
-  nuevo: boolean;
-  respuestas: number;
   pregunta: string;
   /**
-   * Respuesta de demostración, para que el consultorio público pueda ENSEÑAR
-   * lo que promete. Sin esto la sección mostraba preguntas sin contestar —
-   * decía "te responde un abogado colegiado" y probaba lo contrario.
-   * ⚙️ Pendiente del socio: revisar estas orientaciones antes de lanzar. Son
-   * generales a propósito y no citan artículos sin verificar.
+   * `null` = consulta anónima: se publica ANTES del alta (§7.2) y se le
+   * asigna dueño cuando exista la cuenta. FK a `personas`.
    */
-  respuestaDemo?: string;
+  personaId: string | null;
 }
 
 /** Tabla `notificaciones`. */
@@ -321,7 +335,12 @@ export interface PerfilAbogado {
   nombre: string;
   nombreCorto: string;
   iniciales: string;
-  colegiacion: string;
+  /**
+   * Solo el número del carné del CAH («00000»). El rótulo «Colegiación CAH
+   * Nº …» lo arma `etiquetaColegiacion()`: hasta el 2026-09-02 la cadena
+   * completa vivía en el dato.
+   */
+  colegiacionNumero: string;
   ciudad: string;
   bio: string;
   especialidades: Materia[];

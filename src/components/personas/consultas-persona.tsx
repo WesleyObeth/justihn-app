@@ -9,11 +9,12 @@
  * preguntado es lo único que importa y va abierto; en cuanto tiene consultas,
  * lo que importa es SEGUIRLAS, así que se pliega detrás de un botón.
  */
+import { FirmaRespuesta } from "@/components/personas/firma-respuesta";
 import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
-import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
+import { LEADS_RESPONDIDOS, respuestasDe } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
 import { FormularioPregunta } from "@/components/publico/formulario-pregunta";
 import { cn } from "@/lib/utils";
@@ -194,8 +195,9 @@ function FilaConsulta({ lead, respuestas }: { lead: Lead; respuestas: RespuestaC
  * que Inicio y que la sección consultorio de la home).
  */
 function EjemploRespondido() {
-  const ejemplo = LEADS.find((l) => l.respuestaDemo);
-  if (!ejemplo) return null;
+  const ejemplo = LEADS_RESPONDIDOS[0];
+  const respuesta = ejemplo ? respuestasDe(ejemplo.id, {})[0] : undefined;
+  if (!ejemplo || !respuesta) return null;
 
   return (
     <div className="mt-5 rounded-2xl border border-borde bg-white p-5">
@@ -215,16 +217,8 @@ function EjemploRespondido() {
         </div>
         <p className="mt-2 text-[13.5px] leading-[1.55]">“{ejemplo.pregunta}”</p>
         <div className="mt-3 border-t border-borde pt-3">
-          <div className="flex items-center gap-2.5">
-            <span className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-celeste text-[11px] font-semibold text-white">
-              {ABOGADA_DEMO.iniciales}
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[12.5px] font-semibold">{ABOGADA_DEMO.nombre}</span>
-              <span className="block text-[11px] text-texto-4">{ABOGADA_DEMO.colegiacion}</span>
-            </span>
-          </div>
-          <p className="mt-2 text-[12.5px] leading-[1.6] text-texto-3">{ejemplo.respuestaDemo}</p>
+          <FirmaRespuesta abogadoId={respuesta.abogadoId} tamano="sm" />
+          <p className="mt-2 text-[12.5px] leading-[1.6] text-texto-3">{respuesta.texto}</p>
         </div>
       </div>
     </div>

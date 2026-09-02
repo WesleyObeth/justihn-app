@@ -14,6 +14,7 @@
  * Sus métricas, además, ENLAZAN: en el abogado son indicadores de su negocio;
  * aquí son la puerta a lo que la persona dejó a medias.
  */
+import { mesAnio } from "@/lib/tiempo";
 import Link from "next/link";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { PERSONA_DEMO } from "@/data/persona";
@@ -54,7 +55,7 @@ export function PerfilPersona() {
                   {PERSONA_DEMO.nombre}
                 </h2>
                 <p className="mt-0.5 text-[12.5px] text-texto-3">
-                  {PERSONA_DEMO.ciudad} · miembro desde {PERSONA_DEMO.miembroDesde}
+                  {PERSONA_DEMO.ciudad} · miembro desde {mesAnio(PERSONA_DEMO.creadoEn)}
                 </p>
               </div>
               <button

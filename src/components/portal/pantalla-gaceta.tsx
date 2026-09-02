@@ -12,7 +12,7 @@ import {
   Rotulo,
   TituloSeccion,
 } from "@/components/ui/primitivos";
-import { DIGEST, PUBLICACIONES } from "@/data/gaceta";
+import { DIGEST, PUBLICACIONES, etiquetaPublicacion } from "@/data/gaceta";
 import { usePortal } from "@/store/portal";
 import { usePreguntarAJusIA } from "@/hooks/use-preguntar-jus-ia";
 import { cn } from "@/lib/utils";
@@ -116,7 +116,7 @@ export function PantallaGaceta() {
                     <ChipMateria>{p.materia}</ChipMateria>
                     <div className="flex-1">
                       <div className="text-sm font-semibold">{p.titulo}</div>
-                      <div className="mt-[3px] text-[12.5px] text-texto-3">{p.meta}</div>
+                      <div className="mt-[3px] text-[12.5px] text-texto-3">{etiquetaPublicacion(p)}</div>
                     </div>
                     <span className="text-[12.5px] whitespace-nowrap text-celeste">
                       Ver publicación →

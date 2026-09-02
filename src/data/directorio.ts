@@ -1,4 +1,4 @@
-import { ABOGADA_DEMO } from "@/data/catalogo";
+import { ABOGADA_DEMO, etiquetaColegiacion } from "@/data/catalogo";
 import type { Materia } from "@/types/dominio";
 
 /**
@@ -264,7 +264,7 @@ export function getFirmante(abogadoId: string): Firmante | undefined {
       nombre: ABOGADA_DEMO.nombre,
       iniciales: ABOGADA_DEMO.iniciales,
       ciudad: ABOGADA_DEMO.ciudad,
-      colegiacion: ABOGADA_DEMO.colegiacion,
+      colegiacion: etiquetaColegiacion(ABOGADA_DEMO.colegiacionNumero),
     };
   }
   const a = DIRECTORIO.find((x) => x.id === abogadoId);

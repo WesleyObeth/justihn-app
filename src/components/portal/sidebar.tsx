@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { LogoJustihn, SimboloJustihn, SimboloJusIALinear } from "@/components/brand/logos";
 import { usePortal, useCuota, useNotifsSinLeer } from "@/store/portal";
-import { ABOGADA_DEMO } from "@/data/catalogo";
+import { ABOGADA_DEMO, etiquetaColegiacion } from "@/data/catalogo";
 import { cn } from "@/lib/utils";
 import { BuscadorGlobal } from "./buscador-global";
 
@@ -226,7 +226,7 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                 </span>
               </div>
               <div className="mt-0.5 text-[11.5px] text-sobre-marino">
-                {ABOGADA_DEMO.colegiacion}
+                {etiquetaColegiacion(ABOGADA_DEMO.colegiacionNumero)}
               </div>
             </div>
 

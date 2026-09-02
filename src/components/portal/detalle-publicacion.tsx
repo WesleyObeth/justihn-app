@@ -1,5 +1,6 @@
 "use client";
 
+import { fechaTexto } from "@/lib/tiempo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BotonJusIA } from "@/components/ia/boton-jus-ia";
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/primitivos";
 import { usePortal } from "@/store/portal";
 import { usePreguntarAJusIA } from "@/hooks/use-preguntar-jus-ia";
-import { PUBLICACIONES } from "@/data/gaceta";
+import { PUBLICACIONES, etiquetaPublicacion } from "@/data/gaceta";
 import type { PublicacionGaceta } from "@/types/dominio";
 
 export function DetallePublicacion({ publicacion }: { publicacion: PublicacionGaceta }) {
@@ -36,7 +37,7 @@ export function DetallePublicacion({ publicacion }: { publicacion: PublicacionGa
       <Card className="p-7">
         <div className="flex items-center gap-2">
           <ChipMateria>{publicacion.materia}</ChipMateria>
-          <Meta>{publicacion.meta}</Meta>
+          <Meta>{etiquetaPublicacion(publicacion)}</Meta>
         </div>
 
         <h2 className="font-display mt-2.5 text-xl leading-[1.35] font-bold">
@@ -91,7 +92,7 @@ function TambienEnElDigest({ actual }: { actual: PublicacionGaceta }) {
             <Card interactiva className="px-4.5 py-4">
               <div className="flex flex-wrap items-center gap-2">
                 <ChipMateria>{p.materia}</ChipMateria>
-                <Meta>{p.meta.split("·")[1]?.trim()}</Meta>
+                <Meta>{fechaTexto(p.fechaIso)}</Meta>
               </div>
               <div className="font-display mt-2 text-[13.5px] leading-[1.4] font-semibold">
                 {p.titulo}

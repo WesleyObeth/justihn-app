@@ -5,6 +5,7 @@ import type {
   PerfilAbogado,
   Plan,
   Plantilla,
+  RespuestaConsulta,
 } from "@/types/dominio";
 
 /**
@@ -166,49 +167,108 @@ export const LEADS: Lead[] = [
     materia: "Laboral",
     ciudad: "San Pedro Sula",
     creadoEn: "2026-09-02T09:20:00-06:00",
-    nuevo: true,
-    respuestas: 1,
     pregunta:
       "Me despidieron después de 4 años sin darme ninguna explicación ni pagarme prestaciones. ¿Qué puedo reclamar y cuánto tiempo tengo?",
-    respuestaDemo:
-      "Te corresponden cesantía, preaviso, vacaciones y aguinaldo proporcionales. Ojo con el plazo: el reclamo por despido injustificado prescribe a los dos meses desde que terminó el contrato (artículo 864 del Código del Trabajo). La Procuraduría del Trabajo asesora gratis, y conviene ir con el cálculo hecho.",
+    personaId: null,
   },
   {
     id: "lead-2407",
     materia: "Familia",
     ciudad: "Tegucigalpa",
     creadoEn: "2026-09-02T06:40:00-06:00",
-    nuevo: true,
-    respuestas: 0,
     pregunta:
       "Mi expareja no cumple con la pensión alimenticia acordada. ¿Cómo puedo exigir el pago?",
-    respuestaDemo:
-      "Puedes pedir la ejecución ante el mismo juzgado que fijó la pensión. Lleva el acta o la sentencia y el detalle de los meses no pagados: el juez puede ordenar la retención directa del salario.",
+    personaId: null,
   },
   {
     id: "lead-2404",
     materia: "Civil",
     ciudad: "La Ceiba",
     creadoEn: "2026-09-01T15:10:00-06:00",
-    nuevo: false,
-    respuestas: 3,
     pregunta:
       "Quiero comprar un terreno pero el vendedor solo tiene un documento privado. ¿Es seguro? ¿Qué debo verificar antes?",
-    respuestaDemo:
-      "Un documento privado no te hace dueño. Antes de pagar, pide en el Instituto de la Propiedad la certificación del inmueble para ver quién figura como titular y si tiene gravámenes; la compraventa se formaliza en escritura pública ante notario y se inscribe.",
+    personaId: null,
   },
   {
     id: "lead-2402",
     materia: "Laboral",
     ciudad: "Choloma",
     creadoEn: "2026-09-01T11:30:00-06:00",
-    nuevo: false,
-    respuestas: 2,
     pregunta: "¿Es legal que mi empleador me descuente del salario los faltantes de caja?",
-    respuestaDemo:
-      "No de forma automática. El patrono no puede descontarte del salario a discreción: los descuentos por faltantes exigen que se te haya comprobado responsabilidad y, en general, tu autorización. Guarda tus boletas de pago — son la prueba.",
+    personaId: null,
   },
 ];
+
+/**
+ * Tabla `respuestas_consulta` — las respuestas de demostración, como FILAS
+ * con autor y fecha, no como un texto pegado al lead. Existen para que el
+ * consultorio público pueda ENSEÑAR lo que promete: sin ellas mostraba
+ * preguntas sin contestar y probaba lo contrario de su título.
+ *
+ * Quién firma importa (§4.5: sin autor identificable no se pinta): las
+ * laborales las firma la abogada demo —por eso su portal las ve como
+ * RESPONDIDAS—, y las otras dos, abogados del directorio de esa materia, así
+ * que a ella le quedan consultas por responder.
+ * ⚙️ Pendiente del socio: revisar estas orientaciones antes de lanzar. Son
+ * generales a propósito y no citan artículos sin verificar.
+ */
+export const RESPUESTAS_SEED: Record<string, RespuestaConsulta[]> = {
+  "lead-2408": [
+    {
+      abogadoId: "maria-castillo",
+      texto:
+        "Te corresponden cesantía, preaviso, vacaciones y aguinaldo proporcionales. Ojo con el plazo: el reclamo por despido injustificado prescribe a los dos meses desde que terminó el contrato (artículo 864 del Código del Trabajo). La Procuraduría del Trabajo asesora gratis, y conviene ir con el cálculo hecho.",
+      creadoEn: "2026-09-02T10:05:00-06:00",
+    },
+  ],
+  "lead-2407": [
+    {
+      abogadoId: "roberto-pineda",
+      texto:
+        "Puedes pedir la ejecución ante el mismo juzgado que fijó la pensión. Lleva el acta o la sentencia y el detalle de los meses no pagados: el juez puede ordenar la retención directa del salario.",
+      creadoEn: "2026-09-02T08:30:00-06:00",
+    },
+  ],
+  "lead-2404": [
+    {
+      abogadoId: "gabriela-nunez",
+      texto:
+        "Un documento privado no te hace dueño. Antes de pagar, pide en el Instituto de la Propiedad la certificación del inmueble para ver quién figura como titular y si tiene gravámenes; la compraventa se formaliza en escritura pública ante notario y se inscribe.",
+      creadoEn: "2026-09-01T18:20:00-06:00",
+    },
+  ],
+  "lead-2402": [
+    {
+      abogadoId: "maria-castillo",
+      texto:
+        "No de forma automática. El patrono no puede descontarte del salario a discreción: los descuentos por faltantes exigen que se te haya comprobado responsabilidad y, en general, tu autorización. Guarda tus boletas de pago — son la prueba.",
+      creadoEn: "2026-09-01T13:45:00-06:00",
+    },
+  ],
+};
+
+/**
+ * Las respuestas de una consulta: las del seed más las del store, en orden
+ * de llegada. Si el mismo abogado tiene una en las dos (reescribió la suya),
+ * manda la del store. ÚNICO sitio que las junta: el abogado y el ciudadano
+ * tienen que ver la misma lista o el portal se contradice.
+ */
+export function respuestasDe(
+  leadId: string,
+  persistidas: Record<string, RespuestaConsulta[]>,
+): RespuestaConsulta[] {
+  const delStore = persistidas[leadId] ?? [];
+  const reescritas = new Set(delStore.map((r) => r.abogadoId));
+  return [...(RESPUESTAS_SEED[leadId] ?? []).filter((r) => !reescritas.has(r.abogadoId)), ...delStore];
+}
+
+/** Los leads del seed que ya tienen respuesta — lo que las vitrinas enseñan. */
+export const LEADS_RESPONDIDOS: Lead[] = LEADS.filter((l) => RESPUESTAS_SEED[l.id]?.length);
+
+/** «Colegiación CAH Nº 00000» a partir del número. Un solo rótulo para todas las superficies. */
+export function etiquetaColegiacion(numero: string): string {
+  return `Colegiación CAH Nº ${numero}`;
+}
 
 export const NOTIFICACIONES: Notificacion[] = [
   {
@@ -274,7 +334,7 @@ export const ABOGADA_DEMO: PerfilAbogado = {
   nombre: "Abg. María Castillo",
   nombreCorto: "María Castillo",
   iniciales: "MC",
-  colegiacion: "Colegiación CAH Nº 00000",
+  colegiacionNumero: "00000",
   ciudad: "Tegucigalpa, M.D.C.",
   bio: "Litigio laboral y civil, derecho de familia. Atiende consultas en línea.",
   especialidades: ["Laboral", "Civil", "Familia"],

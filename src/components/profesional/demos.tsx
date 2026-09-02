@@ -1,11 +1,12 @@
 "use client";
 
+import { fechaTexto } from "@/lib/tiempo";
 import { Cuando } from "@/components/ui/cuando";
 import { Icono } from "@/components/brand/iconos";
 import { SeccionDemo, Ventana } from "@/components/landing/demo-marco";
 import { SimboloJusIA } from "@/components/brand/logos";
-import { LEADS } from "@/data/catalogo";
-import { PUBLICACIONES } from "@/data/gaceta";
+import { LEADS, respuestasDe } from "@/data/catalogo";
+import { PUBLICACIONES, etiquetaPublicacion } from "@/data/gaceta";
 import { SENTENCIAS } from "@/data/sentencias";
 
 // La landing de abogados sigue importando `SeccionDemo` desde aquí.
@@ -116,11 +117,9 @@ export function DemoGaceta() {
                 </span>
               )}
               <span className="text-[10.5px]" style={{ color: "var(--muted)" }}>
-                {/* El seed guarda "La Gaceta Nº ______ · 19 ago 2026": el número
-                    va en blanco hasta cargar la Gaceta real. En la demo se
-                    muestra solo la fecha, porque ese "______" se leería como
-                    una pantalla sin terminar. */}
-                {p.meta.split("·").at(-1)?.trim()}
+                {/* Solo la fecha: el número de Gaceta es `null` en el seed hasta
+                    cargar la Gaceta real, y «La Gaceta · fecha» aquí sería ruido. */}
+                {fechaTexto(p.fechaIso)}
               </span>
             </div>
             <p className="mt-1.5 text-[12.5px] leading-[1.45] font-semibold text-marino">
@@ -158,7 +157,7 @@ export function DemoLeads() {
               <span className="rounded-full bg-chip px-2.5 py-[2px] text-[10.5px] font-semibold text-celeste">
                 {lead.materia}
               </span>
-              {lead.nuevo && (
+              {i === 0 && (
                 <span className="rounded-full bg-exito-bg px-2.5 py-[2px] text-[10.5px] font-bold text-exito">
                   Nuevo
                 </span>
@@ -172,11 +171,11 @@ export function DemoLeads() {
             </p>
             <div className="mt-3 flex items-center justify-between gap-2">
               <span className="text-[11px]" style={{ color: "var(--muted)" }}>
-                {lead.respuestas === 0
+                {respuestasDe(lead.id, {}).length === 0
                   ? "Nadie ha respondido todavía"
-                  : lead.respuestas === 1
+                  : respuestasDe(lead.id, {}).length === 1
                     ? "1 abogado ya respondió"
-                    : `${lead.respuestas} abogados ya respondieron`}
+                    : `${respuestasDe(lead.id, {}).length} abogados ya respondieron`}
               </span>
               <span
                 className="rounded-[8px] px-3 py-1.5 text-[11.5px] font-semibold text-white"

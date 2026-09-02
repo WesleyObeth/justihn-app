@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ABOGADA_DEMO } from "@/data/catalogo";
+import { ABOGADA_DEMO, etiquetaColegiacion } from "@/data/catalogo";
 import { DIRECTORIO, getFirmante } from "@/data/directorio";
 import { migrarPersistido } from "./portal";
 
@@ -10,6 +10,24 @@ import { migrarPersistido } from "./portal";
  */
 const migrar = (estado: unknown, desde: number) =>
   migrarPersistido(estado, desde) as Record<string, unknown>;
+
+describe("v5 — el lead es solo la fila", () => {
+  it("quita nuevo/respuestas/respuestaDemo de las preguntas persistidas y pone dueño", () => {
+    const s = migrar(
+      {
+        preguntasPublico: [
+          { id: "pub-1", materia: "Laboral", ciudad: "Tela", creadoEn: "2026-09-01T10:00:00-06:00", nuevo: true, respuestas: 0, pregunta: "p" },
+        ],
+      },
+      4,
+    );
+    const p = (s.preguntasPublico as Record<string, unknown>[])[0]!;
+    expect(p).not.toHaveProperty("nuevo");
+    expect(p).not.toHaveProperty("respuestas");
+    expect(p.personaId).toBe("persona-demo");
+    expect(p.pregunta).toBe("p");
+  });
+});
 
 describe("v4 — «cuando» (texto de pantalla) pasa a «creadoEn» (ISO)", () => {
   it("renombra el campo en respuestas, mensajes y preguntas, y no deja ninguno sin instante", () => {
@@ -47,7 +65,7 @@ describe("v3 — un solo id para la abogada demo", () => {
     expect(DIRECTORIO[0]!.id).toBe(ABOGADA_DEMO.id);
     expect(ABOGADA_DEMO.id).not.toBe(VIEJO);
     // Y el firmante sigue aportando la colegiación, que el directorio no publica.
-    expect(getFirmante(ABOGADA_DEMO.id)?.colegiacion).toBe(ABOGADA_DEMO.colegiacion);
+    expect(getFirmante(ABOGADA_DEMO.id)?.colegiacion).toBe(etiquetaColegiacion(ABOGADA_DEMO.colegiacionNumero));
   });
 
   it("renombra el id viejo en las respuestas del consultorio", () => {

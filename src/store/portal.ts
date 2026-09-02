@@ -14,6 +14,7 @@ import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { ABOGADA_DEMO, CUOTA_BASE, NOTIFICACIONES } from "@/data/catalogo";
+import { PERSONA_DEMO } from "@/data/persona";
 import { VIGILADOS_INICIALES, VIGILADOS_INICIALES_PERSONA } from "@/data/monitoreo";
 import type {
   Lead,
@@ -53,6 +54,8 @@ interface PortalState {
   constanciaSubida: boolean;
   /** Notificaciones leídas una a una (clic); convive con "marcar todas". */
   notifsLeidasIds: string[];
+  /** Leads que ESTE abogado ya abrió — «NUEVO» es estado del lector, no de la fila. */
+  leadsVistosIds: string[];
   sidebarColapsado: boolean;
   /** Drawer de navegación en pantallas pequeñas. No se persiste. */
   menuMovil: boolean;
@@ -104,6 +107,7 @@ interface PortalState {
   subirConstancia: () => void;
   marcarNotifsLeidas: (ids: string[]) => void;
   marcarNotifLeida: (id: string) => void;
+  marcarLeadVisto: (id: string) => void;
   toggleSidebar: () => void;
   setMenuMovil: (abierto: boolean) => void;
   setConsultaPendiente: (consulta: string | null) => void;
@@ -225,6 +229,15 @@ export function migrarPersistido(persistido: unknown, version: number): unknown 
     if (Array.isArray(s.preguntasPublico)) s.preguntasPublico = s.preguntasPublico.map(conInstante);
   }
 
+  // v5: la fila del lead sin estado de lector ni conteos.
+  if (version < 5 && Array.isArray(s.preguntasPublico)) {
+    s.preguntasPublico = s.preguntasPublico.map((x) => {
+      const fila = (x && typeof x === "object" ? x : {}) as Record<string, unknown>;
+      const { nuevo: _nuevo, respuestas: _respuestas, respuestaDemo: _demo, ...resto } = fila;
+      return { ...resto, personaId: typeof fila.personaId === "string" ? fila.personaId : PERSONA_DEMO.id };
+    });
+  }
+
   return persistido;
 }
 
@@ -244,6 +257,7 @@ export const usePortal = create<PortalState>()(
       bannerValidacionOculto: false,
       constanciaSubida: false,
       notifsLeidasIds: [],
+      leadsVistosIds: [],
       sidebarColapsado: false,
       menuMovil: false,
       consultaPendiente: null,
@@ -278,6 +292,10 @@ export const usePortal = create<PortalState>()(
       subirConstancia: () => set({ constanciaSubida: true }),
       marcarNotifsLeidas: (ids) =>
         set((s) => ({ notifsLeidasIds: [...new Set([...s.notifsLeidasIds, ...ids])] })),
+      marcarLeadVisto: (id) =>
+        set((s) =>
+          s.leadsVistosIds.includes(id) ? s : { leadsVistosIds: [...s.leadsVistosIds, id] },
+        ),
       marcarNotifLeida: (id) =>
         set((s) =>
           s.notifsLeidasIds.includes(id) ? s : { notifsLeidasIds: [...s.notifsLeidasIds, id] },
@@ -387,9 +405,10 @@ export const usePortal = create<PortalState>()(
               materia,
               ciudad,
               creadoEn: new Date().toISOString(),
-              nuevo: true,
-              respuestas: 0,
               pregunta,
+              // Fase 1: un solo navegador, una sola persona. En Fase 2 la
+              // consulta nace anónima y toma dueño al crear la cuenta (§7.2).
+              personaId: PERSONA_DEMO.id,
             },
             ...s.preguntasPublico,
           ],
@@ -426,8 +445,10 @@ export const usePortal = create<PortalState>()(
        *      respuestas del consultorio y en las claves de `mensajesAbogado`.
        *  v4: `cuando` («reciente», texto de pantalla) pasó a `creadoEn` (ISO)
        *      en respuestas, mensajes y preguntas del consultorio.
+       *  v5: `Lead` se quedó solo con la fila: fuera `nuevo` y `respuestas`
+       *      (estado del lector y conteo derivado) y entra `personaId`.
        */
-      version: 4,
+      version: 5,
       migrate: migrarPersistido,
       partialize: (s) => ({
         plan: s.plan,
@@ -449,6 +470,7 @@ export const usePortal = create<PortalState>()(
         pasosTramite: s.pasosTramite,
         prefsPersona: s.prefsPersona,
         notifsLeidasIds: s.notifsLeidasIds,
+        leadsVistosIds: s.leadsVistosIds,
         sidebarColapsado: s.sidebarColapsado,
       }),
     },

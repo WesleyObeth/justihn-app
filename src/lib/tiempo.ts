@@ -63,6 +63,30 @@ export function grupoRecencia(iso: string, ahora: Date): GrupoRecencia {
   return "anteriores";
 }
 
+const MESES_LARGOS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+/**
+ * Un día («2026-08-19») como fecha LOCAL. `new Date("2026-08-19")` lo lee
+ * como medianoche UTC, que en Honduras (UTC−6) es el día anterior a las 18:00:
+ * la Gaceta del 19 saldría fechada el 18.
+ */
+function diaLocal(isoDia: string): Date {
+  const m = isoDia.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(isoDia);
+}
+
+/** «19 ago 2026» a partir de un día ISO. Siempre con año: es un dato de cita, no de feed. */
+export function fechaTexto(isoDia: string): string {
+  const f = diaLocal(isoDia);
+  return `${f.getDate()} ${MESES[f.getMonth()]} ${f.getFullYear()}`;
+}
+
+/** «agosto 2026» — para «miembro desde». */
+export function mesAnio(iso: string): string {
+  const f = diaLocal(iso);
+  return `${MESES_LARGOS[f.getMonth()]} ${f.getFullYear()}`;
+}
+
 /** Fecha completa para el `title`/lector de pantalla: «2 sep 2026, 09:20». */
 export function fechaLarga(iso: string): string {
   const f = new Date(iso);

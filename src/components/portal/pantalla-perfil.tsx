@@ -5,7 +5,7 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icono } from "@/components/brand/iconos";
 import { Boton, Card, ChipMateria, Rotulo, TituloSeccion } from "@/components/ui/primitivos";
-import { ABOGADA_DEMO, DOCUMENTOS_VALIDACION, getPlan } from "@/data/catalogo";
+import { ABOGADA_DEMO, DOCUMENTOS_VALIDACION, etiquetaColegiacion, getPlan } from "@/data/catalogo";
 import { usePortal, useCuota } from "@/store/portal";
 import { useUpgrade } from "@/components/portal/marco";
 
@@ -53,7 +53,7 @@ function TarjetaPerfil() {
             )}
           </div>
           <p className="mt-[3px] text-[13px] text-texto-3">
-            {ABOGADA_DEMO.colegiacion} · {ABOGADA_DEMO.ciudad}
+            {etiquetaColegiacion(ABOGADA_DEMO.colegiacionNumero)} · {ABOGADA_DEMO.ciudad}
           </p>
           <p className="mt-1.5 text-[13px] leading-[1.5] text-texto-2">{ABOGADA_DEMO.bio}</p>
         </div>

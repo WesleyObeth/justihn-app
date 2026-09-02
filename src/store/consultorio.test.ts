@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { usePortal } from "./portal";
-import { ABOGADA_DEMO } from "@/data/catalogo";
+import { ABOGADA_DEMO, LEADS, LEADS_RESPONDIDOS, RESPUESTAS_SEED, respuestasDe } from "@/data/catalogo";
 import { getFirmante, DIRECTORIO } from "@/data/directorio";
 
 /**
@@ -62,6 +62,40 @@ describe("responderLead — varias respuestas por consulta", () => {
  * resolutor fallara, se mostraría una respuesta sin autor en una pantalla que
  * promete abogados colegiados — por eso el detalle no la pinta (§4.5).
  */
+/**
+ * Las respuestas de demostración son FILAS de `respuestas_consulta`, y el
+ * abogado y el ciudadano tienen que ver la misma lista: seed + store, con la
+ * del store mandando si el mismo abogado reescribió la suya.
+ */
+describe("respuestasDe — seed y store, una sola lista", () => {
+  it("toda respuesta del seed tiene autor resoluble y su lead existe", () => {
+    for (const [leadId, lista] of Object.entries(RESPUESTAS_SEED)) {
+      expect(LEADS.some((l) => l.id === leadId), leadId).toBe(true);
+      for (const r of lista) expect(getFirmante(r.abogadoId), `${leadId}/${r.abogadoId}`).toBeTruthy();
+    }
+    expect(LEADS_RESPONDIDOS.length).toBeGreaterThan(0);
+  });
+
+  it("suma las del store a las del seed, en orden de llegada", () => {
+    const lista = respuestasDe("lead-2407", {
+      "lead-2407": [{ abogadoId: "carlos-mejia", texto: "otra", creadoEn: "2026-09-02T12:00:00-06:00" }],
+    });
+    expect(lista.map((r) => r.abogadoId)).toEqual(["roberto-pineda", "carlos-mejia"]);
+  });
+
+  it("si el mismo abogado reescribió la suya, manda la del store", () => {
+    const lista = respuestasDe("lead-2408", {
+      "lead-2408": [{ abogadoId: ABOGADA_DEMO.id, texto: "corregida", creadoEn: "2026-09-02T12:00:00-06:00" }],
+    });
+    expect(lista).toHaveLength(1);
+    expect(lista[0]!.texto).toBe("corregida");
+  });
+
+  it("un lead sin respuestas devuelve lista vacía, no undefined", () => {
+    expect(respuestasDe("no-existe", {})).toEqual([]);
+  });
+});
+
 describe("getFirmante — quién firma cada respuesta", () => {
   it("resuelve a la abogada suscriptora, con su colegiación", () => {
     const f = getFirmante(ABOGADA_DEMO.id)!;
@@ -136,9 +170,8 @@ describe("borrarDatosPersona", () => {
           materia: "Consumidor",
           ciudad: "Tegucigalpa",
           creadoEn: "2026-09-01T10:00:00-06:00",
-          nuevo: true,
-          respuestas: 0,
           pregunta: "Producto vencido",
+          personaId: "persona-demo",
         },
       ],
       leadsRespondidos: { "pub-1": [{ abogadoId: ABOGADA_DEMO.id, texto: "x", creadoEn: "2026-09-01T10:00:00-06:00" }] },

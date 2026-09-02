@@ -1,4 +1,5 @@
 import type { PublicacionGaceta } from "@/types/dominio";
+import { fechaTexto } from "@/lib/tiempo";
 
 /**
  * Seed de alertas de La Gaceta.
@@ -14,7 +15,7 @@ export const PUBLICACIONES: PublicacionGaceta[] = [
     id: "salario-minimo-2026",
     materia: "Laboral",
     titulo: "Acuerdo — tabla de salario mínimo por actividad económica",
-    meta: "La Gaceta Nº ______ · 19 ago 2026",
+    numeroGaceta: null,
     fechaIso: "2026-08-19",
     resumen:
       "Fija la nueva tabla de salario mínimo por actividad económica y tamaño de empresa, vigente a partir de su publicación. Incluye los montos base para el cálculo de prestaciones e indemnizaciones.\n\n(Resumen de demostración — el producto final muestra el texto oficial íntegro.)",
@@ -25,7 +26,7 @@ export const PUBLICACIONES: PublicacionGaceta[] = [
     id: "reforma-arrendamiento-2026",
     materia: "Civil",
     titulo: "Decreto — reforma a disposiciones sobre arrendamiento",
-    meta: "La Gaceta Nº ______ · 18 ago 2026",
+    numeroGaceta: null,
     fechaIso: "2026-08-18",
     resumen:
       "Reforma los plazos de preaviso para la terminación del contrato de arrendamiento y las causales de desahucio. Aplica a contratos celebrados después de su vigencia.\n\n(Resumen de demostración.)",
@@ -36,7 +37,7 @@ export const PUBLICACIONES: PublicacionGaceta[] = [
     id: "reglamento-teletrabajo-2026",
     materia: "Laboral",
     titulo: "Reglamento — teletrabajo en el sector privado",
-    meta: "La Gaceta Nº ______ · 18 ago 2026",
+    numeroGaceta: null,
     fechaIso: "2026-08-18",
     resumen:
       "Regula la jornada en teletrabajo, la reversibilidad del acuerdo y las obligaciones del empleador en equipo y conectividad. Establece plazo de adecuación de 6 meses.\n\n(Resumen de demostración.)",
@@ -47,7 +48,7 @@ export const PUBLICACIONES: PublicacionGaceta[] = [
     id: "fe-errata-11-ago",
     materia: "Civil",
     titulo: "Fe de errata — publicación del 11 de agosto",
-    meta: "La Gaceta Nº ______ · 17 ago 2026",
+    numeroGaceta: null,
     fechaIso: "2026-08-17",
     resumen:
       "Corrige errores materiales en la publicación del 11 de agosto relativa a disposiciones registrales. Prevalece el texto corregido.\n\n(Resumen de demostración.)",
@@ -58,7 +59,7 @@ export const PUBLICACIONES: PublicacionGaceta[] = [
     id: "comisiones-higiene-2026",
     materia: "Laboral",
     titulo: "Acuerdo ministerial — comisiones de higiene y seguridad",
-    meta: "La Gaceta Nº ______ · 17 ago 2026",
+    numeroGaceta: null,
     fechaIso: "2026-08-17",
     resumen:
       "Actualiza la integración y funciones de las comisiones mixtas de higiene y seguridad en centros de trabajo con más de 10 empleados.\n\n(Resumen de demostración.)",
@@ -93,3 +94,13 @@ export const DIGEST = {
   titulo: semanaDelDigest(),
   detalle: `${PUBLICACIONES.length} publicaciones en tus materias suscritas · enviado también por WhatsApp`,
 } as const;
+
+/**
+ * «La Gaceta Nº 35,807 · 19 ago 2026» — o «La Gaceta · 19 ago 2026» mientras
+ * el número no se conozca: un hueco «Nº ______» es un marcador de maqueta y
+ * se lee como descuido.
+ */
+export function etiquetaPublicacion(p: Pick<PublicacionGaceta, "numeroGaceta" | "fechaIso">): string {
+  const cabecera = p.numeroGaceta ? `La Gaceta Nº ${p.numeroGaceta}` : "La Gaceta";
+  return `${cabecera} · ${fechaTexto(p.fechaIso)}`;
+}

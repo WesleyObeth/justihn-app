@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
 import { BotonJusIA } from "@/components/ia/boton-jus-ia";
 import { Boton, Card, ChipMateria, Meta, Rotulo, TituloSeccion } from "@/components/ui/primitivos";
-import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
+import { ABOGADA_DEMO, LEADS, respuestasDe } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
 import { useUpgrade } from "@/components/portal/marco";
 import { cn } from "@/lib/utils";
@@ -41,12 +41,16 @@ export function PantallaLeads() {
   };
 
   const materias = [...new Set(todos.map((l) => l.materia))];
+  // «Sin responder» es de la fila (nadie de ESTA cuenta contestó); «NUEVO» es
+  // del lector (no la abrió). Eran un solo booleano en el seed y no lo son.
+  const sinMiRespuesta = (l: Lead) =>
+    !respuestasDe(l.id, respondidos).some((r) => r.abogadoId === ABOGADA_DEMO.id);
   const filtrados = todos.filter((l) => {
     const porMateria = filtroMateria === "todas" || l.materia === filtroMateria;
-    const porNuevo = !soloNuevos || (l.nuevo && !respondidos[l.id]?.length);
+    const porNuevo = !soloNuevos || sinMiRespuesta(l);
     return porMateria && porNuevo;
   });
-  const nuevosSinResponder = todos.filter((l) => l.nuevo && !respondidos[l.id]?.length).length;
+  const nuevosSinResponder = todos.filter(sinMiRespuesta).length;
 
   return (
     <>
@@ -104,17 +108,23 @@ function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const respondidos = usePortal((s) => s.leadsRespondidos);
   const responderLead = usePortal((s) => s.responderLead);
+  const vistos = usePortal((s) => s.leadsVistosIds);
+  const marcarLeadVisto = usePortal((s) => s.marcarLeadVisto);
   const solicitarUpgrade = useUpgrade();
   const [abierto, setAbierto] = useState(false);
   const [texto, setTexto] = useState("");
 
-  const respuestas = respondidos[lead.id] ?? [];
+  // Seed + store, la MISMA lista que ve el ciudadano (`respuestasDe`).
+  const respuestas = respuestasDe(lead.id, respondidos);
+  const esNuevo = !vistos.includes(lead.id);
   // "La mía" es la de ESTA abogada: otro abogado puede haber respondido la
   // misma consulta y su respuesta no es editable desde aquí.
   const miRespuesta = respuestas.find((r) => r.abogadoId === ABOGADA_DEMO.id)?.texto;
   const deOtros = respuestas.filter((r) => r.abogadoId !== ABOGADA_DEMO.id);
 
   const responder = () => {
+    // Abrirla ya es leerla: el «NUEVO» se apaga aunque no llegue a responder.
+    marcarLeadVisto(lead.id);
     if (!esPremium) {
       solicitarUpgrade();
       return;
@@ -146,7 +156,7 @@ function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
         <Meta>
           {lead.ciudad} · <Cuando iso={lead.creadoEn} />
         </Meta>
-        {lead.nuevo && !miRespuesta && (
+        {esNuevo && !miRespuesta && (
           <span className="rounded-full bg-celeste px-2 py-0.5 text-[10.5px] font-bold text-white">
             NUEVO
           </span>
@@ -209,7 +219,7 @@ function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
           </Boton>
         )}
         <span className="text-xs text-texto-4">
-          {etiquetaRespuestas(lead, miRespuesta, deOtros.length)}
+          {etiquetaRespuestas(miRespuesta, deOtros.length)}
         </span>
       </div>
     </Card>
@@ -218,16 +228,11 @@ function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
 
 /** Conteo de respuestas con gramática correcta y sin contar la tuya como "de otros". */
 /**
- * Las de otros son las REALES del store más el contador del seed: la consulta
- * queda abierta a varios abogados, así que este número tiene que sumar las dos
- * fuentes o diría menos de lo que la persona ve en su pantalla.
+ * «Otras» son las de los demás abogados, seed y store juntos: la consulta
+ * queda abierta a varios, y este número tiene que coincidir con el que la
+ * persona ve en su pantalla — por eso las dos salen de `respuestasDe`.
  */
-function etiquetaRespuestas(
-  lead: Lead,
-  miRespuesta: string | undefined,
-  deOtrosReales: number,
-): string {
-  const otras = lead.respuestas + deOtrosReales;
+function etiquetaRespuestas(miRespuesta: string | undefined, otras: number): string {
   if (miRespuesta) {
     return otras === 0 ? "Tu respuesta es la primera" : `Tu respuesta + ${otras} de otros abogados`;
   }
@@ -240,7 +245,12 @@ function etiquetaRespuestas(
 
 function TuDesempeno() {
   const respondidos = usePortal((s) => s.leadsRespondidos);
-  const respuestas = Object.keys(respondidos).length;
+  const preguntasPublico = usePortal((s) => s.preguntasPublico);
+  // Misma lista que las cards (seed + store): contar solo el store decía «0»
+  // con dos respuestas suyas a la vista.
+  const respuestas = [...preguntasPublico, ...LEADS].filter((l) =>
+    respuestasDe(l.id, respondidos).some((r) => r.abogadoId === ABOGADA_DEMO.id),
+  ).length;
 
   return (
     <Card className="p-5">

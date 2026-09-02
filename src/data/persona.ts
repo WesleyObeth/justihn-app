@@ -9,7 +9,8 @@ export const PERSONA_DEMO = {
   ciudad: "Tegucigalpa, M.D.C.",
   email: "carlos.zelaya@gmail.com",
   whatsapp: "+504 8888-0000",
-  miembroDesde: "agosto 2026",
+  /** ISO → `creado_en`. «Miembro desde agosto 2026» lo arma `mesAnio()`. */
+  creadoEn: "2026-08-15T09:00:00-06:00",
 } as const;
 
 /** Preferencias de notificación del ciudadano (espejo de las del abogado). */

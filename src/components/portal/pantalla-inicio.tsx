@@ -10,7 +10,7 @@ import { BotonJusIA } from "@/components/ia/boton-jus-ia";
 import { Card, CardMarino, ChipMateria, TituloSeccion } from "@/components/ui/primitivos";
 import { BannerValidacion } from "@/components/portal/marco";
 import { usePortal, useCuota } from "@/store/portal";
-import { ABOGADA_DEMO, ACTIVIDAD_RECIENTE, LEADS } from "@/data/catalogo";
+import { ABOGADA_DEMO, ACTIVIDAD_RECIENTE, LEADS, respuestasDe } from "@/data/catalogo";
 import { PUBLICACIONES } from "@/data/gaceta";
 import { SENTENCIAS } from "@/data/sentencias";
 import { BRIEF, HISTORIAL } from "@/data/jus-ia";
@@ -373,14 +373,25 @@ function RetomarInvestigacion() {
 
 function LeadsRecientes() {
   const recientes = LEADS.slice(0, 2);
+  // «Nuevo» es del lector: los que esta cuenta no ha abierto (mismo dato que
+  // apaga la insignia en la pantalla Leads).
+  const vistos = usePortal((s) => s.leadsVistosIds);
+  const respondidos = usePortal((s) => s.leadsRespondidos);
+  const nuevos = LEADS.filter(
+    (l) =>
+      !vistos.includes(l.id) &&
+      !respuestasDe(l.id, respondidos).some((r) => r.abogadoId === ABOGADA_DEMO.id),
+  ).length;
 
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
         <TituloSeccion>Leads en tu especialidad</TituloSeccion>
-        <span className="rounded-full bg-celeste px-2 py-0.5 text-[10.5px] font-bold text-white">
-          {recientes.filter((l) => l.nuevo).length} nuevos
-        </span>
+        {nuevos > 0 && (
+          <span className="rounded-full bg-celeste px-2 py-0.5 text-[10.5px] font-bold text-white">
+            {nuevos} {nuevos === 1 ? "nuevo" : "nuevos"}
+          </span>
+        )}
       </div>
 
       <div className="mt-3 flex flex-col gap-2.5">

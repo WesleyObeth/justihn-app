@@ -10,10 +10,11 @@
  * y cuánto tiempo le queda. Por eso las métricas son de SU gestión, el triaje
  * se deriva de lo que hizo, y el destacado es un plazo legal — no un digest.
  */
+import { FirmaRespuesta } from "@/components/personas/firma-respuesta";
 import Link from "next/link";
 import { useState } from "react";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
-import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
+import { LEADS_RESPONDIDOS, respuestasDe } from "@/data/catalogo";
 import { PERSONA_DEMO } from "@/data/persona";
 import { PLAZOS_CIUDADANO, etiquetaPlazo } from "@/data/plazos";
 import { buscarGuias, getInstitucion, INSTITUCIONES, TRAMITES } from "@/data/tramites";
@@ -340,8 +341,9 @@ function MisConsultas() {
  * pintan sobre temas distintos; lo compartido es la fuente y el criterio.
  */
 function ConsultorioVacio() {
-  const ejemplo = LEADS.find((l) => l.respuestaDemo);
-  if (!ejemplo) return null;
+  const ejemplo = LEADS_RESPONDIDOS[0];
+  const respuesta = ejemplo ? respuestasDe(ejemplo.id, {})[0] : undefined;
+  if (!ejemplo || !respuesta) return null;
 
   return (
     <div className="mt-3">
@@ -364,17 +366,9 @@ function ConsultorioVacio() {
         <p className="mt-2 text-[13px] leading-[1.55] text-texto-2">“{ejemplo.pregunta}”</p>
 
         <div className="mt-3 border-t border-borde pt-3">
-          <div className="flex items-center gap-2.5">
-            <span className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-celeste text-[11px] font-semibold text-white">
-              {ABOGADA_DEMO.iniciales}
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[12.5px] font-semibold">{ABOGADA_DEMO.nombre}</span>
-              <span className="block text-[11px] text-texto-4">{ABOGADA_DEMO.colegiacion}</span>
-            </span>
-          </div>
+          <FirmaRespuesta abogadoId={respuesta.abogadoId} tamano="sm" />
           <p className="mt-2 line-clamp-3 text-[12.5px] leading-[1.6] text-texto-3">
-            {ejemplo.respuestaDemo}
+            {respuesta.texto}
           </p>
         </div>
       </div>
@@ -466,7 +460,7 @@ function MisTramites() {
  * que le llegan al abogado.
  */
 function LoQueOtrosPreguntan() {
-  const ejemplos = LEADS.filter((l) => l.respuestaDemo).slice(1, 4);
+  const ejemplos = LEADS_RESPONDIDOS.slice(1, 4);
   if (ejemplos.length === 0) return null;
 
   return (

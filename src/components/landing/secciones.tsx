@@ -6,6 +6,7 @@
  * interactiva de verdad — filtros, buscador y el formulario real del
  * consultorio — sobre el tema aurora claro.
  */
+import { credencial } from "@/components/personas/firma-respuesta";
 import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -19,11 +20,11 @@ import {
   TRAMITES,
 } from "@/data/tramites";
 import type { RutaTramite, Tramite } from "@/data/tramites";
-import { buscarAbogados, buscarNotarios, DIRECTORIO } from "@/data/directorio";
+import { DIRECTORIO, buscarAbogados, buscarNotarios, getFirmante } from "@/data/directorio";
 import { TarjetaAbogado } from "@/components/publico/tarjeta-abogado";
-import { LEADS, ABOGADA_DEMO } from "@/data/catalogo";
+import { LEADS_RESPONDIDOS, respuestasDe } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
-import type { Lead, Materia } from "@/types/dominio";
+import type { Lead, Materia, RespuestaConsulta } from "@/types/dominio";
 import { cn } from "@/lib/utils";
 
 function normalizar(texto: string): string {
@@ -338,9 +339,11 @@ export function SeccionProcesos() {
  * verdad, firmado por una colegiada, y el formulario debajo: se enseña qué
  * recibes ANTES de pedirte que escribas.
  *
- * Las respuestas salen de `respuestaDemo` en el seed. Antes esta sección
- * mostraba preguntas SIN contestar (porque `leadsRespondidos` arranca vacío)
- * y probaba justo lo contrario de lo que su título promete.
+ * Las respuestas salen de `RESPUESTAS_SEED` (filas de `respuestas_consulta`
+ * con autor). Antes esta sección mostraba preguntas SIN contestar (porque
+ * `leadsRespondidos` arranca vacío) y probaba justo lo contrario de lo que su
+ * título promete. La firma se resuelve del `abogadoId`: pintar siempre a la
+ * abogada demo firmaba respuestas que no eran suyas.
  */
 export function SeccionConsultorio() {
   const preguntasPublico = usePortal((s) => s.preguntasPublico);
@@ -349,7 +352,7 @@ export function SeccionConsultorio() {
   // Si el visitante ya preguntó en esta sesión, su consulta manda: ver la
   // propia publicada es mejor prueba que cualquier ejemplo.
   const propia = preguntasPublico[0];
-  const ejemplo = LEADS.find((l) => l.respuestaDemo);
+  const ejemplo = LEADS_RESPONDIDOS[0];
 
   return (
     <section id="consultorio" className="scroll-mt-24 py-16">
@@ -364,11 +367,11 @@ export function SeccionConsultorio() {
           {propia ? (
             <Intercambio
               lead={propia}
-              respuesta={respondidos[propia.id]?.[0]?.texto}
+              respuesta={respuestasDe(propia.id, respondidos)[0]}
               etiqueta="Tu consulta"
             />
           ) : (
-            ejemplo && <Intercambio lead={ejemplo} respuesta={ejemplo.respuestaDemo} />
+            ejemplo && <Intercambio lead={ejemplo} respuesta={respuestasDe(ejemplo.id, {})[0]} />
           )}
 
           {/* El formulario va DENTRO de la misma card, bajo un divisor: en dos
@@ -403,9 +406,12 @@ function Intercambio({
   etiqueta,
 }: {
   lead: Lead;
-  respuesta?: string;
+  respuesta?: RespuestaConsulta;
   etiqueta?: string;
 }) {
+  // Sin autor identificable no hay respuesta que enseñar (§4.5).
+  const firmante = respuesta ? getFirmante(respuesta.abogadoId) : undefined;
+  const materiasFirmante = DIRECTORIO.find((a) => a.id === firmante?.id)?.materias ?? [];
   return (
     <div className="glass-card p-5 md:p-6">
       <div className="flex flex-wrap items-center gap-2">
@@ -417,7 +423,7 @@ function Intercambio({
           {lead.ciudad ? `${lead.ciudad} · ` : ""}
           <Cuando iso={lead.creadoEn} />
         </span>
-        {respuesta && (
+        {firmante && (
           <span className="ml-auto inline-flex items-center gap-1 text-[11.5px] font-bold text-exito">
             <Icono nombre="check" size={10} strokeWidth={2.8} />
             Respondida
@@ -427,24 +433,24 @@ function Intercambio({
 
       <p className="mt-2.5 text-[14.5px] leading-[1.55]">“{lead.pregunta}”</p>
 
-      {respuesta ? (
+      {respuesta && firmante ? (
         <div className="mt-4 border-t pt-4" style={{ borderColor: "var(--line)" }}>
           <div className="flex items-center gap-2.5">
             <span
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-bold text-white"
               style={{ background: "var(--color-celeste)" }}
             >
-              {ABOGADA_DEMO.iniciales}
+              {firmante.iniciales}
             </span>
             <div className="min-w-0">
-              <p className="text-[13px] leading-[1.3] font-semibold">{ABOGADA_DEMO.nombre}</p>
+              <p className="text-[13px] leading-[1.3] font-semibold">{firmante.nombre}</p>
               <p className="text-[11.5px] leading-[1.3]" style={{ color: "var(--muted)" }}>
-                {ABOGADA_DEMO.colegiacion} · {ABOGADA_DEMO.especialidades.join(" · ")}
+                {[credencial(firmante), ...materiasFirmante].join(" · ")}
               </p>
             </div>
           </div>
           <p className="mt-2.5 text-[13.5px] leading-[1.6]" style={{ color: "var(--muted)" }}>
-            {respuesta}
+            {respuesta.texto}
           </p>
         </div>
       ) : (

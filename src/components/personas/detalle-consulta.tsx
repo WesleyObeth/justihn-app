@@ -9,11 +9,12 @@
  * abogados de esa rama— así que la persona sale con algo aunque nadie haya
  * contestado todavía.
  */
+import { credencial } from "@/components/personas/firma-respuesta";
 import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
-import { ABOGADA_DEMO, LEADS } from "@/data/catalogo";
+import { LEADS_RESPONDIDOS, respuestasDe } from "@/data/catalogo";
 import { buscarAbogados, getFirmante } from "@/data/directorio";
 import { getInstitucion, guiasDeMateria } from "@/data/tramites";
 import { usePortal, useStoreHidratado } from "@/store/portal";
@@ -189,9 +190,7 @@ function RespuestaDeAbogado({ respuesta }: { respuesta: RespuestaConsulta }) {
         </span>
         <span className="min-w-0">
           <span className="block text-[13.5px] font-semibold">{firmante.nombre}</span>
-          <span className="block text-[11.5px] text-texto-4">
-            {firmante.colegiacion ?? `${firmante.ciudad}${firmante.anios ? ` · ${firmante.anios} años` : ""}`}
-          </span>
+          <span className="block text-[11.5px] text-texto-4">{credencial(firmante)}</span>
         </span>
         <button
           type="button"
@@ -214,12 +213,12 @@ function RespuestaDeAbogado({ respuesta }: { respuesta: RespuestaConsulta }) {
  * Consultas de la MISMA materia que ya tienen respuesta.
  *
  * Es lo más útil que se le puede dar a alguien esperando: puede que su duda ya
- * esté contestada ahí. Salen del seed del consultorio (`respuestaDemo`), las
+ * esté contestada ahí. Salen del seed del consultorio (`RESPUESTAS_SEED`), las
  * mismas que ve el abogado — no es un "relacionadas" inventado por similitud
  * de texto, es el filtro por materia, que sí se puede sostener.
  */
 function YaRespondidas({ materia }: { materia: string }) {
-  const ejemplos = LEADS.filter((l) => l.respuestaDemo && l.materia === materia).slice(0, 2);
+  const ejemplos = LEADS_RESPONDIDOS.filter((l) => l.materia === materia).slice(0, 2);
   if (ejemplos.length === 0) return null;
 
   return (
@@ -241,12 +240,17 @@ function YaRespondidas({ materia }: { materia: string }) {
               </span>
             </div>
             <p className="mt-1.5 text-[13.5px] leading-[1.55]">“{l.pregunta}”</p>
-            <div className="mt-2.5 border-t border-borde pt-2.5">
-              <div className="text-[11.5px] font-semibold text-marino">
-                {ABOGADA_DEMO.nombre} · {ABOGADA_DEMO.colegiacion}
-              </div>
-              <p className="mt-1 text-[12.5px] leading-[1.6] text-texto-3">{l.respuestaDemo}</p>
-            </div>
+            {respuestasDe(l.id, {}).map((r) => {
+              const f = getFirmante(r.abogadoId);
+              return f ? (
+                <div key={r.abogadoId} className="mt-2.5 border-t border-borde pt-2.5">
+                  <div className="text-[11.5px] font-semibold text-marino">
+                    {f.nombre} · {credencial(f)}
+                  </div>
+                  <p className="mt-1 text-[12.5px] leading-[1.6] text-texto-3">{r.texto}</p>
+                </div>
+              ) : null;
+            })}
           </div>
         ))}
       </div>

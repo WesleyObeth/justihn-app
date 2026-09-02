@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fechaCorta, fechaLarga, formatearRelativo, grupoRecencia } from "./tiempo";
+import { fechaCorta, fechaLarga, fechaTexto, formatearRelativo, grupoRecencia, mesAnio } from "./tiempo";
 
 /** Martes 2 de septiembre de 2026, 11:00 hora local. */
 const AHORA = new Date(2026, 8, 2, 11, 0, 0);
@@ -45,6 +45,14 @@ describe("grupoRecencia", () => {
     expect(grupoRecencia(hace(12 * H), AHORA)).toBe("ayer");
     expect(grupoRecencia(new Date(2026, 8, 0, 9, 0).toISOString(), AHORA)).toBe("anteriores");
     expect(grupoRecencia(hace(-3 * MIN), AHORA)).toBe("hoy");
+  });
+});
+
+describe("fechaTexto / mesAnio — un día ISO es un día LOCAL", () => {
+  it("la Gaceta del 19 no sale fechada el 18 por la zona horaria", () => {
+    expect(fechaTexto("2026-08-19")).toBe("19 ago 2026");
+    expect(fechaTexto("2026-01-01")).toBe("1 ene 2026");
+    expect(mesAnio("2026-08-15T09:00:00-06:00")).toBe("agosto 2026");
   });
 });
 

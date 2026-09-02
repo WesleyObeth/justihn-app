@@ -6,6 +6,7 @@
  * preferencia viaja con la persona), navegación agrupada por categorías y
  * drawer en móvil. La "cuenta" es la sesión demo de la persona.
  */
+import { mesAnio } from "@/lib/tiempo";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -207,7 +208,7 @@ function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
                 </span>
               </div>
               <div className="mt-0.5 text-[11.5px] text-sobre-marino">
-                Miembro desde {PERSONA_DEMO.miembroDesde}
+                Miembro desde {mesAnio(PERSONA_DEMO.creadoEn)}
               </div>
             </div>
 
