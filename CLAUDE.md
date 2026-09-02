@@ -56,6 +56,16 @@ Perfil · Planes · Configuración · Ayuda.
 - **Jus IA:** chat en una sola columna centrada (~760px); el historial va en un
   panel lateral, no en columna fija. El titular del hero sale del pool
   `TITULARES_HERO` (`data/jus-ia.ts`), elegido en cliente tras el mount.
+  **«Historial» y «Nueva consulta» son acciones de PÁGINA** (refinado
+  2026-09-02, pedido de Wesley): van en la línea de cabecera que las demás
+  pantallas usan para su título, a 1280 de ancho y agrupadas a la derecha —
+  mismo patrón que Notificaciones. Antes flotaban en los bordes de la columna
+  de 760, que no se ve: en la pantalla vacía «Historial» quedaba suelto a la
+  derecha de nada y en conversación «Nueva consulta» se leía como parte del
+  hilo. A la izquierda de esa línea va el **título de la consulta actual**
+  (su primera pregunta), que al reabrir una del historial era lo único que
+  faltaba para saber en cuál estás. En móvil con conversación los botones
+  son solo icono con `aria-label`, para que el título tenga el ancho.
 - **Jurisprudencia busca sobre el corpus real desde el 2026-09-02** (§1.7):
   dos modos, filtros de materia/proceso/año, paginación con conteo exacto y
   ficha por `record_id`. **Legislación** y **Monitoreo de nombres** existen
