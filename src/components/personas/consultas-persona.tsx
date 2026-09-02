@@ -9,6 +9,7 @@
  * preguntado es lo único que importa y va abierto; en cuanto tiene consultas,
  * lo que importa es SEGUIRLAS, así que se pliega detrás de un botón.
  */
+import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/brand/iconos";
@@ -159,7 +160,7 @@ function FilaConsulta({ lead, respuestas }: { lead: Lead; respuestas: RespuestaC
             {lead.materia}
           </span>
           <span className="text-[12px] text-texto-4">
-            {lead.ciudad} · {lead.cuando}
+            {lead.ciudad} · <Cuando iso={lead.creadoEn} />
           </span>
           {primera ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-exito-bg px-2 py-[3px] text-[10.5px] font-bold text-exito">

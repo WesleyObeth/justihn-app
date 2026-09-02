@@ -150,6 +150,7 @@ export function migrarPersistido(persistido: unknown, version: number): unknown 
         plan?: string;
         leadsRespondidos?: Record<string, unknown>;
         mensajesAbogado?: Record<string, unknown>;
+    preguntasPublico?: unknown[];
       }
     | undefined;
   if (!s) return persistido;
@@ -164,7 +165,7 @@ export function migrarPersistido(persistido: unknown, version: number): unknown 
       Object.entries(s.leadsRespondidos).map(([id, valor]) => [
         id,
         typeof valor === "string"
-          ? [{ abogadoId: ABOGADA_DEMO.id, texto: valor, cuando: "reciente" }]
+          ? [{ abogadoId: ABOGADA_DEMO.id, texto: valor, creadoEn: new Date().toISOString() }]
           : Array.isArray(valor)
             ? valor
             : [],
@@ -197,6 +198,33 @@ export function migrarPersistido(persistido: unknown, version: number): unknown 
       };
     }
   }
+  /**
+   * v4: el texto de pantalla («reciente») deja de vivir en el dato. Lo que
+   * ya estaba guardado no trae instante: se le pone el de la migración, que es
+   * la cota más honesta que se conoce (se escribió ANTES de ahora) — y es lo
+   * que la pantalla decía hasta hoy. Los datos nuevos llevan su ISO real.
+   */
+  if (version < 4) {
+    const ahora = new Date().toISOString();
+    const conInstante = (x: unknown) => {
+      const fila = (x && typeof x === "object" ? x : {}) as Record<string, unknown>;
+      const { cuando: _cuando, ...resto } = fila;
+      return { ...resto, creadoEn: typeof fila.creadoEn === "string" ? fila.creadoEn : ahora };
+    };
+    const porClave = (r: unknown) =>
+      r && typeof r === "object"
+        ? Object.fromEntries(
+            Object.entries(r as Record<string, unknown>).map(([k, lista]) => [
+              k,
+              Array.isArray(lista) ? lista.map(conInstante) : [],
+            ]),
+          )
+        : {};
+    if (s.leadsRespondidos) s.leadsRespondidos = porClave(s.leadsRespondidos);
+    if (s.mensajesAbogado) s.mensajesAbogado = porClave(s.mensajesAbogado);
+    if (Array.isArray(s.preguntasPublico)) s.preguntasPublico = s.preguntasPublico.map(conInstante);
+  }
+
   return persistido;
 }
 
@@ -272,7 +300,11 @@ export const usePortal = create<PortalState>()(
       responderLead: (leadId, respuesta, abogadoId = ABOGADA_DEMO.id) =>
         set((s) => {
           const previas = s.leadsRespondidos[leadId] ?? [];
-          const mia: RespuestaConsulta = { abogadoId, texto: respuesta, cuando: "reciente" };
+          const mia: RespuestaConsulta = {
+            abogadoId,
+            texto: respuesta,
+            creadoEn: new Date().toISOString(),
+          };
           const yaEstaba = previas.some((r) => r.abogadoId === abogadoId);
           return {
             leadsRespondidos: {
@@ -318,7 +350,7 @@ export const usePortal = create<PortalState>()(
             ...s.mensajesAbogado,
             [abogadoId]: [
               ...(s.mensajesAbogado[abogadoId] ?? []),
-              { abogadoId, materia, texto, cuando: "reciente" },
+              { abogadoId, materia, texto, creadoEn: new Date().toISOString() },
             ],
           },
         })),
@@ -354,7 +386,7 @@ export const usePortal = create<PortalState>()(
               id: `pub-${Date.now()}`,
               materia,
               ciudad,
-              cuando: "reciente",
+              creadoEn: new Date().toISOString(),
               nuevo: true,
               respuestas: 0,
               pregunta,
@@ -392,8 +424,10 @@ export const usePortal = create<PortalState>()(
        *  v3: la abogada demo pasó a tener UN id (`maria-castillo`, el de su
        *      ficha pública); el viejo `demo-abogada-castillo` vivía en las
        *      respuestas del consultorio y en las claves de `mensajesAbogado`.
+       *  v4: `cuando` («reciente», texto de pantalla) pasó a `creadoEn` (ISO)
+       *      en respuestas, mensajes y preguntas del consultorio.
        */
-      version: 3,
+      version: 4,
       migrate: migrarPersistido,
       partialize: (s) => ({
         plan: s.plan,

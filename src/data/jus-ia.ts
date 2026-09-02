@@ -80,7 +80,7 @@ export const HISTORIAL: ConversacionGuardada[] = [
   {
     id: "conv-divorcio",
     titulo: "Requisitos del divorcio por mutuo consentimiento",
-    fecha: "Ayer",
+    creadoEn: "2026-09-01T10:15:00-06:00",
     mensajes: [
       {
         id: "conv-divorcio-u",
@@ -101,7 +101,7 @@ export const HISTORIAL: ConversacionGuardada[] = [
   {
     id: "conv-prescripcion",
     titulo: "Prescripción de acciones laborales",
-    fecha: "Jue 20",
+    creadoEn: "2026-08-20T17:40:00-06:00",
     mensajes: [
       {
         id: "conv-prescripcion-u",
@@ -122,7 +122,7 @@ export const HISTORIAL: ConversacionGuardada[] = [
   {
     id: "conv-nulidad",
     titulo: "Nulidad de contrato — criterio de la Sala Civil",
-    fecha: "Lun 17",
+    creadoEn: "2026-08-17T08:55:00-06:00",
     mensajes: [
       {
         id: "conv-nulidad-u",

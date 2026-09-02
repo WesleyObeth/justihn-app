@@ -153,13 +153,19 @@ export const PLANTILLAS: Plantilla[] = [
   },
 ];
 
-/** TODO(data): tabla `leads` — consultas del consultorio gratuito (Vía B). */
+/**
+ * TODO(data): tabla `leads` — consultas del consultorio gratuito (Vía B).
+ * `creadoEn` son instantes FIJOS (hora de Honduras): el «hace 2 h» que se ve
+ * en pantalla sale del reloj del visitante, así que con el tiempo estos leads
+ * dirán «hace 3 semanas» — que es la verdad de un seed, no un defecto. Las
+ * filas reales de Fase 2 traen su `creado_en` y el mismo componente las pinta.
+ */
 export const LEADS: Lead[] = [
   {
     id: "lead-2408",
     materia: "Laboral",
     ciudad: "San Pedro Sula",
-    cuando: "hace 2 h",
+    creadoEn: "2026-09-02T09:20:00-06:00",
     nuevo: true,
     respuestas: 1,
     pregunta:
@@ -171,7 +177,7 @@ export const LEADS: Lead[] = [
     id: "lead-2407",
     materia: "Familia",
     ciudad: "Tegucigalpa",
-    cuando: "hace 5 h",
+    creadoEn: "2026-09-02T06:40:00-06:00",
     nuevo: true,
     respuestas: 0,
     pregunta:
@@ -183,7 +189,7 @@ export const LEADS: Lead[] = [
     id: "lead-2404",
     materia: "Civil",
     ciudad: "La Ceiba",
-    cuando: "ayer",
+    creadoEn: "2026-09-01T15:10:00-06:00",
     nuevo: false,
     respuestas: 3,
     pregunta:
@@ -195,7 +201,7 @@ export const LEADS: Lead[] = [
     id: "lead-2402",
     materia: "Laboral",
     ciudad: "Choloma",
-    cuando: "ayer",
+    creadoEn: "2026-09-01T11:30:00-06:00",
     nuevo: false,
     respuestas: 2,
     pregunta: "¿Es legal que mi empleador me descuente del salario los faltantes de caja?",
@@ -210,7 +216,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icono: "gaceta",
     titulo: "Nueva publicación en Gaceta — materia Laboral",
     meta: "Reglamento de teletrabajo en el sector privado",
-    cuando: "hace 2 h",
+    creadoEn: "2026-09-02T08:10:00-06:00",
     noLeidaPorDefecto: true,
     destino: "/abogados/gaceta?materia=Laboral",
   },
@@ -219,7 +225,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icono: "leads",
     titulo: "Nuevo lead en tu especialidad",
     meta: "Despido injustificado · San Pedro Sula",
-    cuando: "hace 3 h",
+    creadoEn: "2026-09-02T07:05:00-06:00",
     noLeidaPorDefecto: true,
     destino: "/abogados/leads?pendientes=1",
   },
@@ -228,7 +234,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icono: "bell",
     titulo: "Tu digest semanal está listo",
     meta: "5 publicaciones en Laboral y Civil",
-    cuando: "ayer",
+    creadoEn: "2026-09-01T09:00:00-06:00",
     noLeidaPorDefecto: true,
     destino: "/abogados/gaceta?digest=1",
   },
@@ -237,7 +243,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icono: "ia",
     titulo: "Respuesta de Jus IA guardada en tu historial",
     meta: "Consulta sobre divorcio · 3 fuentes citadas",
-    cuando: "ayer",
+    creadoEn: "2026-09-01T16:30:00-06:00",
     noLeidaPorDefecto: false,
     destino: "/abogados",
   },
@@ -246,7 +252,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icono: "card",
     titulo: "Factura de agosto disponible",
     meta: "Plan Profesional · L147",
-    cuando: "Vie 21",
+    creadoEn: "2026-08-21T10:00:00-06:00",
     noLeidaPorDefecto: false,
     destino: "/abogados/perfil",
   },

@@ -1,5 +1,6 @@
 "use client";
 
+import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -358,7 +359,7 @@ function RetomarInvestigacion() {
             >
               <div className="truncate text-[13px] font-semibold text-marino">{conv.titulo}</div>
               <div className="mt-0.5 text-[11.5px] text-texto-4">
-                {conv.fecha} · {fuentes} fuentes citadas
+                <Cuando iso={conv.creadoEn} /> · {fuentes} fuentes citadas
               </div>
             </button>
           );
@@ -392,7 +393,7 @@ function LeadsRecientes() {
             <div className="flex items-center gap-2">
               <ChipMateria>{lead.materia}</ChipMateria>
               <span className="text-[11px] text-texto-4">
-                {lead.ciudad} · {lead.cuando}
+                {lead.ciudad} · <Cuando iso={lead.creadoEn} />
               </span>
             </div>
             <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-[1.5] text-texto-2">

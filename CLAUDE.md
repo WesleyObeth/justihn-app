@@ -844,13 +844,21 @@ oscuro, no después.
     que conserva el punto de envoltura en anchos medios sin forzar el estrecho.
     ⚙️ Quedan varios `min-w-[180..240px] flex-1` en los portales — revisar en el
     refinado del pendiente #1.
+21. **Un tiempo relativo («hace 2 h») nunca se guarda ni se calcula en
+    servidor.** El servidor no sabe la hora del visitante y un `Date.now()`
+    en SSR es un mismatch de hidratación esperando. El dato es `creadoEn`
+    (ISO) y lo pinta `<Cuando iso>`: fecha corta en SSR, relativo tras el
+    mount vía `useAhora()`. Agrupar por recencia (Notificaciones) usa
+    `grupoRecencia(iso, ahora)` con el mismo reloj; sin reloj todo cae en
+    «Anteriores» y se reparte al hidratar. Si una pantalla nueva necesita
+    «hace X», no inventar otro formateador: `lib/tiempo.ts` es el único.
 
 ## 5. Comandos
 
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (195 tests de invariantes)
+pnpm test         # Vitest (208 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -949,15 +957,21 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      se derivan de la ficha (§1.7). El comentario del tipo lo dice ahora, y lo
      mismo `PerfilAbogado` respecto de `AbogadoDirectorio` (`metricas` se
      deriva; `valoracion` no tiene productor y no será columna).
-   - ⏳ **`cuando` como texto de pantalla («hace 2 h», «ayer», «reciente»,
-     «Vie 21») en `Lead`, `RespuestaConsulta`, `MensajeAbogado`,
-     `Notificacion` y `ConversacionGuardada.fecha`.** Es el hallazgo más
-     grande: una tabla guarda `creado_en` (timestamp) y el «hace 2 h» se
-     calcula al pintar. Hoy Notificaciones agrupa por `startsWith("hace")`.
-     El cambio toca seis pantallas y exige el patrón `useSyncExternalStore`
-     de `use-saludo.ts` (el tiempo relativo no es determinista en SSR, §4.5).
-     **Decisión: se hace en el refinado, ANTES de crear las tablas de negocio**
-     — es el que más cuesta después.
+   - ✅ **`cuando` → `creadoEn` (ISO 8601) en `Lead`, `RespuestaConsulta`,
+     `MensajeAbogado`, `Notificacion` y `ConversacionGuardada`** (hecho
+     2026-09-02, segunda pasada). Era el hallazgo más grande: el dato guardaba
+     el texto de pantalla («hace 2 h», «reciente», «Vie 21») y Notificaciones
+     agrupaba por `startsWith("hace")`. Ahora el instante es la columna y el
+     relativo es una VISTA: `lib/tiempo.ts` (puro, recibe `ahora`, con tests
+     de tramos y del «ayer» por día de calendario), `useAhora()` en
+     `use-saludo.ts` (mismo patrón `useSyncExternalStore`) y `<Cuando iso>`
+     (`ui/cuando.tsx`), que sirve la fecha corta en SSR y el relativo tras el
+     mount, con `<time dateTime>` y la fecha completa en el `title`. Los
+     seeds llevan instantes FIJOS en hora de Honduras — con el tiempo dirán
+     «hace 3 semanas», que es la verdad de un seed. **Migración v4 del store**
+     con test: lo persistido sin instante recibe el de la migración (la cota
+     honesta: se escribió antes de ahora). Verificado en Chromium: Hoy / Ayer
+     / Anteriores se reparten por reloj y no hay errores de hidratación.
    - ⏳ **`Lead` mezcla fila con estado de quien mira:** `nuevo` es «no leído
      por este abogado» (va per-usuario, como `notifsLeidasIds`), `respuestas`
      es un conteo derivable de `respuestas_consulta`, y `respuestaDemo` es solo

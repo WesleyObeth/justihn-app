@@ -6,6 +6,9 @@ import { SimboloJusIALinear } from "@/components/brand/logos";
 import { Boton } from "@/components/ui/primitivos";
 import { NOTIFICACIONES } from "@/data/catalogo";
 import { usePortal, useNotifsSinLeer } from "@/store/portal";
+import { useAhora } from "@/hooks/use-saludo";
+import { grupoRecencia, type GrupoRecencia } from "@/lib/tiempo";
+import { Cuando } from "@/components/ui/cuando";
 import { cn } from "@/lib/utils";
 
 export function PantallaNotificaciones() {
@@ -13,6 +16,7 @@ export function PantallaNotificaciones() {
   const marcarLeidas = usePortal((s) => s.marcarNotifsLeidas);
   const marcarLeida = usePortal((s) => s.marcarNotifLeida);
   const sinLeer = useNotifsSinLeer();
+  const ahora = useAhora();
 
   return (
     <>
@@ -32,8 +36,12 @@ export function PantallaNotificaciones() {
         </Boton>
       </div>
 
-      {GRUPOS.map(({ etiqueta, filtro }) => {
-        const delGrupo = NOTIFICACIONES.filter(filtro);
+      {GRUPOS.map(({ etiqueta, grupo }) => {
+        const delGrupo = NOTIFICACIONES.filter(
+          // Sin reloj (SSR) todo va a «Anteriores» con fecha corta; tras el
+          // mount se reparte en Hoy/Ayer — sin parpadeo de contenido, solo de cabecera.
+          (n) => (ahora ? grupoRecencia(n.creadoEn, ahora) : "anteriores") === grupo,
+        );
         if (delGrupo.length === 0) return null;
         return (
           <div key={etiqueta} className="mb-4">
@@ -66,7 +74,7 @@ export function PantallaNotificaciones() {
                 <div className="mt-0.5 text-[12.5px] text-texto-3">{n.meta}</div>
               </div>
 
-              <span className="text-[11.5px] whitespace-nowrap text-texto-4">{n.cuando}</span>
+              <Cuando iso={n.creadoEn} className="text-[11.5px] whitespace-nowrap text-texto-4" />
                   {noLeida && (
                     <span
                       className="h-2 w-2 min-w-2 rounded-full bg-celeste"
@@ -85,12 +93,9 @@ export function PantallaNotificaciones() {
   );
 }
 
-/** Agrupación por recencia a partir del `cuando` del seed. */
-const GRUPOS = [
-  { etiqueta: "Hoy", filtro: (n: { cuando: string }) => n.cuando.startsWith("hace") },
-  { etiqueta: "Ayer", filtro: (n: { cuando: string }) => n.cuando === "ayer" },
-  {
-    etiqueta: "Anteriores",
-    filtro: (n: { cuando: string }) => !n.cuando.startsWith("hace") && n.cuando !== "ayer",
-  },
+/** Cabeceras por recencia, calculadas del `creadoEn` contra el reloj del visitante. */
+const GRUPOS: { etiqueta: string; grupo: GrupoRecencia }[] = [
+  { etiqueta: "Hoy", grupo: "hoy" },
+  { etiqueta: "Ayer", grupo: "ayer" },
+  { etiqueta: "Anteriores", grupo: "anteriores" },
 ];

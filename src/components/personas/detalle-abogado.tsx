@@ -222,7 +222,7 @@ function Escribirle({ abogado: a }: { abogado: AbogadoDirectorio }) {
         <div className="mt-3.5 flex flex-col gap-2.5">
           {enviados.map((m, i) => (
             <div
-              key={`${m.cuando}-${i}`}
+              key={`${m.creadoEn}-${i}`}
               className="rounded-xl border-l-[3px] border-exito bg-exito-bg/40 px-4 py-3"
             >
               <div className="flex flex-wrap items-center gap-2 text-[11.5px]">

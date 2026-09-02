@@ -1,5 +1,6 @@
 "use client";
 
+import { Cuando } from "@/components/ui/cuando";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
@@ -126,7 +127,7 @@ function PanelHistorial({ abierto, onCerrar }: { abierto: boolean; onCerrar: () 
                     {conv.titulo}
                   </div>
                   <div className="mt-0.5 text-[11.5px] text-texto-4">
-                    {conv.fecha} · {fuentes} fuentes citadas
+                    <Cuando iso={conv.creadoEn} /> · {fuentes} fuentes citadas
                   </div>
                 </button>
               );

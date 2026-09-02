@@ -1,5 +1,6 @@
 "use client";
 
+import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -143,7 +144,7 @@ function CardLead({ lead, esPremium }: { lead: Lead; esPremium: boolean }) {
       <div className="flex flex-wrap items-center gap-2">
         <ChipMateria>{lead.materia}</ChipMateria>
         <Meta>
-          {lead.ciudad} · {lead.cuando}
+          {lead.ciudad} · <Cuando iso={lead.creadoEn} />
         </Meta>
         {lead.nuevo && !miRespuesta && (
           <span className="rounded-full bg-celeste px-2 py-0.5 text-[10.5px] font-bold text-white">

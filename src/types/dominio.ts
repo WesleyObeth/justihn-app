@@ -158,7 +158,8 @@ export interface RespuestaConsulta {
   /** `id` del directorio, o el de la abogada demo. */
   abogadoId: string;
   texto: string;
-  cuando: string;
+  /** ISO 8601 → columna `creado_en`. El «hace 2 h» se calcula al pintar (`lib/tiempo.ts`). */
+  creadoEn: string;
 }
 
 /**
@@ -176,14 +177,21 @@ export interface MensajeAbogado {
   /** Materia del asunto — el abogado necesita saber de qué le hablan. */
   materia: Materia;
   texto: string;
-  cuando: string;
+  /** ISO 8601 → `creado_en`. */
+  creadoEn: string;
 }
 
+/**
+ * Tabla `leads`. Hasta el 2026-09-02 llevaba `cuando: "hace 2 h"` — el texto
+ * de pantalla dentro del dato. Una tabla guarda el instante; el relativo es
+ * una vista y la pinta `<Cuando>`.
+ */
 export interface Lead {
   id: string;
   materia: Materia;
   ciudad: string;
-  cuando: string;
+  /** ISO 8601 → `creado_en`. */
+  creadoEn: string;
   nuevo: boolean;
   respuestas: number;
   pregunta: string;
@@ -203,7 +211,8 @@ export interface Notificacion {
   icono: "gaceta" | "leads" | "bell" | "ia" | "card";
   titulo: string;
   meta: string;
-  cuando: string;
+  /** ISO 8601 → `creado_en`. Notificaciones agrupa Hoy/Ayer/Anteriores a partir de esto. */
+  creadoEn: string;
   /** Estado inicial; el "leído" real vive por usuario. */
   noLeidaPorDefecto: boolean;
   destino: string;
@@ -276,7 +285,8 @@ export interface MensajeChat {
 export interface ConversacionGuardada {
   id: string;
   titulo: string;
-  fecha: string;
+  /** ISO 8601 → `creado_en`. */
+  creadoEn: string;
   mensajes: MensajeChat[];
 }
 

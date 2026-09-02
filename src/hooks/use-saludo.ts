@@ -103,3 +103,22 @@ function snapshotHoy(): Date {
 export function useHoy(): Date | null {
   return useSyncExternalStore<Date | null>(SIN_SUSCRIPCION, snapshotHoy, () => null);
 }
+
+/**
+ * El instante del mount, para pintar «hace 2 h» sobre un `creadoEn` real
+ * (`lib/tiempo.ts`). Se memoiza como los demás: un snapshot que cambiara en
+ * cada render haría que `useSyncExternalStore` volviera a renderizar sin fin.
+ * Que el relativo no avance mientras la pestaña sigue abierta es aceptable —
+ * es lo que hace cualquier feed— y se refresca al navegar entre pantallas.
+ */
+let ahoraMemo: Date | null = null;
+
+function snapshotAhora(): Date {
+  if (ahoraMemo === null) ahoraMemo = new Date();
+  return ahoraMemo;
+}
+
+/** `null` durante SSR e hidratación; el reloj del visitante después del mount. */
+export function useAhora(): Date | null {
+  return useSyncExternalStore<Date | null>(SIN_SUSCRIPCION, snapshotAhora, () => null);
+}

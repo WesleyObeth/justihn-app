@@ -1,5 +1,6 @@
 "use client";
 
+import { Cuando } from "@/components/ui/cuando";
 import { Icono } from "@/components/brand/iconos";
 import { SeccionDemo, Ventana } from "@/components/landing/demo-marco";
 import { SimboloJusIA } from "@/components/brand/logos";
@@ -163,7 +164,7 @@ export function DemoLeads() {
                 </span>
               )}
               <span className="text-[10.5px]" style={{ color: "var(--muted)" }}>
-                {lead.ciudad} · {lead.cuando}
+                {lead.ciudad} · <Cuando iso={lead.creadoEn} />
               </span>
             </div>
             <p className="mt-2 text-[12.5px] leading-[1.55] text-texto-2">

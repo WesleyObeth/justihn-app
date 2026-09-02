@@ -9,6 +9,7 @@
  * abogados de esa rama— así que la persona sale con algo aunque nadie haya
  * contestado todavía.
  */
+import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
@@ -52,7 +53,7 @@ export function DetalleConsulta({ id }: { id: string }) {
                 {lead.materia}
               </span>
               <span className="text-[12px] text-texto-4">
-                {lead.ciudad} · {lead.cuando}
+                {lead.ciudad} · <Cuando iso={lead.creadoEn} />
               </span>
               {respuestas.length > 0 ? (
                 <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-exito-bg px-2.5 py-[3px] text-[10.5px] font-bold text-exito">

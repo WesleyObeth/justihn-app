@@ -6,6 +6,7 @@
  * interactiva de verdad — filtros, buscador y el formulario real del
  * consultorio — sobre el tema aurora claro.
  */
+import { Cuando } from "@/components/ui/cuando";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useBusquedaUrl } from "@/hooks/use-busqueda-url";
@@ -414,7 +415,7 @@ function Intercambio({
         <span className="text-[11.5px]" style={{ color: "var(--muted)" }}>
           {etiqueta ? `${etiqueta} · ` : ""}
           {lead.ciudad ? `${lead.ciudad} · ` : ""}
-          {lead.cuando}
+          <Cuando iso={lead.creadoEn} />
         </span>
         {respuesta && (
           <span className="ml-auto inline-flex items-center gap-1 text-[11.5px] font-bold text-exito">
