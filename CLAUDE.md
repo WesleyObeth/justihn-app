@@ -836,7 +836,10 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      con reintento.
 
 1. **🔎 REFINADO FINAL DE LOS DOS PORTALES — `/abogados` (15 pantallas) y
-   `/personas` (9 rutas) — ANTES de Supabase** (decisión Wesley 2026-08-30).
+   `/personas` (17 rutas) — ANTES de congelar el esquema de Fase 2** (decisión
+   Wesley 2026-08-30; entonces se decía "antes de Supabase" — el proyecto ya
+   existe por el corpus, pero las tablas de NEGOCIO —abogados, leads, planes—
+   siguen sin crearse y los seeds siguen siendo su contrato).
    Va primero por un motivo técnico, no de gusto: **los seeds son el contrato
    literal del esquema**. Si el refinado cambia un dato, renombra un campo o
    descubre que falta uno, ahora cuesta una línea; con las tablas ya creadas
@@ -853,15 +856,18 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      y móvil, deep-links, estados vacíos, y que nada prometa lo que no hace (§4.5).
    - **Lo que el E2E dejó fuera:** los portales solo se tocaron de refilón — el
      recorrido cubrió las cinco pantallas públicas.
-2. **Crear el proyecto Supabase** (solo DB al inicio) y cambiar el destino del
-   workflow del corpus de Data Table → Postgres + embeddings pgvector (el esquema
-   SQL ya está diseñado; ver justihn/CLAUDE.md backlog #3). Entra **después** del
-   punto 1: los seeds validados por el socio más lo que salga del refinado son el
-   contrato del esquema.
-3. **Cron `launchd` en la Mac** para el scraper de escala (20.202 sentencias,
-   ~1.000/noche) — el VPS no alcanza la API del PJ (geo-bloqueo). No depende de
-   nada: el destino provisional (Data Table de n8n) sigue válido, así que puede
-   avanzar en paralelo a todo lo demás.
+2. **🔌 CONECTAR JURISPRUDENCIA AL CORPUS REAL** (recomendación aceptada por
+   Wesley 2026-09-02). La pantalla Jurisprudencia sigue siendo vitrina de Fase 1
+   sobre los 12 seeds del piloto — su letrero lo dice honestamente ("muestra
+   real del corpus, piloto de 100") — mientras Jus IA ya busca sobre las 19.742.
+   Ahora que el corpus está en Supabase con la `anon` + RLS probados, cablearla
+   es el incremento natural: endpoint de búsqueda pasando por `guard()` (sin
+   costo de LLM — es Postgres puro), filtros de materia/órgano/año contra datos
+   reales, paginación de verdad y la ficha de detalle por `record_id`. Decidir
+   en el camino: ¿búsqueda por texto (ILIKE/FTS) o semántica (pgvector), o las
+   dos? Arrastra a **Monitoreo** y **Mi nombre**, que hacen su matching sobre
+   los mismos 12 seeds (`buscarApariciones`) y pasarían a buscar en la base.
+   El letrero del piloto muere aquí, sustituido por el conteo real.
 4. **Elegir entre `/para-abogados` y `/para-abogados-black`** y borrar la ruta
    perdedora (o convertirla en redirect) — ⏸️ **aplazado a propósito** (Wesley
    2026-08-30): es una comparación visual que no bloquea nada. Ídem con la prueba
