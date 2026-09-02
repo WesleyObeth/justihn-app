@@ -56,16 +56,16 @@ Perfil · Planes · Configuración · Ayuda.
 - **Jus IA:** chat en una sola columna centrada (~760px); el historial va en un
   panel lateral, no en columna fija. El titular del hero sale del pool
   `TITULARES_HERO` (`data/jus-ia.ts`), elegido en cliente tras el mount.
-  **«Historial» y «Nueva consulta» son acciones de PÁGINA** (refinado
-  2026-09-02, pedido de Wesley): van en la línea de cabecera que las demás
-  pantallas usan para su título, a 1280 de ancho y agrupadas a la derecha —
-  mismo patrón que Notificaciones. Antes flotaban en los bordes de la columna
-  de 760, que no se ve: en la pantalla vacía «Historial» quedaba suelto a la
-  derecha de nada y en conversación «Nueva consulta» se leía como parte del
-  hilo. A la izquierda de esa línea va el **título de la consulta actual**
-  (su primera pregunta), que al reabrir una del historial era lo único que
-  faltaba para saber en cuál estás. En móvil con conversación los botones
-  son solo icono con `aria-label`, para que el título tenga el ancho.
+  **«Nueva consulta» e «Historial» viven en el SIDEBAR, como hijos de la
+  entrada Jus IA** (decisión Wesley 2026-09-02, patrón Mercury): la flecha
+  aparece al pasar el mouse por «Jus IA» y al abrirla se despliegan los dos
+  con su línea guía. Sin preferencia guardada se abre solo cuando Jus IA es
+  la pantalla activa; el toggle se persiste (`navDesplegado`). Los hijos son
+  ACCIONES, no rutas: desde otra pantalla primero llevan a Jus IA. El panel
+  de historial se abre por el store (`historialJusIAAbierto`) porque quien lo
+  abre ya no es la pantalla. Se probó antes una fila de acciones en la
+  cabecera de la página y Wesley la descartó ese mismo día. ⚠️ La flecha va
+  FUERA del `<Link>`: un botón dentro de un enlace no se puede activar.
 - **Jurisprudencia busca sobre el corpus real desde el 2026-09-02** (§1.7):
   dos modos, filtros de materia/proceso/año, paginación con conteo exacto y
   ficha por `record_id`. **Legislación** y **Monitoreo de nombres** existen

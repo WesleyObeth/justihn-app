@@ -10,18 +10,39 @@ import { ABOGADA_DEMO, etiquetaColegiacion } from "@/data/catalogo";
 import { cn } from "@/lib/utils";
 import { BuscadorGlobal } from "./buscador-global";
 
+/**
+ * Un hijo de una entrada del sidebar: no es una ruta, es una ACCIÓN sobre la
+ * pantalla del padre («Nueva consulta», «Historial»). Patrón Mercury (decisión
+ * Wesley 2026-09-02): la flecha aparece al pasar el mouse por el padre y al
+ * abrirla se despliegan los hijos con su línea guía.
+ */
+interface HijoNav {
+  label: string;
+  icono: NombreIcono;
+  accion: "nueva-consulta" | "historial";
+}
+
 interface ItemNav {
   href: string;
   label: string;
   icono?: NombreIcono;
   jusIa?: boolean;
   premium?: boolean;
+  hijos?: HijoNav[];
 }
 
 type EntradaNav = ItemNav | { seccion: string };
 
 const NAV: EntradaNav[] = [
-  { href: "/abogados", label: "Jus IA", jusIa: true },
+  {
+    href: "/abogados",
+    label: "Jus IA",
+    jusIa: true,
+    hijos: [
+      { label: "Nueva consulta", icono: "mas", accion: "nueva-consulta" },
+      { label: "Historial", icono: "reloj", accion: "historial" },
+    ],
+  },
   { href: "/abogados/dashboard", label: "Dashboard", icono: "dash" },
   { seccion: "Investigación" },
   { href: "/abogados/jurisprudencia", label: "Jurisprudencia", icono: "juris" },
@@ -118,6 +139,7 @@ export function Sidebar({ variante = "escritorio" }: { variante?: "escritorio" |
               item={entrada}
               activo={esRutaActiva(pathname, entrada.href)}
               expandido={expandido}
+              movil={variante === "movil"}
             />
           );
         })}
@@ -138,37 +160,108 @@ function ItemNavegacion({
   item,
   activo,
   expandido,
+  movil,
 }: {
   item: ItemNav;
   activo: boolean;
   expandido: boolean;
+  /** En el drawer no hay hover: la flecha tiene que verse siempre. */
+  movil: boolean;
 }) {
   const esPremium = usePortal((s) => s.plan) === "premium";
+  const desplegadoManual = usePortal((s) => s.navDesplegado[item.href]);
+  const setNavDesplegado = usePortal((s) => s.setNavDesplegado);
+  // Con hijos y sin preferencia guardada, se abre cuando su pantalla es la
+  // activa: quien está en Jus IA tiene las dos acciones a la vista.
+  const conHijos = expandido && !!item.hijos?.length;
+  const desplegado = conHijos && (desplegadoManual ?? activo);
 
   return (
-    <Link
-      href={item.href}
-      title={item.label}
-      aria-current={activo ? "page" : undefined}
-      className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-[9px] transition-colors",
-        activo ? "bg-celeste text-white" : "text-nav hover:bg-white/[0.08]",
-      )}
-    >
-      <span className="grid w-[22px] min-w-[22px] place-items-center">
-        {item.jusIa ? <SimboloJusIALinear size={17} /> : <Icono nombre={item.icono!} size={17} />}
-      </span>
-      {expandido && (
-        <>
-          <span className="text-[13.5px] font-medium whitespace-nowrap">{item.label}</span>
-          {item.premium && !esPremium && (
-            <span className="ml-auto rounded-full border border-[rgba(201,154,58,.4)] bg-[rgba(201,154,58,.18)] px-1.5 py-px text-[10px] font-semibold text-dorado">
-              PREMIUM
-            </span>
+    <div className={cn(conHijos && "group")}>
+      <div className="relative">
+        <Link
+          href={item.href}
+          title={item.label}
+          aria-current={activo ? "page" : undefined}
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-[9px] transition-colors",
+            activo ? "bg-celeste text-white" : "text-nav hover:bg-white/[0.08]",
+            conHijos && "pr-9",
           )}
-        </>
+        >
+          <span className="grid w-[22px] min-w-[22px] place-items-center">
+            {item.jusIa ? <SimboloJusIALinear size={17} /> : <Icono nombre={item.icono!} size={17} />}
+          </span>
+          {expandido && (
+            <>
+              <span className="text-[13.5px] font-medium whitespace-nowrap">{item.label}</span>
+              {item.premium && !esPremium && (
+                <span className="ml-auto rounded-full border border-[rgba(201,154,58,.4)] bg-[rgba(201,154,58,.18)] px-1.5 py-px text-[10px] font-semibold text-dorado">
+                  PREMIUM
+                </span>
+              )}
+            </>
+          )}
+        </Link>
+        {conHijos && (
+          // La flecha va FUERA del enlace (un botón dentro de un <a> no se
+          // puede activar) y solo se ve al pasar el mouse, con foco o abierta.
+          <button
+            type="button"
+            aria-label={desplegado ? `Contraer ${item.label}` : `Desplegar ${item.label}`}
+            aria-expanded={desplegado}
+            onClick={() => setNavDesplegado(item.href, !desplegado)}
+            className={cn(
+              "absolute top-1/2 right-1.5 grid h-6 w-6 -translate-y-1/2 cursor-pointer place-items-center rounded-md transition-opacity focus-visible:opacity-100",
+              activo ? "text-white hover:bg-white/15" : "text-nav hover:bg-white/[0.12]",
+              desplegado || movil ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+            )}
+          >
+            <span className={cn("grid transition-transform", desplegado && "rotate-180")}>
+              <Icono nombre="chevron" size={13} strokeWidth={2.2} />
+            </span>
+          </button>
+        )}
+      </div>
+      {desplegado && item.hijos && (
+        <div className="mt-0.5 ml-[23px] flex flex-col gap-0.5 border-l border-white/15 pl-2.5">
+          {item.hijos.map((hijo) => (
+            <HijoNavegacion key={hijo.accion} padre={item.href} hijo={hijo} />
+          ))}
+        </div>
       )}
-    </Link>
+    </div>
+  );
+}
+
+/**
+ * Las dos acciones de Jus IA desde el sidebar. Si el abogado está en otra
+ * pantalla, primero se le lleva a Jus IA; el drawer móvil se cierra al navegar,
+ * y si ya estaba allí, se cierra aquí — si no, el panel se abriría debajo.
+ */
+function HijoNavegacion({ padre, hijo }: { padre: string; hijo: HijoNav }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const nuevaConsulta = usePortal((s) => s.nuevaConsulta);
+  const setHistorialJusIA = usePortal((s) => s.setHistorialJusIA);
+  const setMenuMovil = usePortal((s) => s.setMenuMovil);
+
+  const ejecutar = () => {
+    setMenuMovil(false);
+    if (hijo.accion === "nueva-consulta") nuevaConsulta();
+    if (hijo.accion === "historial") setHistorialJusIA(true);
+    if (pathname !== padre) router.push(padre);
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={ejecutar}
+      className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-left text-[13px] whitespace-nowrap text-nav transition-colors hover:bg-white/[0.08] hover:text-white"
+    >
+      <Icono nombre={hijo.icono} size={13} strokeWidth={2.2} />
+      {hijo.label}
+    </button>
   );
 }
 

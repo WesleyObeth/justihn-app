@@ -6,7 +6,7 @@ import { Icono } from "@/components/brand/iconos";
 import { SeccionDemo, Ventana } from "@/components/landing/demo-marco";
 import { SimboloJusIA } from "@/components/brand/logos";
 import { LEADS, respuestasDe } from "@/data/catalogo";
-import { PUBLICACIONES, etiquetaPublicacion } from "@/data/gaceta";
+import { PUBLICACIONES } from "@/data/gaceta";
 import { SENTENCIAS } from "@/data/sentencias";
 
 // La landing de abogados sigue importando `SeccionDemo` desde aquí.
