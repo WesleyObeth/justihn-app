@@ -915,6 +915,58 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      y móvil, deep-links, estados vacíos, y que nada prometa lo que no hace (§4.5).
    - **Lo que el E2E dejó fuera:** los portales solo se tocaron de refilón — el
      recorrido cubrió las cinco pantallas públicas.
+
+   **Auditoría de los seeds como esquema — primera pasada (2026-09-02).**
+   Se leyó `types/dominio.ts`, los 15 seeds de `data/` y el estado persistido
+   del store con la pregunta «¿esto sería una columna?». Lo que se corrigió y
+   lo que queda decidido:
+   - ✅ **Un solo id para la abogada demo.** Tenía dos (`demo-abogada-castillo`
+     en el perfil, `maria-castillo` en el directorio) y `getFirmante` hacía de
+     puente. En `abogados` hay UNA fila: perfil del suscriptor y ficha pública
+     son dos vistas. Unificado en `maria-castillo` (también el `usuarioId` del
+     modo demo en `api-guard`), con **migración v3 del store** para lo
+     persistido en navegadores ajenos y `store/migraciones.test.ts`.
+   - ✅ **`validado` → `verificado`** en `AbogadoDirectorio`: era la misma
+     validación CAH que `PerfilAbogado.verificado` con otro nombre — dos nombres
+     para un dato son una migración esperando.
+   - ✅ **`Sentencia` ya no es «tabla»: es VISTA.** La tabla real existe
+     (`01-corpus.sql`) y no tiene `titulo`, `ponente`, `fallo` ni `extracto`:
+     se derivan de la ficha (§1.7). El comentario del tipo lo dice ahora, y lo
+     mismo `PerfilAbogado` respecto de `AbogadoDirectorio` (`metricas` se
+     deriva; `valoracion` no tiene productor y no será columna).
+   - ⏳ **`cuando` como texto de pantalla («hace 2 h», «ayer», «reciente»,
+     «Vie 21») en `Lead`, `RespuestaConsulta`, `MensajeAbogado`,
+     `Notificacion` y `ConversacionGuardada.fecha`.** Es el hallazgo más
+     grande: una tabla guarda `creado_en` (timestamp) y el «hace 2 h» se
+     calcula al pintar. Hoy Notificaciones agrupa por `startsWith("hace")`.
+     El cambio toca seis pantallas y exige el patrón `useSyncExternalStore`
+     de `use-saludo.ts` (el tiempo relativo no es determinista en SSR, §4.5).
+     **Decisión: se hace en el refinado, ANTES de crear las tablas de negocio**
+     — es el que más cuesta después.
+   - ⏳ **`Lead` mezcla fila con estado de quien mira:** `nuevo` es «no leído
+     por este abogado» (va per-usuario, como `notifsLeidasIds`), `respuestas`
+     es un conteo derivable de `respuestas_consulta`, y `respuestaDemo` es solo
+     de demostración. La fila real es id · materia · ciudad · pregunta ·
+     creado_en · persona_id.
+   - ⏳ **Cadenas compuestas que en la tabla son dos campos:**
+     `PublicacionGaceta.meta` («La Gaceta Nº ___ · 19 ago 2026» → número +
+     fecha, y la fecha ya existe en `fechaIso`), `PerfilAbogado.colegiacion`
+     («Colegiación CAH Nº 00000» → el número) y `PERSONA_DEMO.miembroDesde`
+     («agosto 2026» → `creado_en`).
+   - ⏳ **`NombreVigilado.id` es un slug del nombre** (`vig-<slug>`): en la
+     tabla será uuid con unicidad por (dueño, nombre normalizado). No cambia
+     la UI; se anota para el esquema.
+   - 📌 **`Proceso.plantillaId` se queda** aunque la pantalla se llame Modelos:
+     `plantillas` es el nombre de tabla; «Modelos» es el término del gremio en
+     la UI (decisión ya tomada el 2026-08-25).
+   - 📌 **`ItemBrief` (el brief del Dashboard) no tiene tabla detrás**: depende
+     de «Mis casos», que está diferida hasta validar con abogados reales. Al
+     crear el esquema, o nace `casos` o el brief se deriva de Gaceta + leads y
+     pierde la fila «ACTUAR». Decidir con el feedback del backlog #4.
+   - 📌 **Legislación es la siguiente pantalla que puede conectarse al corpus
+     real** (mismo patrón que Jurisprudencia): la tabla de artículos existe y
+     Jus IA ya la usa; la pantalla sigue sobre los artículos del CPC del seed
+     con `estado: "muestra" | "preparacion"`.
 2. [x] ✅ **JURISPRUDENCIA CONECTADA AL CORPUS REAL (2026-09-02)** — §1.7.
    Las dos búsquedas (palabras + significado), filtros reales, paginación con
    conteo exacto, ficha por `record_id` con la ficha del CEDIJ parseada, y

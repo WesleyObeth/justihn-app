@@ -29,7 +29,19 @@ export type Materia =
 
 export type PlanId = "gratis" | "profesional" | "premium";
 
-/** Tabla `sentencias` — corpus CSJ + cortes de apelaciones. */
+/**
+ * VISTA de una sentencia para la UI — NO es la tabla.
+ *
+ * La tabla `sentencias` existe desde el 2026-09-01 y su esquema literal está
+ * en `automatizaciones/corpus-csj/esquema/01-corpus.sql` (record_id,
+ * expediente, materia del CEDIJ, tribunal de procedencia, magistrado, fecha,
+ * proceso, resumen_cedij, texto = la FICHA jurisprudencial, fuente_url,
+ * reservada). Lo que aquí se llama `titulo`, `ponente`, `fallo`, `extracto` y
+ * `organo` se DERIVA de esa ficha en `lib/corpus/sentencias.ts` (§1.7 del
+ * CLAUDE.md técnico); `materia` es la etiqueta corta, mapeada en
+ * `lib/corpus/catalogo.ts`. Los 12 seeds de `data/sentencias.ts` cumplen esta
+ * misma forma para que Dashboard, demos y Jus IA demo sigan funcionando.
+ */
 export interface Sentencia {
   id: string;
   expediente: string;
@@ -288,7 +300,12 @@ export interface DocumentoValidacion {
   estado: "recibido" | "pendiente";
 }
 
-/** Tabla `abogados` — perfil del suscriptor. */
+/**
+ * Tabla `abogados` — perfil del suscriptor. `AbogadoDirectorio` (en
+ * `data/directorio.ts`) es la VISTA PÚBLICA de esta misma fila: comparten `id`
+ * y `verificado`; `metricas` se deriva (vistas, contactos) y `valoracion` no
+ * tiene productor —no hay reseñas— así que no será columna.
+ */
 export interface PerfilAbogado {
   id: string;
   nombre: string;

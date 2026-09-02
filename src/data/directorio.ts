@@ -61,7 +61,12 @@ export interface AbogadoDirectorio {
    */
   valoracion: string;
   contactos: number;
-  validado: boolean;
+  /**
+   * Validación CAH. Se llama IGUAL que en `PerfilAbogado.verificado` desde el
+   * 2026-09-02 (era `validado`): es la misma columna de `abogados` vista desde
+   * el directorio, y dos nombres para un dato son una migración esperando.
+   */
+  verificado: boolean;
   /** Premium = prioridad en el directorio (feature del plan). */
   premium: boolean;
   /** Credencial de notario, independiente de `materias`. */
@@ -70,7 +75,8 @@ export interface AbogadoDirectorio {
 
 export const DIRECTORIO: AbogadoDirectorio[] = [
   {
-    id: "maria-castillo",
+    // Mismo id que `ABOGADA_DEMO`: una fila de `abogados`, dos vistas.
+    id: ABOGADA_DEMO.id,
     nombre: ABOGADA_DEMO.nombre,
     iniciales: ABOGADA_DEMO.iniciales,
     ciudad: ABOGADA_DEMO.ciudad,
@@ -78,12 +84,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     bio: ABOGADA_DEMO.bio,
     anios: 12,
     responde: "el mismo día",
-    cita:
-      "El plazo corre desde que terminó el contrato, no desde que te pagaron. Dos meses.",
+    cita: "El plazo corre desde que terminó el contrato, no desde que te pagaron. Dos meses.",
     enLinea: true,
     valoracion: ABOGADA_DEMO.metricas.valoracion,
     contactos: ABOGADA_DEMO.metricas.contactos,
-    validado: false,
+    verificado: false,
     premium: false,
   },
   {
@@ -95,12 +100,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     bio: "Constitución de sociedades, contratos y notariado. Acompaño negocios desde el pacto social hasta el permiso de operación.",
     anios: 15,
     responde: "en 1 día",
-    cita:
-      "Antes de firmar el pacto social decide quién administra: cambiarlo después cuesta otra escritura.",
+    cita: "Antes de firmar el pacto social decide quién administra: cambiarlo después cuesta otra escritura.",
     enLinea: true,
     valoracion: "4.8",
     contactos: 21,
-    validado: true,
+    verificado: true,
     premium: true,
     notario: { exequatur: "N-2014-0731", verificado: false },
   },
@@ -113,12 +117,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     bio: "Licencias ambientales y sanitarias, permisos y litigios contra la administración. 9 años ante MiAmbiente y ARSA.",
     anios: 9,
     responde: "en 2 días",
-    cita:
-      "La licencia ambiental no se pide al final: si arrancas sin ella, la multa la fija MiAmbiente por día.",
+    cita: "La licencia ambiental no se pide al final: si arrancas sin ella, la multa la fija MiAmbiente por día.",
     enLinea: false,
     valoracion: "4.7",
     contactos: 14,
-    validado: true,
+    verificado: true,
     premium: true,
   },
   {
@@ -130,12 +133,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     bio: "Propiedad, herencias y familia. Reviso el folio real antes de que firmes — la mitad de mi trabajo es evitar pleitos.",
     anios: 18,
     responde: "el mismo día",
-    cita:
-      "Pídeme el folio real antes de dar un adelanto. La mitad de mi trabajo es evitar ese pleito.",
+    cita: "Pídeme el folio real antes de dar un adelanto. La mitad de mi trabajo es evitar ese pleito.",
     enLinea: true,
     valoracion: "4.6",
     contactos: 9,
-    validado: true,
+    verificado: true,
     premium: false,
     // Es notario aunque su práctica esté en Civil y Familia: la credencial no
     // se deduce de la materia. Este perfil existe justamente para probarlo.
@@ -150,12 +152,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     bio: "Reclamos de consumo y garantías: productos vencidos o defectuosos, cobros indebidos y servicios que no cumplieron lo prometido.",
     anios: 11,
     responde: "en 24 horas",
-    cita:
-      "Antes de pelear, pide el libro de quejas y deja constancia ahí. Ese asiento vale más que diez llamadas al gerente.",
+    cita: "Antes de pelear, pide el libro de quejas y deja constancia ahí. Ese asiento vale más que diez llamadas al gerente.",
     enLinea: true,
     valoracion: "4.8",
     contactos: 11,
-    validado: true,
+    verificado: true,
     premium: false,
   },
   {
@@ -167,12 +168,11 @@ export const DIRECTORIO: AbogadoDirectorio[] = [
     bio: "Defensa penal y acompañamiento en denuncias. Atención de urgencias.",
     anios: 7,
     responde: "en horas",
-    cita:
-      "Si te citan a declarar, no vayas solo. Puedes pedir asistencia antes de decir una palabra.",
+    cita: "Si te citan a declarar, no vayas solo. Puedes pedir asistencia antes de decir una palabra.",
     enLinea: true,
     valoracion: "4.9",
     contactos: 17,
-    validado: true,
+    verificado: true,
     premium: false,
   },
 ];
@@ -204,11 +204,7 @@ export function filtrarDirectorio(opciones: {
   soloNotarios?: boolean;
 }): AbogadoDirectorio[] {
   const { materia = "todas", ciudad = "todas", q = "", soloNotarios = false } = opciones;
-  const termino = q
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "");
+  const termino = q.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
 
   return ordenar(
     DIRECTORIO.filter((a) => {
@@ -260,6 +256,8 @@ export interface Firmante {
 }
 
 export function getFirmante(abogadoId: string): Firmante | undefined {
+  // Con un solo id, esta rama solo aporta la colegiación (el directorio no la
+  // publica). Cuando `abogados` sea tabla, será una sola lectura.
   if (abogadoId === ABOGADA_DEMO.id) {
     return {
       id: ABOGADA_DEMO.id,

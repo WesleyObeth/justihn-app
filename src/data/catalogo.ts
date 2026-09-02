@@ -256,8 +256,15 @@ export const NOTIFICACIONES: Notificacion[] = [
  * Perfil demo. TODO(auth): sale de `supabase.auth.getUser()` + tabla `abogados`
  * con RLS por `abogado_id`; ningún dato de perfil se sirve sin sesión.
  */
+/**
+ * ⚠️ El `id` es EL MISMO que el de su ficha en `DIRECTORIO` (2026-09-02). Eran
+ * dos —`demo-abogada-castillo` aquí, `maria-castillo` allá— y `getFirmante`
+ * hacía de puente. En la tabla `abogados` hay una fila y un id: el perfil del
+ * suscriptor y su ficha pública son dos VISTAS del mismo registro, no dos
+ * registros. El store migra (v3) lo que quedó persistido con el id viejo.
+ */
 export const ABOGADA_DEMO: PerfilAbogado = {
-  id: "demo-abogada-castillo",
+  id: "maria-castillo",
   nombre: "Abg. María Castillo",
   nombreCorto: "María Castillo",
   iniciales: "MC",

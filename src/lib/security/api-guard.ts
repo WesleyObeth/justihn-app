@@ -51,7 +51,7 @@ function error(status: number, codigo: string, mensaje: string, extra?: Record<s
  */
 async function resolverSesion(): Promise<{ usuarioId: string | null; rol: Rol }> {
   const demo = process.env.JUSTIHN_DEMO_SESSION === "1";
-  if (demo) return { usuarioId: "demo-abogada-castillo", rol: "session" };
+  if (demo) return { usuarioId: "maria-castillo", rol: "session" };
   return { usuarioId: null, rol: "public" };
 }
 

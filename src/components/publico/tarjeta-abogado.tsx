@@ -105,7 +105,7 @@ export function TarjetaAbogado({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-        {a.validado ? (
+        {a.verificado ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-exito-bg px-2 py-[2px] text-[10.5px] font-bold text-exito">
             <Icono nombre="check" size={9} strokeWidth={2.8} />
             Colegiación validada

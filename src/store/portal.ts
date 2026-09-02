@@ -140,6 +140,66 @@ const SUBS_INICIALES: Record<string, boolean> = {
   "Contencioso Adm.": false,
 };
 
+/**
+ * Las migraciones del estado persistido, exportadas para poder probarlas con
+ * un estado en formato viejo sin pasar por `localStorage`.
+ */
+export function migrarPersistido(persistido: unknown, version: number): unknown {
+  const s = persistido as
+    | {
+        plan?: string;
+        leadsRespondidos?: Record<string, unknown>;
+        mensajesAbogado?: Record<string, unknown>;
+      }
+    | undefined;
+  if (!s) return persistido;
+
+  if (version < 1) {
+    if (s.plan === "base") s.plan = "profesional";
+    if (s.plan === "pro") s.plan = "premium";
+  }
+
+  if (version < 2 && s.leadsRespondidos) {
+    s.leadsRespondidos = Object.fromEntries(
+      Object.entries(s.leadsRespondidos).map(([id, valor]) => [
+        id,
+        typeof valor === "string"
+          ? [{ abogadoId: ABOGADA_DEMO.id, texto: valor, cuando: "reciente" }]
+          : Array.isArray(valor)
+            ? valor
+            : [],
+      ]),
+    );
+  }
+  if (version < 3) {
+    const VIEJO = "demo-abogada-castillo";
+    const renombrar = (r: unknown) =>
+      r && typeof r === "object" && (r as { abogadoId?: string }).abogadoId === VIEJO
+        ? { ...(r as object), abogadoId: ABOGADA_DEMO.id }
+        : r;
+    if (s.leadsRespondidos) {
+      s.leadsRespondidos = Object.fromEntries(
+        Object.entries(s.leadsRespondidos).map(([id, valor]) => [
+          id,
+          Array.isArray(valor) ? valor.map(renombrar) : valor,
+        ]),
+      );
+    }
+    if (s.mensajesAbogado && VIEJO in s.mensajesAbogado) {
+      const { [VIEJO]: viejos, ...resto } = s.mensajesAbogado;
+      const nuevos = resto[ABOGADA_DEMO.id];
+      s.mensajesAbogado = {
+        ...resto,
+        [ABOGADA_DEMO.id]: [
+          ...(Array.isArray(nuevos) ? nuevos : []),
+          ...(Array.isArray(viejos) ? viejos.map(renombrar) : []),
+        ],
+      };
+    }
+  }
+  return persistido;
+}
+
 export const usePortal = create<PortalState>()(
   persist(
     (set) => ({
@@ -249,10 +309,7 @@ export const usePortal = create<PortalState>()(
             .replace(/^-|-$/g, "")}`;
           if (s.nombresVigiladosPersona.some((v) => v.id === id)) return s;
           return {
-            nombresVigiladosPersona: [
-              ...s.nombresVigiladosPersona,
-              { id, nombre, tipo },
-            ],
+            nombresVigiladosPersona: [...s.nombresVigiladosPersona, { id, nombre, tipo }],
           };
         }),
       escribirAAbogado: (abogadoId, materia, texto) =>
@@ -270,9 +327,7 @@ export const usePortal = create<PortalState>()(
         set((s) => {
           const limpio = nombre.trim();
           if (limpio.length < 4) return s;
-          const resto = s.consultasVerifica.filter(
-            (n) => n.toLowerCase() !== limpio.toLowerCase(),
-          );
+          const resto = s.consultasVerifica.filter((n) => n.toLowerCase() !== limpio.toLowerCase());
           return { consultasVerifica: [limpio, ...resto].slice(0, 8) };
         }),
       olvidarConsultasVerifica: () => set({ consultasVerifica: [] }),
@@ -334,33 +389,12 @@ export const usePortal = create<PortalState>()(
        *      respuestas. Sin esto, un navegador con datos previos haría `.map`
        *      sobre un string y la pantalla reventaría — el store se persiste
        *      desde el primer día, así que hay gente con el formato viejo.
+       *  v3: la abogada demo pasó a tener UN id (`maria-castillo`, el de su
+       *      ficha pública); el viejo `demo-abogada-castillo` vivía en las
+       *      respuestas del consultorio y en las claves de `mensajesAbogado`.
        */
-      version: 2,
-      migrate: (persistido, version) => {
-        const s = persistido as
-          | { plan?: string; leadsRespondidos?: Record<string, unknown> }
-          | undefined;
-        if (!s) return persistido;
-
-        if (version < 1) {
-          if (s.plan === "base") s.plan = "profesional";
-          if (s.plan === "pro") s.plan = "premium";
-        }
-
-        if (version < 2 && s.leadsRespondidos) {
-          s.leadsRespondidos = Object.fromEntries(
-            Object.entries(s.leadsRespondidos).map(([id, valor]) => [
-              id,
-              typeof valor === "string"
-                ? [{ abogadoId: ABOGADA_DEMO.id, texto: valor, cuando: "reciente" }]
-                : Array.isArray(valor)
-                  ? valor
-                  : [],
-            ]),
-          );
-        }
-        return persistido;
-      },
+      version: 3,
+      migrate: migrarPersistido,
       partialize: (s) => ({
         plan: s.plan,
         cicloPlan: s.cicloPlan,

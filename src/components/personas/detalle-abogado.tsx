@@ -72,7 +72,7 @@ function Perfil({ abogado: a }: { abogado: AbogadoDirectorio }) {
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              {a.validado ? (
+              {a.verificado ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-exito-bg px-2.5 py-[3px] text-[11px] font-bold text-exito">
                   <Icono nombre="check" size={10} strokeWidth={2.8} />
                   Colegiación validada
