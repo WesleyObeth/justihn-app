@@ -38,8 +38,7 @@ export async function POST(req: Request) {
     schema: esquema,
     rateLimit: { limit: 40, windowMs: 60_000 },
     rateLimitGlobal: semantica ? { limit: TECHO_SEMANTICO_DIA, windowMs: 86_400_000 } : undefined,
-    // TODO(auth): "session" al cablear Supabase Auth — es pantalla del portal.
-    role: "public",
+    role: "session",
     cost: 0,
     maxBodyBytes: 2 * 1024,
   });

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     action: "corpus-apariciones",
     schema: esquema,
     rateLimit: { limit: 30, windowMs: 60_000 },
-    role: "public",
+    role: "session",
     cost: 0,
     maxBodyBytes: 1024,
   });

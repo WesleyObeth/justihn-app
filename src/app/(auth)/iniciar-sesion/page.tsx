@@ -13,11 +13,25 @@ export const metadata: Metadata = {
  * del abogado durante un instante) y solo personaliza — nunca cambia lo que
  * se pide para entrar.
  */
+/** Solo rutas internas de los portales: un `next` libre sería un redirect abierto. */
+function destinoSeguro(next?: string): string | undefined {
+  if (!next || next.startsWith("//")) return undefined;
+  return next.startsWith("/abogados") || next.startsWith("/personas") ? next : undefined;
+}
+
 export default async function PaginaIniciarSesion({
   searchParams,
 }: {
-  searchParams: Promise<{ tipo?: string }>;
+  searchParams: Promise<{ tipo?: string; next?: string; error?: string }>;
 }) {
-  const { tipo } = await searchParams;
-  return <PantallaIniciarSesion esPersona={tipo === "persona"} />;
+  const { tipo, next, error } = await searchParams;
+  return (
+    <PantallaIniciarSesion
+      esPersona={tipo === "persona"}
+      next={destinoSeguro(next)}
+      errorInicial={
+        error === "enlace" ? "Ese enlace ya no es válido. Inicia sesión o pide uno nuevo." : undefined
+      }
+    />
+  );
 }

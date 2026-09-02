@@ -12,11 +12,14 @@
  * ⚠️ FASE 1 — sin autenticación real: los pasos validan formato y el final usa
  * la sesión de demostración. La nota bajo el card lo dice.
  *
- * TODO(auth): Supabase Auth (blueprint §4, plataforma/CLAUDE.md §7.2) —
- * `signUp` en el paso 1 (sesión en cookie, RLS por `abogado_id`); el paso 2
- * sube la constancia a Storage y crea la fila en `documentos_validacion`; el
- * paso 3 persiste las materias como suscripciones de alertas. Conservar el
- * `consultaPendiente` para redirigir al chat después del alta real.
+ * **Cableado a Supabase Auth el 2026-09-02.** La cuenta se crea al terminar
+ * el paso 3 (`signUp` con nombre, colegiación, ciudad, teléfono y materias en
+ * los metadatos): el trigger `al_registrarse` de la base crea `personas` y
+ * `abogados` en el mismo instante — así funciona también cuando el proyecto
+ * exige confirmar el correo y `signUp` no devuelve sesión. La constancia del
+ * paso 2 se sube si ya hay sesión; si no, la pide el banner «Completar
+ * validación» del portal. `consultaPendiente` sobrevive en el store y el chat
+ * la dispara al llegar.
  */
 import Link from "next/link";
 import { useState } from "react";
@@ -24,6 +27,7 @@ import { LogoJustihn } from "@/components/brand/logos";
 import { CheckCuadro } from "@/components/auth/iniciar-sesion";
 import { SplashJustihn } from "@/components/auth/splash";
 import { usePortal } from "@/store/portal";
+import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -100,8 +104,12 @@ export function PantallaOnboarding() {
   const [ciudad, setCiudad] = useState("");
   const [colegiacion, setColegiacion] = useState("");
   const [archivo, setArchivo] = useState<string | null>(null);
+  const [archivoFile, setArchivoFile] = useState<File | null>(null);
   const [sel, setSel] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const [ocupado, setOcupado] = useState(false);
+  /** `signUp` sin sesión = el proyecto pide confirmar el correo. */
+  const [pendienteCorreo, setPendienteCorreo] = useState(false);
 
   const limpiar = <T,>(setter: (v: T) => void) => (v: T) => {
     setter(v);
@@ -117,9 +125,43 @@ export function PantallaOnboarding() {
     setStep(2);
   };
 
-  const irPaso4 = () => {
+  const irPaso4 = async () => {
     if (sel.length === 0) return setError("Elige al menos una materia para tus alertas.");
     setError("");
+    setOcupado(true);
+    const supabase = supabaseNavegador();
+    const { data, error: e } = await supabase.auth.signUp({
+      email: correo,
+      password: pass,
+      options: {
+        data: {
+          nombre: nombre.trim(),
+          tipo: "abogado",
+          colegiacion_numero: colegiacion.trim(),
+          ciudad: [ciudad.trim(), depto].filter(Boolean).join(", "),
+          telefono: telefono.trim(),
+          materias: sel,
+        },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (e) {
+      setOcupado(false);
+      return setError(mensajeAuth(e.code, "No se pudo crear la cuenta. Inténtalo de nuevo."));
+    }
+    // La constancia solo se puede subir con sesión (RLS del bucket). Sin
+    // sesión, el banner del portal la pedirá al entrar.
+    if (data.session && archivoFile && data.user) {
+      const ruta = `${data.user.id}/${Date.now()}-${archivoFile.name}`;
+      const { error: eSubida } = await supabase.storage.from("constancias").upload(ruta, archivoFile);
+      if (!eSubida) {
+        await supabase
+          .from("documentos_validacion")
+          .insert({ abogado_id: data.user.id, nombre: archivoFile.name, storage_path: ruta });
+      }
+    }
+    setPendienteCorreo(!data.session);
+    setOcupado(false);
     setStep(4);
   };
 
@@ -430,7 +472,10 @@ export function PantallaOnboarding() {
                   className="hidden"
                   onChange={(e) => {
                     const fl = e.target.files?.[0];
-                    if (fl) setArchivo(fl.name);
+                    if (fl) {
+                      setArchivo(fl.name);
+                      setArchivoFile(fl);
+                    }
                   }}
                 />
               </div>
@@ -553,7 +598,8 @@ export function PantallaOnboarding() {
             <div className="mt-[18px] flex flex-col gap-3">
               <button
                 type="button"
-                onClick={irPaso4}
+                onClick={() => void irPaso4()}
+                disabled={ocupado}
                 className="btn-marino cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold"
               >
                 Finalizar
@@ -608,9 +654,13 @@ export function PantallaOnboarding() {
             </p>
             <div className="mt-[22px] flex w-full flex-col gap-2 text-left">
               <FilaResumen
-                ok
-                texto={`Cuenta creada con ${correo || "tu correo"}`}
-                tag="Listo"
+                ok={!pendienteCorreo}
+                texto={
+                  pendienteCorreo
+                    ? `Confirma tu correo: enviamos un enlace a ${correo}`
+                    : `Cuenta creada con ${correo || "tu correo"}`
+                }
+                tag={pendienteCorreo ? "Revisa tu correo" : "Listo"}
               />
               {validacionEnviada ? (
                 <FilaResumen ok texto="Validación CAH enviada a revisión" tag="1–2 días" />
@@ -653,23 +703,30 @@ export function PantallaOnboarding() {
                 ))}
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setStep(5)}
-              className="btn-marino mt-[22px] w-full cursor-pointer rounded-[10px] border-none py-3.5 text-[15px] font-semibold"
-            >
-              Entrar al portal
-            </button>
+            {pendienteCorreo ? (
+              <p
+                className="mt-[22px] w-full rounded-[10px] border px-3.5 py-3 text-[12.5px] leading-[1.55]"
+                style={{ background: "#e7f6ee", borderColor: "#bfe3cf", color: "#1a5c3a" }}
+              >
+                Al abrir el enlace del correo entras directo a tu portal. Si no llega en unos
+                minutos, revisa la carpeta de spam.
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setStep(5)}
+                className="btn-marino mt-[22px] w-full cursor-pointer rounded-[10px] border-none py-3.5 text-[15px] font-semibold"
+              >
+                Entrar al portal
+              </button>
+            )}
           </div>
         )}
       </div>
 
       {step === 5 && <SplashJustihn />}
 
-      <p className="relative mt-4 text-[11.5px]" style={{ color: "var(--muted)" }}>
-        Demo de validación — todavía no se crean cuentas ni se guardan tus datos.
-      </p>
-      <p className="relative mt-2 text-[12px]" style={{ color: "var(--muted)" }}>
+      <p className="relative mt-4 text-[12px]" style={{ color: "var(--muted)" }}>
         © 2026 Justihn · Honduras
       </p>
     </section>

@@ -10,15 +10,13 @@
  * El **login sí es compartido** (`/iniciar-sesion`): una sola base de cuentas.
  * Lo que se separa es el alta, no la entrada.
  *
- * ⚠️ FASE 1 — no crea cuentas: valida formato y entra con la sesión demo.
- *
- * TODO(auth): Supabase Auth — `signUp({ email, password })` + fila en
- * `personas` con el nombre; sin ficha de abogado, que es lo que después hace
- * que el login resuelva el destino a `/personas`. Conservar el redirect al
- * portal tras el alta. ⚠️ Con `desde=consultorio` la consulta ya se publicó
- * ANTES del alta: al cablear Supabase hay que asignarle el dueño en cuanto
- * exista la cuenta (y decidir qué pasa si el visitante abandona el alta —
- * hoy queda publicada y anónima, que es lo que la sección promete).
+ * **Cableado a Supabase Auth el 2026-09-02**: `signUp` con el nombre en los
+ * metadatos; el trigger `al_registrarse` crea la fila en `personas` (sin
+ * ficha de abogado, que es lo que hace que el login resuelva a `/personas`).
+ * Si el proyecto exige confirmar el correo, `signUp` no devuelve sesión y la
+ * pantalla lo dice en vez de fingir que entró. La consulta del consultorio
+ * espera en el navegador y se publica cuando la cuenta existe (decisión 2 del
+ * esquema): permitir inserts anónimos sería un canal de spam.
  */
 import Link from "next/link";
 import { useState } from "react";
@@ -26,6 +24,7 @@ import { Icono } from "@/components/brand/iconos";
 import { CheckCuadro } from "@/components/auth/iniciar-sesion";
 import { SplashJustihn } from "@/components/auth/splash";
 import { LogoJustihn } from "@/components/brand/logos";
+import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,8 +50,10 @@ export function RegistroPersona({
   const [acepta, setAcepta] = useState(false);
   const [error, setError] = useState("");
   const [entrando, setEntrando] = useState(false);
+  const [ocupado, setOcupado] = useState(false);
+  const [confirmarCorreo, setConfirmarCorreo] = useState(false);
 
-  const enviar = () => {
+  const enviar = async () => {
     if (!nombre.trim()) return setError("Escribe tu nombre.");
     if (!EMAIL_RE.test(correo))
       return setError("Ingresa un correo electrónico válido.");
@@ -60,6 +61,19 @@ export function RegistroPersona({
       return setError("La contraseña debe tener al menos 8 caracteres.");
     if (!acepta) return setError("Debes aceptar los términos para continuar.");
     setError("");
+    setOcupado(true);
+    const { data, error: e } = await supabaseNavegador().auth.signUp({
+      email: correo,
+      password: pass,
+      options: {
+        data: { nombre: nombre.trim(), tipo: "persona" },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    setOcupado(false);
+    if (e) return setError(mensajeAuth(e.code, "No se pudo crear la cuenta. Inténtalo de nuevo."));
+    // Sin sesión = el proyecto pide confirmar el correo: se dice, no se finge.
+    if (!data.session) return setConfirmarCorreo(true);
     setEntrando(true);
   };
 
@@ -128,7 +142,7 @@ export function RegistroPersona({
           className="mt-5 flex flex-col gap-3.5"
           onSubmit={(e) => {
             e.preventDefault();
-            enviar();
+            void enviar();
           }}
         >
           <Campo
@@ -217,11 +231,22 @@ export function RegistroPersona({
             </div>
           )}
 
+          {confirmarCorreo && (
+            <div
+              className="rounded-[10px] border px-3.5 py-3 text-[12.5px] leading-[1.55]"
+              style={{ background: "#e7f6ee", borderColor: "#bfe3cf", color: "#1a5c3a" }}
+              role="status"
+            >
+              <b>Revisa tu correo.</b> Enviamos un enlace a {correo} para confirmar tu cuenta.
+              Al abrirlo entras directo a tu portal.
+            </div>
+          )}
           <button
             type="submit"
-            className="btn-marino mt-1 cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold"
+            disabled={ocupado || confirmarCorreo}
+            className="btn-marino mt-1 cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold disabled:opacity-60"
           >
-            Crear cuenta gratis
+            {ocupado ? "Creando tu cuenta…" : confirmarCorreo ? "Enlace enviado" : "Crear cuenta gratis"}
           </button>
           <p className="text-center text-[13px]" style={{ color: "#5a6b82" }}>
             ¿Ya tienes cuenta?{" "}
@@ -241,14 +266,7 @@ export function RegistroPersona({
       )}
 
       <p
-        className="relative mt-4 text-[11.5px]"
-        style={{ color: "var(--muted)" }}
-      >
-        Demo de validación — todavía no se crean cuentas ni se guardan tus
-        datos.
-      </p>
-      <p
-        className="relative mt-2 text-[12px]"
+        className="relative mt-4 text-[12px]"
         style={{ color: "var(--muted)" }}
       >
         ¿Eres abogado?{" "}

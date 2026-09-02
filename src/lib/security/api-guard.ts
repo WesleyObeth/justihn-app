@@ -9,6 +9,7 @@
 import { NextResponse } from "next/server";
 import type { z } from "zod";
 import { rateLimit, clientIp } from "./rate-limit";
+import { usuarioActual } from "@/lib/supabase/servidor";
 
 export type Rol = "public" | "session" | "admin";
 
@@ -42,17 +43,19 @@ function error(status: number, codigo: string, mensaje: string, extra?: Record<s
 }
 
 /**
- * Resuelve la sesión. Fase 1: no hay Supabase Auth cableado todavía, así que
- * las rutas con `role: "session"` deben FALLAR CERRADO (§0.4) salvo que se
- * habilite explícitamente el modo demo. "Pasa por ahora" no es una opción.
+ * Resuelve la sesión contra Supabase Auth (cableado 2026-09-02). El usuario
+ * se VERIFICA con `getUser()` —no se lee de la cookie—, y sin sesión la ruta
+ * falla cerrada (§0.4): el modo demo `JUSTIHN_DEMO_SESSION` se retiró.
  *
- * TODO(auth): reemplazar por `supabase.auth.getUser()` y leer el rol desde la
- * fila del abogado (RLS por `abogado_id` detrás).
+ * `admin` no existe todavía: nace con el panel de validación de constancias.
  */
 async function resolverSesion(): Promise<{ usuarioId: string | null; rol: Rol }> {
-  const demo = process.env.JUSTIHN_DEMO_SESSION === "1";
-  if (demo) return { usuarioId: "maria-castillo", rol: "session" };
-  return { usuarioId: null, rol: "public" };
+  try {
+    const user = await usuarioActual();
+    return user ? { usuarioId: user.id, rol: "session" } : { usuarioId: null, rol: "public" };
+  } catch {
+    return { usuarioId: null, rol: "public" };
+  }
 }
 
 export async function guard<S extends z.ZodType>(

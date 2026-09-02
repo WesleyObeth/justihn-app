@@ -14,21 +14,16 @@
  * nombre y correo), y por eso `?tipo=` solo decide el copy, a qué alta manda y
  * a qué portal entra — nunca lo que se le pide para entrar.
  *
- * ⚠️ FASE 1 — sin autenticación real: valida formato y entra con la sesión de
- * demostración. Como no hay cuenta que consultar, el destino sale del origen
- * (`?tipo=persona`); en Fase 2 lo decide la cuenta y el parámetro sobra.
- *
- * TODO(auth): Supabase Auth (blueprint §4, plataforma/CLAUDE.md §7.2) —
- * `signInWithPassword` + `resetPasswordForEmail` para "¿La olvidaste?", sesión
- * en cookie y RLS por `abogado_id`. Al cablearlo, `entrar()` deja de ser
- * simulado y el destino se resuelve consultando el perfil: si la cuenta tiene
- * ficha de abogado va a `/abogados`, si no a `/personas`. El splash y la
- * navegación quedan igual.
+ * **Cableado a Supabase Auth el 2026-09-02**: `signInWithPassword`, y el
+ * destino lo decide la CUENTA (`mi_destino()`: ¿tiene ficha de abogado?), no
+ * el `?tipo=`, que solo personaliza el copy. «¿La olvidaste?» manda el enlace
+ * de recuperación, que vuelve por `/auth/callback` a `/restablecer`.
  */
 import Link from "next/link";
 import { useState } from "react";
 import { LogoJustihn } from "@/components/brand/logos";
 import { SplashJustihn } from "@/components/auth/splash";
+import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -36,9 +31,19 @@ type Vista = "login" | "recuperar" | "enviado" | "splash";
 
 /** `esPersona` lo resuelve la página en el SERVIDOR (ver `page.tsx`): así el
  *  HTML ya llega con el copy correcto y no se ve el del abogado un instante. */
-export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boolean }) {
-  // Solo personaliza; nunca cambia lo que se pide para entrar.
-  const destino = esPersona ? "/personas" : "/abogados";
+export function PantallaIniciarSesion({
+  esPersona = false,
+  next,
+  errorInicial,
+}: {
+  esPersona?: boolean;
+  /** Ruta interna a la que volver (ya validada por la page). */
+  next?: string;
+  /** Mensaje que trae la URL (p. ej. un enlace de correo caducado). */
+  errorInicial?: string;
+}) {
+  // Solo personaliza; a dónde entra lo decide la cuenta al iniciar sesión.
+  const [destino, setDestino] = useState(next ?? (esPersona ? "/personas" : "/abogados"));
   const altaHref = esPersona ? "/crear-cuenta?tipo=persona" : "/crear-cuenta";
   // Hasta el placeholder delata la audiencia: "nombre@bufete.hn" le dice a un
   // ciudadano que se equivocó de sitio.
@@ -49,23 +54,43 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
   const [pass, setPass] = useState("");
   const [verPass, setVerPass] = useState(false);
   const [recordar, setRecordar] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(errorInicial ?? "");
+  const [ocupado, setOcupado] = useState(false);
 
   const emailOk = EMAIL_RE.test(correo);
 
-  const entrar = () => {
+  const entrar = async () => {
     if (!emailOk) return setError("Ingresa un correo electrónico válido.");
     if (!pass) return setError("Escribe tu contraseña.");
     setError("");
+    setOcupado(true);
+    const supabase = supabaseNavegador();
+    const { error: e } = await supabase.auth.signInWithPassword({ email: correo, password: pass });
+    if (e) {
+      setOcupado(false);
+      return setError(mensajeAuth(e.code, "No se pudo iniciar sesión. Inténtalo de nuevo."));
+    }
+    // La cuenta decide el portal; `next` (validado) gana si venía de una ruta concreta.
+    if (!next) {
+      const { data } = await supabase.rpc("mi_destino");
+      setDestino(data === "abogados" ? "/abogados" : "/personas");
+    }
+    setOcupado(false);
     setVista("splash");
   };
 
-  const enviarEnlace = () => {
+  const enviarEnlace = async () => {
     if (!emailOk) {
       setVista("recuperar");
       return setError("Ingresa un correo electrónico válido.");
     }
     setError("");
+    setOcupado(true);
+    const { error: e } = await supabaseNavegador().auth.resetPasswordForEmail(correo, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/restablecer`,
+    });
+    setOcupado(false);
+    if (e) return setError(mensajeAuth(e.code, "No se pudo enviar el enlace. Inténtalo en un momento."));
     setVista("enviado");
   };
 
@@ -96,7 +121,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
               className="mt-6 flex flex-col gap-3.5"
               onSubmit={(e) => {
                 e.preventDefault();
-                entrar();
+                void entrar();
               }}
             >
               <CampoAuth
@@ -165,9 +190,10 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
               {error && <ErrorAuth mensaje={error} />}
               <button
                 type="submit"
-                className="btn-celeste mt-0.5 cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold"
+                disabled={ocupado}
+                className="btn-celeste mt-0.5 cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold disabled:opacity-60"
               >
-                Iniciar sesión
+                {ocupado ? "Entrando…" : "Iniciar sesión"}
               </button>
               <p className="text-center text-[13px]" style={{ color: "#5a6b82" }}>
                 ¿Aún no tienes cuenta?{" "}
@@ -191,7 +217,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
               className="mt-6 flex flex-col gap-3.5"
               onSubmit={(e) => {
                 e.preventDefault();
-                enviarEnlace();
+                void enviarEnlace();
               }}
             >
               <CampoAuth
@@ -208,9 +234,10 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
               {error && <ErrorAuth mensaje={error} />}
               <button
                 type="submit"
-                className="btn-celeste cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold"
+                disabled={ocupado}
+                className="btn-celeste cursor-pointer rounded-[10px] border-none py-[13px] text-[14.5px] font-semibold disabled:opacity-60"
               >
-                Enviar enlace
+                {ocupado ? "Enviando…" : "Enviar enlace"}
               </button>
               <button
                 type="button"
@@ -256,7 +283,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
               style={{ color: "#5a6b82" }}
             >
               Enviamos un enlace de recuperación a <b className="text-marino">{correo}</b>.
-              Expira en 30 minutos.
+              Expira en una hora.
             </p>
             <button
               type="button"
@@ -267,7 +294,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
             </button>
             <button
               type="button"
-              onClick={enviarEnlace}
+              onClick={() => void enviarEnlace()}
               className="mt-3 cursor-pointer text-[12.5px] transition-colors select-none hover:text-celeste"
               style={{ color: "#8095ad" }}
             >
@@ -279,10 +306,7 @@ export function PantallaIniciarSesion({ esPersona = false }: { esPersona?: boole
 
       {vista === "splash" && <SplashJustihn destino={destino} />}
 
-      <p className="relative mt-4 text-[11.5px]" style={{ color: "var(--muted)" }}>
-        Demo de validación — todavía no se crean cuentas ni sesiones reales.
-      </p>
-      <p className="relative mt-2 text-[12px]" style={{ color: "var(--muted)" }}>
+      <p className="relative mt-4 text-[12px]" style={{ color: "var(--muted)" }}>
         © 2026 Justihn · Honduras
       </p>
     </section>

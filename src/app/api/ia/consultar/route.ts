@@ -27,9 +27,7 @@ export async function POST(req: Request) {
     schema: consultaSchema,
     rateLimit: { limit: 20, windowMs: 60_000 },
     rateLimitGlobal: motor ? { limit: techoDiarioIA(), windowMs: 86_400_000 } : undefined,
-    // TODO(auth): pasar a "session" al cablear Supabase Auth. Hoy la ruta es
-    // pública porque el portal corre en modo demo sin datos de personas reales.
-    role: "public",
+    role: "session",
     cost: 0,
     maxBodyBytes: 8 * 1024,
   });
