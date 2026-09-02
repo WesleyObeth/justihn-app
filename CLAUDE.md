@@ -618,6 +618,18 @@ esconde a la clave `anon`). Todo pasa por `guard()`; nada gasta LLM.
 
 ### 1.5 Marca
 
+- **Card «Papel» en los dos portales** (decisión Wesley 2026-09-02, «si no me
+  gusta, lo revertimos»). Se compararon cuatro tratamientos sobre el Dashboard
+  real —Actual · Vidrio · Papel · Trazo— en un prototipo intercambiable:
+  https://claude.ai/code/artifact/0ed80186-a4da-44c8-aac4-deb6e36c1cce.
+  Papel = sin borde visible, radio 16, sombra tonal marina en dos capas
+  (`--shadow-papel`), y la interactiva se levanta 1px al pasar el mouse. Motivo:
+  sobre el lienzo Cielo el borde gris de 1px se perdía y las cards no se
+  separaban del fondo. Vidrio (glass) se descartó por costo de GPU en listas
+  largas y contraste en pantallas baratas. Vive en UN sitio: el primitivo
+  `Card` de `ui/primitivos.tsx` (+ 2 tokens en `globals.css`); revertir es ese
+  bloque.
+
 - **Favicon:** `src/app/icon.svg` **ES** `logo/justihn-icon.svg`, con el viewBox
   recortado a la tinta (`4.1 1.1 39.9 39.9`) y sin adaptación a modo oscuro — el
   logo no cambia de color. ⚠️ Rompe a propósito la ficha de marca (que pedía la

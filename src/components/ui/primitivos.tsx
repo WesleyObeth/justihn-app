@@ -59,12 +59,21 @@ export function Card({
   interactiva,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { interactiva?: boolean }) {
+  /**
+   * Tratamiento «Papel» (decisión Wesley 2026-09-02, prototipo con 4
+   * variantes: Actual · Vidrio · Papel · Trazo): sin borde visible, radio 16 y
+   * sombra tonal marina en dos capas — sobre el lienzo Cielo el borde gris de
+   * 1px se perdía y las cards no se separaban del fondo. El borde se conserva
+   * transparente para que nada se mueva un píxel respecto a la versión
+   * anterior. La interactiva se levanta 1px al pasar el mouse. Revertir = este
+   * bloque y los dos tokens `--shadow-papel*` de globals.css.
+   */
   return (
     <div
       className={cn(
-        "rounded-xl border border-borde bg-white",
+        "rounded-2xl border border-transparent bg-white shadow-papel",
         interactiva &&
-          "cursor-pointer transition-shadow hover:border-celeste hover:shadow-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-celeste",
+          "cursor-pointer transition-[box-shadow,transform] hover:-translate-y-px hover:shadow-papel-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-celeste",
         className,
       )}
       {...props}
