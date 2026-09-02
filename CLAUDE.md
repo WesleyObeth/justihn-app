@@ -808,72 +808,32 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
 
 ## 6. Pendientes — próxima sesión (en orden)
 
-> **Foto al cerrar el 2026-09-01:** 2.009 sentencias · 24.808 fragmentos, todos
-> vectorizados · 353 reservadas · página 42 de ~405 · `launchd` cargado. Jus IA
-> responde con citas reales **en local**; en `justihn.com` sigue el motor de
-> demostración porque Vercel no tiene las variables.
+> **Foto al cerrar el 2026-09-02:** 🎉 **EL CORPUS ESTÁ COMPLETO Y EN VIVO.**
+> 19.742 sentencias · 150.600 fragmentos, TODOS vectorizados (~US$1,25 total) ·
+> 2.423 reservadas por §5 (12,3%) · + 2.162 artículos de legislación. Jus IA
+> responde en **justihn.com** con el motor real: Upstash conectado (interlock
+> verde), techo diario armado, rate limit probado en producción (429 al nº 21),
+> y la negativa honesta verificada en vivo. El launchd nocturno quedó
+> descargado: el corpus pasa a mantenimiento con el **refresco semanal** de
+> `tareas-desde-la-mac.md` §1b (captura de lo nuevo + espejo de retiradas).
 
-0. **🚀 TERMINAR EL CORPUS Y PONERLO EN VIVO** — es lo primero de la próxima
-   sesión, y son dos cosas independientes que pueden ir en paralelo.
-
-   **(a) Capturar el resto.** Quedan ~18.200 sentencias (página 42 de ~405).
-   Dos caminos, y conviene el segundo:
-   - **Esperar el cron**: corre solo a las 02:00 (`noche.sh` captura 1.000 e
-     ingiere). A ese ritmo el corpus completo son **~18 noches**.
-   - **Correrlo a mano, que es mucho más rápido** — no hay que esperar a la
-     noche ni limitarse a 1.000:
-     ```bash
-     cd ~/Desktop/DignuxAI/justihn/automatizaciones/corpus-csj
-     ./noche.sh                    # 1.000 y las ingiere (~7 min)
-     node scraper.mjs --max=5000   # tandas más grandes
-     node ingesta.mjs              # subir lo capturado
-     node embeddings.mjs           # vectorizar lo nuevo (~US$0,01 por millar)
-     ```
-     Medido: **1.000 sentencias ≈ 7 min** de captura + 20 s de ingesta. Las
-     20.233 completas son ~2,5 h de reloj y **~US$1,20** de embeddings. El cron
-     y la corrida manual **no chocan**: el cursor (`estado.json`) es el mismo y
-     la ingesta es idempotente.
-   - ⚠️ **Solo desde la Mac.** El VPS no alcanza la API del PJ (geo-bloqueo
-     verificado). Y **`embeddings.mjs` hay que correrlo aparte** tras cada
-     captura: `noche.sh` no vectoriza a propósito, porque es el único paso que
-     cuesta dinero y no debe dispararse solo.
-
-   **(b) Poner las variables en Vercel** para que Jus IA responda en
-   `justihn.com`. Hoy el sitio en vivo usa `responderDemo` (el router de Fase 1)
-   porque `JUSTIHN_MOTOR_IA` no existe allí — el `.env.local` es local y está
-   fuera de git a propósito.
-
-   Los dos avisos que este punto arrastraba **quedaron resueltos en código el
-   2026-09-01** (commit "Frenos de gasto…", tests en `motor-activo.test.ts`):
-   - **Interlock:** en producción, si no hay rate limit distribuido, el motor
-     real NO se enciende aunque `JUSTIHN_MOTOR_IA` lo pida — se sirve el demo
-     y `console.error` dice exactamente qué falta. Un despliegue a medias
-     degrada a demo, nunca corre con la puerta abierta.
-   - **Techo global diario:** 200 consultas/día al motor real entre TODOS los
-     llamantes (`JUSTIHN_IA_TECHO_DIA` lo ajusta). Es el freno que la ventana
-     por IP no da — rotando IPs, 20/min eran ~29.000 consultas/día (~US$900);
-     con techo, el peor día cuesta ~US$6 y se acaba.
-
-   Checklist en el dashboard de Vercel (nada de esto lo puede hacer Claude —
-   el MCP de vercel está sin autenticar y no hay CLI logueada):
-   1. **Instalar "Upstash for Redis" desde el Marketplace de Vercel** (plan
-      free) y conectarlo al proyecto. Inyecta `KV_REST_API_URL/TOKEN`, que
-      `rate-limit.ts` ya acepta como alias — no hay que renombrar nada.
-   2. *Settings → Environment Variables*:
-
-      | Variable | Valor |
-      |---|---|
-      | `NEXT_PUBLIC_SUPABASE_URL` | `https://eemgphtiywxwrqwpylkv.supabase.co` |
-      | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | la `anon` (pública por diseño; su seguridad es RLS) |
-      | `OPENAI_API_KEY` | **sin** `NEXT_PUBLIC_`, o acabaría en el bundle del navegador |
-      | `JUSTIHN_MOTOR_IA` | `openai` |
-
-   3. Redeploy y probar: si responde demo, mirar los logs — el interlock dice
-      qué variable falta.
-   4. **Límite de gasto en OpenAI** (platform.openai.com → Settings → Limits):
-      sigue siendo el cinturón de seguridad externo al código. Con el techo
-      diario ya no es lo único que separa el saldo de un abuso, pero ponerlo
-      cuesta un minuto.
+0. [x] ✅ **CORPUS COMPLETO Y EN VIVO (2026-09-02).** Lo que este punto pedía
+   quedó hecho: captura terminada (19.742 de 20.232 — las ~490 restantes viven
+   en páginas que la paginación profunda de la API devuelve vacías; el refresco
+   semanal las recogerá cuando el listado las sirva), variables en Vercel,
+   Upstash del Marketplace conectado (alias `KV_*`), límite de gasto en OpenAI
+   (US$50) y disco de Supabase en 8 GB con ~6 libres.
+   **Las tres averías de la carga masiva y sus defensas** (ya en el código,
+   las hereda la próxima fuente grande — La Gaceta):
+   - **La API devuelve páginas vacías por hipo Y tiene huecos de paginación
+     profunda** (398-404 vacías con la 405 llena): el scraper reintenta 3
+     veces y luego SALTA la página; el fin solo se declara pasado el total.
+   - **El WAL de Postgres crece más rápido que el autoscaling del disco de
+     Supabase** en cargas masivas (error 53100 con el disco "vacío"): pausa
+     de 1,5 s entre lotes de embeddings.
+   - **El índice HNSW encarece cada insert a medida que crece** (statement
+     timeout 57014 a los ~40k vectores): las escrituras van en tandas de 50
+     con reintento.
 
 1. **🔎 REFINADO FINAL DE LOS DOS PORTALES — `/abogados` (15 pantallas) y
    `/personas` (9 rutas) — ANTES de Supabase** (decisión Wesley 2026-08-30).
@@ -931,12 +891,13 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
 
 ## 7. Qué falta para Fase 2 (en orden)
 
-1. [~] **Corpus — EN CURSO desde el 2026-09-01.** El proyecto Supabase existe
+1. [x] ✅ **Corpus — COMPLETO el 2026-09-02.** El proyecto Supabase
    (`eemgphtiywxwrqwpylkv`) con `sentencias` + `sentencia_chunks` (pgvector,
-   HNSW) y el RPC `buscar_corpus` que `motor-claude.ts` ya nombraba en su
-   `TODO(data)`. **1.705 sentencias y 20.739 fragmentos** dentro; el resto entra
-   solo, cada noche (`justihn/automatizaciones/corpus-csj/`, launchd 02:00).
-   Falta capturar ~18.500 (≈3 semanas) y **vectorizar** al final.
+   HNSW) y el RPC `buscar_corpus`. **19.742 sentencias · 150.600 fragmentos,
+   todos vectorizados** (las ~490 restantes viven en los huecos de paginación
+   de la API — las recoge el refresco semanal, `tareas-desde-la-mac.md` §1b,
+   que además **espeja las retiradas del CEDIJ**: decisión Wesley 2026-09-01).
+   El launchd nocturno está descargado.
    - **Credenciales:** la `anon` va en `.env.local` (`NEXT_PUBLIC_*`, ignorada
      por git). ⚠️ La `service_role` **NUNCA** entra en este repo: se deploya a
      Vercel y un `NEXT_PUBLIC_` la publicaría en el bundle. Vive en
