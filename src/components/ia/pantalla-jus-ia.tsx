@@ -36,35 +36,59 @@ export function PantallaJusIA() {
     return () => window.clearTimeout(id);
   }, [enviar]);
 
+  // El título de la conversación es su primera pregunta: al reabrir una del
+  // historial, es lo único que dice en cuál estás.
+  const titulo = chat.find((m) => m.who === "u")?.text ?? "";
+
   return (
-    <div
-      className="mx-auto flex h-full w-full max-w-[760px] flex-col"
-      style={{ animation: "fadeUp .3s ease" }}
-    >
-      <div className="flex items-center justify-between pb-2">
+    <div className="flex h-full flex-col" style={{ animation: "fadeUp .3s ease" }}>
+      {/*
+        Acciones de PÁGINA, no del hilo: van en la línea de cabecera que las
+        demás pantallas usan para su título (ancho 1280, no la columna de 760).
+        Antes flotaban en los bordes de la columna del chat, que no se ve: en
+        la pantalla vacía «Historial» quedaba suelto a la derecha de nada, y en
+        conversación «Nueva consulta» se leía como parte del hilo. Mismo patrón
+        que Notificaciones: estado a la izquierda, acciones a la derecha.
+      */}
+      <div className="mb-3 flex min-h-[34px] max-w-[1280px] items-center justify-between gap-4">
         {hayMensajes ? (
-          <button
-            type="button"
-            onClick={nueva}
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-borde bg-white px-3 py-[7px] text-[12.5px] font-semibold text-marino hover:border-celeste hover:text-celeste"
-          >
-            <Icono nombre="mas" size={12} strokeWidth={2.2} />
-            Nueva consulta
-          </button>
+          <p className="min-w-0 truncate text-[13px] text-texto-3" title={titulo}>
+            <span className="hidden text-texto-4 sm:inline">Consulta actual · </span>
+            <span className="font-semibold text-marino">{titulo}</span>
+          </p>
         ) : (
           <span />
         )}
-        <button
-          type="button"
-          onClick={() => setHistorialAbierto(true)}
-          className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-[7px] text-[12.5px] text-texto-3 hover:bg-white hover:text-marino"
-        >
-          <Icono nombre="reloj" size={13} strokeWidth={2} />
-          Historial
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setHistorialAbierto(true)}
+            aria-label="Historial de consultas"
+            title="Historial de consultas"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-[7px] text-[12.5px] text-texto-3 hover:bg-white hover:text-marino"
+          >
+            <Icono nombre="reloj" size={13} strokeWidth={2} />
+            {/* En móvil, con conversación, el título necesita el ancho: solo
+                icono. Sin conversación no compite con nada y el reloj solo
+                sería críptico. */}
+            <span className={cn(hayMensajes && "hidden sm:inline")}>Historial</span>
+          </button>
+          {hayMensajes && (
+            <button
+              type="button"
+              onClick={nueva}
+              aria-label="Nueva consulta"
+              title="Nueva consulta"
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-borde bg-white px-3 py-[7px] text-[12.5px] font-semibold text-marino hover:border-celeste hover:text-celeste"
+            >
+              <Icono nombre="mas" size={12} strokeWidth={2.2} />
+              <span className="hidden sm:inline">Nueva consulta</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div className="mx-auto flex min-h-0 w-full max-w-[760px] flex-1 flex-col">
         {hayMensajes ? (
           <Hilo chat={chat} pensando={pensando} onEnviar={enviar} />
         ) : (
