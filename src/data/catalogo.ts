@@ -47,6 +47,7 @@ export const PLANES: Plan[] = [
     periodoAnual: "/año",
     colorEtiqueta: "var(--color-celeste)",
     features: [
+      "Mis casos: expediente por cliente, checklist y plazos",
       "Jurisprudencia y legislación ilimitadas",
       "Alertas de Gaceta por materia",
       "Jus IA con citas verificadas (60/mes)",
@@ -73,7 +74,8 @@ export const PLANES: Plan[] = [
     colorEtiqueta: "var(--color-dorado)",
     features: [
       "Jus IA con citas ilimitada",
-      "Modelos de escritos editables",
+      "Propuestas de honorarios generadas desde el trámite",
+      "Modelos de escritos editables, incluidos los notariales",
       "Calculadoras y análisis de documentos",
       "Monitoreo de nombres",
       "Prioridad en leads del directorio",
@@ -103,7 +105,37 @@ export function getPlan(id: string): Plan | undefined {
  * Las `vistaPrevia` son aperturas de demostración con [corchetes] por completar
  * — el texto final lo valida el socio abogado (backlog #5 del proyecto).
  */
+/**
+ * Los modelos notariales (auténticas, acta de matrimonio) nacen el 2026-09-02
+ * del feedback de un abogado. Son BORRADORES de estructura para revisión del
+ * socio: no citan artículos del Código del Notariado porque esa norma no está
+ * en ninguna fuente estatal legible (ver `actos-notariales.ts`).
+ */
 export const PLANTILLAS: Plantilla[] = [
+  {
+    id: "autentica-firma",
+    tipo: "Notarial",
+    nombre: "Razón de autenticación de firma",
+    desc: "Borrador de estructura — pendiente de revisión del socio.",
+    vistaPrevia:
+      "El infrascrito Notario, [NOMBRE], con exequátur número [___], DA FE: que la firma que antecede, puesta al pie del documento [DESCRIPCIÓN], es auténtica por haber sido puesta en mi presencia, en esta fecha, por [NOMBRE DEL COMPARECIENTE], mayor de edad, [ESTADO CIVIL], [PROFESIÓN], de este domicilio, a quien identifico con su documento de identidad número [___].\n\n[CIUDAD], [FECHA].",
+  },
+  {
+    id: "autentica-copia",
+    tipo: "Notarial",
+    nombre: "Razón de autenticación de copia",
+    desc: "Borrador de estructura — pendiente de revisión del socio.",
+    vistaPrevia:
+      "El infrascrito Notario, [NOMBRE], con exequátur número [___], DA FE: que la presente fotocopia, compuesta de [N] folios, es fiel y conforme con su original, documento [DESCRIPCIÓN], que he tenido a la vista y devuelvo a la persona interesada.\n\n[CIUDAD], [FECHA].",
+  },
+  {
+    id: "acta-matrimonio-notarial",
+    tipo: "Notarial",
+    nombre: "Acta de matrimonio civil ante notario",
+    desc: "Comparecencia, lectura de los artículos 40, 41, 42, 64, 68 y 70 y régimen patrimonial (art. 30 C. de Familia).",
+    vistaPrevia:
+      "En la ciudad de [CIUDAD], a los [___] días del mes de [___] de [AÑO], ante mí, [NOTARIO], Notario Público con exequátur número [___], comparecen [CONTRAYENTE 1] y [CONTRAYENTE 2], mayores de edad, [ESTADOS CIVILES], [PROFESIONES], de este domicilio, con identidades número [___] y [___], acompañados de los testigos [TESTIGO 1] y [TESTIGO 2], mayores de edad, no parientes de los contrayentes…\n\nDI LECTURA de viva voz a los artículos 40, 41, 42, 64, 68 y 70 del Código de Familia y, preguntados los contrayentes si comprenden sus alcances y persisten en formalizar el matrimonio, respondieron afirmativamente, adoptando el régimen patrimonial de [RÉGIMEN]…",
+  },
   {
     id: "divorcio-mutuo",
     tipo: "Familia",

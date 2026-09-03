@@ -17,9 +17,13 @@ import { ABOGADA_DEMO, CUOTA_BASE, NOTIFICACIONES } from "@/data/catalogo";
 import { PERSONA_DEMO } from "@/data/persona";
 import { VIGILADOS_INICIALES, VIGILADOS_INICIALES_PERSONA } from "@/data/monitoreo";
 import type {
+  Caso,
+  DocumentoCaso,
   Lead,
   Materia,
   MensajeChat,
+  PlazoCaso,
+  PropuestaHonorarios,
   NombreVigilado,
   PlanId,
   MensajeAbogado,
@@ -93,6 +97,10 @@ interface PortalState {
   prefsPersona: Record<string, boolean>;
   escrito: { abierto: boolean; titulo: string; texto: string };
   toast: string;
+  /** Expedientes del despacho («Mis casos»). Persistido. */
+  casos: Caso[];
+  /** Propuestas de honorarios guardadas. Persistido. */
+  propuestas: PropuestaHonorarios[];
 
   setPlan: (plan: PlanId, ciclo?: CicloPlan) => void;
   setBorrador: (texto: string) => void;
@@ -131,6 +139,25 @@ interface PortalState {
   cerrarEscrito: () => void;
   mostrarToast: (mensaje: string) => void;
   ocultarToast: () => void;
+  /** Devuelve el id del caso creado. */
+  crearCaso: (
+    datos: Pick<Caso, "cliente" | "tipo" | "referenciaId" | "titulo" | "notas"> & {
+      documentos: DocumentoCaso[];
+      plazos?: PlazoCaso[];
+    },
+  ) => string;
+  actualizarCaso: (
+    id: string,
+    cambios: Partial<Pick<Caso, "estado" | "notas" | "cliente" | "propuestaId">>,
+  ) => void;
+  toggleDocumentoCaso: (casoId: string, indice: number) => void;
+  agregarDocumentoCaso: (casoId: string, titulo: string) => void;
+  agregarPlazoCaso: (casoId: string, titulo: string, fechaIso: string) => void;
+  quitarPlazoCaso: (casoId: string, plazoId: string) => void;
+  eliminarCaso: (id: string) => void;
+  /** Devuelve el id (nuevo o el mismo si venía). */
+  guardarPropuesta: (p: Omit<PropuestaHonorarios, "id" | "abogadoId" | "creadoEn"> & { id?: string }) => string;
+  eliminarPropuesta: (id: string) => void;
 }
 
 // Coherente con ABOGADA_DEMO.especialidades (Laboral · Civil · Familia):
@@ -155,6 +182,8 @@ export function migrarPersistido(persistido: unknown, version: number): unknown 
         leadsRespondidos?: Record<string, unknown>;
         mensajesAbogado?: Record<string, unknown>;
     preguntasPublico?: unknown[];
+    casos?: unknown;
+    propuestas?: unknown;
       }
     | undefined;
   if (!s) return persistido;
@@ -236,6 +265,12 @@ export function migrarPersistido(persistido: unknown, version: number): unknown 
       const { nuevo: _nuevo, respuestas: _respuestas, respuestaDemo: _demo, ...resto } = fila;
       return { ...resto, personaId: typeof fila.personaId === "string" ? fila.personaId : PERSONA_DEMO.id };
     });
+  }
+
+  // v6: Mis casos y propuestas de honorarios. Listas vacías si no existían.
+  if (version < 6) {
+    if (!Array.isArray(s.casos)) s.casos = [];
+    if (!Array.isArray(s.propuestas)) s.propuestas = [];
   }
 
   return persistido;
@@ -426,6 +461,104 @@ export const usePortal = create<PortalState>()(
       abrirEscrito: (titulo, texto) => set({ escrito: { abierto: true, titulo, texto } }),
       setTextoEscrito: (texto) => set((s) => ({ escrito: { ...s.escrito, texto } })),
       cerrarEscrito: () => set((s) => ({ escrito: { ...s.escrito, abierto: false } })),
+      casos: [],
+      propuestas: [],
+      crearCaso: (datos) => {
+        const id = `caso-${Date.now().toString(36)}`;
+        const ahora = new Date().toISOString();
+        set((s) => ({
+          casos: [
+            {
+              id,
+              abogadoId: ABOGADA_DEMO.id,
+              cliente: datos.cliente,
+              tipo: datos.tipo,
+              referenciaId: datos.referenciaId,
+              titulo: datos.titulo,
+              estado: "abierto",
+              documentos: datos.documentos,
+              plazos: datos.plazos ?? [],
+              notas: datos.notas,
+              creadoEn: ahora,
+              actualizadoEn: ahora,
+            },
+            ...s.casos,
+          ],
+        }));
+        return id;
+      },
+      actualizarCaso: (id, cambios) =>
+        set((s) => ({
+          casos: s.casos.map((c) =>
+            c.id === id ? { ...c, ...cambios, actualizadoEn: new Date().toISOString() } : c,
+          ),
+        })),
+      toggleDocumentoCaso: (casoId, indice) =>
+        set((s) => ({
+          casos: s.casos.map((c) =>
+            c.id === casoId
+              ? {
+                  ...c,
+                  documentos: c.documentos.map((d, i) =>
+                    i === indice ? { ...d, recibido: !d.recibido } : d,
+                  ),
+                  actualizadoEn: new Date().toISOString(),
+                }
+              : c,
+          ),
+        })),
+      agregarDocumentoCaso: (casoId, titulo) =>
+        set((s) => ({
+          casos: s.casos.map((c) =>
+            c.id === casoId
+              ? { ...c, documentos: [...c.documentos, { titulo, recibido: false }] }
+              : c,
+          ),
+        })),
+      agregarPlazoCaso: (casoId, titulo, fechaIso) =>
+        set((s) => ({
+          casos: s.casos.map((c) =>
+            c.id === casoId
+              ? {
+                  ...c,
+                  plazos: [
+                    ...c.plazos,
+                    { id: `plazo-${Date.now().toString(36)}`, titulo, fechaIso },
+                  ].sort((a, b) => a.fechaIso.localeCompare(b.fechaIso)),
+                }
+              : c,
+          ),
+        })),
+      quitarPlazoCaso: (casoId, plazoId) =>
+        set((s) => ({
+          casos: s.casos.map((c) =>
+            c.id === casoId ? { ...c, plazos: c.plazos.filter((p) => p.id !== plazoId) } : c,
+          ),
+        })),
+      eliminarCaso: (id) => set((s) => ({ casos: s.casos.filter((c) => c.id !== id) })),
+      guardarPropuesta: (p) => {
+        const id = p.id ?? `prop-${Date.now().toString(36)}`;
+        set((s) => {
+          const existente = s.propuestas.find((x) => x.id === id);
+          const fila: PropuestaHonorarios = {
+            ...p,
+            id,
+            abogadoId: ABOGADA_DEMO.id,
+            creadoEn: existente?.creadoEn ?? new Date().toISOString(),
+          };
+          return {
+            propuestas: existente
+              ? s.propuestas.map((x) => (x.id === id ? fila : x))
+              : [fila, ...s.propuestas],
+          };
+        });
+        return id;
+      },
+      eliminarPropuesta: (id) =>
+        set((s) => ({
+          propuestas: s.propuestas.filter((p) => p.id !== id),
+          casos: s.casos.map((c) => (c.propuestaId === id ? { ...c, propuestaId: undefined } : c)),
+        })),
       mostrarToast: (toast) => set({ toast }),
       ocultarToast: () => set({ toast: "" }),
     }),
@@ -447,8 +580,10 @@ export const usePortal = create<PortalState>()(
        *      en respuestas, mensajes y preguntas del consultorio.
        *  v5: `Lead` se quedó solo con la fila: fuera `nuevo` y `respuestas`
        *      (estado del lector y conteo derivado) y entra `personaId`.
+       *  v6: nacen `casos` y `propuestas` (Mis casos + propuestas de
+       *      honorarios). Solo hay que garantizar que existan como listas.
        */
-      version: 5,
+      version: 6,
       migrate: migrarPersistido,
       partialize: (s) => ({
         plan: s.plan,
@@ -472,6 +607,8 @@ export const usePortal = create<PortalState>()(
         notifsLeidasIds: s.notifsLeidasIds,
         leadsVistosIds: s.leadsVistosIds,
         sidebarColapsado: s.sidebarColapsado,
+        casos: s.casos,
+        propuestas: s.propuestas,
       }),
     },
   ),

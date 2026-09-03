@@ -316,6 +316,80 @@ export interface ItemBrief {
   accion: string;
 }
 
+// ── Despacho: casos y propuestas (nacen 2026-09-02 del feedback de un abogado) ──
+
+/** De qué nace un caso: un acto notarial, un trámite ante una institución o un proceso judicial. */
+export type TipoCaso = "notarial" | "tramite" | "proceso";
+
+/** Un documento del expediente y si ya lo entregó el cliente. */
+export interface DocumentoCaso {
+  titulo: string;
+  /** Artículo que lo exige, si la fuente está cargada. */
+  fuente?: string;
+  recibido: boolean;
+}
+
+/** Un vencimiento que el expediente vigila. */
+export interface PlazoCaso {
+  id: string;
+  titulo: string;
+  /** Día (YYYY-MM-DD). */
+  fechaIso: string;
+}
+
+/**
+ * Tabla `casos` — el expediente por cliente («Mis casos», pantalla #16,
+ * desbloqueada por el feedback de #4 del producto). El checklist nace del
+ * origen (`actos-notariales.ts` o la guía de `tramites.ts`) al crearlo y desde
+ * ahí es del caso: si la guía cambia, un expediente ya abierto no pierde lo
+ * que el cliente ya entregó. RLS por `abogado_id`.
+ */
+export interface Caso {
+  id: string;
+  abogadoId: string;
+  cliente: {
+    nombre: string;
+    /** 13 dígitos sin guiones (`lib/identidad.ts`). */
+    identidad?: string;
+    telefono?: string;
+    correo?: string;
+  };
+  tipo: TipoCaso;
+  /** id del acto notarial, del trámite o del proceso, según `tipo`. */
+  referenciaId: string;
+  titulo: string;
+  estado: "abierto" | "en_tramite" | "cerrado";
+  documentos: DocumentoCaso[];
+  plazos: PlazoCaso[];
+  notas: string;
+  /** Propuesta de honorarios vinculada, si la hay. */
+  propuestaId?: string;
+  creadoEn: string;
+  actualizadoEn: string;
+}
+
+/**
+ * Tabla `propuestas_honorarios`. Guarda SOLO lo que escribió el abogado; el
+ * documento (servicios, requisitos, advertencias) se deriva de la guía en
+ * cada render con `lib/honorarios.ts` — un solo dato de origen (§4.4).
+ */
+export interface PropuestaHonorarios {
+  id: string;
+  abogadoId: string;
+  casoId?: string;
+  origen: { tipo: TipoCaso; referenciaId: string };
+  cliente: { nombre: string; rtn?: string; atencion?: string };
+  referencia: string;
+  /** Día de la propuesta (YYYY-MM-DD). */
+  fechaIso: string;
+  /** Lempiras. */
+  honorarios: number;
+  /** «en un solo pago» · «50% al inicio y 50% a la entrega» … */
+  formaPago: string;
+  notas?: string;
+  creadoEn: string;
+}
+
 /** Documento de validación profesional ante el CAH. */
 export interface DocumentoValidacion {
   id: string;

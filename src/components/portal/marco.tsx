@@ -67,7 +67,7 @@ export function BannerValidacion() {
   if (oculto || constanciaSubida || pathname === "/abogados/perfil") return null;
 
   return (
-    <div className="mb-4.5 flex max-w-[1280px] flex-wrap items-center gap-3 rounded-xl border border-aviso-borde bg-aviso px-4.5 py-3.5">
+    <div className="mb-4.5 flex max-w-[1280px] flex-wrap items-center gap-3 rounded-xl border border-aviso-borde bg-aviso px-4.5 py-3.5 print:hidden">
       <span className="grid place-items-center text-aviso-texto">
         <Icono nombre="alerta" size={16} />
       </span>

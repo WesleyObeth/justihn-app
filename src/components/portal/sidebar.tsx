@@ -24,6 +24,11 @@ type EntradaNav = ItemNav | { seccion: string };
 const NAV: EntradaNav[] = [
   { href: "/abogados", label: "Jus IA", jusIa: true },
   { href: "/abogados/dashboard", label: "Dashboard", icono: "dash" },
+  // Despacho: lo que el abogado gestiona, no lo que consulta (nace 2026-09-02
+  // del feedback de un abogado: expedientes y propuestas de honorarios).
+  { seccion: "Despacho" },
+  { href: "/abogados/casos", label: "Mis casos", icono: "documento" },
+  { href: "/abogados/propuestas", label: "Propuestas", icono: "plantillas", premium: true },
   { seccion: "Investigación" },
   { href: "/abogados/jurisprudencia", label: "Jurisprudencia", icono: "juris" },
   { href: "/abogados/legislacion", label: "Legislación", icono: "libro" },
@@ -51,7 +56,7 @@ export function Sidebar({ variante = "escritorio" }: { variante?: "escritorio" |
     <nav
       aria-label="Navegación principal"
       className={cn(
-        "relative z-20 flex shrink-0 flex-col text-[#e8eef6] transition-[width,min-width] duration-[250ms]",
+        "relative z-20 flex shrink-0 flex-col text-[#e8eef6] transition-[width,min-width] duration-[250ms] print:hidden",
         esMovil ? "h-full" : "max-lg:hidden",
       )}
       style={{
@@ -383,7 +388,7 @@ export function HeaderMovil() {
   const setMenuMovil = usePortal((s) => s.setMenuMovil);
 
   return (
-    <header className="flex items-center gap-2.5 border-b border-borde bg-white px-4 py-2.5 lg:hidden">
+    <header className="print:hidden flex items-center gap-2.5 border-b border-borde bg-white px-4 py-2.5 lg:hidden">
       <button
         type="button"
         onClick={() => setMenuMovil(true)}

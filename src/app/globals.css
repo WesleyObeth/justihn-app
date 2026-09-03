@@ -383,3 +383,21 @@
     animation-delay: 0.32s;
   }
 }
+
+/* Impresión a PDF de documentos del despacho (propuestas de honorarios):
+   papel carta, márgenes de documento, y el lienzo Cielo se apaga — un
+   degradado impreso gasta tinta y no es el documento. */
+@media print {
+  @page {
+    size: letter;
+    margin: 16mm;
+  }
+  .lienzo-cielo {
+    background: #fff !important;
+  }
+  .documento-imprimible {
+    box-shadow: none !important;
+    border: 0 !important;
+    max-width: none !important;
+  }
+}

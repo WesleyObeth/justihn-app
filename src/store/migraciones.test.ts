@@ -11,6 +11,19 @@ import { migrarPersistido } from "./portal";
 const migrar = (estado: unknown, desde: number) =>
   migrarPersistido(estado, desde) as Record<string, unknown>;
 
+describe("v6 — Mis casos y propuestas", () => {
+  it("garantiza las dos listas sin tocar lo demás", () => {
+    const s = migrar({ plan: "premium", casos: "basura" }, 5);
+    expect(s.casos).toEqual([]);
+    expect(s.propuestas).toEqual([]);
+    expect(s.plan).toBe("premium");
+  });
+  it("respeta listas que ya existieran", () => {
+    const s = migrar({ casos: [{ id: "c1" }], propuestas: [] }, 5);
+    expect(s.casos).toEqual([{ id: "c1" }]);
+  });
+});
+
 describe("v5 — el lead es solo la fila", () => {
   it("quita nuevo/respuestas/respuestaDemo de las preguntas persistidas y pone dueño", () => {
     const s = migrar(
@@ -102,8 +115,8 @@ describe("v3 — un solo id para la abogada demo", () => {
     expect(m[ABOGADA_DEMO.id]!.every((x) => x.abogadoId === ABOGADA_DEMO.id)).toBe(true);
   });
 
-  it("un estado ya migrado pasa intacto", () => {
+  it("un estado ya migrado pasa intacto (salvo las listas que v6 garantiza)", () => {
     const entrada = { leadsRespondidos: {}, mensajesAbogado: {}, plan: "premium" };
-    expect(migrar(structuredClone(entrada), 3)).toEqual(entrada);
+    expect(migrar(structuredClone(entrada), 3)).toEqual({ ...entrada, casos: [], propuestas: [] });
   });
 });

@@ -38,7 +38,7 @@ el 2026-08-31**: sus prototipos `.dc.html` (260 KB) y su runtime (72 KB) eran la
 maqueta de partida y el producto los superó — solo ese día se refinaron diez
 pantallas. Se conservaron los 40 KB de especificación, que sí es viva.
 
-### 1.1 Portal de abogados — `/abogados` (15 pantallas)
+### 1.1 Portal de abogados — `/abogados` (15 pantallas + Despacho, §1.1b)
 
 Rutas reales, no estado: el deep-link a una sentencia o a una publicación
 funciona y es compartible. Dashboard · Jus IA · Jurisprudencia · Legislación ·
@@ -72,6 +72,57 @@ Perfil · Planes · Configuración · Ayuda.
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
   disclaimer de homónimos y exclusión de materias reservadas; mientras la
   migración 03 no esté pasada, responde sobre el piloto **y lo dice** (§1.7).
+
+### 1.1b Despacho — Mis casos y Propuestas de honorarios (2026-09-02)
+
+Nacen del **primer feedback de un abogado externo** (ver `justihn/CLAUDE.md`
+backlog #4, #10 y #11): pagaba US$20/mes de ChatGPT sobre todo para redactar
+propuestas de honorarios, y pidió «digitalizar los expedientes notariales».
+Sección nueva del sidebar, **Despacho**, entre Dashboard e Investigación: lo
+que el abogado gestiona, no lo que consulta.
+
+- **Mis casos** (`/abogados/casos`, `+ /nuevo`, `+ /[id]`): el expediente por
+  cliente. Nace de un **acto notarial** (`data/actos-notariales.ts`: matrimonio
+  civil, auténtica, declaratoria de herederos), de un **trámite** o de un
+  **proceso** del catálogo, y **el checklist de documentos se llena desde la
+  fuente verificada** al crearlo; desde ahí es del caso (si la guía cambia, un
+  expediente abierto no pierde lo que el cliente ya entregó). Tres bloques de
+  trabajo —documentos con progreso, plazos con días restantes por `useHoy`,
+  notas— y lateral con cliente (DNI con máscara, opcional), origen con su
+  fuente, estado y la propuesta enlazada. `lib/casos.ts` es el único sitio que
+  sabe qué es un `referenciaId`. Store `casos` (v6), busca por id tras
+  `useStoreHidratado` (§1.2: sin eso, 404 falso al recargar).
+- **Propuestas de honorarios** (`/abogados/propuestas`, `+ /nueva`, `+ /[id]`):
+  el abogado elige de qué nace, pone honorarios, forma de pago y cliente, y el
+  documento **se ARMA desde la guía** (`lib/honorarios.ts`): alcance por
+  etapas = pasos, requisitos = requisitos con su artículo, advertencias = tasa
+  y nota, condiciones estándar, membrete del perfil. Cifra y letras («Dieciocho
+  mil lempiras exactos», `lempirasALetras`, con tests). El store guarda SOLO
+  lo que escribió; el documento se deriva en cada render (§4.4). **Descargar
+  en PDF = `window.print()`** con `print:hidden` en sidebar, header, banner y
+  barra, y `print:overflow-visible` en el layout (sin eso el `h-screen` +
+  scroll interno cortaba a una página); `@page` carta en `globals.css`. La
+  vista previa es libre; guardar y descargar son **Premium** (es la función
+  que justifica el plan frente a ChatGPT). Desde un caso llega prellenada
+  (`?caso=`) y al guardar se enlaza.
+- **Modelos notariales** (auténtica de firma, de copia, acta de matrimonio):
+  borradores de estructura, `desc` lo dice, para revisión del socio. La
+  pantalla Modelos abre con la card «Propuesta de honorarios desde un trámite».
+- ⚠️ **Sin fuente no hay texto, también aquí.** El matrimonio cita los arts.
+  21, 24-30 del Código de Familia (verificados en los artículos parseados de
+  `automatizaciones/legislacion/`). La auténtica declara `fuentePendiente`: el
+  Código del Notariado (Decreto 353-2005) no está en ninguna fuente estatal
+  legible que hayamos podido verificar. El divorcio por mutuo consentimiento
+  es JUDICIAL (art. 244: «al Juez»), así que entra como proceso, no como acto.
+  `actos-notariales.test.ts` exige fuente o pendencia declarada en cada acto.
+- **Verificado E2E en Chromium** con una cuenta real de prueba (login →
+  caso notarial con 10 documentos → marcar → plazo → propuesta prellenada con
+  «Quince mil lempiras exactos» y «art. 24» → guardar → PDF sin interfaz →
+  el caso enlaza la propuesta), y móvil sin desborde.
+- ⚙️ Pendiente: **nombre de la firma** separado del nombre del abogado en el
+  membrete (hoy repite «Abg. María Castillo»); columna `firma` en `abogados`
+  cuando el perfil se edite. Y el Dashboard aún no deriva «Pendientes de
+  hoy» de los plazos de los casos (sigue sobre `BRIEF`).
 
 ### 1.2 Portal ciudadano — `/personas` (17 rutas)
 
@@ -928,7 +979,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (222 tests de invariantes)
+pnpm test         # Vitest (243 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

@@ -60,6 +60,24 @@ export function PantallaPlantillas() {
 
   return (
     <>
+      {/* La propuesta de honorarios no es una plantilla fija: se ARMA desde el
+          trámite con los requisitos verificados. Por eso va aparte y arriba. */}
+      <Link
+        href="/abogados/propuestas/nueva"
+        className="mb-4 flex flex-wrap items-center gap-3.5 rounded-2xl border border-chip-borde bg-chip px-5 py-4 text-marino hover:border-celeste"
+      >
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-celeste">
+          <Icono nombre="plantillas" size={18} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[14.5px] font-semibold">Propuesta de honorarios desde un trámite</span>
+          <span className="mt-0.5 block text-[12.5px] text-texto-3">
+            Eliges el trámite o acto, pones honorarios y cliente, y sale el documento con los
+            requisitos citados de la fuente oficial. Listo para PDF.
+          </span>
+        </span>
+        <span className="text-[12.5px] font-semibold text-celeste">Crear propuesta →</span>
+      </Link>
       {!esPremium && (
         <div
           className="mb-4.5 flex flex-wrap items-center gap-3.5 rounded-xl px-5 py-4 text-[#e8eef6]"
