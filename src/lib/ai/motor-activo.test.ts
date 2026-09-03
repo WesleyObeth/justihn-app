@@ -6,7 +6,7 @@ import { guard } from "@/lib/security/api-guard";
 
 /**
  * El interlock del motor real y el techo global son los dos frenos de gasto
- * del endpoint público de Jus IA (§6.0 del CLAUDE.md). Si un refactor los
+ * del endpoint público de Jus IA (§0 y §7.1 del CLAUDE.md). Si un refactor los
  * relaja en silencio, el peor día pasa de ~US$6 a la tarjeta entera — por eso
  * cada regla está fijada aquí.
  */
