@@ -19,10 +19,12 @@ import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
  * Cuántos dígitos trae el código. **Tiene que coincidir con el proyecto de
  * Supabase** (Authentication, Sign In / Providers, Email, «Email OTP Length»):
  * si allí son 8 y aquí 6, la casilla se llena antes de tiempo y se verifica un
- * código truncado — que es exactamente lo que pasó el 2026-09-02 en la primera
- * prueba con SMTP propio. Un solo sitio para cambiarlo.
+ * código truncado, que es exactamente lo que pasó el 2026-09-02 en la primera
+ * prueba con SMTP propio. El proyecto quedó en 6 ese mismo día (decisión
+ * Wesley): es el estándar del sector y se teclea sin esfuerzo. Un solo sitio
+ * para cambiarlo si el ajuste de Supabase vuelve a moverse.
  */
-const LONGITUD_CODIGO = 8;
+const LONGITUD_CODIGO = 6;
 
 export function CodigoCorreo({
   correo,
