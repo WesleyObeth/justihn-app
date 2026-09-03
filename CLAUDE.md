@@ -1225,6 +1225,12 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
    - ✅ **Legislación conectada a las tablas reales (2026-09-03)** — §1.8.
      De paso, el seed pasó de «muestra» a **catálogo + destacados** y se
      corrigió el 399/400 invertido.
+   - ⏳ **Reestructurar Legislación** (pedido de Wesley 2026-09-03). Los tres
+     prototipos —Buscador · Lector · Temas— viven en un Artifact con el shell
+     del portal y datos reales, NO en el portal (se construyeron ahí por
+     error y se revirtieron el mismo día):
+     https://claude.ai/code/artifact/a7a10a59-7fc4-4d8e-9d07-0bde0cac98b5.
+     Al elegir, se construye esa estructura sobre lo ya conectado (§1.8).
    - ⏳ **Elegir la estructura de Legislación** entre las tres vistas que
      conviven en el portal (`?vista=`, §1.8) y borrar las otras dos junto con
      el conmutador. Recomendación: Temas como principal con la caja del
