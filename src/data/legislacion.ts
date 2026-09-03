@@ -181,6 +181,84 @@ export const CODIGOS: Codigo[] = [
   },
 ];
 
+/**
+ * Temas: la entrada por SITUACIÓN (prototipo «Temas», 2026-09-03). Cada tema
+ * junta los artículos que la regulan aunque vivan en códigos distintos, y la
+ * herramienta del portal que los aplica. Nacen de los destacados ya
+ * verificados; un tema nuevo exige que sus artículos existan en la tabla
+ * (`legislacion.test.ts` lo exige contra los destacados o el catálogo).
+ */
+export interface TemaLegislacion {
+  id: string;
+  titulo: string;
+  /** Pares código + número, en el orden en que se leen. */
+  articulos: { codigoId: string; numero: string }[];
+  herramienta: { etiqueta: string; href: string };
+  /** Qué hace la herramienta con estos artículos, en una frase. */
+  detalle: string;
+}
+
+const T = (numero: string) => ({ codigoId: "codigo-trabajo", numero });
+const F = (numero: string) => ({ codigoId: "codigo-familia", numero });
+const P = (numero: string) => ({ codigoId: "codigo-procesal-civil", numero });
+
+export const TEMAS_LEGISLACION: TemaLegislacion[] = [
+  {
+    id: "despido",
+    titulo: "Despido y prestaciones",
+    articulos: [T("116"), T("120"), T("120-A"), T("346"), T("864"), T("865")],
+    herramienta: { etiqueta: "Calcular prestaciones", href: "/abogados/calculadoras" },
+    detalle:
+      "La calculadora aplica los arts. 116, 120 y 346 y devuelve cada concepto con su artículo; el 864 marca el plazo para reclamar.",
+  },
+  {
+    id: "terminacion",
+    titulo: "Terminación del contrato de trabajo",
+    articulos: [T("110"), T("111"), T("112"), T("113"), T("114"), T("115")],
+    herramienta: { etiqueta: "Ver el proceso de despido", href: "/abogados/procesos" },
+    detalle: "Las causas justas de una y otra parte, y el emplazamiento cuando el patrono alega justa causa.",
+  },
+  {
+    id: "matrimonio",
+    titulo: "Matrimonio civil y notarial",
+    articulos: [F("21"), F("24"), F("30")],
+    herramienta: { etiqueta: "Abrir un caso de matrimonio", href: "/abogados/casos/nuevo" },
+    detalle: "Mis casos precarga el checklist de documentos desde estos artículos.",
+  },
+  {
+    id: "divorcio",
+    titulo: "Divorcio",
+    articulos: [F("240"), F("244")],
+    herramienta: { etiqueta: "Ver el proceso", href: "/abogados/procesos" },
+    detalle: "El mutuo consentimiento es judicial (art. 244): entra como proceso, no como acto notarial.",
+  },
+  {
+    id: "deuda",
+    titulo: "Cobro de una deuda",
+    articulos: [P("676"), P("677"), P("782"), P("400")],
+    herramienta: { etiqueta: "Calcular la vía por cuantía", href: "/abogados/calculadoras" },
+    detalle: "Monitorio hasta L 200,000; abreviado hasta L 100,000; los títulos extrajudiciales van a ejecución directa.",
+  },
+  {
+    id: "arrendamiento",
+    titulo: "Arrendamiento y depósito",
+    articulos: [P("400"), P("598")],
+    herramienta: { etiqueta: "Calcular la vía por cuantía", href: "/abogados/calculadoras" },
+    detalle: "La expiración del arrendamiento y la impugnación de depósitos van por el abreviado, con base en la Ley de Inquilinato.",
+  },
+  {
+    id: "via",
+    titulo: "¿Ordinario o abreviado?",
+    articulos: [P("399"), P("400")],
+    herramienta: { etiqueta: "Calcular la vía por cuantía", href: "/abogados/calculadoras" },
+    detalle: "El 399 reparte por materia; el 400, por cuantía y materias tasadas.",
+  },
+];
+
+export function getTema(id: string | null | undefined): TemaLegislacion | undefined {
+  return TEMAS_LEGISLACION.find((t) => t.id === id);
+}
+
 /** Ids viejos que siguen en enlaces (calculadoras, marcadores del navegador). */
 export const ALIAS_CODIGO: Record<string, string> = { cpc: "codigo-procesal-civil" };
 
