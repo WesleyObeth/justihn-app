@@ -826,11 +826,13 @@ maqueta** (mismo patrón que Monitoreo antes de la migración 03).
 - ⚙️ Pendientes: ampliar las reglas de materia con el socio; buscar en la
   Sección B por nombre (Monitoreo); el buscador global (⌘K) y el demo de la
   landing siguen sobre el seed; archivo 2015-2026 (`--desde 2015-01`).
-- 🚦 **Gate para verlo en vivo:** ✅ `01-gaceta.sql` pasado por Wesley el
-  2026-09-03. ⏳ Falta correr `python3 capturar.py --desde 2026-08` desde la
-  Mac y dejar el cron diario (`tareas-desde-la-mac.md` §4). Con las tablas
-  creadas y vacías la pantalla lo dice («conectada, sin ediciones
-  capturadas») y enseña la maqueta debajo; el Dashboard sigue en «Maqueta».
+- ✅ **EN VIVO desde el 2026-09-03**: `01-gaceta.sql` pasado por Wesley y
+  primera captura corrida (13 ediciones, 41 publicaciones: agosto hasta el
+  14 y el 1 de septiembre — hasta donde llega la ENAG). ⏳ Falta dejar el
+  **cron diario** (`tareas-desde-la-mac.md` §4). ⚠️ En la terminal de Wesley
+  `python3` es el de Anaconda: `pypdf` se instaló ahí (antes daba
+  `No module named 'pypdf'`). Con las tablas vacías la pantalla lo diría
+  («conectada, sin ediciones capturadas») y enseñaría la maqueta.
 
 **Confirmación del correo por CÓDIGO, no por enlace** (decisión Wesley
 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la deja
