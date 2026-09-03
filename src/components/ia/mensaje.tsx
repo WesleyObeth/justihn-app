@@ -11,12 +11,25 @@ import { renderMarkdownLite } from "@/lib/ai/markdown-lite";
 import { useMaquinaDeEscribir } from "./maquina-escribir";
 import type { MensajeChat } from "@/types/dominio";
 
+/**
+ * Lo que escribe el abogado. Tratamiento **Papel** — el mismo de las cards
+ * (§1.5): blanco sin borde visible y sombra tonal marina en dos capas.
+ *
+ * Era `#e9eff6` y Wesley lo rechazó por gris (2026-09-03): sobre el lienzo
+ * Cielo, que arranca en #d8e9f8, un gris azulado casi del mismo valor no
+ * contrasta — se lee sucio en vez de leerse como una superficie. Blanco es el
+ * único tono que en este lienzo sube de valor en lugar de bajar, y ya es el
+ * lenguaje de superficie del portal.
+ *
+ * El adjunto que va DENTRO pasa a lienzo con borde: era blanco sobre gris y
+ * ahora sería blanco sobre blanco.
+ */
 export function BurbujaUsuario({ mensaje }: { mensaje: MensajeChat }) {
   return (
     <div className="flex justify-end">
-      <div className="max-w-[76%] rounded-[14px] bg-[#e9eff6] px-4 py-[11px] text-sm leading-[1.6] whitespace-pre-line text-marino [overflow-wrap:anywhere]">
+      <div className="max-w-[76%] rounded-[14px] border border-transparent bg-white px-4 py-[11px] text-sm leading-[1.6] shadow-papel whitespace-pre-line text-marino [overflow-wrap:anywhere]">
         {mensaje.adjunto && (
-          <div className="mb-2 flex items-center gap-[9px] rounded-[9px] border border-[#d5dfeb] bg-white px-3 py-2">
+          <div className="mb-2 flex items-center gap-[9px] rounded-[9px] border border-borde bg-lienzo px-3 py-2">
             <span className="grid place-items-center text-celeste">
               <Icono nombre="documento" size={16} />
             </span>

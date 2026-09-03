@@ -385,6 +385,17 @@ abierto, sin movimiento.
   sobre el lienzo Cielo el borde gris de 1px se perdía. Vidrio se descartó por
   costo de GPU en listas largas y contraste en pantallas baratas. Vive en UN
   sitio: el primitivo `Card` (+ 2 tokens en `globals.css`); revertir es ese bloque.
+- **La burbuja del usuario en Jus IA también es «Papel»** (2026-09-03). Era
+  `#e9eff6` y Wesley la rechazó por gris: sobre el lienzo Cielo, que arranca en
+  `#d8e9f8`, un gris azulado del mismo valor no contrasta — se lee sucio en vez
+  de leerse como superficie. Se compararon cinco tratamientos sobre el hilo
+  real; blanco es el único que en este lienzo **sube** de valor, y además empareja
+  con el composer, que ya es blanco con sombra. El chip celeste (`--chip`,
+  `#e7f3fa`) se descartó midiendo: a media conversación el lienzo vale `#ecf3fa`
+  y la burbuja desaparecería. ⚠️ El adjunto va DENTRO de la burbuja y era blanco:
+  pasa a `bg-lienzo` con borde. ⚙️ La **demo de la landing usa `bg-chip`** para
+  esta misma burbuja y ahí sí funciona (el fondo es la ventana blanca): las dos
+  superficies divergen a propósito.
 - **Favicon:** `src/app/icon.svg` **ES** `logo/justihn-icon.svg`, con el viewBox
   recortado a la tinta (`4.1 1.1 39.9 39.9`) y sin adaptación a modo oscuro — el
   logo no cambia de color. ⚠️ Rompe a propósito la ficha de marca (que pedía la
