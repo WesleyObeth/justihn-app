@@ -137,12 +137,24 @@ export interface Codigo {
   motivoPendiente?: string;
 }
 
+/**
+ * Una cita que se puede ABRIR. `url` es una ruta del portal (el artículo en
+ * Legislación, una sentencia en Jurisprudencia) o un PDF oficial abierto en
+ * su página; `procesos.test.ts` no admite otra cosa. Contrato de la tabla
+ * `citas_paso` (paso → n citas).
+ */
+export interface FuenteCita {
+  /** «Código de Familia, art. 244». */
+  etiqueta: string;
+  url: string;
+}
+
 /** Tabla `procesos` + `pasos_proceso` — el "paso a paso" con fuente citada. */
 export interface PasoProceso {
   titulo: string;
   detalle: string;
-  fuente: string;
-  fuenteUrl?: string;
+  /** Al menos una: sin fuente no hay paso (regla #1). */
+  fuentes: FuenteCita[];
   /** Detalle expandible: qué llevar, cuándo y qué error evitar. */
   documentos?: string[];
   plazo?: string;
@@ -153,6 +165,10 @@ export interface Proceso {
   id: string;
   nombre: string;
   materia: Materia;
+  /** Para quién y qué cambia: el dato que decide si este es el proceso. */
+  resumen: string;
+  /** Las normas de las que salen las citas, para el sello de la cabecera. */
+  fuentesOficiales: string[];
   pasos: PasoProceso[];
   /** Plantilla de escrito que acompaña el proceso (id en `PLANTILLAS`). */
   plantillaId?: string;

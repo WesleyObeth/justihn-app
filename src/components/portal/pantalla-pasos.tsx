@@ -4,14 +4,15 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
 import { BotonJusIA } from "@/components/ia/boton-jus-ia";
-import { Boton, Card, ChipMateria, EnlaceFuente, Rotulo } from "@/components/ui/primitivos";
+import Link from "next/link";
+import { Boton, Card, ChipMateria, Rotulo } from "@/components/ui/primitivos";
 import { ModalVistaPrevia } from "@/components/portal/modal-plantilla";
 import { PROCESOS } from "@/data/procesos";
 import { PLANTILLAS } from "@/data/catalogo";
 import { usePortal } from "@/store/portal";
 import { usePreguntarAJusIA } from "@/hooks/use-preguntar-jus-ia";
 import { cn } from "@/lib/utils";
-import type { Plantilla } from "@/types/dominio";
+import type { FuenteCita, Plantilla } from "@/types/dominio";
 
 /**
  * El "paso a paso" es checklist, no solo guía: cada paso se marca como hecho
@@ -31,7 +32,6 @@ export function PantallaPasos() {
     router.replace(`/abogados/procesos?proceso=${id}`, { scroll: false });
   };
   const [previa, setPrevia] = useState<Plantilla | null>(null);
-  const mostrarToast = usePortal((s) => s.mostrarToast);
   const pasosHechos = usePortal((s) => s.pasosHechos);
   const togglePasoHecho = usePortal((s) => s.togglePasoHecho);
   const reiniciarProceso = usePortal((s) => s.reiniciarProceso);
@@ -96,15 +96,23 @@ export function PantallaPasos() {
                 <h2 className="font-display text-[19px] font-bold">{proceso.nombre}</h2>
                 <ChipMateria>{proceso.materia}</ChipMateria>
               </div>
-              <p className="mt-1 text-[13px] text-texto-3">
-                Marca los pasos a medida que avanzas — cada uno enlaza el artículo o sentencia
-                que lo sustenta.
+              <p className="mt-1 max-w-[70ch] text-[13px] leading-[1.55] text-texto-3">
+                {proceso.resumen}
               </p>
             </div>
             <BotonJusIA compacto onClick={preguntarAJusIA}>
               Preguntar a Jus IA
             </BotonJusIA>
           </div>
+
+          {/* El sello: de qué normas salen las citas. Cada paso enlaza las suyas. */}
+          <p className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] text-texto-4">
+            <span className="inline-flex items-center gap-1 font-semibold text-exito">
+              <Icono nombre="check" size={11} strokeWidth={2.6} />
+              Cada paso cita su artículo
+            </span>
+            · {proceso.fuentesOficiales.join(" · ")} · marca los pasos a medida que avanzas
+          </p>
 
           {/* Progreso del proceso */}
           <div className="mt-4 flex items-center gap-3">
@@ -186,12 +194,7 @@ export function PantallaPasos() {
                       )}
                     </button>
 
-                    <EnlaceFuente
-                      href={paso.fuenteUrl}
-                      onClick={() => mostrarToast("Abriendo la fuente oficial…")}
-                    >
-                      {paso.fuente}
-                    </EnlaceFuente>
+                    <Fuentes fuentes={paso.fuentes} />
 
                     {abierto && (
                       <div
@@ -325,6 +328,44 @@ export function PantallaPasos() {
       </div>
 
       <ModalVistaPrevia plantilla={previa} onCerrar={() => setPrevia(null)} />
+    </div>
+  );
+}
+
+/**
+ * Las citas de un paso. Una ruta del portal (el artículo en Legislación) se
+ * abre en la misma pestaña; un PDF oficial, en otra y en su página. Antes
+ * había UN enlace por paso y, sin `href`, mostraba un toast «Abriendo la
+ * fuente oficial…» que no abría nada.
+ */
+function Fuentes({ fuentes }: { fuentes: FuenteCita[] }) {
+  return (
+    <div className="mt-1.5 flex flex-wrap gap-x-3.5 gap-y-1">
+      {fuentes.map((f) => {
+        const contenido = (
+          <>
+            <Icono nombre="libro" size={11} strokeWidth={2} className="shrink-0" />
+            {f.etiqueta}
+          </>
+        );
+        // Clave por etiqueta, no por URL: varios artículos de una ley caen en
+        // la misma página del PDF y compartirían URL (arts. 57-59 → #page=21).
+        return f.url.startsWith("/") ? (
+          <Link key={f.etiqueta} href={f.url} className="inline-flex items-center gap-[5px] text-[12px]">
+            {contenido}
+          </Link>
+        ) : (
+          <a
+            key={f.etiqueta}
+            href={f.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-[5px] text-[12px]"
+          >
+            {contenido}
+          </a>
+        );
+      })}
     </div>
   );
 }

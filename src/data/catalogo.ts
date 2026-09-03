@@ -49,6 +49,7 @@ export const PLANES: Plan[] = [
     features: [
       "Mis casos: expediente por cliente, checklist y plazos",
       "Jurisprudencia y legislación ilimitadas",
+      "Procesos paso a paso, cada paso con su artículo",
       "Alertas de Gaceta por materia",
       "Jus IA con citas verificadas (60/mes)",
       "Soporte por WhatsApp",

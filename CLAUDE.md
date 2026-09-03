@@ -3,7 +3,8 @@
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
 > Creado: **2026-08-25** · Última actualización: **2026-09-03** (Legislación
-> conectada a las tablas reales, artículo por artículo — §1.8).
+> sobre las tablas reales — §1.8 — y Procesos concluida: cada paso cita su
+> artículo, sin marcadores — §1.9).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -728,6 +729,50 @@ herramienta del portal que lo aplica.
   Supabase. **WebKit no pudo iniciar sesión en `localhost` por http** (la
   cookie de sesión no se guarda): queda por comprobar sobre `justihn.com`.
 
+### 1.9 Procesos — concluida el 2026-09-03: cada paso cita su artículo
+
+Los cuatro procesos (despido · divorcio por mutuo consentimiento · sociedad
+mercantil · amparo) llevaban «art. ___» desde el 25 de agosto: marcadores
+honestos mientras no hubiera códigos cargados. Ahora **cada paso cita una o
+varias fuentes que se ABREN**: los artículos de Trabajo, Familia y CPC abren
+el artículo en el portal (`/abogados/legislacion/<código>/<número>`, §1.8);
+las leyes que no están en la tabla abren el PDF oficial **en su página**.
+
+- **Contrato nuevo**: `PasoProceso.fuentes: FuenteCita[]` (etiqueta + url)
+  sustituye a `fuente`/`fuenteUrl`; `Proceso` gana `resumen` (el dato que
+  decide si es este proceso: el plazo, la audiencia inmediata…) y
+  `fuentesOficiales` (el sello de la cabecera). Tabla futura `citas_paso`.
+- **Dos fuentes nuevas del Estado, verificadas el 2026-09-03**:
+  **Ley sobre Justicia Constitucional** (Decreto 244-2003) en el TSC
+  (`tsc.gob.hn/web/leyes/Ley Sobre Justicia Constitucional (07).pdf`, 42 pp.
+  con texto) — amparo: procedencia 42, inadmisibilidad 46, plazo de DOS
+  MESES 48, escrito 49, enmienda 50, informe 52-54, prueba 55-56, cautelares
+  57-59, sentencia 63-67. Y el **Código de Comercio** (Decreto 73-50) en
+  e-Regulations (`/media/codigo del comercio.pdf`, 418 pp. con texto). ⚠️ Es
+  una edición sin las reformas recientes: se citan solo artículos
+  estructurales (14 contenido de la escritura, 93 fundación ante notario,
+  95 certificado de depósito, 18 quince días para inscribir, 384 registro
+  en la Cámara), nunca mínimos de socios o capital, que han cambiado. El
+  Banco Central también lo publica, pero su servidor no respondió.
+- **Despido**: 864/865 (prescripción), 123 (salario promedio, reglas de la
+  indemnización), 116/120/120-A/346 (prestaciones → calculadora), 638-641
+  (Procuraduría gratuita, avenimiento, acta), 703/704/711 (demanda, copias,
+  abogado), 755/750/749 (audiencia en 2 días, conciliación y fallo en el
+  acto, incomparecencia). **Divorcio**: Familia 243-248 + CPC 631.2 (una
+  sola defensa), 652 (acumulación en el convenio), 654 (recursos).
+- `procesos.test.ts`: ningún «___», toda cita interna apunta a un código
+  cargado con número real, toda externa es host de la whitelist y, si es
+  PDF, lleva `#page=`; todo plazo nombra su artículo; el modelo existe.
+- Se quitó el toast «Abriendo la fuente oficial…» que salía cuando el paso
+  no tenía enlace: prometía abrir algo que no abría (§4.5).
+- **Procesos entra en el plan Profesional** («Procesos paso a paso, cada
+  paso con su artículo»): cierra el pendiente §6.6. Es contenido, y el modelo
+  es «todo el corpus para todos los de pago, escalera por cuota de IA».
+- ⚙️ Pendiente del socio: validar documentos y notas de práctica (son
+  conocimiento del gremio, no texto de ley) y decidir si el Código de
+  Comercio y la Ley sobre Justicia Constitucional se cargan como códigos de
+  Legislación (ya hay PDF con texto para los dos).
+
 **Confirmación del correo por CÓDIGO, no por enlace** (decisión Wesley
 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la deja
 en otra pestaña; el código la mantiene en la misma pantalla y termina con
@@ -1042,7 +1087,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (258 tests de invariantes)
+pnpm test         # Vitest (262 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -1229,9 +1274,8 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
    visitante que llegara de una búsqueda se registraría en algo que no existe, y
    sin sitemap el primer rastreo se desaprovecha. **Quitarlo es una línea**, y el
    momento de hacerlo es el mismo en que el alta empiece a crear cuentas de verdad.
-6. **Decidir en qué plan entra "Procesos"** (`data/catalogo.ts`): la pantalla
-   existe y la landing la vende, pero la tabla de planes no dice desde cuál se
-   tiene. Antes de cobrar.
+6. [x] ✅ **Procesos entra en Profesional** (2026-09-03, §1.9). Y la pantalla
+   quedó concluida: cada paso cita su artículo real.
 7. **Más demos con seed real** si se sigue refinando: los candidatos son
    Calculadoras y Modelos de escritos. El patrón está: `SeccionDemo` + una vista.
    **Video real del portal**: hoy los demos son animación HTML a propósito (siguen
@@ -1327,8 +1371,8 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
   texto oficial). `data/sentencias.ts` se genera con `generar-seed.mjs` —
   regenerar, no editar a mano. Los expedientes `CAS-…` de brief y adjuntos son los
   **casos propios de la abogada demo**, no sentencias publicadas.
-- Los `art. ___` de los procesos son marcadores deliberados hasta cargar los
-  códigos (backlog #5 del proyecto).
+- ✅ **Resuelta 2026-09-03 — los `art. ___` de los procesos ya no existen**:
+  cada paso cita artículos reales (§1.9), con test que impide que vuelvan.
 - **Login y onboarding son maqueta:** validan formato y **entran con cualquier
   correo y contraseña** usando la sesión demo. Hay nota visible bajo el card y
   `TODO(auth)` en cada archivo. El E2E del 2026-08-30 lo confirma como
