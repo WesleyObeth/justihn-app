@@ -52,6 +52,19 @@ export function PantallaGaceta() {
       </>
     );
   }
+  if (estado.datos.gacetas.length === 0) {
+    // Tablas creadas, captura aún no corrida: se dice, y la maqueta debajo.
+    return (
+      <>
+        <p className="mb-3 rounded-r-[10px] border-l-[3px] border-dorado bg-aviso px-4 py-2.5 text-[12.5px] leading-[1.5] text-aviso-cuerpo">
+          <b>La Gaceta está conectada, pero todavía no hay ediciones capturadas.</b> Falta correr
+          <code className="mx-1 rounded bg-white/60 px-1">python3 capturar.py --desde 2026-08</code>
+          desde la Mac (y dejar el cron diario); mientras tanto, estas publicaciones son de ejemplo.
+        </p>
+        <PantallaGacetaSeed />
+      </>
+    );
+  }
   return <GacetaReal datos={estado.datos} />;
 }
 

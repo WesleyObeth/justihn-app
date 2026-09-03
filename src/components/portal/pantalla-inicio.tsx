@@ -456,7 +456,7 @@ function AccesoRapido({
 function DigestEnUnaLinea() {
   const estado = useGaceta({ dias: 30 });
   const subs = usePortal((s) => s.subs);
-  if (estado.tipo === "listo" && estado.datos.disponible) {
+  if (estado.tipo === "listo" && estado.datos.disponible && estado.datos.gacetas.length > 0) {
     const pubs = estado.datos.publicaciones.filter((p) => p.tipo !== "Avance");
     const mias = pubs.filter((p) => p.materia && subs[p.materia]).length;
     return (
