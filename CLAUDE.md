@@ -521,7 +521,10 @@ Grupo `(auth)`, shell propio sin navegación, del handoff
   (misma `x = 24 − W/2 = 18,15`) y se separan ±7 al girar — ese es el libro
   cerrado de verdad, una sola forma visible. `SplashJustihn` hace una pasada y
   navega a los 5 s, justo al cerrar el tercer acto. Con reduced-motion se muestra
-  el logo abierto, sin movimiento.
+  el logo abierto, sin movimiento. **Solo en las dos altas** (onboarding del abogado y registro de la
+  persona): el login entra directo al portal desde el 2026-09-03 (decisión
+  Wesley) — quien ya tiene cuenta quiere llegar, no ver la bienvenida cada
+  vez. Verificado: 1,4 s del clic al portal.
   ⚠️ **`ancho` es un MÁXIMO, no una medida.** El lockup se dibuja a la escala
   intrínseca del archivo (788) y se reduce con `scale`, así que un ancho fijo no
   sabe nada del teléfono: a 520px en una pantalla de 390 se cortaba por los dos
