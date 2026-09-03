@@ -616,6 +616,21 @@ esconde a la clave `anon`). Todo pasa por `guard()`; nada gasta LLM.
   columna lateral y cada card salen del mismo dato; con dos derivaciones
   podrían contradecirse. Caché por nombre a nivel de módulo.
 
+**Confirmación del correo por CÓDIGO, no por enlace** (decisión Wesley
+2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la deja
+en otra pestaña; el código la mantiene en la misma pantalla y termina con
+sesión abierta ahí mismo. Lo canjea `verifyOtp(type: "signup")` en
+`components/auth/codigo-correo.tsx`. ⚠️ **`LONGITUD_CODIGO` tiene que coincidir
+con «Email OTP Length» del proyecto de Supabase**: el proyecto nació en 8 y la
+UI dibujaba 6, así que la casilla se llenaba antes de tiempo y se verificaba un
+código truncado. Hoy los dos están en 6. Las plantillas de correo con la marca
+viven en `supabase/correos/`.
+
+⚠️ **El splash bloquea el scroll del documento mientras dura** (`splash.tsx`):
+es `fixed` y se recorta solo, pero la página de auth de debajo mide más que la
+ventana y se podía arrastrar la escena para ver la card asomando. Restaura el
+valor anterior al desmontar, no lo pone a `""`.
+
 ### 1.5 Marca
 
 - **Card «Papel» en los dos portales** (decisión Wesley 2026-09-02, «si no me

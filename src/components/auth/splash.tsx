@@ -21,11 +21,27 @@ export function SplashJustihn({ destino = "/abogados" }: { destino?: string }) {
     return () => clearTimeout(t);
   }, [router, destino]);
 
+  /**
+   * Bloquea el scroll del documento mientras dura el splash. El overlay es
+   * `fixed` y ya se recorta solo, pero la página de auth que queda debajo mide
+   * más que la ventana: sin esto se puede arrastrar la escena hacia arriba y
+   * ver la card del formulario asomando por el borde, que rompe la sensación
+   * de "entrando al portal". Se restaura el valor anterior al desmontar, no se
+   * pone a `""`, para no pisar un bloqueo que hubiera puesto otra capa.
+   */
+  useEffect(() => {
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previo;
+    };
+  }, []);
+
   return (
     <div
       // `overflow-hidden`: aunque la escena ya se recorta al viewport, este
       // overlay no puede ser nunca el que le dé scroll horizontal a la página.
-      className="fixed inset-0 z-[100] grid place-items-center overflow-hidden"
+      className="fixed inset-0 z-[100] grid place-items-center overflow-hidden overscroll-none"
       style={{ background: "linear-gradient(180deg,#0d2144 0%,#0a1830 100%)" }}
       role="status"
       aria-label="Preparando tu portal"
