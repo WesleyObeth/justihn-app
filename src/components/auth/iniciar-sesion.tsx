@@ -2,8 +2,14 @@
 
 /**
  * Iniciar sesión (handoff en `logo/especificacion/handoff-auth.md`):
- * card glass sobre el aurora oscuro, con recuperación de contraseña y el
- * splash del logo al entrar.
+ * card glass sobre el aurora oscuro, con recuperación de contraseña.
+ *
+ * **Sin splash al entrar** (decisión Wesley 2026-09-03): quien inicia sesión
+ * ya conoce el portal y quiere llegar; la escena del logo es la bienvenida de
+ * las DOS altas (onboarding del abogado y registro de la persona), no un peaje
+ * en cada login. Tras autenticar se navega directo al portal, con
+ * `router.replace` (el login no queda en el historial) y `router.refresh()`
+ * (el proxy vuelve a leer las cookies de sesión).
  *
  * **Una sola pantalla para las DOS vías** (decisión Wesley 2026-08-30). Es una
  * sola base de cuentas: dos logins significarían duplicar recuperación,
@@ -21,13 +27,13 @@
  */
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { LogoJustihn } from "@/components/brand/logos";
-import { SplashJustihn } from "@/components/auth/splash";
 import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Vista = "login" | "recuperar" | "enviado" | "splash";
+type Vista = "login" | "recuperar" | "enviado";
 
 /** `esPersona` lo resuelve la página en el SERVIDOR (ver `page.tsx`): así el
  *  HTML ya llega con el copy correcto y no se ve el del abogado un instante. */
@@ -43,6 +49,7 @@ export function PantallaIniciarSesion({
   errorInicial?: string;
 }) {
   // Solo personaliza; a dónde entra lo decide la cuenta al iniciar sesión.
+  const router = useRouter();
   const [destino, setDestino] = useState(next ?? (esPersona ? "/personas" : "/abogados"));
   const altaHref = esPersona ? "/crear-cuenta?tipo=persona" : "/crear-cuenta";
   // Hasta el placeholder delata la audiencia: "nombre@bufete.hn" le dice a un
@@ -71,12 +78,16 @@ export function PantallaIniciarSesion({
       return setError(mensajeAuth(e.code, "No se pudo iniciar sesión. Inténtalo de nuevo."));
     }
     // La cuenta decide el portal; `next` (validado) gana si venía de una ruta concreta.
+    let a = destino;
     if (!next) {
       const { data } = await supabase.rpc("mi_destino");
-      setDestino(data === "abogados" ? "/abogados" : "/personas");
+      a = data === "abogados" ? "/abogados" : "/personas";
+      setDestino(a);
     }
-    setOcupado(false);
-    setVista("splash");
+    // `ocupado` se queda en true: el botón sigue «Entrando…» hasta que el
+    // portal reemplace esta pantalla.
+    router.replace(a);
+    router.refresh();
   };
 
   const enviarEnlace = async () => {
@@ -309,7 +320,6 @@ export function PantallaIniciarSesion({
         )}
       </div>
 
-      {vista === "splash" && <SplashJustihn destino={destino} />}
 
       <p className="relative mt-4 text-[12px]" style={{ color: "var(--muted)" }}>
         © 2026 Justihn · Honduras
