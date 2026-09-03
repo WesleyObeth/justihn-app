@@ -249,64 +249,6 @@ export async function buscarArticulosPorSignificado(q: string): Promise<Resultad
   };
 }
 
-// ── Índice de un código (vista Lector) ─────────────────────────────────────
-
-export interface EntradaIndice {
-  numero: string;
-  orden: number;
-  pagina: number | null;
-  rubrica: string | null;
-  /** Primeras palabras del cuerpo, para los artículos sin rúbrica. */
-  arranque: string;
-}
-
-const indices = new Map<string, { entradas: EntradaIndice[]; en: number }>();
-
-/**
- * Todo el articulado de un código, ligero (sin el texto): es lo que pinta el
- * índice del Lector. Se lee entero de la base (930 filas × ~1 KB) y se cachea
- * 10 min en memoria: un código no cambia entre dos clics.
- */
-export async function indiceDeCodigo(codigoId: string): Promise<EntradaIndice[]> {
-  const c = indices.get(codigoId);
-  if (c && Date.now() - c.en < CONTEO_TTL_MS) return c.entradas;
-  const entradas: EntradaIndice[] = [];
-  for (let desde = 0; ; desde += 1000) {
-    const { filas } = await consultar<{ numero: string; orden: number; pagina: number | null; texto: string }>(
-      `select=numero,orden,pagina,texto&codigo_id=eq.${encodeURIComponent(codigoId)}&order=orden.asc`,
-      { desde, hasta: desde + 999 },
-    );
-    for (const f of filas) {
-      const { rubrica, cuerpo } = parsearArticulo(f.texto);
-      entradas.push({
-        numero: f.numero,
-        orden: f.orden,
-        pagina: f.pagina,
-        rubrica,
-        arranque: cuerpo.replace(/\s+/g, " ").slice(0, 80),
-      });
-    }
-    if (filas.length < 1000) break;
-  }
-  indices.set(codigoId, { entradas, en: Date.now() });
-  return entradas;
-}
-
-// ── Selección por tema ─────────────────────────────────────────────────────
-
-/** Los artículos de un tema, en el orden pedido (vista Temas). */
-export async function getArticulosSeleccion(
-  pares: { codigoId: string; numero: string }[],
-): Promise<ArticuloCorpus[]> {
-  if (pares.length === 0) return [];
-  const or = pares
-    .map((p) => `and(codigo_id.eq.${encodeURIComponent(p.codigoId)},numero.eq.${encodeURIComponent(p.numero)})`)
-    .join(",");
-  const { filas } = await consultar<FilaArticulo>(`select=${COLUMNAS}&or=(${or})`);
-  const porClave = new Map(filas.map((f) => [`${f.codigo_id}/${f.numero}`, filaAArticulo(f)]));
-  return pares.map((p) => porClave.get(`${p.codigoId}/${p.numero}`)).filter((a): a is ArticuloCorpus => !!a);
-}
-
 // ── Un artículo ────────────────────────────────────────────────────────────
 
 export async function getArticulo(codigoId: string, numero: string): Promise<ArticuloCorpus | null> {

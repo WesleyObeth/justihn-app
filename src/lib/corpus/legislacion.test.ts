@@ -1,15 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { pareceNumeroArticulo, parrafosDe, parsearArticulo } from "./articulo";
 import { filaAArticulo } from "./legislacion";
-import {
-  ALIAS_CODIGO,
-  ARTICULOS_SIN_TEXTO,
-  CODIGOS,
-  CODIGOS_CARGADOS,
-  getCodigo,
-  getTema,
-  TEMAS_LEGISLACION,
-} from "@/data/legislacion";
+import { ALIAS_CODIGO, ARTICULOS_SIN_TEXTO, CODIGOS, CODIGOS_CARGADOS, getCodigo } from "@/data/legislacion";
 import { isFuenteOficial } from "@/lib/security/sanitize";
 
 /**
@@ -165,30 +157,5 @@ describe("el catálogo de códigos como contrato de la tabla `codigos`", () => {
         expect(c!.destacados.some((d) => d.numero === n), `${codigoId} ${n}`).toBe(false);
       }
     }
-  });
-});
-
-describe("los temas — la entrada por situación (vista Temas)", () => {
-  it("cada tema apunta a códigos cargados y a números reales, sin repetir", () => {
-    for (const t of TEMAS_LEGISLACION) {
-      expect(t.articulos.length, t.id).toBeGreaterThan(0);
-      const claves = t.articulos.map((a) => `${a.codigoId}/${a.numero}`);
-      expect(new Set(claves).size, t.id).toBe(claves.length);
-      for (const a of t.articulos) {
-        expect(getCodigo(a.codigoId)?.estado, `${t.id} ${a.codigoId}`).toBe("cargado");
-        expect(a.numero, `${t.id} ${a.numero}`).toMatch(/^\d{1,4}(-[A-Z])?$/);
-        expect(ARTICULOS_SIN_TEXTO[a.codigoId] ?? [], `${t.id} ${a.numero}`).not.toContain(a.numero);
-      }
-    }
-  });
-
-  it("ids únicos, herramienta dentro del portal y detalle escrito", () => {
-    expect(new Set(TEMAS_LEGISLACION.map((t) => t.id)).size).toBe(TEMAS_LEGISLACION.length);
-    for (const t of TEMAS_LEGISLACION) {
-      expect(t.herramienta.href, t.id).toMatch(/^\/abogados\//);
-      expect(t.detalle.length, t.id).toBeGreaterThan(20);
-    }
-    expect(getTema("despido")?.titulo).toBe("Despido y prestaciones");
-    expect(getTema("no-existe")).toBeUndefined();
   });
 });

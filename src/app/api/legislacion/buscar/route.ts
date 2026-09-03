@@ -2,13 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { guard } from "@/lib/security/api-guard";
 import { LIMITES, sanitizeText } from "@/lib/security/sanitize";
-import { getCodigo, getTema } from "@/data/legislacion";
+import { getCodigo } from "@/data/legislacion";
 import {
   buscarArticulos,
   buscarArticulosPorSignificado,
   contarArticulos,
-  getArticulosSeleccion,
-  indiceDeCodigo,
   type ResultadoArticulos,
 } from "@/lib/corpus/legislacion";
 
@@ -26,19 +24,7 @@ const esquema = z.object({
     .default(null),
   q: z.string().max(LIMITES.busqueda).default(""),
   pagina: z.number().int().min(1).max(200).default(1),
-  /**
-   * `texto` y `semantica` buscan; `indice` devuelve el articulado ligero de
-   * un código (vista Lector); `tema` devuelve los artículos de un tema del
-   * catálogo (vista Temas) — el tema se nombra por id, nunca se aceptan
-   * pares sueltos del cliente.
-   */
-  modo: z.enum(["texto", "semantica", "indice", "tema"]).default("texto"),
-  tema: z
-    .string()
-    .max(40)
-    .regex(/^[a-z0-9-]+$/)
-    .nullable()
-    .default(null),
+  modo: z.enum(["texto", "semantica"]).default("texto"),
 });
 
 const TECHO_SEMANTICO_DIA = 3000;
@@ -68,30 +54,6 @@ export async function POST(req: Request) {
       { error: "codigo_no_cargado", mensaje: "Ese código no está cargado todavía." },
       { status: 400 },
     );
-  }
-
-  if (g.data.modo === "indice" || g.data.modo === "tema") {
-    try {
-      if (g.data.modo === "indice") {
-        if (!codigo) {
-          return NextResponse.json({ error: "sin_codigo", mensaje: "Elige un código." }, { status: 400 });
-        }
-        const [indice, conteos] = await Promise.all([indiceDeCodigo(codigo.id), contarArticulos()]);
-        return NextResponse.json({ indice, conteos, modo: "indice" });
-      }
-      const tema = getTema(g.data.tema);
-      if (!tema) {
-        return NextResponse.json({ error: "tema_desconocido", mensaje: "Ese tema no existe." }, { status: 400 });
-      }
-      const [articulos, conteos] = await Promise.all([getArticulosSeleccion(tema.articulos), contarArticulos()]);
-      return NextResponse.json({ articulos, total: articulos.length, pagina: 1, porPagina: articulos.length, conteos, modo: "tema" });
-    } catch (error) {
-      console.error("[legislacion] el corpus no respondió:", error);
-      return NextResponse.json(
-        { error: "corpus_no_disponible", mensaje: "El corpus no respondió. Inténtalo de nuevo en unos segundos." },
-        { status: 503 },
-      );
-    }
   }
 
   if (g.data.modo === "semantica" && q.length < 3) {

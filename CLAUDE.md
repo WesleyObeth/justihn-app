@@ -728,36 +728,6 @@ herramienta del portal que lo aplica.
   Supabase. **WebKit no pudo iniciar sesión en `localhost` por http** (la
   cookie de sesión no se guarda): queda por comprobar sobre `justihn.com`.
 
-**Tres estructuras conviven como prototipos DENTRO del portal (2026-09-03,
-pedido de Wesley: «que el prototipo sea ya de la pantalla del portal»).**
-`?vista=buscador|lector|temas`, con un conmutador punteado arriba que se
-borra al elegir. Viven en `components/portal/legislacion/` (`comun.tsx` +
-una vista por archivo) sobre la MISMA API, que ganó dos modos que no
-buscan: `indice` (el articulado ligero de un código, cacheado 10 min) y
-`tema` (los artículos de un tema del catálogo, por id — nunca pares sueltos
-del cliente).
-- **Buscador** (la vista por defecto): una caja sobre los tres códigos con
-  chips de código; sin consulta ni código propone **temas** y «leer un
-  código en orden»; los resultados se leen sin salir de la lista («Leer
-  aquí»). Es la pantalla anterior evolucionada.
-- **Lector**: selector de código, índice completo a la izquierda (los
-  destacados fijados arriba) y el artículo a la derecha con anterior y
-  siguiente. `?art=` en la URL. ⚠️ El artículo puede llegar ANTES que el
-  índice (dos peticiones): el título no puede depender del índice — lo hizo
-  y rompía la vista en el primer render.
-- **Temas**: `TEMAS_LEGISLACION` en `data/legislacion.ts` (7 situaciones que
-  juntan artículos de códigos distintos, con herramienta y detalle;
-  `legislacion.test.ts` exige códigos cargados, números reales y href
-  interno). Panel con nota verificada, texto plegable, herramienta, fuentes
-  y Jus IA al lado. Es la que convierte la legislación en producto; los
-  temas los debe curar el socio.
-- Nota de calidad: desde el estado vacío del Buscador, un tema manda al modo
-  semántico con su título como consulta («cobro de una deuda») y el ranking
-  no pone el 676 primero; la vista Temas usa la lista curada y sí. Al
-  elegir, si gana Buscador, esos tiles deben enlazar a la lista curada.
-- Verificado E2E en Chromium: 24 comprobaciones en las tres vistas,
-  escritorio y 390px, 0 errores de JS. Índice del Trabajo: 875 entradas.
-
 **Confirmación del correo por CÓDIGO, no por enlace** (decisión Wesley
 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la deja
 en otra pestaña; el código la mantiene en la misma pantalla y termina con
@@ -1072,7 +1042,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (260 tests de invariantes)
+pnpm test         # Vitest (258 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -1225,6 +1195,12 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
    - ✅ **Legislación conectada a las tablas reales (2026-09-03)** — §1.8.
      De paso, el seed pasó de «muestra» a **catálogo + destacados** y se
      corrigió el 399/400 invertido.
+   - ⏳ **Reestructurar Legislación** (pedido de Wesley 2026-09-03). Los tres
+     prototipos —Buscador · Lector · Temas— viven en un Artifact con el shell
+     del portal y datos reales, NO en el portal (se construyeron ahí por
+     error y se revirtieron el mismo día):
+     https://claude.ai/code/artifact/a7a10a59-7fc4-4d8e-9d07-0bde0cac98b5.
+     Al elegir, se construye esa estructura sobre lo ya conectado (§1.8).
    - ⏳ **Reestructurar Legislación** (pedido de Wesley 2026-09-03). Los tres
      prototipos —Buscador · Lector · Temas— viven en un Artifact con el shell
      del portal y datos reales, NO en el portal (se construyeron ahí por
