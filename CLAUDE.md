@@ -640,6 +640,25 @@ personal (`supabase/esquema/03-identidad.sql`, que además lo borra de
 al validar la identidad el botón bloqueaba en silencio. Al añadir una
 validación a un paso, comprobar que ese paso tiene dónde enseñarla.
 
+**El alta ciudadana también pide el número de identidad**, justo tras el
+nombre (pedido de Wesley 2026-09-02): el abogado que atienda el caso lo
+necesita para actuar por la persona. Es **opcional** y lo dice bajo el campo,
+porque quien solo viene a leer una guía de trámites no tiene por qué entregar
+su documento, y el alta corta es lo que sostiene la vía B. ⚠️ El copy prometía
+que el correo era «lo único que te vamos a pedir»: dejaba de ser cierto y se
+cambió. `personas.identidad` y `abogados.identidad` comparten reglas —13
+dígitos sin guiones, índice único, fuera de toda vista pública— y el trigger
+borra el dato de `raw_user_meta_data` en las dos vías, para que un documento
+de identidad no viaje dentro del JWT en cada petición.
+
+**Los dos portales cierran sesión de verdad** (2026-09-02): el botón ya existía
+en el menú del avatar y solo enseñaba un aviso de demostración. Ahora hace
+`signOut`, `router.replace` a la landing de su vía y `router.refresh()`. Los
+tres pasos hacen falta: el primero borra las cookies que lee el proxy, el
+segundo saca el portal del historial y el tercero invalida el caché de rutas
+de Next, sin el cual se puede volver a pintar una pantalla ya renderizada con
+la sesión anterior.
+
 **El logo de las pantallas de auth vuelve a su landing** (pedido de Wesley
 2026-09-02): el onboarding a `/para-abogados`, el alta ciudadana y el
 restablecer a `/`, y el login a la que corresponda a su vía.

@@ -6,6 +6,7 @@
  * preferencia viaja con la persona), navegación agrupada por categorías y
  * drawer en móvil. La "cuenta" es la sesión demo de la persona.
  */
+import { supabaseNavegador } from "@/lib/supabase/cliente";
 import { mesAnio } from "@/lib/tiempo";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -166,9 +167,24 @@ export function SidebarPersona({
  *  configuración, ayuda y cerrar sesión. */
 function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
   const router = useRouter();
-  const mostrarToast = usePortal((s) => s.mostrarToast);
   const sinLeer = useNotifsSinLeer(useTodosLosAvisos());
   const [abierto, setAbierto] = useState(false);
+  const [saliendo, setSaliendo] = useState(false);
+
+  /**
+   * Cierre de sesión real. Tres pasos y ninguno sobra: `signOut` borra las
+   * cookies que lee el proxy, `replace` saca el portal del historial para que
+   * el botón atrás no vuelva a él, y `refresh` invalida el caché de rutas de
+   * Next — sin él se puede volver a pintar una pantalla del portal que ya
+   * estaba renderizada con la sesión anterior.
+   */
+  const salir = async () => {
+    setAbierto(false);
+    setSaliendo(true);
+    await supabaseNavegador().auth.signOut();
+    router.replace("/");
+    router.refresh();
+  };
 
   useEffect(() => {
     if (!abierto) return;
@@ -257,12 +273,9 @@ function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
               <ItemMenu
                 icono="logout"
                 destructivo
-                onClick={() => {
-                  setAbierto(false);
-                  mostrarToast("Sesión de demostración — el login llega con la Fase 2");
-                }}
+                onClick={() => void salir()}
               >
-                Cerrar sesión
+                {saliendo ? "Cerrando sesión…" : "Cerrar sesión"}
               </ItemMenu>
             </div>
           </div>

@@ -25,6 +25,7 @@ import { CheckCuadro } from "@/components/auth/iniciar-sesion";
 import { SplashJustihn } from "@/components/auth/splash";
 import { LogoJustihn } from "@/components/brand/logos";
 import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
+import { formatearIdentidad, soloDigitos, validarIdentidad } from "@/lib/identidad";
 import { CodigoCorreo } from "@/components/auth/codigo-correo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,6 +46,7 @@ export function RegistroPersona({
   destino?: string;
 }) {
   const [nombre, setNombre] = useState("");
+  const [identidad, setIdentidad] = useState("");
   const [correo, setCorreo] = useState("");
   const [pass, setPass] = useState("");
   const [verPass, setVerPass] = useState(false);
@@ -56,6 +58,10 @@ export function RegistroPersona({
 
   const enviar = async () => {
     if (!nombre.trim()) return setError("Escribe tu nombre.");
+    // Opcional a propósito: quien solo viene a leer una guía no tiene por qué
+    // entregar su documento. Si lo escribe, se valida.
+    const problemaIdentidad = identidad ? validarIdentidad(identidad) : null;
+    if (problemaIdentidad) return setError(problemaIdentidad);
     if (!EMAIL_RE.test(correo))
       return setError("Ingresa un correo electrónico válido.");
     if (pass.length < 8)
@@ -67,7 +73,7 @@ export function RegistroPersona({
       email: correo,
       password: pass,
       options: {
-        data: { nombre: nombre.trim(), tipo: "persona" },
+        data: { nombre: nombre.trim(), tipo: "persona", identidad: soloDigitos(identidad) },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
@@ -123,7 +129,7 @@ export function RegistroPersona({
           className="mt-[5px] text-[13.5px] leading-[1.55]"
           style={{ color: "#5a6b82" }}
         >
-          Sin tarjeta y sin caducidad. Es lo único que te vamos a pedir.
+          Sin tarjeta y sin caducidad. Nada de esto se publica en ninguna parte.
         </p>
 
         <ul className="mt-4 flex flex-col gap-1.5">
@@ -155,6 +161,18 @@ export function RegistroPersona({
             placeholder="Ej. Carlos Zelaya"
             valor={nombre}
             onCambio={limpiar(setNombre)}
+          />
+          <Campo
+            etiqueta="Número de identidad"
+            tipo="text"
+            nombre="identidad"
+            placeholder="0801-1990-12345"
+            valor={identidad}
+            onCambio={(v) => {
+              setIdentidad(formatearIdentidad(v));
+              setError("");
+            }}
+            ayuda="Opcional. El abogado que atienda tu caso lo necesita para actuar por ti."
           />
           <Campo
             etiqueta="Correo electrónico"
@@ -288,6 +306,7 @@ function Campo({
   placeholder,
   valor,
   onCambio,
+  ayuda,
 }: {
   etiqueta: string;
   tipo: string;
@@ -295,6 +314,8 @@ function Campo({
   placeholder: string;
   valor: string;
   onCambio: (v: string) => void;
+  /** Una línea bajo el campo: para qué sirve el dato, o que es opcional. */
+  ayuda?: string;
 }) {
   return (
     <label className="flex flex-col gap-1.5">
@@ -313,6 +334,11 @@ function Campo({
         onChange={(e) => onCambio(e.target.value)}
         className="input-dia rounded-[10px] border px-3.5 py-[11px] text-[14px] text-marino outline-none"
       />
+          {ayuda && (
+        <span className="text-[11.5px] leading-[1.45]" style={{ color: "#8095ad" }}>
+          {ayuda}
+        </span>
+      )}
     </label>
   );
 }

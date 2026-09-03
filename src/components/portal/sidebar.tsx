@@ -1,5 +1,6 @@
 "use client";
 
+import { supabaseNavegador } from "@/lib/supabase/cliente";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -175,9 +176,9 @@ function ItemNavegacion({
 function MenuUsuario({ expandido }: { expandido: boolean }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
+  const [saliendo, setSaliendo] = useState(false);
   const contenedor = useRef<HTMLDivElement>(null);
   const cuota = useCuota();
-  const mostrarToast = usePortal((s) => s.mostrarToast);
   const sinLeer = useNotifsSinLeer();
 
   // Escape cierra el menú; el clic fuera lo cubre el overlay de abajo.
@@ -193,6 +194,21 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
   const ir = (href: string) => {
     setAbierto(false);
     router.push(href);
+  };
+
+  /**
+   * Cierre de sesión real. Tres pasos y ninguno sobra: `signOut` borra las
+   * cookies que lee el proxy, `replace` saca el portal del historial para que
+   * el botón atrás no vuelva a él, y `refresh` invalida el caché de rutas de
+   * Next — sin él se puede volver a pintar una pantalla del portal que ya
+   * estaba renderizada con la sesión anterior.
+   */
+  const salir = async () => {
+    setAbierto(false);
+    setSaliendo(true);
+    await supabaseNavegador().auth.signOut();
+    router.replace("/para-abogados");
+    router.refresh();
   };
 
   return (
@@ -285,12 +301,9 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
               <ItemMenu
                 icono="logout"
                 destructivo
-                onClick={() => {
-                  setAbierto(false);
-                  mostrarToast("Sesión cerrada — demo: sigue navegando");
-                }}
+                onClick={() => void salir()}
               >
-                Cerrar sesión
+                {saliendo ? "Cerrando sesión…" : "Cerrar sesión"}
               </ItemMenu>
             </div>
           </div>
