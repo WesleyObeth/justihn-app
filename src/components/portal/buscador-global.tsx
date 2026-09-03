@@ -103,15 +103,24 @@ export function BuscadorGlobal() {
       },
       {
         seccion: "Legislación",
-        items: CODIGOS.flatMap((c) =>
-          c.articulos
-            .filter((a) => normalizar(`${a.numero} ${a.titulo} ${a.sintesis}`).includes(termino))
-            .map((a) => ({
-              titulo: `Art. ${a.numero} — ${a.titulo}`,
-              meta: `${c.nombre} · verificado`,
-              destino: `/abogados/legislacion?codigo=${c.id}`,
-            })),
-        ).slice(0, 3),
+        // Los destacados del catálogo responden al instante; el resto de los
+        // 2.162 artículos se busca en la pantalla, que sí consulta la base.
+        items: [
+          ...CODIGOS.flatMap((c) =>
+            c.destacados
+              .filter((d) => normalizar(`${d.numero} ${d.titulo} ${d.nota ?? ""}`).includes(termino))
+              .map((d) => ({
+                titulo: `Art. ${d.numero} — ${d.titulo}`,
+                meta: `${c.nombre} · texto oficial`,
+                destino: `/abogados/legislacion/${c.id}/${d.numero}`,
+              })),
+          ).slice(0, 2),
+          {
+            titulo: `Buscar «${q.trim()}» en los códigos`,
+            meta: "Legislación · Trabajo, Familia y Procesal Civil, artículo por artículo",
+            destino: `/abogados/legislacion?q=${encodeURIComponent(q.trim())}`,
+          },
+        ],
       },
       {
         seccion: "Procesos",
@@ -142,7 +151,7 @@ export function BuscadorGlobal() {
     ];
 
     return secciones.filter((g) => g.items.length > 0);
-  }, [termino, hayTermino]);
+  }, [termino, hayTermino, q]);
 
   const navegar = (destino: string) => {
     setQ("");

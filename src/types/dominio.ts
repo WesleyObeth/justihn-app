@@ -98,30 +98,43 @@ export interface NombreVigilado {
   tipo: "propio" | "familiar" | "cliente" | "contraparte";
 }
 
-/** Tabla `codigos` + `articulos_codigo` — legislación consolidada del PJ. */
-export interface ArticuloCodigo {
-  /** Número o rango real del articulado (p. ej. "676" o "680–685"). */
+/**
+ * Tabla `codigos` (`automatizaciones/legislacion/esquema/01-legislacion.sql`,
+ * cargada el 2026-09-01 con Trabajo · Familia · Procesal Civil) más lo que la
+ * tabla NO guarda y la pantalla sí necesita: decreto, materia y descripción.
+ * El texto de los artículos vive en `articulos` y se lee por
+ * `lib/corpus/legislacion.ts` — aquí ya no hay síntesis: hay artículos reales.
+ */
+export interface ArticuloDestacado {
+  /** Número real del articulado («120», «120-A»). UNO, para enlazar su ruta. */
   numero: string;
+  /**
+   * Rótulo propio para reconocerlo de un vistazo — el CEDIJ solo titula los
+   * artículos del CPC; los del Trabajo y Familia no llevan rúbrica.
+   */
   titulo: string;
-  /** Síntesis propia del contenido — NO el texto literal (ese llega con el corpus). */
-  sintesis: string;
-  /** Dato práctico verificado (montos, plazos) que merece destacarse. */
+  /** Dato práctico verificado contra el PDF oficial (montos, plazos). */
   nota?: string;
-  /** Enlaza la herramienta que aplica la regla (p. ej. calculadora de vía). */
+  /** La herramienta del producto que aplica la regla. */
   herramienta?: { etiqueta: string; href: string };
 }
 
 export interface Codigo {
+  /** = `codigos.id` — el mismo id que usa el pipeline de ingesta. */
   id: string;
+  /** = `codigos.nombre`. */
   nombre: string;
   decreto: string;
   materia: Materia;
-  /** "muestra" = artículos verificados cargados · "preparacion" = llega con el corpus. */
-  estado: "muestra" | "preparacion";
-  /** PDF oficial íntegro (host de la whitelist §3.3). */
+  /** "cargado" = artículo por artículo en Supabase · "preparacion" = sin fuente estatal legible. */
+  estado: "cargado" | "preparacion";
+  /** = `codigos.fuente_url` (PDF oficial del CEDIJ, host de la whitelist §3.3). Solo los cargados. */
   fuenteUrl?: string;
   descripcion: string;
-  articulos: ArticuloCodigo[];
+  /** Artículos que el producto ya usa en otra pantalla, con su herramienta. */
+  destacados: ArticuloDestacado[];
+  /** Por qué no está, cuando no está: el hueco se explica (§4.5). */
+  motivoPendiente?: string;
 }
 
 /** Tabla `procesos` + `pasos_proceso` — el "paso a paso" con fuente citada. */

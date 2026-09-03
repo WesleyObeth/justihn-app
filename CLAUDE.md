@@ -2,8 +2,8 @@
 
 > Cerebro técnico del producto. Manda en su dominio sobre `justihn/CLAUDE.md`
 > (producto/negocio) y sigue `../../STACK-BLUEPRINT.md` (arquitectura de la agencia).
-> Creado: **2026-08-25** · Última actualización: **2026-09-02** (Jurisprudencia,
-> Monitoreo, Mi nombre y Verifica conectados al corpus real — §1.7).
+> Creado: **2026-08-25** · Última actualización: **2026-09-03** (Legislación
+> conectada a las tablas reales, artículo por artículo — §1.8).
 >
 > **Cómo leerlo:** §1 dice qué hay y dónde. §4 son las reglas que no se
 > renegocian, y **§4.7 las trampas** — lo que costó horas descubrir y no se ve
@@ -66,9 +66,10 @@ Perfil · Planes · Configuración · Ayuda.
   dos modos, filtros de materia/proceso/año, paginación con conteo exacto y
   ficha por `record_id`. **Legislación** y **Monitoreo de nombres** existen
   para que la tabla de planes quede 100% respaldada por UI (estaban vendidas y
-  no existían). Legislación muestra los artículos del CPC verificados contra el
-  PDF oficial del PJ; los demás códigos aparecen "en preparación" — sin fuente
-  no hay texto. Monitoreo pregunta al corpus por `/api/corpus/apariciones`
+  no existían). **Legislación lee los 2.162 artículos reales** de `codigos` +
+  `articulos` desde el 2026-09-03 (§1.8); Civil, Penal y Justicia
+  Constitucional aparecen «en preparación» diciendo POR QUÉ — sin fuente no
+  hay texto. Monitoreo pregunta al corpus por `/api/corpus/apariciones`
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
   disclaimer de homónimos y exclusión de materias reservadas; mientras la
   migración 03 no esté pasada, responde sobre el piloto **y lo dice** (§1.7).
@@ -667,6 +668,66 @@ esconde a la clave `anon`). Todo pasa por `guard()`; nada gasta LLM.
   columna lateral y cada card salen del mismo dato; con dos derivaciones
   podrían contradecirse. Caché por nombre a nivel de módulo.
 
+### 1.8 Legislación sobre las tablas reales — conectada el 2026-09-03
+
+La pantalla dejó de enseñar seis síntesis del CPC escritas a mano: lee los
+**2.162 artículos** de `codigos` + `articulos` (Trabajo 875 · Familia 357 ·
+Procesal Civil 930, cada uno con la página del PDF oficial). Mismo reparto
+que Jurisprudencia: `api/legislacion/buscar` tras `guard()`, dos modos, y
+**cada artículo es una ruta real** (`/abogados/legislacion/[codigo]/[numero]`)
+con su texto, el PDF abierto en su página, los vecinos por posición y la
+herramienta del portal que lo aplica.
+
+- **Dos modos.** *Por número o palabras*: si la consulta parece un número
+  («120», «art 120-A») va directo al artículo; si no, ILIKE con AND sobre el
+  texto, **en el orden del código** (un código se lee en orden, no por
+  fecha), 20 por página, y **sin consulta lista el código entero** — es la
+  forma de leerlo, no solo de buscar en él. Medido: 0,15 s sin índice
+  trigram (2.162 filas de ~1 KB). *Por significado*: el MISMO RPC
+  `buscar_legislacion` que Jus IA, sobre los tres códigos a la vez (el RPC no
+  filtra por código), hasta 12 por afinidad, techo global propio (3.000/día).
+- **Umbral 0,45, medido otra vez sobre los artículos** (2026-09-03):
+  pertinentes 0,51–0,71 · ajenas 0,19–0,33. Un solo número para Jus IA,
+  Jurisprudencia y Legislación porque el modelo de embeddings es uno.
+- ⚠️ **El seed tenía dos artículos INVERTIDOS.** Decía que el art. 399 del
+  CPC era el proceso abreviado (tope L100.000) y el 400 el ordinario. El PDF
+  oficial dice lo contrario: **399 = ámbito del ordinario, 400 = ámbito del
+  abreviado** (reformado por Decreto 21-2015). Estuvo así desde el 2026-08-25
+  enlazado desde Calculadoras. Es la razón de que la pantalla ya no enseñe
+  síntesis: enseña el texto, y el seed solo guarda los **destacados** (los
+  artículos que otra pantalla ya aplica) con número, rótulo, nota y
+  herramienta.
+- ⚠️ **Los ids del seed no eran los de la tabla** (`cpc` vs
+  `codigo-procesal-civil`): la pantalla habría preguntado por un código
+  inexistente. El seed ahora usa los ids de `articulos.mjs` y `ALIAS_CODIGO`
+  resuelve los enlaces viejos (`?codigo=cpc` y `/legislacion/cpc/40`
+  redirigen). `legislacion.test.ts` fija los tres ids cargados.
+- **Solo el CPC trae rúbricas** («Artículo 676. OBJETO .», «Artículo 399. -
+  ÁMBITO DEL…», con la nota al pie pegada «ABREVIADO.1»): `parsearArticulo`
+  (`lib/corpus/articulo.ts`, puro) las separa y las pasa a frase; en 400
+  fichas del CPC, 363 la traen. Trabajo y Familia no titulan: la card enseña
+  el número y, si es destacado, el rótulo del portal **diciendo que es del
+  portal**. Sin rúbrica ni destacado, solo el número: nunca un título inventado.
+- **ILIKE no ignora tildes** («cesantia» no encuentra «cesantía»). El estado
+  vacío lo dice y ofrece el modo por significado, que sí lo entiende.
+- **Cuatro artículos existen en el código y no en la tabla** (Trabajo 527 y
+  529 · CPC 40 y 420: el encabezado no está en la capa de texto del PDF —
+  `automatizaciones/legislacion/README.md`). `ARTICULOS_SIN_TEXTO` hace que
+  buscarlos o abrir su ruta explique el hueco con enlace al PDF, en vez de
+  «no existe» o un 404.
+- **Móvil: la columna de seis códigos se vuelve un `<select>`**; con la
+  columna, los artículos quedaban seis tarjetas más abajo.
+- Se quitó el botón «Avisarme cuando esté» de los códigos en preparación:
+  enseñaba un toast y no avisaba a nadie (§4.5).
+- ⚠️ Trampa de E2E: el buscador global lleva `aria-label="Buscar en
+  jurisprudencia, …"` y la pantalla `aria-label="Buscar en {código}"` — un
+  selector `[aria-label^='Buscar en']` pulsa el global y acaba en una
+  sentencia. En el recorrido, el campo se localiza por `placeholder`.
+- Verificado en Chromium (escritorio y 390px, 24 comprobaciones, 0 errores
+  de JS) con una cuenta de prueba creada y borrada por la API admin de
+  Supabase. **WebKit no pudo iniciar sesión en `localhost` por http** (la
+  cookie de sesión no se guarda): queda por comprobar sobre `justihn.com`.
+
 **Confirmación del correo por CÓDIGO, no por enlace** (decisión Wesley
 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la deja
 en otra pestaña; el código la mantiene en la misma pantalla y termina con
@@ -764,10 +825,10 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 |---|---|
 | `src/app/abogados/` · `src/app/personas/` | Los dos portales, cada pantalla una **ruta real** (no estado) |
 | `src/app/(landing)/` · `(profesional)/` · `(profesional-black)/` · `(publico)/` · `(auth)/` | Las superficies públicas, cada grupo con su shell |
-| `src/app/api/` | `ia/consultar` (Jus IA) · `jurisprudencia/buscar` (dos modos, §1.7) · `corpus/apariciones` (nombre como parte). Todo pasa por `guard()` antes de gastar nada |
+| `src/app/api/` | `ia/consultar` (Jus IA) · `jurisprudencia/buscar` (dos modos, §1.7) · `legislacion/buscar` (dos modos, §1.8) · `corpus/apariciones` (nombre como parte). Todo pasa por `guard()` antes de gastar nada |
 | `src/lib/security/` | **El harness (§3 del blueprint).** `api-guard` · `rate-limit` · `sanitize` · `ai-safety`. Toda superficie de servidor lo consume; no reinventar por ruta |
 | `src/lib/ai/` | `router-demo` (Fase 1, determinístico) · `motor-claude` y `motor-openai` (Fase 2, **encendidos**) · `sin-fuentes` (la negativa, en un solo sitio) · `tipos` (el contrato que cumplen los tres) |
-| `src/lib/corpus/` | **El RAG y el buscador.** `supabase` (RPC con la clave `anon`) · `embeddings` (vectoriza la consulta) · `recuperar` (**una sola recuperación para los dos motores** — ver §1.6) · `ficha` (parser de la ficha del CEDIJ) · `catalogo` (materias/procesos, puro, lo importa la pantalla) · `sentencias` (búsqueda, ficha por id, apariciones por nombre — §1.7) |
+| `src/lib/corpus/` | **El RAG y el buscador.** `supabase` (RPC con la clave `anon`) · `embeddings` (vectoriza la consulta) · `recuperar` (**una sola recuperación para los dos motores** — ver §1.6) · `ficha` (parser de la ficha del CEDIJ) · `catalogo` (materias/procesos, puro, lo importa la pantalla) · `sentencias` (búsqueda, ficha por id, apariciones por nombre — §1.7) · `articulo` (puro: parser de rúbricas y números) · `legislacion` (búsqueda, artículo, vecinos — §1.8) |
 | `src/lib/og/tarjeta.tsx` | El componente único de las tres tarjetas sociales |
 | `src/data/` | Seeds = **contrato literal** de las tablas Supabase futuras. Cada archivo lleva su `TODO(data)` con la fuente real |
 | `src/store/portal.ts` | Zustand + persist en `justihn-portal-v1` (misma clave del prototipo) |
@@ -981,7 +1042,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (243 tests de invariantes)
+pnpm test         # Vitest (258 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 
@@ -1001,7 +1062,9 @@ las palabras del ciudadano, sin tildes, y que toda guía sea alcanzable), los
 títulos de página, las
 rutas de trámites, las colisiones de transform del imán, y el parser de la ficha
 del CEDIJ (fallo real vs estado de publicación, partes, problemas múltiples,
-título derivado) con el mapeo fila → `Sentencia`.
+título derivado) con el mapeo fila → `Sentencia`, y el de los artículos
+(rúbricas del CPC con nota al pie pegada, números con letra, el catálogo de
+códigos como contrato de la tabla `codigos` y los alias viejos).
 
 **Recorridos E2E** (2026-08-30): los scripts de los tres caminos de un visitante
 viven en el scratchpad de la sesión, no commiteados — dependen del servidor de
@@ -1129,10 +1192,9 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      de «Mis casos», que está diferida hasta validar con abogados reales. Al
      crear el esquema, o nace `casos` o el brief se deriva de Gaceta + leads y
      pierde la fila «ACTUAR». Decidir con el feedback del backlog #4.
-   - 📌 **Legislación es la siguiente pantalla que puede conectarse al corpus
-     real** (mismo patrón que Jurisprudencia): la tabla de artículos existe y
-     Jus IA ya la usa; la pantalla sigue sobre los artículos del CPC del seed
-     con `estado: "muestra" | "preparacion"`.
+   - ✅ **Legislación conectada a las tablas reales (2026-09-03)** — §1.8.
+     De paso, el seed pasó de «muestra» a **catálogo + destacados** y se
+     corrigió el 399/400 invertido.
 2. [x] ✅ **JURISPRUDENCIA CONECTADA AL CORPUS REAL (2026-09-02)** — §1.7.
    Las dos búsquedas (palabras + significado), filtros reales, paginación con
    conteo exacto, ficha por `record_id` con la ficha del CEDIJ parseada, y

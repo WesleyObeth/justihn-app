@@ -315,7 +315,7 @@ function CalculadoraVia() {
 
       <p className="mt-2.5 text-[11px] text-texto-4">
         Umbrales verificados contra el PDF oficial del CPC (2018) —{" "}
-        <Link href="/abogados/legislacion?codigo=cpc">ver los artículos</Link>. Orientativo —
+        <Link href="/abogados/legislacion?codigo=codigo-procesal-civil">ver los artículos</Link>. Orientativo —
         revisa el caso concreto.
       </p>
     </Card>
