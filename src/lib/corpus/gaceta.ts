@@ -140,7 +140,10 @@ export interface ResultadoGaceta {
   desdeIso: string;
 }
 
-let disponible: boolean | null = null;
+// ⚠️ NO se recuerda que la tabla «no existe»: la migración se pasa en
+// caliente y el servidor en marcha tiene que verla en la siguiente petición.
+// Costó una verificación: el aviso «sin ediciones» no salía porque un
+// recuerdo de «sin tabla» de antes de la migración cortocircuitaba.
 
 /**
  * Las publicaciones de la Sección A desde una fecha (por defecto los últimos
@@ -151,7 +154,6 @@ let disponible: boolean | null = null;
 export async function publicacionesRecientes(opciones: { dias?: number; materia?: string | null } = {}): Promise<ResultadoGaceta> {
   const dias = opciones.dias ?? 30;
   const vacio = (d: boolean): ResultadoGaceta => ({ disponible: d, publicaciones: [], gacetas: [], porMateria: {}, desdeIso: "" });
-  if (disponible === false) return vacio(false);
   try {
     // La fecha de corte se calcula sobre la ÚLTIMA edición capturada, no
     // sobre hoy: la ENAG publica con retraso y «los últimos 30 días» de
@@ -182,7 +184,6 @@ export async function publicacionesRecientes(opciones: { dias?: number; materia?
           .join("&"),
       ),
     ]);
-    disponible = true;
     const numeros = new Set(gacetasFilas.map((g) => g.numero));
     const publicaciones = pubs.filter((p) => numeros.has(p.gaceta_numero)).map(filaAPublicacion);
     const porMateria: Record<string, number> = {};
@@ -202,25 +203,18 @@ export async function publicacionesRecientes(opciones: { dias?: number; materia?
       desdeIso,
     };
   } catch (error) {
-    if (error instanceof SinTabla) {
-      disponible = false;
-      return vacio(false);
-    }
+    if (error instanceof SinTabla) return vacio(false);
     throw error;
   }
 }
 
 export async function getPublicacionReal(id: number): Promise<PublicacionReal | null> {
-  if (!Number.isInteger(id) || id <= 0 || disponible === false) return null;
+  if (!Number.isInteger(id) || id <= 0) return null;
   try {
     const { filas } = await consultar<FilaPublicacion>("publicaciones_gaceta", `select=${COLUMNAS}&id=eq.${id}&limit=1`);
-    disponible = true;
     return filas[0] ? filaAPublicacion(filas[0]) : null;
   } catch (error) {
-    if (error instanceof SinTabla) {
-      disponible = false;
-      return null;
-    }
+    if (error instanceof SinTabla) return null;
     throw error;
   }
 }
