@@ -792,6 +792,44 @@ las leyes que no están en la tabla abren el PDF oficial **en su página**.
 - ⚙️ Pendiente del socio: validar documentos y notas de práctica (son
   conocimiento del gremio, no texto de ley).
 
+### 1.10 Alertas de Gaceta — en vivo desde la ENAG (2026-09-03)
+
+La pantalla deja de ser un seed de cinco publicaciones inventadas: lee
+`gacetas` + `publicaciones_gaceta` (`automatizaciones/gaceta/esquema/01-gaceta.sql`),
+que llena `capturar.py` desde la Mac con los PDF de la ENAG (README del
+pipeline). **Mientras la migración no esté pasada, la API responde
+`disponible: false` y la pantalla enseña la maqueta diciendo que es la
+maqueta** (mismo patrón que Monitoreo antes de la migración 03).
+
+- **Fuente**: `enag.gob.hn` (⚠️ sin `www`, que rechaza la conexión) →
+  listado por mes → `/viewdocument/{id}` sirve el PDF sin login. Cada PDF
+  trae texto; la portada lleva el SUMARIO con emisor, documentos y rangos de
+  página. Se probó sobre 13 ediciones de agosto y septiembre: 41
+  publicaciones, todas con página. La ENAG publica con retraso (el 3 de
+  septiembre faltaban las de la segunda quincena de agosto).
+- **Una publicación = un bloque de emisor del sumario**, con su rango de
+  páginas, tipo (Decreto · Acuerdo · Auto acordado · …), materia SOLO con
+  regla clara (Trabajo → Laboral, CNBS → Mercantil…; en agosto 1 de 41) y
+  un `extracto` de ~900 caracteres desde donde arranca en su página. La
+  cita abre el PDF **en esa página**. El «Avance» (anuncio de la siguiente
+  edición) se guarda y no se lista. La Sección B (avisos legales) se guarda
+  íntegra en `gacetas.texto_b` para Monitoreo; aún no se busca desde la app.
+- **Lo que se quitó a propósito (§4.5):** el «impacto en tu práctica»
+  redactado a mano por publicación y el conteo «afectan tus casos activos».
+  Nadie produce ese dato; la ficha real enseña cómo empieza la publicación
+  en el Diario Oficial y el abogado se lo pregunta a Jus IA con el texto
+  delante. Y el digest ya no dice «enviado también por WhatsApp».
+- **Un solo hook** (`useGaceta`) alimenta la pantalla y la línea del
+  Dashboard: con datos reales cuentan lo mismo; sin ellos, el Dashboard dice
+  «Maqueta: …». `/abogados/gaceta/[id]`: id numérico → publicación real
+  (ficha + «También en esta edición»); slug → seed.
+- ⚙️ Pendientes: ampliar las reglas de materia con el socio; buscar en la
+  Sección B por nombre (Monitoreo); el buscador global (⌘K) y el demo de la
+  landing siguen sobre el seed; archivo 2015-2026 (`--desde 2015-01`).
+- 🚦 **Gate para verlo en vivo (Wesley):** pasar `01-gaceta.sql` en el
+  editor SQL de Supabase y correr `python3 capturar.py --desde 2026-08`;
+  después, el cron diario de `tareas-desde-la-mac.md` §4.
+
 **Confirmación del correo por CÓDIGO, no por enlace** (decisión Wesley
 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la deja
 en otra pestaña; el código la mantiene en la misma pantalla y termina con
@@ -889,10 +927,10 @@ Instalados y listos para Fase 2, aún sin cablear: `@anthropic-ai/sdk`,
 |---|---|
 | `src/app/abogados/` · `src/app/personas/` | Los dos portales, cada pantalla una **ruta real** (no estado) |
 | `src/app/(landing)/` · `(profesional)/` · `(profesional-black)/` · `(publico)/` · `(auth)/` | Las superficies públicas, cada grupo con su shell |
-| `src/app/api/` | `ia/consultar` (Jus IA) · `jurisprudencia/buscar` (dos modos, §1.7) · `legislacion/buscar` (dos modos, §1.8) · `corpus/apariciones` (nombre como parte). Todo pasa por `guard()` antes de gastar nada |
+| `src/app/api/` | `ia/consultar` (Jus IA) · `jurisprudencia/buscar` (dos modos, §1.7) · `legislacion/buscar` (dos modos, §1.8) · `gaceta/publicaciones` (§1.10) · `corpus/apariciones` (nombre como parte). Todo pasa por `guard()` antes de gastar nada |
 | `src/lib/security/` | **El harness (§3 del blueprint).** `api-guard` · `rate-limit` · `sanitize` · `ai-safety`. Toda superficie de servidor lo consume; no reinventar por ruta |
 | `src/lib/ai/` | `router-demo` (Fase 1, determinístico) · `motor-claude` y `motor-openai` (Fase 2, **encendidos**) · `sin-fuentes` (la negativa, en un solo sitio) · `tipos` (el contrato que cumplen los tres) |
-| `src/lib/corpus/` | **El RAG y el buscador.** `supabase` (RPC con la clave `anon`) · `embeddings` (vectoriza la consulta) · `recuperar` (**una sola recuperación para los dos motores** — ver §1.6) · `ficha` (parser de la ficha del CEDIJ) · `catalogo` (materias/procesos, puro, lo importa la pantalla) · `sentencias` (búsqueda, ficha por id, apariciones por nombre — §1.7) · `articulo` (puro: parser de rúbricas y números) · `legislacion` (búsqueda, artículo, vecinos — §1.8) |
+| `src/lib/corpus/` | **El RAG y el buscador.** `supabase` (RPC con la clave `anon`) · `embeddings` (vectoriza la consulta) · `recuperar` (**una sola recuperación para los dos motores** — ver §1.6) · `ficha` (parser de la ficha del CEDIJ) · `catalogo` (materias/procesos, puro, lo importa la pantalla) · `sentencias` (búsqueda, ficha por id, apariciones por nombre — §1.7) · `articulo` (puro: parser de rúbricas y números) · `legislacion` (búsqueda, artículo, vecinos — §1.8) · `gaceta` (publicaciones y ediciones, `disponible: false` sin migración — §1.10) |
 | `src/lib/og/tarjeta.tsx` | El componente único de las tres tarjetas sociales |
 | `src/data/` | Seeds = **contrato literal** de las tablas Supabase futuras. Cada archivo lleva su `TODO(data)` con la fuente real |
 | `src/store/portal.ts` | Zustand + persist en `justihn-portal-v1` (misma clave del prototipo) |
@@ -1106,7 +1144,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (262 tests de invariantes)
+pnpm test         # Vitest (265 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

@@ -92,7 +92,8 @@ function semanaDelDigest(): string {
 
 export const DIGEST = {
   titulo: semanaDelDigest(),
-  detalle: `${PUBLICACIONES.length} publicaciones en tus materias suscritas · enviado también por WhatsApp`,
+  // Sin «enviado por WhatsApp»: no hay envío que lo respalde (§4.5).
+  detalle: `${PUBLICACIONES.length} publicaciones de ejemplo en tus materias suscritas`,
 } as const;
 
 /**

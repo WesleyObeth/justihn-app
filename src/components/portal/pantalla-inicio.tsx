@@ -12,6 +12,7 @@ import { BannerValidacion } from "@/components/portal/marco";
 import { usePortal, useCuota } from "@/store/portal";
 import { ABOGADA_DEMO, ACTIVIDAD_RECIENTE, LEADS, respuestasDe } from "@/data/catalogo";
 import { PUBLICACIONES } from "@/data/gaceta";
+import { useGaceta } from "@/hooks/use-gaceta";
 import { SENTENCIAS } from "@/data/sentencias";
 import { BRIEF, HISTORIAL } from "@/data/jus-ia";
 import { usePreguntarAJusIA } from "@/hooks/use-preguntar-jus-ia";
@@ -55,10 +56,7 @@ export function PantallaInicio() {
           <div className="flex flex-col gap-4">
             <CardMarino className="p-5">
               <TituloSeccion className="text-[#e8eef6]">Digest de Gaceta</TituloSeccion>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-sobre-marino-2">
-                Tu resumen semanal está listo: {PUBLICACIONES.length} publicaciones en{" "}
-                {listarMaterias(PUBLICACIONES.map((p) => p.materia))}.
-              </p>
+              <DigestEnUnaLinea />
               <Link
                 href="/abogados/gaceta?digest=1"
                 className="mt-3.5 inline-block rounded-lg bg-celeste px-3.5 py-[9px] text-[13px] font-semibold text-white hover:bg-[#0d6ba3] hover:text-white"
@@ -448,5 +446,31 @@ function AccesoRapido({
       </span>
       {children}
     </Link>
+  );
+}
+
+/**
+ * La línea del digest sale del MISMO hook que la pantalla de Gaceta: con la
+ * migración pasada cuenta publicaciones reales; sin ella, el seed y lo dice.
+ */
+function DigestEnUnaLinea() {
+  const estado = useGaceta({ dias: 30 });
+  const subs = usePortal((s) => s.subs);
+  if (estado.tipo === "listo" && estado.datos.disponible) {
+    const pubs = estado.datos.publicaciones.filter((p) => p.tipo !== "Avance");
+    const mias = pubs.filter((p) => p.materia && subs[p.materia]).length;
+    return (
+      <p className="mt-1.5 text-[12.5px] leading-[1.5] text-sobre-marino-2">
+        {pubs.length} publicaciones en las últimas {estado.datos.gacetas.length} ediciones de La Gaceta
+        {mias > 0 ? `; ${mias} en tus materias suscritas` : ""}.
+      </p>
+    );
+  }
+  return (
+    <p className="mt-1.5 text-[12.5px] leading-[1.5] text-sobre-marino-2">
+      {estado.tipo === "cargando"
+        ? "Leyendo las últimas ediciones…"
+        : `Maqueta: ${PUBLICACIONES.length} publicaciones de ejemplo en ${listarMaterias(PUBLICACIONES.map((p) => p.materia))}.`}
+    </p>
   );
 }
