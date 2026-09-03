@@ -6,9 +6,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { BurbujaUsuario, IndicadorPensando, RespuestaJusIA } from "@/components/ia/mensaje";
 import { usePortal, useCuota } from "@/store/portal";
-import { adjuntoDemo, useJusIA } from "@/hooks/use-jus-ia";
+import { useJusIA } from "@/hooks/use-jus-ia";
 import { useTitularJusIA } from "@/hooks/use-saludo";
 import { HISTORIAL, SUGERENCIAS } from "@/data/jus-ia";
+import { useMiPerfil } from "@/components/portal/proveedor-perfil";
 import { cn } from "@/lib/utils";
 
 /**
@@ -146,7 +147,8 @@ function PanelHistorial({ abierto, onCerrar }: { abierto: boolean; onCerrar: () 
 // ── Estado fresco ──────────────────────────────────────────────────────────
 
 function EstadoFresco({ onEnviar }: { onEnviar: (texto: string) => void }) {
-  const titular = useTitularJusIA();
+  const perfil = useMiPerfil();
+  const titular = useTitularJusIA(perfil.nombreCorto.split(" ")[0]!);
 
   return (
     <div className="flex flex-1 flex-col items-stretch justify-center pb-[4vh]">
@@ -235,12 +237,11 @@ function Composer({
   onEnviar,
 }: {
   variante: "hero" | "hilo";
-  onEnviar: (texto: string, adjunto?: ReturnType<typeof adjuntoDemo>) => void;
+  onEnviar: (texto: string) => void;
 }) {
   const borrador = usePortal((s) => s.borrador);
   const setBorrador = usePortal((s) => s.setBorrador);
   const pensando = usePortal((s) => s.pensando);
-  const chat = usePortal((s) => s.chat);
   const cuota = useCuota();
   const campoRef = useRef<HTMLTextAreaElement>(null);
 
@@ -256,12 +257,6 @@ function Composer({
   const enviar = () => {
     if (!borrador.trim() || pensando) return;
     onEnviar(borrador);
-  };
-
-  const adjuntar = () => {
-    if (pensando) return;
-    const adjunto = adjuntoDemo(chat.filter((m) => m.adjunto).length);
-    onEnviar(adjunto.texto, adjunto);
   };
 
   const campo = (
@@ -336,25 +331,15 @@ function Composer({
     >
       {bordeAurora}
       {campo}
+      {/* Aquí vivían dos botones de adjuntar (2026-09-03, §4.5): no subían nada.
+          Metían una clave en el texto de la consulta y el router demo devolvía
+          un resumen inventado. Con el motor real encendido era peor: la clave
+          iba al RAG, el modelo contestaba que no tenía el documento y, al no
+          marcar ningún [n], el fallback de `seleccionarCitas` pintaba debajo
+          las 8 sentencias recuperadas — una respuesta que no responde, vestida
+          de respaldada. Vuelven cuando exista subida real (§7.3): el archivo se
+          analiza en servidor y viaja como file_id, nunca dentro del prompt. */}
       <div className="flex items-center gap-3.5">
-        <button
-          type="button"
-          onClick={adjuntar}
-          title="Adjuntar documento"
-          aria-label="Adjuntar documento"
-          className="grid cursor-pointer place-items-center text-texto-4 hover:text-marino"
-        >
-          <Icono nombre="mas" size={17} />
-        </button>
-        <button
-          type="button"
-          onClick={adjuntar}
-          title="Adjuntar expediente"
-          aria-label="Adjuntar expediente"
-          className="grid cursor-pointer place-items-center text-texto-4 hover:text-marino"
-        >
-          <Icono nombre="documento" size={17} />
-        </button>
         <span className="flex-1" />
         <span className="text-[11.5px] text-texto-4">
           {cuota.esPremium ? "Consultas ilimitadas" : `${cuota.restantes} consultas restantes`}

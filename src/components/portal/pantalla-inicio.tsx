@@ -11,6 +11,7 @@ import { Card, CardMarino, ChipMateria, TituloSeccion } from "@/components/ui/pr
 import { BannerValidacion } from "@/components/portal/marco";
 import { usePortal, useCuota } from "@/store/portal";
 import { ABOGADA_DEMO, ACTIVIDAD_RECIENTE, LEADS, respuestasDe } from "@/data/catalogo";
+import { useMiPerfil } from "./proveedor-perfil";
 import { PUBLICACIONES } from "@/data/gaceta";
 import { useGaceta } from "@/hooks/use-gaceta";
 import { SENTENCIAS } from "@/data/sentencias";
@@ -24,11 +25,16 @@ import { useSaludoPorHora, useSemanaActual } from "@/hooks/use-saludo";
  * card navega o dispara una acción.
  */
 export function PantallaInicio() {
+  const perfil = useMiPerfil();
   const franja = useSaludoPorHora();
   const semana = useSemanaActual();
-  const apellido = ABOGADA_DEMO.nombreCorto.split(" ")[1];
+  // «Abg.», no «abogada»: el saludo estaba en femenino porque el seed era una
+  // abogada, y desde que el perfil es real (2026-09-03) le decía «abogada
+  // Mejía» a un hombre. El género de una persona no se deduce de su nombre y la
+  // tabla no lo guarda — ni tiene por qué. La abreviatura del gremio es neutra.
+  const apellido = perfil.nombreCorto.split(" ")[1] ?? perfil.nombreCorto;
   // Derivado del mismo seed que "Nuevo en tus materias": un solo lugar por dato.
-  const especialidades = new Set<string>(ABOGADA_DEMO.especialidades);
+  const especialidades = new Set<string>(perfil.especialidades);
   const novedades = SENTENCIAS.filter((s) => especialidades.has(s.materia)).length;
 
   return (
@@ -37,7 +43,7 @@ export function PantallaInicio() {
       <div className="max-w-[1280px]" style={{ animation: "fadeUp .3s ease" }}>
         <h1 className="font-display text-[26px] font-bold">Dashboard</h1>
         <p className="mt-1 text-sm text-texto-3">
-          {franja && `${franja}, abogada ${apellido} — `}
+          {franja && `${franja}, Abg. ${apellido} — `}
           {semana && `${semana} · `}
           <Link href="/abogados/jurisprudencia">{novedades} novedades en tus materias</Link>
         </p>
@@ -289,7 +295,8 @@ function ActividadReciente() {
  * corazón del producto presente en el Dashboard, con deep-link a cada fallo.
  */
 function NuevoEnTusMaterias() {
-  const especialidades = new Set<string>(ABOGADA_DEMO.especialidades);
+  const perfil = useMiPerfil();
+  const especialidades = new Set<string>(perfil.especialidades);
   const recientes = SENTENCIAS.filter((s) => especialidades.has(s.materia)).slice(0, 2);
 
   return (
@@ -297,7 +304,7 @@ function NuevoEnTusMaterias() {
       <div className="flex items-center justify-between">
         <TituloSeccion>Nuevo en tus materias</TituloSeccion>
         <span className="text-[11.5px] text-texto-4">
-          {ABOGADA_DEMO.especialidades.join(" · ")}
+          {perfil.especialidades.join(" · ")}
         </span>
       </div>
 
@@ -378,6 +385,9 @@ function LeadsRecientes() {
   const nuevos = LEADS.filter(
     (l) =>
       !vistos.includes(l.id) &&
+      // El FIRMANTE sigue siendo el demo mientras las respuestas vivan en
+      // localStorage (§7.3): las semilla están firmadas «maria-castillo», así
+      // que comparar con el uuid de la sesión no encontraría ninguna.
       !respuestasDe(l.id, respondidos).some((r) => r.abogadoId === ABOGADA_DEMO.id),
   ).length;
 

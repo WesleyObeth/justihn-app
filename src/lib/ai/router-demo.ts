@@ -13,9 +13,6 @@
 import { buscarPorExpediente } from "@/data/sentencias";
 import type { RespuestaIA } from "./tipos";
 
-export const CLAVE_ADJUNTO_PDF = "__adjunto_pdf__";
-export const CLAVE_ADJUNTO_FOTO = "__adjunto_foto__";
-
 const SALUDO_RE =
   /^(hola|buenas|buenos días|buenas tardes|buenas noches|hey|saludos|qué tal|gracias|muchas gracias|ok|vale|perfecto|excelente)[\s!.,]*$/;
 
@@ -92,37 +89,6 @@ export function responderDemo(consulta: string, turno: number, metaCosto: string
       ],
       meta: "Sin costo",
       gratuita: true,
-    };
-  }
-
-  if (low.includes(CLAVE_ADJUNTO_PDF)) {
-    return {
-      text: "Leí el documento completo (14 páginas). Resumen:\n\n• Es una sentencia de la Corte de Apelaciones del Trabajo que confirma la condena por despido injustificado en primera instancia.\n• El punto central: el empleador no probó la causal invocada; la carga de la prueba del despido justificado recae en el patrono (Código del Trabajo, art. ___).\n• Montos confirmados: cesantía, preaviso y salarios caídos por L 98,400.\n• Voto particular de un magistrado sobre el cómputo de los salarios caídos — útil si te toca distinguir el caso.\n\n¿Quieres que lo compare con tu caso activo o que extraiga las citas para tu escrito?",
-      citas: [
-        { etiqueta: "Código del Trabajo, art. ___" },
-        { etiqueta: "CAT-0312-2026, considerando IV" },
-      ],
-      chips: [
-        "Compáralo con mi caso CAS-0178",
-        "Extrae las citas para mi escrito",
-        "¿El voto particular me sirve?",
-      ],
-      meta: metaCosto,
-    };
-  }
-
-  if (low.includes(CLAVE_ADJUNTO_FOTO)) {
-    return {
-      text: "Leí la foto — es un contrato de arrendamiento manuscrito/escaneado. Lo que identifiqué:\n\n• Partes: [arrendador] y [arrendatario], inmueble en Comayagüela.\n• Canon: L 8,500 mensuales, plazo de 2 años con renovación automática.\n• Ojo: la cláusula sexta fija un preaviso de 15 días — el decreto publicado el 18 de agosto establece un mínimo mayor para contratos nuevos; esa cláusula podría ser inaplicable.\n\nLa imagen tiene una sección borrosa en la cláusula de depósito: si puedes, súbela de nuevo con más luz.",
-      citas: [
-        { etiqueta: "Código Civil, art. ___" },
-        { etiqueta: "La Gaceta Nº ______, 18 ago 2026" },
-      ],
-      chips: [
-        "Redacta una adenda que corrija el preaviso",
-        "¿Qué pasa con los contratos ya firmados?",
-      ],
-      meta: metaCosto,
     };
   }
 

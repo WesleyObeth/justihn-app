@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Boton, Card, TituloSeccion, TogglePill } from "@/components/ui/primitivos";
-import { ABOGADA_DEMO, PREFERENCIAS_NOTIFICACION } from "@/data/catalogo";
+import { PREFERENCIAS_NOTIFICACION } from "@/data/catalogo";
+import { useMiPerfil } from "./proveedor-perfil";
 import { usePortal, type PreferenciasNotificacion } from "@/store/portal";
 import { useUpgrade } from "@/components/portal/marco";
 
 export function PantallaConfiguracion() {
+  const perfil = useMiPerfil();
   const prefs = usePortal((s) => s.prefs);
   const togglePreferencia = usePortal((s) => s.togglePreferencia);
   const mostrarToast = usePortal((s) => s.mostrarToast);
@@ -14,9 +16,9 @@ export function PantallaConfiguracion() {
   const solicitarUpgrade = useUpgrade();
 
   const [cuenta, setCuenta] = useState({
-    nombre: ABOGADA_DEMO.nombreCorto,
-    correo: ABOGADA_DEMO.email,
-    whatsapp: ABOGADA_DEMO.whatsapp,
+    nombre: perfil.nombreCorto,
+    correo: perfil.email,
+    whatsapp: perfil.whatsapp,
   });
   // "Guardar" solo se habilita cuando la cuenta cambió respecto a lo guardado.
   const [guardada, setGuardada] = useState(cuenta);

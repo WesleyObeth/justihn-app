@@ -5,10 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { DocumentoPropuestaVista } from "@/components/portal/documento-propuesta";
 import { useUpgrade } from "@/components/portal/marco";
 import { Boton, BotonVolver, Card, Rotulo } from "@/components/ui/primitivos";
-import { ABOGADA_DEMO } from "@/data/catalogo";
 import { useHoy } from "@/hooks/use-saludo";
 import { opcionesDeTipo, TIPOS_CASO } from "@/lib/casos";
 import { armarPropuesta } from "@/lib/honorarios";
+import { useMiPerfil } from "./proveedor-perfil";
 import { usePortal, useStoreHidratado } from "@/store/portal";
 import { cn } from "@/lib/utils";
 import type { PropuestaHonorarios, TipoCaso } from "@/types/dominio";
@@ -35,6 +35,7 @@ export function NuevaPropuesta() {
   const hidratado = useStoreHidratado();
   const casoId = params.get("caso") ?? undefined;
   const caso = usePortal((s) => s.casos.find((c) => c.id === casoId));
+  const perfil = useMiPerfil();
   const guardarPropuesta = usePortal((s) => s.guardarPropuesta);
   const actualizarCaso = usePortal((s) => s.actualizarCaso);
   const mostrarToast = usePortal((s) => s.mostrarToast);
@@ -69,7 +70,7 @@ export function NuevaPropuesta() {
   const monto = Number(honorarios.replace(/[^\d.]/g, ""));
   const borrador: PropuestaHonorarios = {
     id: "borrador",
-    abogadoId: ABOGADA_DEMO.id,
+    abogadoId: perfil.id,
     casoId,
     origen: { tipo, referenciaId },
     cliente: { nombre: nombre.trim() || "[Cliente]", rtn: rtn.trim() || undefined, atencion: atencion.trim() || undefined },
@@ -80,7 +81,7 @@ export function NuevaPropuesta() {
     notas: notas.trim() || undefined,
     creadoEn: "",
   };
-  const doc = referenciaId ? armarPropuesta(borrador, ABOGADA_DEMO) : null;
+  const doc = referenciaId ? armarPropuesta(borrador, perfil) : null;
 
   const guardar = () => {
     if (!referenciaId) return setError("Elige el trámite, proceso o acto.");

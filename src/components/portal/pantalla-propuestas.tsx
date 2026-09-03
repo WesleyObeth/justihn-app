@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { Icono } from "@/components/brand/iconos";
 import { DocumentoPropuestaVista } from "@/components/portal/documento-propuesta";
 import { Boton, BotonVolver, Card, Meta } from "@/components/ui/primitivos";
-import { ABOGADA_DEMO } from "@/data/catalogo";
 import { armarPropuesta, formatearLempiras, resolverOrigen } from "@/lib/honorarios";
+import { useMiPerfil } from "./proveedor-perfil";
 import { fechaTexto } from "@/lib/tiempo";
 import { usePortal, useStoreHidratado } from "@/store/portal";
 
@@ -71,6 +71,9 @@ export function PantallaPropuestas() {
 /** Una propuesta guardada: el documento, y encima la barra para imprimirla. */
 export function DetallePropuesta({ id }: { id: string }) {
   const router = useRouter();
+  // El membrete es de quien la firma: hasta el 2026-09-03 decía «Abg. María
+  // Castillo» aunque la propuesta la hubiera hecho otra cuenta.
+  const perfil = useMiPerfil();
   const hidratado = useStoreHidratado();
   const propuesta = usePortal((s) => s.propuestas.find((p) => p.id === id));
   const eliminar = usePortal((s) => s.eliminarPropuesta);
@@ -87,7 +90,7 @@ export function DetallePropuesta({ id }: { id: string }) {
       </Card>
     );
   }
-  const doc = armarPropuesta(propuesta, ABOGADA_DEMO);
+  const doc = armarPropuesta(propuesta, perfil);
   if (!doc) return null;
 
   return (

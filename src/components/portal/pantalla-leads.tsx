@@ -8,6 +8,7 @@ import { Icono } from "@/components/brand/iconos";
 import { BotonJusIA } from "@/components/ia/boton-jus-ia";
 import { Boton, Card, ChipMateria, Meta, Rotulo, TituloSeccion } from "@/components/ui/primitivos";
 import { ABOGADA_DEMO, LEADS, respuestasDe } from "@/data/catalogo";
+import { useMiPerfil } from "./proveedor-perfil";
 import { usePortal } from "@/store/portal";
 import { useUpgrade } from "@/components/portal/marco";
 import { cn } from "@/lib/utils";
@@ -244,6 +245,7 @@ function etiquetaRespuestas(miRespuesta: string | undefined, otras: number): str
 // ── Columna lateral ────────────────────────────────────────────────────────
 
 function TuDesempeno() {
+  const perfil = useMiPerfil();
   const respondidos = usePortal((s) => s.leadsRespondidos);
   const preguntasPublico = usePortal((s) => s.preguntasPublico);
   // Misma lista que las cards (seed + store): contar solo el store decía «0»
@@ -264,7 +266,7 @@ function TuDesempeno() {
         <FilaStat etiqueta="Valoración media" valor={ABOGADA_DEMO.metricas.valoracion} />
       </div>
       <p className="mt-3 border-t border-borde-suave pt-2.5 text-[11.5px] leading-[1.5] text-texto-4">
-        Los leads llegan por tus especialidades ({ABOGADA_DEMO.especialidades.join(" · ")}) —{" "}
+        Los leads llegan por tus especialidades ({perfil.especialidades.join(" · ")}) —{" "}
         <Link href="/abogados/perfil" className="text-celeste hover:text-marino">
           edítalas en tu perfil
         </Link>

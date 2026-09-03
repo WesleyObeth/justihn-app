@@ -55,7 +55,7 @@ export function useJusIA() {
   );
 
   const enviar = useCallback(
-    async (texto: string, adjunto?: Adjunto & { clave: string }) => {
+    async (texto: string, adjunto?: Adjunto) => {
       const consulta = texto.trim();
       if (!consulta || usePortal.getState().pensando) return;
 
@@ -95,10 +95,8 @@ export function useJusIA() {
         const res = await fetch("/api/ia/consultar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          // La clave del adjunto viaja en la consulta para que el motor sepa que
-          // hay un documento adjunto; en Fase 2 se sustituye por el file_id real.
           body: JSON.stringify({
-            consulta: adjunto ? `${adjunto.clave} ${consulta}` : consulta,
+            consulta,
             turno,
             cuotaRestante: cuota.restantes,
           }),
@@ -153,28 +151,4 @@ export function useJusIA() {
   );
 
   return { chat, pensando, enviar };
-}
-
-/**
- * Adjuntos de demostración: alterna documento y foto para mostrar las dos rutas
- * de lectura (PDF de sentencia · foto de contrato).
- *
- * TODO(data): reemplazar por subida real a Supabase Storage + Files API; el
- * archivo se analiza server-side y nunca se envía crudo al prompt (§3.2).
- */
-export function adjuntoDemo(indice: number): Adjunto & { clave: string; texto: string } {
-  const esFoto = indice % 2 === 1;
-  return esFoto
-    ? {
-        nombre: "contrato-arrendamiento.jpg",
-        meta: "Foto · 2.1 MB",
-        clave: "__adjunto_foto__",
-        texto: "Léeme este contrato y dime si hay algo que corregir",
-      }
-    : {
-        nombre: "sentencia-CAT-0312-2026.pdf",
-        meta: "PDF · 14 páginas",
-        clave: "__adjunto_pdf__",
-        texto: "Resúmeme esta sentencia",
-      };
 }

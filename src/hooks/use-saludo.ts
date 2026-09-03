@@ -12,7 +12,6 @@
  */
 import { useSyncExternalStore } from "react";
 import { TITULARES_HERO } from "@/data/jus-ia";
-import { ABOGADA_DEMO } from "@/data/catalogo";
 
 let franjaMemo: string | null = null;
 
@@ -36,23 +35,30 @@ export function useSaludoPorHora(): string {
  * corre solo en cliente tras el mount (nunca en carga de módulo, regla §4.5) y
  * se memoiza para que el snapshot sea estable entre renders.
  */
-let titularMemo: string | null = null;
+let titularMemo: { nombre: string; texto: string } | null = null;
 
-function snapshotTitular(): string {
-  if (titularMemo === null) {
-    const contexto = {
-      franja: snapshotCliente(),
-      nombre: ABOGADA_DEMO.nombreCorto.split(" ")[0]!,
-    };
+/**
+ * El nombre entra por parámetro porque sale del perfil de la sesión, que vive
+ * en un contexto de React y aquí no se puede leer: este snapshot corre fuera
+ * del render. Se memoiza CON el nombre — si cambiara y el memo no lo mirara,
+ * el titular seguiría saludando a quien ya no está.
+ */
+function snapshotTitular(nombre: string): string {
+  if (titularMemo === null || titularMemo.nombre !== nombre) {
+    const contexto = { franja: snapshotCliente(), nombre };
     const elegido = TITULARES_HERO[Math.floor(Math.random() * TITULARES_HERO.length)]!;
-    titularMemo = elegido(contexto);
+    titularMemo = { nombre, texto: elegido(contexto) };
   }
-  return titularMemo;
+  return titularMemo.texto;
 }
 
 /** `""` durante SSR e hidratación; el titular elegido después del mount. */
-export function useTitularJusIA(): string {
-  return useSyncExternalStore(SIN_SUSCRIPCION, snapshotTitular, () => "");
+export function useTitularJusIA(nombre: string): string {
+  return useSyncExternalStore(
+    SIN_SUSCRIPCION,
+    () => snapshotTitular(nombre),
+    () => "",
+  );
 }
 
 /**

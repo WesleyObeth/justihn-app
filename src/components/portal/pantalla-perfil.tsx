@@ -5,7 +5,8 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Icono } from "@/components/brand/iconos";
 import { Boton, Card, ChipMateria, Rotulo, TituloSeccion } from "@/components/ui/primitivos";
-import { ABOGADA_DEMO, DOCUMENTOS_VALIDACION, etiquetaColegiacion, getPlan } from "@/data/catalogo";
+import { DOCUMENTOS_VALIDACION, etiquetaColegiacion, getPlan } from "@/data/catalogo";
+import { useMiPerfil } from "./proveedor-perfil";
 import { usePortal, useCuota } from "@/store/portal";
 import { useUpgrade } from "@/components/portal/marco";
 
@@ -26,6 +27,7 @@ export function PantallaPerfil() {
 }
 
 function TarjetaPerfil() {
+  const perfil = useMiPerfil();
   const mostrarToast = usePortal((s) => s.mostrarToast);
   const constanciaSubida = usePortal((s) => s.constanciaSubida);
   const [vistaPublica, setVistaPublica] = useState(false);
@@ -37,15 +39,15 @@ function TarjetaPerfil() {
           className="font-display grid h-[72px] w-[72px] place-items-center rounded-full text-2xl font-semibold text-white"
           style={{ background: "linear-gradient(180deg,#0d2144,#0a1830)" }}
         >
-          {ABOGADA_DEMO.iniciales}
+          {perfil.iniciales}
         </div>
 
         <div className="min-w-[220px] flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-display text-xl font-bold whitespace-nowrap">
-              {ABOGADA_DEMO.nombre}
+              {perfil.nombre}
             </h2>
-            {!ABOGADA_DEMO.verificado && (
+            {!perfil.verificado && (
               <span className="inline-flex items-center gap-[5px] rounded-full border border-aviso-borde bg-aviso px-2.5 py-[3px] text-[11px] font-semibold text-aviso-texto">
                 <Icono nombre="reloj" size={11} strokeWidth={2.2} />
                 {constanciaSubida ? "En revisión (1–2 días hábiles)" : "Verificación pendiente"}
@@ -53,9 +55,9 @@ function TarjetaPerfil() {
             )}
           </div>
           <p className="mt-[3px] text-[13px] text-texto-3">
-            {etiquetaColegiacion(ABOGADA_DEMO.colegiacionNumero)} · {ABOGADA_DEMO.ciudad}
+            {etiquetaColegiacion(perfil.colegiacionNumero)} · {perfil.ciudad}
           </p>
-          <p className="mt-1.5 text-[13px] leading-[1.5] text-texto-2">{ABOGADA_DEMO.bio}</p>
+          <p className="mt-1.5 text-[13px] leading-[1.5] text-texto-2">{perfil.bio}</p>
         </div>
 
         <div className="flex flex-col gap-2 self-start">
@@ -80,7 +82,7 @@ function TarjetaPerfil() {
           Especialidades visibles en el directorio
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
-          {ABOGADA_DEMO.especialidades.map((esp) => (
+          {perfil.especialidades.map((esp) => (
             <span
               key={esp}
               className="rounded-full bg-chip px-3 py-[5px] text-[12.5px] font-medium text-celeste"
@@ -99,9 +101,9 @@ function TarjetaPerfil() {
       </div>
 
       <div className="mt-5 grid grid-cols-3 gap-3">
-        <Metrica valor={String(ABOGADA_DEMO.metricas.vistas)} etiqueta="Vistas del perfil (30 d)" />
-        <Metrica valor={String(ABOGADA_DEMO.metricas.contactos)} etiqueta="Contactos recibidos" />
-        <Metrica valor={ABOGADA_DEMO.metricas.valoracion} etiqueta="Valoración media" />
+        <Metrica valor={String(perfil.metricas.vistas)} etiqueta="Vistas del perfil (30 d)" />
+        <Metrica valor={String(perfil.metricas.contactos)} etiqueta="Contactos recibidos" />
+        <Metrica valor={perfil.metricas.valoracion} etiqueta="Valoración media" />
       </div>
 
       <ModalVistaPublica
@@ -126,6 +128,7 @@ function ModalVistaPublica({
   onCerrar: () => void;
   validado: boolean;
 }) {
+  const perfil = useMiPerfil();
   const mostrarToast = usePortal((s) => s.mostrarToast);
 
   return (
@@ -147,12 +150,12 @@ function ModalVistaPublica({
                 className="font-display grid h-[64px] w-[64px] place-items-center rounded-full text-xl font-semibold text-white"
                 style={{ background: "linear-gradient(180deg,#0d2144,#0a1830)" }}
               >
-                {ABOGADA_DEMO.iniciales}
+                {perfil.iniciales}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-display text-[17px] font-bold text-marino">
-                    {ABOGADA_DEMO.nombre}
+                    {perfil.nombre}
                   </span>
                   {validado ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-exito-bg px-2 py-[3px] text-[10.5px] font-bold text-exito">
@@ -166,19 +169,19 @@ function ModalVistaPublica({
                   )}
                 </div>
                 <div className="mt-0.5 text-[12.5px] text-texto-3">
-                  {ABOGADA_DEMO.ciudad} · ★ {ABOGADA_DEMO.metricas.valoracion} ·{" "}
-                  {ABOGADA_DEMO.metricas.contactos} contactos
+                  {perfil.ciudad} · ★ {perfil.metricas.valoracion} ·{" "}
+                  {perfil.metricas.contactos} contactos
                 </div>
               </div>
             </div>
 
             <div className="mt-3.5 flex flex-wrap gap-1.5">
-              {ABOGADA_DEMO.especialidades.map((esp) => (
+              {perfil.especialidades.map((esp) => (
                 <ChipMateria key={esp}>{esp}</ChipMateria>
               ))}
             </div>
 
-            <p className="mt-3 text-[13px] leading-[1.6] text-texto-2">{ABOGADA_DEMO.bio}</p>
+            <p className="mt-3 text-[13px] leading-[1.6] text-texto-2">{perfil.bio}</p>
 
             <Boton
               variante="celeste"
@@ -189,7 +192,7 @@ function ModalVistaPublica({
                   (`publico/tarjeta-abogado.tsx`): esto es la vista previa de
                   su perfil, y si no coinciden le estamos enseñando al abogado
                   algo que los ciudadanos no ven. */}
-              Consultar con {ABOGADA_DEMO.nombreCorto.split(" ")[0]}
+              Consultar con {perfil.nombreCorto.split(" ")[0]}
             </Boton>
             {!validado && (
               <p className="mt-2.5 text-center text-[11.5px] text-texto-4">
@@ -369,13 +372,14 @@ function TarjetaPrioridadLeads() {
 }
 
 function TarjetaContacto() {
+  const perfil = useMiPerfil();
   return (
     <Card className="p-5">
       <TituloSeccion className="text-[14.5px]">Contacto público</TituloSeccion>
       <div className="mt-3 flex flex-col gap-[9px] text-[12.5px] text-texto-2">
-        <LineaContacto icono="correo">{ABOGADA_DEMO.email}</LineaContacto>
-        <LineaContacto icono="telefono">{ABOGADA_DEMO.whatsapp} (WhatsApp)</LineaContacto>
-        <LineaContacto icono="ubicacion">{ABOGADA_DEMO.direccion}</LineaContacto>
+        <LineaContacto icono="correo">{perfil.email}</LineaContacto>
+        <LineaContacto icono="telefono">{perfil.whatsapp} (WhatsApp)</LineaContacto>
+        <LineaContacto icono="ubicacion">{perfil.direccion}</LineaContacto>
       </div>
     </Card>
   );

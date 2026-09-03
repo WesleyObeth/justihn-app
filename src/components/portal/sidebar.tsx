@@ -7,7 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { Icono, type NombreIcono } from "@/components/brand/iconos";
 import { LogoJustihn, SimboloJustihn, SimboloJusIALinear } from "@/components/brand/logos";
 import { usePortal, useCuota, useNotifsSinLeer } from "@/store/portal";
-import { ABOGADA_DEMO, etiquetaColegiacion } from "@/data/catalogo";
+import { etiquetaColegiacion, getPlan } from "@/data/catalogo";
+import { useMiPerfil } from "./proveedor-perfil";
 import { cn } from "@/lib/utils";
 import { BuscadorGlobal } from "./buscador-global";
 
@@ -191,6 +192,8 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
   const [abierto, setAbierto] = useState(false);
   const [saliendo, setSaliendo] = useState(false);
   const contenedor = useRef<HTMLDivElement>(null);
+  const perfil = useMiPerfil();
+  const plan = usePortal((s) => s.plan);
   const cuota = useCuota();
   const sinLeer = useNotifsSinLeer();
 
@@ -245,7 +248,7 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
             {/* Identidad + plan de un vistazo */}
             <div className="border-b border-white/10 px-3 pt-2.5 pb-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold">{ABOGADA_DEMO.nombre}</span>
+                <span className="text-sm font-semibold">{perfil.nombre}</span>
                 <span
                   className={cn(
                     "rounded-full px-1.5 py-px text-[10px] font-bold",
@@ -254,11 +257,11 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
                       : "border border-white/20 bg-white/10 text-[#9fb6d0]",
                   )}
                 >
-                  {cuota.esPremium ? "PREMIUM" : "PROFESIONAL"}
+                  {(getPlan(plan)?.nombre ?? "Gratis").toUpperCase()}
                 </span>
               </div>
               <div className="mt-0.5 text-[11.5px] text-sobre-marino">
-                {etiquetaColegiacion(ABOGADA_DEMO.colegiacionNumero)}
+                {etiquetaColegiacion(perfil.colegiacionNumero)}
               </div>
             </div>
 
@@ -334,16 +337,16 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
         className="flex w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-2 py-[7px] text-left hover:bg-white/[0.08]"
       >
         <span className="grid h-[34px] w-[34px] min-w-[34px] place-items-center rounded-full bg-celeste text-[12.5px] font-semibold text-white">
-          {ABOGADA_DEMO.iniciales}
+          {perfil.iniciales}
         </span>
         {expandido && (
           <>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-semibold">
-                {ABOGADA_DEMO.nombreCorto}
+                {perfil.nombreCorto}
               </span>
               <span className="block text-[11px] text-sobre-marino">
-                {cuota.esPremium ? "Plan Premium" : "Plan Profesional"}
+                Plan {getPlan(plan)?.nombre ?? "Gratis"}
               </span>
             </span>
             <span className="grid place-items-center text-sobre-marino">

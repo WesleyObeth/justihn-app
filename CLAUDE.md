@@ -28,6 +28,7 @@ resto sigue sobre seeds. Producción: **https://justihn.com** (repo
 | **Procesos** | 🟢 4 procesos, cada paso citando artículos que se abren (§1.9) |
 | **Gaceta** | 🟢 13 ediciones · 41 publicaciones de la ENAG. ⏳ Falta el cron diario (§1.10) |
 | **Auth** | 🟢 Supabase Auth real: alta, confirmación por código, login, cierre de sesión (§1.4) |
+| **Perfil del abogado** | 🟢 El portal se pinta con la fila de `abogados` de la sesión: nombre, iniciales, colegiación, ciudad, materias y plan (§1.11) |
 | **Monitoreo / Mi nombre / Verifica** | 🟡 Buscan en el corpus real, pero la lista de vigilados vive en `localStorage` (§7.3) |
 | **Leads, consultas, casos, propuestas** | 🔴 Solo `localStorage`: no sobreviven al cambio de dispositivo (§7.3) |
 
@@ -79,6 +80,18 @@ Notificaciones · Perfil · Planes · Configuración · Ayuda.
   descartaron dos alternativas: una fila de acciones en la cabecera de página, y
   los dos como hijos desplegables de «Jus IA» en el sidebar (patrón Mercury).
   No volver a proponerlas sin un motivo nuevo.
+
+- **El portal se pinta con el perfil REAL de la sesión** (§1.11), no con el
+  seed: hasta el 2026-09-03 quien entraba con su cuenta veía «María Castillo»
+  en la barra, en el saludo del Dashboard y en el membrete de sus propuestas.
+- **Jus IA ya no tiene botones de adjuntar** (2026-09-03, §4.5). No subían
+  nada: metían una clave en el texto de la consulta y el router demo devolvía
+  un resumen inventado. Con el motor real encendido era peor — la clave iba al
+  RAG, el modelo contestaba que no tenía el documento y, al no marcar ningún
+  `[n]`, el fallback de `seleccionarCitas` pintaba debajo **las 8 sentencias
+  recuperadas**: una respuesta que no responde, vestida de respaldada. Vuelven
+  con subida real (§7.3), y entonces el archivo se analiza en servidor y viaja
+  como `file_id`, nunca dentro del prompt.
 
 **Despacho — Mis casos y Propuestas** (2026-09-02) nace del **primer feedback de
 un abogado externo** (`justihn/CLAUDE.md` backlog #4, #10, #11): pagaba US$20/mes
@@ -595,6 +608,42 @@ demostración») y con tablas vacías («conectada, sin ediciones capturadas»).
 - ⏳ Falta el **cron diario** (`tareas-desde-la-mac.md` §4). ⚠️ En la terminal de
   Wesley `python3` es el de Anaconda: `pypdf` se instaló ahí.
 
+### 1.11 El perfil real del abogado (2026-09-03)
+
+`miPerfilAbogado()` (`lib/supabase/perfil.ts`) lee la fila de `abogados` de la
+sesión y el layout la baja por contexto (`ProveedorPerfil`); `useMiPerfil()` la
+sirve a la barra, al Dashboard, a Perfil, a Configuración, al membrete de las
+propuestas y al titular de Jus IA.
+
+- **La fila existía desde el alta y nadie la leía**: `mi_destino()` se usaba
+  para elegir portal y ahí se acababa. Verificado entrando con una cuenta nueva:
+  el portal entero decía «María Castillo · Plan Profesional».
+- **Se lee en el SERVIDOR, no con un fetch en cliente**: así el nombre llega en
+  el primer HTML y no hay un parpadeo del nombre demo antes del verdadero.
+- **`useMiPerfil()` mezcla lo real sobre el demo**: lo que la tabla sabe manda;
+  lo que aún no tiene columna —hoy solo `metricas`— sigue siendo demo. Inventar
+  «4.9 de valoración» para una cuenta nueva es lo que prohíbe §4.5.
+- **Sin ficha de abogado cae al demo entero** (`esDemo: true`): es una cuenta de
+  la vía B que abrió `/abogados` por URL — el proxy solo comprueba que HAY
+  sesión, no a qué portal pertenece la cuenta.
+- **El plan sale de la fila, no del navegador.** Se sincroniza al store tras el
+  mount, después de `HidratarStore` (antes, la rehidratación lo pisaría). Sin
+  esto, las pantallas Premium se desbloqueaban con un `localStorage`. ⚠️ El
+  rótulo del plan estaba escrito a mano con dos casos y a una cuenta **gratis**
+  le decía «Plan Profesional»; ahora sale de `getPlan()`.
+- ⚠️ **El saludo del Dashboard estaba en femenino** («abogada Mejía» a un
+  hombre): el seed era una abogada. El género no se deduce de un nombre y la
+  tabla no lo guarda — se saluda con **«Abg.»**, que es neutro y además es la
+  abreviatura del gremio.
+- ⚠️ **El FIRMANTE del consultorio sigue siendo el demo.** Las respuestas viven
+  en `localStorage` y las semilla están firmadas `maria-castillo`: comparar con
+  el uuid de la sesión no encontraría ninguna. Se resuelve con las tablas de
+  negocio (§7.3), no antes.
+- ⚙️ Pendiente que esto destapa: la **cuota** sigue siendo la del seed
+  (`CUOTA_BASE`) para gratis y profesional por igual — solo Premium es
+  ilimitada. Y `metricas.valoracion` sigue viva en Leads y en la vista previa
+  de la ficha pública, cuando §4.5 la eliminó de las superficies públicas.
+
 ---
 
 ## 2. Stack (pins reales)
@@ -615,7 +664,7 @@ Instalados y aún sin cablear: `@anthropic-ai/sdk`, `@tanstack/react-query`,
 | `src/app/api/` | `ia/consultar` (§1.6) · `jurisprudencia/buscar` (§1.7) · `legislacion/buscar` (§1.8) · `gaceta/publicaciones` (§1.10) · `corpus/apariciones`. **Todo pasa por `guard()` antes de gastar nada** |
 | `src/proxy.ts` | Proxy de Next 16: refresca la sesión en cada petición y cierra `/abogados` y `/personas` a quien no la tiene |
 | `src/lib/security/` | **El harness (§3 del blueprint).** `api-guard` · `rate-limit` · `sanitize` (con la whitelist de hosts oficiales) · `ai-safety`. No reinventar por ruta |
-| `src/lib/supabase/` | `cliente` (navegador) · `servidor` (con `usuarioActual()`, que **verifica** el token, no lo lee de la cookie) |
+| `src/lib/supabase/` | `cliente` (navegador) · `servidor` (con `usuarioActual()`, que **verifica** el token, no lo lee de la cookie) · `perfil` (la fila de `abogados` de la sesión, §1.11) |
 | `src/lib/ai/` | `router-demo` (determinístico) · `motor-claude` y `motor-openai` (**encendidos**) · `sin-fuentes` (la negativa, en un solo sitio) · `tipos` |
 | `src/lib/corpus/` | **El RAG y los buscadores.** `supabase` (RPC con la clave `anon`) · `embeddings` · `recuperar` (**una sola recuperación para los dos motores**) · `ficha` (parser del CEDIJ) · `articulo` (parser de rúbricas, puro) · `catalogo` (puro, lo importa la pantalla) · `sentencias` · `legislacion` · `gaceta` |
 | `src/data/` | 12 seeds = **contrato literal** de las tablas futuras. Cada archivo lleva su `TODO(data)` |
@@ -933,8 +982,9 @@ pantalla se verificó solo en Chromium.
      vectores) → escrituras en tandas de 50 con reintento.
 2. [x] ✅ **Supabase Auth + proxy (2026-09-02).** Alta, confirmación por código,
    login con destino por cuenta, cierre de sesión y RLS. El modo demo se retiró.
-3. **⭐ Las tablas de NEGOCIO — el pendiente grande.** Todo lo que la persona y el
-   abogado *hacen* sigue en `localStorage`: consultas del consultorio, respuestas,
+3. **⭐ Las tablas de NEGOCIO — el pendiente grande.** La identidad ya sale de
+   la base (§1.11); lo que la persona y el abogado *hacen* sigue en
+   `localStorage`: consultas del consultorio, respuestas,
    leads, casos, propuestas, nombres vigilados, mensajes a abogados y avance de
    trámites. Consecuencias: no sobrevive al cambio de dispositivo, no hay nada que
    cruzar para las alertas de Monitoreo, y el consultorio no puede conectar de
