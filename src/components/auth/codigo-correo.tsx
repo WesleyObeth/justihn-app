@@ -4,17 +4,26 @@ import { useRef, useState } from "react";
 import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
 
 /**
- * Confirmación del correo por CÓDIGO de seis dígitos, no por enlace (decisión
- * Wesley 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta
- * y la deja en otra pestaña; el código la mantiene en la misma pantalla y
- * termina con sesión abierta aquí mismo.
+ * Confirmación del correo por CÓDIGO, no por enlace (decisión Wesley
+ * 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la
+ * deja en otra pestaña; el código la mantiene en la misma pantalla y termina
+ * con sesión abierta aquí mismo.
  *
  * El código lo manda la plantilla «Confirm signup» de Supabase con
  * `{{ .Token }}` (ver `supabase/correos/confirmar-registro.html`); esta
- * pantalla lo canjea con `verifyOtp(type: "signup")`. Seis casillas que se
+ * pantalla lo canjea con `verifyOtp(type: "signup")`. Las casillas se
  * comportan como un solo campo: pegar el código entero lo reparte, borrar
  * retrocede, y al completar se verifica solo.
  */
+/**
+ * Cuántos dígitos trae el código. **Tiene que coincidir con el proyecto de
+ * Supabase** (Authentication, Sign In / Providers, Email, «Email OTP Length»):
+ * si allí son 8 y aquí 6, la casilla se llena antes de tiempo y se verifica un
+ * código truncado — que es exactamente lo que pasó el 2026-09-02 en la primera
+ * prueba con SMTP propio. Un solo sitio para cambiarlo.
+ */
+const LONGITUD_CODIGO = 8;
+
 export function CodigoCorreo({
   correo,
   onVerificado,
@@ -23,7 +32,7 @@ export function CodigoCorreo({
   /** Con la sesión ya abierta. */
   onVerificado: () => void;
 }) {
-  const [digitos, setDigitos] = useState<string[]>(Array(6).fill(""));
+  const [digitos, setDigitos] = useState<string[]>(Array(LONGITUD_CODIGO).fill(""));
   const [error, setError] = useState("");
   const [ocupado, setOcupado] = useState(false);
   const [reenviado, setReenviado] = useState(false);
@@ -39,7 +48,7 @@ export function CodigoCorreo({
     });
     setOcupado(false);
     if (e || !data.session) {
-      setDigitos(Array(6).fill(""));
+      setDigitos(Array(LONGITUD_CODIGO).fill(""));
       casillas.current[0]?.focus();
       return setError(mensajeAuth(e?.code, "Ese código no es válido o ya venció. Pide uno nuevo."));
     }
@@ -52,11 +61,11 @@ export function CodigoCorreo({
       setDigitos((d) => d.map((x, k) => (k === i ? "" : x)));
       return;
     }
-    // Pegar «872611» en cualquier casilla reparte los seis.
+    // Pegar el código entero en cualquier casilla reparte todos sus dígitos.
     const siguientes = [...digitos];
-    for (let k = 0; k < limpio.length && i + k < 6; k++) siguientes[i + k] = limpio[k]!;
+    for (let k = 0; k < limpio.length && i + k < LONGITUD_CODIGO; k++) siguientes[i + k] = limpio[k]!;
     setDigitos(siguientes);
-    const ultimo = Math.min(i + limpio.length, 5);
+    const ultimo = Math.min(i + limpio.length, LONGITUD_CODIGO - 1);
     casillas.current[ultimo]?.focus();
     if (siguientes.every((d) => d !== "")) void verificar(siguientes.join(""));
   };
@@ -64,7 +73,7 @@ export function CodigoCorreo({
   const tecla = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace" && !digitos[i] && i > 0) casillas.current[i - 1]?.focus();
     if (e.key === "ArrowLeft" && i > 0) casillas.current[i - 1]?.focus();
-    if (e.key === "ArrowRight" && i < 5) casillas.current[i + 1]?.focus();
+    if (e.key === "ArrowRight" && i < LONGITUD_CODIGO - 1) casillas.current[i + 1]?.focus();
   };
 
   const reenviar = async () => {
@@ -77,10 +86,12 @@ export function CodigoCorreo({
   return (
     <div className="mt-[22px] w-full text-left">
       <p className="text-[13.5px] leading-[1.55]" style={{ color: "#33475e" }}>
-        Te enviamos un <b className="text-marino">código de 6 dígitos</b> a{" "}
+        Te enviamos un <b className="text-marino">código de {LONGITUD_CODIGO} dígitos</b> a{" "}
         <b className="text-marino">{correo}</b>. Escríbelo aquí para confirmar tu cuenta.
       </p>
-      <div className="mt-3.5 flex justify-between gap-2" role="group" aria-label="Código de confirmación">
+      {/* `flex-1` con `min-w-0`: con 8 casillas, un ancho fijo se sale de la
+          card en un teléfono de 390px (§4.7.20). */}
+      <div className="mt-3.5 flex gap-1.5" role="group" aria-label="Código de confirmación">
         {digitos.map((d, i) => (
           <input
             key={i}
@@ -89,14 +100,14 @@ export function CodigoCorreo({
             }}
             inputMode="numeric"
             autoComplete={i === 0 ? "one-time-code" : "off"}
-            maxLength={6}
+            maxLength={LONGITUD_CODIGO}
             value={d}
             disabled={ocupado}
             aria-label={`Dígito ${i + 1}`}
             onChange={(e) => escribir(i, e.target.value)}
             onKeyDown={(e) => tecla(i, e)}
             onFocus={(e) => e.target.select()}
-            className="input-dia h-[52px] w-full rounded-[10px] border text-center font-mono text-[22px] font-semibold text-marino outline-none disabled:opacity-60"
+            className="input-dia h-[52px] w-full min-w-0 flex-1 rounded-[10px] border px-0 text-center font-mono text-[19px] font-semibold text-marino outline-none disabled:opacity-60"
           />
         ))}
       </div>
