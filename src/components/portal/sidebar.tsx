@@ -220,7 +220,10 @@ function MenuUsuario({ expandido }: { expandido: boolean }) {
     setAbierto(false);
     setSaliendo(true);
     await supabaseNavegador().auth.signOut();
-    router.replace("/para-abogados");
+    // Al login, no a la landing (decisión Wesley 2026-09-02): quien cierra
+    // sesión suele hacerlo para entrar con otra cuenta o volver luego, y el
+    // login es la puerta más corta. `?tipo=` solo personaliza el copy.
+    router.replace("/iniciar-sesion");
     router.refresh();
   };
 

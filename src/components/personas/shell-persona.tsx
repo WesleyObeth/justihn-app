@@ -182,7 +182,8 @@ function MenuUsuarioPersona({ expandido }: { expandido: boolean }) {
     setAbierto(false);
     setSaliendo(true);
     await supabaseNavegador().auth.signOut();
-    router.replace("/");
+    // Al login (decisión Wesley 2026-09-02), con el copy de la vía ciudadana.
+    router.replace("/iniciar-sesion?tipo=persona");
     router.refresh();
   };
 

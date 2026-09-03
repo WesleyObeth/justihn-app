@@ -704,7 +704,9 @@ de identidad no viaje dentro del JWT en cada petición.
 
 **Los dos portales cierran sesión de verdad** (2026-09-02): el botón ya existía
 en el menú del avatar y solo enseñaba un aviso de demostración. Ahora hace
-`signOut`, `router.replace` a la landing de su vía y `router.refresh()`. Los
+`signOut`, `router.replace` **al login** (`/iniciar-sesion`, con `?tipo=persona`
+desde el portal ciudadano; decisión Wesley 2026-09-02, antes iba a la landing)
+y `router.refresh()`. Los
 tres pasos hacen falta: el primero borra las cookies que lee el proxy, el
 segundo saca el portal del historial y el tercero invalida el caché de rutas
 de Next, sin el cual se puede volver a pintar una pantalla ya renderizada con
