@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogoJustihn } from "@/components/brand/logos";
@@ -34,7 +35,11 @@ export function RestablecerContrasena() {
         className="auth-fadeup-card card-dia w-full max-w-[420px] rounded-[20px] border bg-white px-9 pt-[38px] pb-[30px] text-marino max-sm:px-6"
         style={{ borderColor: "var(--line)", boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
-        <LogoJustihn size={36} variante="claro" textoPx={22} />
+        {/* Se llega desde un enlace del correo, sin saber de qué vía viene:
+            la home es la única salida que no supone nada. */}
+        <Link href="/" aria-label="Volver al inicio de Justihn">
+          <LogoJustihn size={36} variante="claro" textoPx={22} />
+        </Link>
         <h1 className="font-display mt-6 text-[24px] font-bold tracking-[-.3px]">
           {listo ? "Contraseña guardada" : "Crea una contraseña nueva"}
         </h1>

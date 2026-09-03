@@ -105,7 +105,12 @@ export function PantallaIniciarSesion({
         className="auth-fadeup-card card-dia w-full max-w-[420px] rounded-[20px] border bg-white px-9 pt-[38px] pb-[30px] text-marino max-sm:px-6"
         style={{ borderColor: "var(--line)", boxShadow: "0 24px 64px rgba(13,33,68,.16)" }}
       >
-        <LogoJustihn size={36} variante="claro" textoPx={22} />
+        <Link
+          href={esPersona ? "/" : "/para-abogados"}
+          aria-label="Volver al inicio de Justihn"
+        >
+          <LogoJustihn size={36} variante="claro" textoPx={22} />
+        </Link>
 
         {vista === "login" && (
           <div className="auth-fadeup">

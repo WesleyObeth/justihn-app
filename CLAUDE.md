@@ -626,6 +626,24 @@ UI dibujaba 6, así que la casilla se llenaba antes de tiempo y se verificaba un
 código truncado. Hoy los dos están en 6. Las plantillas de correo con la marca
 viven en `supabase/correos/`.
 
+**El paso 2 del onboarding pide el número de identidad** (pedido de Wesley
+2026-09-02), junto a la colegiación: son los dos números con los que el equipo
+contrasta el carné contra el padrón del CAH, y el de colegiación solo se puede
+teclear mal. `lib/identidad.ts` pone la máscara y valida los tramos del DNI
+hondureño —departamento 01-18, municipio distinto de 00, año de nacimiento
+plausible— con 8 tests. Es **opcional**, como todo el paso: exigirlo
+contradiría el «Puedes hacerlo después» de la propia pantalla. Se guarda sin
+guiones, con índice único, y **no entra en la vista `directorio`**: es dato
+personal (`supabase/esquema/03-identidad.sql`, que además lo borra de
+`raw_user_meta_data` tras copiarlo, para que no viaje en el JWT).
+⚠️ **El paso 2 no pintaba ningún error** —solo lo hacían el 1 y el 3—, así que
+al validar la identidad el botón bloqueaba en silencio. Al añadir una
+validación a un paso, comprobar que ese paso tiene dónde enseñarla.
+
+**El logo de las pantallas de auth vuelve a su landing** (pedido de Wesley
+2026-09-02): el onboarding a `/para-abogados`, el alta ciudadana y el
+restablecer a `/`, y el login a la que corresponda a su vía.
+
 ⚠️ **El splash bloquea el scroll del documento mientras dura** (`splash.tsx`):
 es `fixed` y se recorta solo, pero la página de auth de debajo mide más que la
 ventana y se podía arrastrar la escena para ver la card asomando. Restaura el
@@ -891,7 +909,7 @@ oscuro, no después.
 ```bash
 pnpm dev          # http://localhost:3000
 pnpm type-check   # tsc --noEmit
-pnpm test         # Vitest (214 tests de invariantes)
+pnpm test         # Vitest (222 tests de invariantes)
 pnpm build        # gate antes de cualquier entrega
 ```
 

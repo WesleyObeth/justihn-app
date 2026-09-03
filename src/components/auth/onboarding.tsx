@@ -29,6 +29,7 @@ import { SplashJustihn } from "@/components/auth/splash";
 import { usePortal } from "@/store/portal";
 import { mensajeAuth, supabaseNavegador } from "@/lib/supabase/cliente";
 import { CodigoCorreo } from "@/components/auth/codigo-correo";
+import { formatearIdentidad, soloDigitos, validarIdentidad } from "@/lib/identidad";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -104,6 +105,7 @@ export function PantallaOnboarding() {
   const [depto, setDepto] = useState("");
   const [ciudad, setCiudad] = useState("");
   const [colegiacion, setColegiacion] = useState("");
+  const [identidad, setIdentidad] = useState("");
   const [archivo, setArchivo] = useState<string | null>(null);
   const [archivoFile, setArchivoFile] = useState<File | null>(null);
   const [sel, setSel] = useState<string[]>([]);
@@ -139,6 +141,8 @@ export function PantallaOnboarding() {
           nombre: nombre.trim(),
           tipo: "abogado",
           colegiacion_numero: colegiacion.trim(),
+          // Sin guiones: así se guarda, y así la unicidad no depende del formato.
+          identidad: soloDigitos(identidad),
           ciudad: [ciudad.trim(), depto].filter(Boolean).join(", "),
           telefono: telefono.trim(),
           materias: sel,
@@ -174,7 +178,13 @@ export function PantallaOnboarding() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-5 py-10">
       <div className="relative mb-[26px] flex flex-col items-center gap-4">
-        <LogoJustihn size={34} variante="claro" textoPx={24} />
+        {/* El logo vuelve a la landing de la que salió esta pantalla (pedido
+            de Wesley 2026-09-02): quien se arrepiente a medias no debería
+            tener que usar el botón del navegador. Lleva `aria-label` porque
+            el logo es la única pista de a dónde va. */}
+        <Link href="/para-abogados" aria-label="Volver a Justihn para abogados">
+          <LogoJustihn size={34} variante="claro" textoPx={24} />
+        </Link>
         {consultaPendiente && step < 4 && (
           <div
             className="max-w-[480px] rounded-[12px] border px-4 py-2.5 text-center"
@@ -371,14 +381,30 @@ export function PantallaOnboarding() {
                 valor={ciudad}
                 onCambio={limpiar(setCiudad)}
               />
-              <CampoDia
-                etiqueta="Nº de colegiación CAH"
-                tipo="text"
-                nombre="colegiacion"
-                placeholder="Ej. 12345"
-                valor={colegiacion}
-                onCambio={limpiar(setColegiacion)}
-              />
+              {/* Identidad y colegiación juntas: son los dos números con los
+                  que el equipo contrasta el carné contra el padrón del CAH,
+                  y ninguno de los dos llena una línea entera. */}
+              <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
+                <CampoDia
+                  etiqueta="Nº de identidad"
+                  tipo="text"
+                  nombre="identidad"
+                  placeholder="0801-1990-12345"
+                  valor={identidad}
+                  onCambio={(v) => {
+                    setIdentidad(formatearIdentidad(v));
+                    setError("");
+                  }}
+                />
+                <CampoDia
+                  etiqueta="Nº de colegiación CAH"
+                  tipo="text"
+                  nombre="colegiacion"
+                  placeholder="Ej. 12345"
+                  valor={colegiacion}
+                  onCambio={limpiar(setColegiacion)}
+                />
+              </div>
               <div className="flex flex-col gap-1.5">
                 <span className="text-[12.5px] font-semibold" style={{ color: "#33475e" }}>
                   Constancia de solvencia CAH{" "}
@@ -504,12 +530,17 @@ export function PantallaOnboarding() {
                   normalidad.
                 </span>
               </div>
+              {/* El paso 2 no pintaba ningún error (solo lo hacían el 1 y el
+                  3), así que al validar la identidad el botón se quedaba
+                  mudo: bloqueaba sin decir por qué. */}
+              {error && <ErrorDia mensaje={error} />}
               <div className="mt-1 flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => {
                     setArchivo(null);
                     setColegiacion("");
+                    setIdentidad("");
                     setError("");
                     setStep(3);
                   }}
@@ -521,6 +552,11 @@ export function PantallaOnboarding() {
                 <button
                   type="button"
                   onClick={() => {
+                    // El paso entero es opcional ("Lo haré después"), así que
+                    // la identidad solo se valida si la escribió: exigirla
+                    // aquí contradiría la promesa de la propia pantalla.
+                    const problema = identidad ? validarIdentidad(identidad) : null;
+                    if (problema) return setError(problema);
                     setError("");
                     setStep(3);
                   }}
