@@ -1201,16 +1201,6 @@ página, y la home sirviendo **11.462 caracteres de texto sin JS**.
      error y se revirtieron el mismo día):
      https://claude.ai/code/artifact/a7a10a59-7fc4-4d8e-9d07-0bde0cac98b5.
      Al elegir, se construye esa estructura sobre lo ya conectado (§1.8).
-   - ⏳ **Reestructurar Legislación** (pedido de Wesley 2026-09-03). Los tres
-     prototipos —Buscador · Lector · Temas— viven en un Artifact con el shell
-     del portal y datos reales, NO en el portal (se construyeron ahí por
-     error y se revirtieron el mismo día):
-     https://claude.ai/code/artifact/a7a10a59-7fc4-4d8e-9d07-0bde0cac98b5.
-     Al elegir, se construye esa estructura sobre lo ya conectado (§1.8).
-   - ⏳ **Elegir la estructura de Legislación** entre las tres vistas que
-     conviven en el portal (`?vista=`, §1.8) y borrar las otras dos junto con
-     el conmutador. Recomendación: Temas como principal con la caja del
-     Buscador arriba; el Lector como «leer en orden» dentro de cada código.
 2. [x] ✅ **JURISPRUDENCIA CONECTADA AL CORPUS REAL (2026-09-02)** — §1.7.
    Las dos búsquedas (palabras + significado), filtros reales, paginación con
    conteo exacto, ficha por `record_id` con la ficha del CEDIJ parseada, y
