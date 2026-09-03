@@ -26,8 +26,6 @@ import type { FuenteCita, Proceso } from "@/types/dominio";
  *
  * TODO(data): tablas `procesos` + `pasos_proceso` + `citas_paso`.
  */
-const LJC = "https://www.tsc.gob.hn/web/leyes/Ley%20Sobre%20Justicia%20Constitucional%20(07).pdf";
-const COMERCIO = "https://honduras.eregulations.org/media/codigo%20del%20comercio.pdf";
 const EREG_SOCIEDAD = "https://honduras.eregulations.org/procedure/4/5?l=es";
 
 const art = (codigoId: string, nombre: string) => (numero: string): FuenteCita => ({
@@ -37,14 +35,13 @@ const art = (codigoId: string, nombre: string) => (numero: string): FuenteCita =
 const trabajo = art("codigo-trabajo", "Código del Trabajo");
 const familia = art("codigo-familia", "Código de Familia");
 const cpc = art("codigo-procesal-civil", "Código Procesal Civil");
-const ljc = (numero: number, pagina: number): FuenteCita => ({
-  etiqueta: `Ley sobre Justicia Constitucional, art. ${numero}`,
-  url: `${LJC}#page=${pagina}`,
-});
-const comercio = (numero: number, pagina: number): FuenteCita => ({
-  etiqueta: `Código de Comercio, art. ${numero}`,
-  url: `${COMERCIO}#page=${pagina}`,
-});
+// Desde el 2026-09-03 (tarde) la Ley y el Código de Comercio también están
+// en la tabla `articulos`: la cita abre el artículo en el portal, que enlaza
+// el PDF en su página. La página ya no se escribe a mano aquí.
+const ljc = (numero: number, _pagina: number): FuenteCita =>
+  art("ley-justicia-constitucional", "Ley sobre Justicia Constitucional")(String(numero));
+const comercio = (numero: number, _pagina: number): FuenteCita =>
+  art("codigo-comercio", "Código de Comercio")(String(numero));
 const ereg: FuenteCita = {
   etiqueta: "e-Regulations Honduras — constitución de sociedad (33 pasos)",
   url: EREG_SOCIEDAD,

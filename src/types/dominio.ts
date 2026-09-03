@@ -135,6 +135,12 @@ export interface Codigo {
   destacados: ArticuloDestacado[];
   /** Por qué no está, cuando no está: el hueco se explica (§4.5). */
   motivoPendiente?: string;
+  /**
+   * Lo que el lector debe saber de ESTA edición antes de citarla (p. ej. que
+   * el PDF disponible no incorpora reformas recientes). Se enseña en la
+   * cabecera del código y en cada artículo.
+   */
+  advertencia?: string;
 }
 
 /**

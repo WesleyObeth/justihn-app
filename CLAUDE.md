@@ -67,10 +67,10 @@ Perfil · Planes · Configuración · Ayuda.
   dos modos, filtros de materia/proceso/año, paginación con conteo exacto y
   ficha por `record_id`. **Legislación** y **Monitoreo de nombres** existen
   para que la tabla de planes quede 100% respaldada por UI (estaban vendidas y
-  no existían). **Legislación lee los 2.162 artículos reales** de `codigos` +
-  `articulos` desde el 2026-09-03 (§1.8); Civil, Penal y Justicia
-  Constitucional aparecen «en preparación» diciendo POR QUÉ — sin fuente no
-  hay texto. Monitoreo pregunta al corpus por `/api/corpus/apariciones`
+  no existían). **Legislación lee los 3.989 artículos reales** de `codigos` +
+  `articulos` desde el 2026-09-03 (§1.8; cinco códigos desde esa tarde,
+  §1.9); Civil y Penal aparecen «en preparación» diciendo POR QUÉ — sin
+  fuente no hay texto. Monitoreo pregunta al corpus por `/api/corpus/apariciones`
   (vigilados en el store, `nombresVigilados`, persistido con alta y baja), con
   disclaimer de homónimos y exclusión de materias reservadas; mientras la
   migración 03 no esté pasada, responde sobre el piloto **y lo dice** (§1.7).
@@ -768,10 +768,29 @@ las leyes que no están en la tabla abren el PDF oficial **en su página**.
 - **Procesos entra en el plan Profesional** («Procesos paso a paso, cada
   paso con su artículo»): cierra el pendiente §6.6. Es contenido, y el modelo
   es «todo el corpus para todos los de pago, escalera por cuota de IA».
+- ✅ **La Ley y el Código de Comercio son los códigos 4 y 5 de Legislación
+  (misma tarde).** Motivo medido: Jus IA recuperaba bien despido y divorcio,
+  pero para el amparo traía artículos del CPC y del Trabajo (0,58–0,62) y
+  para la escritura de una sociedad artículos ajenos (0,50–0,55) — por
+  encima del umbral, es decir, citas que no venían al caso. La pantalla y el
+  asistente sabían cosas distintas. Ahora las citas de Procesos abren el
+  artículo en el portal (`ljc()`/`comercio()` ya no llevan página a mano).
+  - **Pipeline** (`automatizaciones/legislacion/`, README §«Los dos estilos
+    nuevos»): cada código puede declarar su `patron` de encabezado (la Ley:
+    «ARTÍCULO 48.-» y «ARTÍCULO 5.» sin guion, a mitad de línea; Comercio:
+    «Articulo º 14» y siete con el signo de grado «°»). El PDF de Comercio
+    imprime dos veces el 418 y el 1662 (erratas del origen): se renumera el
+    primero SOLO en códigos con patrón propio, y se reporta. Un `\f` a mitad
+    de línea ahora cuenta la página desde el encabezado. Los tres del CEDIJ
+    salen idénticos salvo 157 textos que pierden un guion suelto tras el
+    número («Artículo 49. - PREJUDICIALIDAD» → «Artículo 49. PREJUDICIALIDAD»).
+  - **Resultado**: Ley 124/124 · Comercio 1.703 (faltan en el ORIGEN el 1000
+    y 1236-1245: `ARTICULOS_SIN_TEXTO`). `Codigo.advertencia` avisa en la
+    cabecera y en cada artículo que la edición de Comercio no incorpora
+    reformas recientes; `legislacion.test.ts` fija los cinco ids y exige esa
+    advertencia.
 - ⚙️ Pendiente del socio: validar documentos y notas de práctica (son
-  conocimiento del gremio, no texto de ley) y decidir si el Código de
-  Comercio y la Ley sobre Justicia Constitucional se cargan como códigos de
-  Legislación (ya hay PDF con texto para los dos).
+  conocimiento del gremio, no texto de ley).
 
 **Confirmación del correo por CÓDIGO, no por enlace** (decisión Wesley
 2026-09-02, patrón Jusbrasil): el enlace saca a la persona del alta y la deja

@@ -381,6 +381,12 @@ function CodigoCargado({
         </div>
       </Card>
 
+      {codigo.advertencia && (
+        <p className="mx-0.5 rounded-r-[10px] border-l-[3px] border-dorado bg-aviso px-4 py-2.5 text-[12.5px] leading-[1.5] text-aviso-cuerpo">
+          <b>Sobre esta edición.</b> {codigo.advertencia}
+        </p>
+      )}
+
       {!hayBusqueda && !enSemantica && codigo.destacados.length > 0 && (
         <div className="mx-0.5">
           <Rotulo>Artículos que el portal ya aplica</Rotulo>

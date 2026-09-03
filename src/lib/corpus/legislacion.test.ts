@@ -112,12 +112,18 @@ describe("el catálogo de códigos como contrato de la tabla `codigos`", () => {
    * (`automatizaciones/legislacion/articulos.mjs`). El seed viejo decía «cpc»
    * y la pantalla habría preguntado por un código inexistente.
    */
-  it("los cargados son exactamente los tres códigos ingeridos", () => {
+  it("los cargados son exactamente los cinco códigos ingeridos", () => {
     expect(CODIGOS_CARGADOS.map((c) => c.id).sort()).toEqual([
+      "codigo-comercio",
       "codigo-familia",
       "codigo-procesal-civil",
       "codigo-trabajo",
+      "ley-justicia-constitucional",
     ]);
+  });
+
+  it("una edición con reformas sin incorporar lo advierte (Código de Comercio)", () => {
+    expect(getCodigo("codigo-comercio")?.advertencia).toMatch(/reformas/i);
   });
 
   it("todo código cargado tiene su PDF oficial en la whitelist §3.3", () => {

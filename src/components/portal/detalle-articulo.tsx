@@ -123,6 +123,11 @@ export function DetalleArticulo({
             <Icono nombre="libro" size={13} />
             PDF oficial{a.pagina ? `, pág. ${a.pagina}` : ""}
           </a>
+          {codigo.advertencia && (
+            <p className="mt-3 rounded-r-[8px] border-l-[3px] border-dorado bg-aviso px-3 py-2 text-[12px] leading-[1.5] text-aviso-cuerpo">
+              <b>Sobre esta edición.</b> {codigo.advertencia}
+            </p>
+          )}
           <p className="mt-3 text-[11.5px] leading-[1.5] text-texto-4">
             Las notas al pie del PDF (reformas, decretos) pueden aparecer pegadas al texto: así
             vienen en la capa de texto del documento oficial.

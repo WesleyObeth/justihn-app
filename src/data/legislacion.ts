@@ -148,6 +148,86 @@ export const CODIGOS: Codigo[] = [
     ],
   },
   {
+    id: "ley-justicia-constitucional",
+    nombre: "Ley sobre Justicia Constitucional",
+    decreto: "Decreto 244-2003",
+    materia: "Constitucional",
+    estado: "cargado",
+    fuenteUrl: "https://www.tsc.gob.hn/web/leyes/Ley%20Sobre%20Justicia%20Constitucional%20(07).pdf",
+    descripcion:
+      "Amparo, habeas corpus, habeas data e inconstitucionalidad — plazos, admisibilidad, medidas cautelares y sentencia. PDF con texto del Tribunal Superior de Cuentas.",
+    destacados: [
+      {
+        numero: "42",
+        titulo: "Procedencia del amparo",
+        nota: "Contra resoluciones, actos y hechos de los Poderes del Estado, incluidas las entidades descentralizadas.",
+        herramienta: { etiqueta: "Ver el proceso de amparo", href: "/abogados/procesos?proceso=recurso-amparo" },
+      },
+      {
+        numero: "46",
+        titulo: "Inadmisibilidad del amparo",
+        nota: "Mera legalidad, actos consentidos, recursos pendientes en la vía contencioso-administrativa.",
+      },
+      {
+        numero: "48",
+        titulo: "Plazo para promover la acción",
+        nota: "2 meses desde la última notificación o desde que se conoció el acto.",
+        herramienta: { etiqueta: "Ver el proceso de amparo", href: "/abogados/procesos?proceso=recurso-amparo" },
+      },
+      {
+        numero: "49",
+        titulo: "Requisitos del escrito de interposición",
+      },
+      {
+        numero: "59",
+        titulo: "Cuándo proceden las medidas cautelares",
+        nota: "Peligro para la integridad del reclamante, o ejecución que haría inútil el amparo.",
+      },
+      {
+        numero: "63",
+        titulo: "Requisitos de la sentencia",
+      },
+    ],
+  },
+  {
+    id: "codigo-comercio",
+    nombre: "Código de Comercio",
+    decreto: "Decreto 73-50",
+    materia: "Mercantil",
+    estado: "cargado",
+    fuenteUrl: "https://honduras.eregulations.org/media/codigo%20del%20comercio.pdf",
+    descripcion:
+      "Comerciantes, sociedades, títulos valores, contratos mercantiles y Registro de Comercio. PDF con texto publicado por e-Regulations Honduras.",
+    advertencia:
+      "Edición publicada por e-Regulations sin las reformas recientes: los mínimos de socios y de capital, entre otros, han cambiado. Úsalo para la estructura y contrasta con La Gaceta antes de citar cifras.",
+    destacados: [
+      {
+        numero: "14",
+        titulo: "Contenido de la escritura constitutiva",
+        herramienta: { etiqueta: "Ver el proceso de constitución", href: "/abogados/procesos?proceso=constitucion-sociedad-mercantil" },
+      },
+      {
+        numero: "18",
+        titulo: "Plazo para inscribir la escritura",
+        nota: "15 días desde el otorgamiento; pasado, cualquier socio puede gestionarla.",
+      },
+      {
+        numero: "93",
+        titulo: "Fundación de la sociedad anónima",
+        nota: "Simultánea, ante notario, o por suscripción pública.",
+      },
+      {
+        numero: "95",
+        titulo: "Aportaciones en dinero",
+        nota: "Certificado de depósito o cheque certificado; el notario da fe.",
+      },
+      {
+        numero: "384",
+        titulo: "Registro obligatorio en la Cámara de Comercio",
+      },
+    ],
+  },
+  {
     id: "codigo-civil",
     nombre: "Código Civil",
     decreto: "1906 (con reformas)",
@@ -168,16 +248,6 @@ export const CODIGOS: Codigo[] = [
     destacados: [],
     motivoPendiente:
       "El CEDIJ solo publica el Código Penal de 1983, derogado desde 2020. Cargarlo como vigente sería citar una ley que ya no rige; el nuevo entra cuando haya PDF oficial con texto.",
-  },
-  {
-    id: "ley-justicia-constitucional",
-    nombre: "Ley sobre Justicia Constitucional",
-    decreto: "Decreto 244-2003",
-    materia: "Constitucional",
-    estado: "preparacion",
-    descripcion: "Amparo, habeas corpus, habeas data e inconstitucionalidad.",
-    destacados: [],
-    motivoPendiente: "Todavía sin PDF oficial con capa de texto localizado en una fuente del Estado.",
   },
 ];
 
@@ -202,4 +272,9 @@ export const CODIGOS_CARGADOS = CODIGOS.filter((c) => c.estado === "cargado");
 export const ARTICULOS_SIN_TEXTO: Record<string, string[]> = {
   "codigo-trabajo": ["527", "529"],
   "codigo-procesal-civil": ["40", "420"],
+  // El PDF de e-Regulations salta del 999 al 1001 y del 1235 al 1246 (falta
+  // una página en el origen). Verificado 2026-09-03.
+  "codigo-comercio": ["1000", "1236", "1237", "1238", "1239", "1240", "1241", "1242", "1243", "1244", "1245"],
 };
+
+/** Hoy: los tres del CEDIJ (2026-09-01) + la Ley y el Código de Comercio (2026-09-03). */
