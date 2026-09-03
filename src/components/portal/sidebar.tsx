@@ -21,6 +21,14 @@ interface ItemNav {
 
 type EntradaNav = ItemNav | { seccion: string };
 
+/**
+ * Densidad del sidebar (2026-09-02): con la sección Despacho la lista pasó a
+ * 12 entradas y 3 rótulos, y a 720px de alto útil —un MacBook con la barra
+ * del navegador— sobraban 56px y aparecía scroll. Los ítems van a `py-[7px]`
+ * y los rótulos a `pt-2.5 pb-0.5`; medido, la lista baja de 598 a ~520px y
+ * cabe con margen. Si vuelve a crecer, antes de añadir una entrada hay que
+ * medir a 720, no a 900.
+ */
 const NAV: EntradaNav[] = [
   { href: "/abogados", label: "Jus IA", jusIa: true },
   { href: "/abogados/dashboard", label: "Dashboard", icono: "dash" },
@@ -106,13 +114,13 @@ export function Sidebar({ variante = "escritorio" }: { variante?: "escritorio" |
 
       {expandido && <BuscadorGlobal />}
 
-      <div className="flex flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto px-2.5 py-1.5">
+      <div className="flex flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto px-2.5 py-1">
         {NAV.map((entrada) => {
           if ("seccion" in entrada) {
             return expandido ? (
               <div
                 key={entrada.seccion}
-                className="px-3 pt-3.5 pb-1 text-[10px] font-semibold tracking-[1.6px] whitespace-nowrap text-[#5f7ba0] uppercase"
+                className="px-3 pt-2.5 pb-0.5 text-[10px] font-semibold tracking-[1.6px] whitespace-nowrap text-[#5f7ba0] uppercase"
               >
                 {entrada.seccion}
               </div>
@@ -157,7 +165,7 @@ function ItemNavegacion({
       title={item.label}
       aria-current={activo ? "page" : undefined}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-[9px] transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-[7px] transition-colors",
         activo ? "bg-celeste text-white" : "text-nav hover:bg-white/[0.08]",
       )}
     >
